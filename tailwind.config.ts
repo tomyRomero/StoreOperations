@@ -202,7 +202,7 @@ module.exports = {
         "groups-sidebar": "-30px 0px 60px 0px rgba(28, 28, 31, 0.50)",
       },
       screens: {
-        xs: "400px",
+        xs: "410px",
       },
       keyframes: {
         "accordion-down": {

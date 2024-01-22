@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 
-export default function Component() {
+export default function Nav() {
   return (
-    <header className="fixed flex z-10 bg-white h-20 w-full items-center p-8 md:py-14 md:px-24 lg:py-14 lg:px-36">
+    <header className="fixed flex z-10 bg-white h-20 w-full items-center p-8 max-xs:px-0 md:py-14 md:px-24 lg:py-14 lg:px-36">
       <Link className="mr-6 flex" href="#">
         <h1 className="px-1 text-heading2-bold max-md:text-heading3-bold justify-center">PaletteHub.</h1>
       </Link>
-      <div className="ml-auto flex items-center gap-2 wrap">
-        <Button className="flex px-2" variant="ghost">
+      <div className="ml-auto flex items-center gap-2 max-xs:gap-1 wrap">
+        <Button className="flex px-2 max-xs:px-0.5" variant="ghost">
           <Image
             src="/assets/price.png"
             alt="price icon"
