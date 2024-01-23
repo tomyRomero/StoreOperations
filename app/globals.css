@@ -8,5 +8,5 @@
 
   /* main */
   .main-container {
-    @apply flex min-h-screen flex-1 flex-col items-center bg-white pt-44 md:pt-80;
+    @apply flex min-h-screen flex-col items-center;
   }

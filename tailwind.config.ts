@@ -16,6 +16,13 @@ module.exports = {
       },
     },
     fontSize: {
+      "heading0-bold": [
+      "56px",
+      {
+        lineHeight: "140%",
+        fontWeight: "800",
+      },
+    ],
       "heading1-bold": [
         "36px",
         {
@@ -202,7 +209,8 @@ module.exports = {
         "groups-sidebar": "-30px 0px 60px 0px rgba(28, 28, 31, 0.50)",
       },
       screens: {
-        xs: "410px",
+        xs: "360px",
+        xxs: "285px",
       },
       keyframes: {
         "accordion-down": {
