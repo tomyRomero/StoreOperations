@@ -1,10 +1,12 @@
+
 import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 
 import "../globals.css";
+import { getServerSession } from "next-auth";
+import { SessionProvider } from "next-auth/react";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,24 +15,26 @@ export const metadata: Metadata = {
   description: "Auth for PaletteHub App",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const session = await getServerSession();
+
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-      }}
-    >
+
       <html lang='en'>
         <body className={`${inter.className} bg-white`}>
         <div className="mx-auto w-full">
-        {children}
+          {/* <SessionProvider session={session}>  */}
+            {children}
+          {/* </SessionProvider>  */}
         </div>
+        <Toaster />
         </body>
       </html>
-    </ClerkProvider>
+
   );
 }

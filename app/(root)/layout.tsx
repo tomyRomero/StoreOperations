@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Jost } from "next/font/google";
 import "../globals.css";
 import Nav from "@/components/shared/Nav";
-import { ClerkProvider, currentUser } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
-
+import { getServerSession } from "next-auth/next";
+import SessionProvider from "../../components/SessionProvider"
 
 const jost = Jost({
   subsets: ['latin'],
@@ -24,30 +23,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  let user;
-
-  try{
-  user = await currentUser()
-  }catch(error){
-    console.log(error)
-     user = {};
-  }
+  const session = await getServerSession();
 
   return (
-    <ClerkProvider
-    appearance={{
-      baseTheme: dark,
-    }}
-  >
+
     <html lang="en">
+    <SessionProvider session={session}>
     <body className={`${jost.className} flex flex-col min-h-screen`}>
-      <Nav userid= {user?.id? user.id : null}/>
+      <Nav/>
       <main className="flex flex-col items-center">
         <section className="main-container w-full">{children}</section>
       </main>
     </body>
+    </SessionProvider>
   </html>
-  </ClerkProvider>
+
   );
 }
 
