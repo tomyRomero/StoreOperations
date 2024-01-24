@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+}
+
+  /* main */
+  .main-container {
+    @apply flex min-h-screen flex-col items-center;
+  }
