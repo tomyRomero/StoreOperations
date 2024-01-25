@@ -52,7 +52,7 @@ module.exports = {
         },
       ],
       "heading3-bold": [
-        "24px",
+        "28px",
         {
           lineHeight: "140%",
           fontWeight: "700",

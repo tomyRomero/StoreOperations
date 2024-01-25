@@ -8,7 +8,7 @@ interface GithubSignInButtonProps {
   children: ReactNode;
 }
 
-const GoogleSignInButton: FC<GithubSignInButtonProps> = ({ children }) => {
+const GithubSignInButton: FC<GithubSignInButtonProps> = ({ children }) => {
   const router = useRouter()
 
   const  loginWithGoogle = async () => {
@@ -43,4 +43,4 @@ const GoogleSignInButton: FC<GithubSignInButtonProps> = ({ children }) => {
   );
 };
 
-export default GoogleSignInButton;
+export default GithubSignInButton;
