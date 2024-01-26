@@ -4,6 +4,7 @@ import "../globals.css";
 import Nav from "@/components/shared/Nav";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
+import Footer from "@/components/shared/Footer";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ export default async function RootLayout({
       <main className="flex flex-col items-center">
         <section className="main-container w-full">{children}</section>
       </main>
+      <Footer />
     </body>
     </SessionProvider>
   </html>

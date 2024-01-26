@@ -1,101 +1,95 @@
+import Link from "next/link"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import { link } from "fs"
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+export default function Footer() {
 
-
-const Footer = () => {
-  const navItems = [
+  const navLinks = [
     {
-        icon: "/assets/instagram.png",
-        label: "instagram icon",
-        link: "https://www.instagram.com/"
+      title: "Home",
+      link: "/"
     },
     {
-        icon: "/assets/twitter.png",
-        label: "twitter icon",
-        link: "https://twitter.com/"
+      title: "Shop",
+      link: "/products"
     },
     {
-        icon: "/assets/facebook.png",
-        label: "facebook icon",
-        link: "https://www.facebook.com/"
+      title: "About Us",
+      link: ""
+    },
+    {
+      title: "Contact Us",
+      link: ""
     }
-  ];
+  ]
 
-  const inclusions = [
+  const socials = [
     {
-        title: "Free Shipping",
-        icon: "/assets/box.png",
-        description: "Free shipping for order above $150"
+      icon: "/assets/facebook.png",
+      title: "facebook icon",
+      link: "https://facebook.com"
     },
     {
-        title: "Money Guarantee",
-        icon: "/assets/dollar.png",
-        description: "Within 30 days for an exchange"
+      icon: "/assets/instagram.png",
+      title: "instagram icon",
+      link: "https://instagram.com"
     },
     {
-        title: "Online Support",
-        icon: "/assets/support.png",
-        description: "24 hours a day, 7 days a week"
-    },
-    {
-        title: "Flexible Payment",
-        icon: "/assets/card.png",
-        description: "Pay with multiple credit cards"
+      icon: "/assets/twitter.png",
+      title: "twitter icon",
+      link: "https://twitter.com"
     }
-
-  ];
+  ]
 
   return (
-    <footer className={`relative mt-14`}>
-        <ul className="grid justify-center gap-8 md:gap-0 md:grid-cols-4 my-10 md:my-0">
-          {inclusions.map((inclusion, index) => (
-            <li key={index} className="text-center">
-              <Image
-                src={inclusion.icon}
-                alt={inclusion.title}
-                width={36}
-                height={36}
-                className="mb-4"
-              />
-              <h5 className="text-lg font-semibold mb-2">{inclusion.title}</h5>
-              <p>{inclusion.description}</p>
-            </li>
-          ))}
-        </ul>
-
-      <div className=" py-8">
-     
-          <div className="flex justify-between items-center flex-wrap gap-2 md:gap-4">
-            <Link href="/">
-              <h1>PaletteHub.</h1>
-            </Link>
-            <p className="text-sm">@2024 PaletteHub All rights reserved</p>
-            <div className="flex gap-4">
-              {navItems.map((item, index) => {
-                return (
-                  <Link
-                    key={index}
-                    href={item.link}
-                    target="_blank"
-                    className="w-6 h-6"
-                  >
-                    <Image
-                      src={item.icon}
-                      alt={item.label}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
+    <footer className="mt-10 w-full bg-gray-800 text-white py-12">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Quick Links</h3>
+          <ul className="space-y-2 text-sm">
+            {navLinks.map((navLink, index) => (
+              <div key={index}>
+                <li>
+                  <Link className="text-gray-300 hover:text-white" href={`${navLink.link}`}>
+                    {navLink.title}
                   </Link>
-                );
-              })}
-            </div>
+                </li>
+              </div>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
+          <div className="flex space-x-4">
+            {socials.map((social, index)=> (
+              <div key={index}>
+               <Link href={`${social.link}`} target="#blank">
+               <Image
+               src={`${social.icon}`}
+               alt={`${social.title}`}
+               width={24}
+               height={24}
+               className="h-6 w-6 hover:scale-150 duration-100 ease-out"
+               />
+             </Link>
+             </div>
+            ))}
           </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Newsletter</h3>
+          <p className="text-sm text-gray-300 mb-4">Subscribe to our newsletter for latest updates</p>
+          <form className="flex space-x-2">
+            <Input className="flex-1 text-black" placeholder="Enter your email" type="email" />
+            <Button type="submit">Subscribe</Button>
+          </form>
+        </div>
       </div>
+      <div className="mt-8 text-center text-body-bold text-gray-300">© 2024 PaletteHub. All rights reserved.</div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+

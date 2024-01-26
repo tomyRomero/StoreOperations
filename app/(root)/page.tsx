@@ -16,7 +16,6 @@ export default async function Home() {
       <Hero />
       <Categories />
       <Promotion />
-      <Footer />
     </section>
   );
 }

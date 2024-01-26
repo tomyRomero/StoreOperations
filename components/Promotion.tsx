@@ -23,6 +23,30 @@ const deals= [{
     newprice: "$49.99"
     }]
 
+    const inclusions = [
+      {
+          title: "Free Shipping",
+          icon: "/assets/box.png",
+          description: "Free shipping for order above $150"
+      },
+      {
+          title: "Money Guarantee",
+          icon: "/assets/dollar.png",
+          description: "Within 30 days for an exchange"
+      },
+      {
+          title: "Online Support",
+          icon: "/assets/support.png",
+          description: "24 hours a day, 7 days a week"
+      },
+      {
+          title: "Flexible Payment",
+          icon: "/assets/card.png",
+          description: "Pay with multiple credit cards"
+      }
+  
+    ];
+
   const [time, setTime] = useState({
     days: 0,
     hours: 0,
@@ -102,6 +126,25 @@ const deals= [{
          </div>
         ))}
     </div>
+    <div className='mt-6'>
+    <ul className="grid grid-cols-2 justify-center gap-10 md:gap-0 lg:grid-cols-4 my-10 md:my-0">
+          {inclusions.map((inclusion, index) => (
+            <div className='md:p-4 lg:p-8'>
+            <li key={index} className="text-center">
+              <Image
+                src={inclusion.icon}
+                alt={inclusion.title}
+                width={46}
+                height={46}
+                className="mb-4 mx-auto"
+              />
+              <h5 className="text-heading3-bold mb-2">{inclusion.title}</h5>
+              <p className='text-body-semibold'>{inclusion.description}</p>
+            </li>
+            </div>
+          ))}
+        </ul>
+        </div>
   </section>
   );
 };
