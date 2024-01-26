@@ -9,8 +9,8 @@ type AppContextProps = {
   cart: number;
   setCart: React.Dispatch<React.SetStateAction<any>>;
 
-  products: any;
-  setProducts: React.Dispatch<React.SetStateAction<any>>;
+  globalProducts: any;
+  setGlobalProducts: React.Dispatch<React.SetStateAction<any>>;
   
 };
 
@@ -20,17 +20,14 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 // Create the AppProvider component that will wrap your application
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Initialize the state using the useState hook
-  //For when there is a new text message, activate all listening components
   const [cart, setCart] = useState(0);
-  const [products, setProducts] = useState([])
-
-
+  const [globalProducts, setGlobalProducts] = useState([])
 
 
   // Provide the context value to the children components, include additional states if there are any
   const contextValue: AppContextProps = {
     cart, setCart,
-    products, setProducts
+    globalProducts, setGlobalProducts
   };
 
  

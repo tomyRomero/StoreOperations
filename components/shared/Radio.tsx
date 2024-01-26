@@ -22,12 +22,12 @@ export const RadioButton: React.FC<RadioButtonProps> = ({
   };
 
   return (
-    <label className="flex items-center gap-10 whitespace-nowrap cursor-pointer">
+    <label className="flex items-center gap-2 whitespace-nowrap cursor-pointer">
       <input
         type="radio"
         checked={isSelected}
         onChange={handleRadioChange}
-        className="appearance-none w-6 h-6 rounded-full border-2 border-dark-500 outline-none cursor-pointer"
+        className=" w-6 h-6 rounded-full border-2 border-black outline-none cursor-pointer"
         name={groupName}
       />
       {label}

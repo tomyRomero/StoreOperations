@@ -37,8 +37,8 @@ const categoriesList = [
         </Link>
       </div>
       <div className="grid gap-8 md:grid-cols-3">
-        {categoriesList.map((category: Category) => (
-          <CategoryCard key={category.id} category={category} />
+        {categoriesList.map((category: Category, index) => (
+          <CategoryCard key={index} category={category} />
         ))}
       </div>
     </section>

@@ -5,6 +5,7 @@ import Nav from "@/components/shared/Nav";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
 import Footer from "@/components/shared/Footer";
+import { AppProvider } from "@/lib/AppContext";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -29,6 +30,7 @@ export default async function RootLayout({
   return (
 
     <html lang="en">
+    <AppProvider>
     <SessionProvider session={session}>
     <body className={`${jost.className} flex flex-col min-h-screen`}>
       <Nav/>
@@ -38,6 +40,7 @@ export default async function RootLayout({
       <Footer />
     </body>
     </SessionProvider>
+    </AppProvider>
   </html>
 
   );
