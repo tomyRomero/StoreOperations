@@ -51,7 +51,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm">
             {navLinks.map((navLink, index) => (
               <div key={index}>
-                <li>
+                <li key={index}>
                   <Link className="text-gray-300 hover:text-white" href={`${navLink.link}`}>
                     {navLink.title}
                   </Link>

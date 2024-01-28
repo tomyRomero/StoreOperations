@@ -17,7 +17,6 @@ import Link from 'next/link';
 import { signIn} from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
-import GithubSignInButton from '../shared/GithubSignInButton';
 
 const FormSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),

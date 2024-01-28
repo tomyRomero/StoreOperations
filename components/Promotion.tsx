@@ -24,22 +24,26 @@ const deals= [{
     }]
 
     const inclusions = [
-      {
+      {   
+          id: "ewfgrhty",
           title: "Free Shipping",
           icon: "/assets/box.png",
           description: "Free shipping for order above $150"
       },
       {
+          id: "egrhtrjy",
           title: "Money Guarantee",
           icon: "/assets/dollar.png",
           description: "Within 30 days for an exchange"
       },
       {
+          id: "uewfgirgho",
           title: "Online Support",
           icon: "/assets/support.png",
           description: "24 hours a day, 7 days a week"
       },
       {
+          id: "uergethgt9o",
           title: "Flexible Payment",
           icon: "/assets/card.png",
           description: "Pay with multiple credit cards"
@@ -92,9 +96,9 @@ const deals= [{
       </div>
       <ul className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <StatBox label="Days" value={time.days} />
-        <StatBox label="Hours" value={time.hours} />
+        <StatBox  label="Hours" value={time.hours} />
         <StatBox label="Minutes" value={time.minutes} />
-        <StatBox label="Seconds" value={time.seconds} />
+        <StatBox  label="Seconds" value={time.seconds} />
       </ul>
     </div>
     <div className="mx-auto mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,9 +132,9 @@ const deals= [{
     </div>
     <div className='mt-6'>
     <ul className="grid grid-cols-2 justify-center gap-10 md:gap-0 lg:grid-cols-4 my-10 md:my-0">
-          {inclusions.map((inclusion, index) => (
-            <div className='md:p-4 lg:p-8'>
-            <li key={index} className="text-center">
+          {inclusions.map((inclusion) => (
+            <div className='md:p-4 lg:p-8' key={inclusion.id}>
+            <li key={inclusion.id} className="text-center">
               <Image
                 src={inclusion.icon}
                 alt={inclusion.title}
@@ -149,7 +153,7 @@ const deals= [{
   );
 };
 
-const StatBox = ({ label, value }: { label: string; value: number }) => (
+const StatBox = ({ label, value}: { label: string; value: number }) => (
     <li className="border-2 border-black rounded-lg p-4 text-center">
       <h4 className="font-bold">{value}</h4>
       <p>{label}</p>

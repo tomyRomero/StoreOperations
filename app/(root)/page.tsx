@@ -8,12 +8,12 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  console.log(session)
-
   if(session?.user.admin)
   {
-    redirect("/admin")
+    redirect("/adminusers")
   }
+
+  console.log(session?.user)
 
   return (
     <section className="flex flex-col w-full items-center justify-center">
