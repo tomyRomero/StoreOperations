@@ -8,7 +8,7 @@ import Category from '@/lib/models/category.model';
 import { revalidatePath } from "next/cache";
 
 //Use Axios to make api request amongst api, server to server
-export const postImage = async (data: any) => {
+const postImage = async (data: any) => {
     try {
       const currentURL = process.env.AXIOS_URL;
   
@@ -23,7 +23,7 @@ export const postImage = async (data: any) => {
     }
   };
 
-  export const getImageData = async (key: string ): Promise<string | boolean> => {
+  const getImageData = async (key: string ): Promise<string | boolean> => {
     try {
       const encodedKey = encodeURIComponent(key);
       const currentURL = process.env.AXIOS_URL;
