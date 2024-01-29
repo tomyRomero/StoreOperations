@@ -8,6 +8,7 @@ import { TableRow, TableCell} from "@/components/ui/table"
 import { getRes } from '@/lib/s3'
 import { deleteCategoryById } from '@/lib/actions/user.actions'
 import { toast } from '../ui/use-toast'
+import { useRouter } from 'next/navigation'
 
 interface Props{
   id: string;
@@ -19,6 +20,7 @@ interface Props{
 
 const CategoryRow = ({id, image, date, title}: Props) => {
   const [img, setImg] = useState("/assets/spinner.svg")
+  const router = useRouter();
   
   useEffect(() => { 
     const loadCategoryImage = async () => {
@@ -52,9 +54,12 @@ const deleteCategory = async () => {
         })
         }
   }
-
 }
     
+const redirect = () => {
+  router.push(`/adminaddcategory/${id}`)
+}
+
   return (
     <TableRow>
       <TableCell>
@@ -71,11 +76,9 @@ const deleteCategory = async () => {
         <TableCell className="">{date}</TableCell>
         <TableCell>
       <div className='flex'>
-        <Link href={`/adminaddcategory/${id}`}>
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="outline" onClick={redirect}>
         Edit
        </Button>
-       </Link>
         <Button className="ml-2" size="sm" variant="outline" onClick={deleteCategory}>
         Delete
       </Button>

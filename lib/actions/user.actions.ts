@@ -38,7 +38,9 @@ export const findCategory = async (id: string) => {
   connectToDB();
   // Find the category by ID
   const category = await Category.findOne({id: id});
-  return category;
+  
+  const {title, photo} = category
+  return {title, photo};
   
   }catch(error)
   {
@@ -47,6 +49,7 @@ export const findCategory = async (id: string) => {
   }
 
 }
+
 
 export const deleteCategoryById = async(categoryId: string) => {
   try {

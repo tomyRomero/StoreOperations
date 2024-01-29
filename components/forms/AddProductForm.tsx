@@ -1,11 +1,27 @@
+"use client"
 
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { SelectValue, SelectTrigger, SelectItem, SelectContent, Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import Image from "next/image"
+import { ChangeEvent, useEffect, useState } from "react";
+import { useForm} from 'react-hook-form';
+import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import Image from 'next/image';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { getRes} from "@/lib/s3";
+import { toast } from "../ui/use-toast";
+import { useRouter, usePathname } from "next/navigation";
+import { revalidate } from "@/lib/actions/user.actions";
 
 export default function AddProductForm() {
   return (

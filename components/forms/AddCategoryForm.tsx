@@ -46,6 +46,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
       }
     }
     }
+    revalidate(path)
     fetchData();
   }, [])
 
@@ -211,3 +212,4 @@ export default function AddCategoryForm({title, photo, id }: Props) {
     </div>
   );
 }
+
