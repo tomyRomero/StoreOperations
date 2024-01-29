@@ -6,6 +6,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { TableRow, TableCell} from "@/components/ui/table"
 import { getRes } from '@/lib/s3'
+import { deleteCategoryById } from '@/lib/actions/user.actions'
+import { toast } from '../ui/use-toast'
 
 interface Props{
   id: string;
@@ -28,7 +30,30 @@ const CategoryRow = ({id, image, date, title}: Props) => {
 
 }, [])
 
-console.log("id: ", id)
+const deleteCategory = async () => {
+
+  const userConfirmed = window.confirm(`Are you sure you want to delete this category?`);
+  if(userConfirmed)
+  {
+    const deleted = await deleteCategoryById(id)
+
+    if(deleted)
+      {
+        toast({
+          title: "Success!",
+          description: "Category Delete", 
+        })
+  
+      }else{
+         toast({
+          title: "Failed to Delete Category",
+          description: "Something went wrong!", 
+          variant: "destructive",
+        })
+        }
+  }
+
+}
     
   return (
     <TableRow>
@@ -51,7 +76,7 @@ console.log("id: ", id)
         Edit
        </Button>
        </Link>
-        <Button className="ml-2" size="sm" variant="outline">
+        <Button className="ml-2" size="sm" variant="outline" onClick={deleteCategory}>
         Delete
       </Button>
       </div>

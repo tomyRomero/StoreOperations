@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import Categories from "@/components/Categories";
 import Promotion from "@/components/Promotion";
 import { redirect } from "next/navigation";
+import { getAllCategories } from "@/lib/actions/user.actions";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -15,10 +16,12 @@ export default async function Home() {
 
   console.log(session?.user)
 
+  const categories = await getAllCategories();
+
   return (
     <section className="flex flex-col w-full items-center justify-center">
       <Hero />
-      <Categories />
+      <Categories data={categories}/>
       <Promotion />
     </section>
   );

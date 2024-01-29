@@ -5,25 +5,12 @@ import { RadioButton } from './Radio';
 import { Checkbox } from './Checkbox';
 import { useAppContext } from '@/lib/AppContext';
 
+interface Category{
+  id: string,
+  title: string
+}
 
-const Filters = ({serverProducts} : any) => {
-  const categoriesList = [
-    {
-      id: "1",
-      media: "/assets/categories/canvas.jpg",
-      title: "Canvases"
-    },
-    {
-      id: "2",
-      media: "/assets/categories/brushes.jpg",
-      title: "Brushes"
-    },
-    {
-      id: "3",
-      media: "/assets/categories/paint.jpg",
-      title: "Paint"
-    },
-  ];
+const Filters = ({serverProducts, categoriesList} : any) => {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState<string>("lowest");
@@ -106,7 +93,7 @@ const Filters = ({serverProducts} : any) => {
       <div>
         <h6 className="whitespace-nowrap text-heading4-bold">Product Categories</h6>
         <div className="flex flex-col gap-4 md:flex-row mt-4 xl:flex-col">
-          {categoriesList.map((category) => {
+          {categoriesList?.map((category: Category) => {
             return (
               <Checkbox
                 key={category.id}

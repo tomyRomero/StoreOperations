@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/form";
 import { getRes} from "@/lib/s3";
 import { toast } from "../ui/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { revalidate } from "@/lib/actions/user.actions";
 
 
 interface Props{
@@ -30,11 +31,12 @@ export default function AddCategoryForm({title, photo, id }: Props) {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [img, setImg] = useState("/assets/image.png");
+  const [imgChanged, setImgChanged] = useState(false);
 
-  console.log("id: ", id)
+  const path = usePathname();
 
   useEffect(()=> {
-    const fetchData = async  () => {
+    const fetchData = async () => {
       if(photo.length > 0)
       {
       const fetched = await getRes(photo)
@@ -44,9 +46,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
       }
     }
     }
-
     fetchData();
-    
   }, [])
 
   const router = useRouter();
@@ -62,8 +62,8 @@ export default function AddCategoryForm({title, photo, id }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      photo: photo.length > 0? photo : "",
       title: title.length > 0? title : "",
+      photo: photo.length > 0? photo : ""
     },
   });
 
@@ -79,7 +79,8 @@ export default function AddCategoryForm({title, photo, id }: Props) {
       body: JSON.stringify({
         id: id,
         title: values.title,
-        photo: values.photo
+        photo: values.photo,
+        imgChanged: imgChanged
       })
      })
 
@@ -90,6 +91,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
         description: "Added New Category", 
       })
 
+      revalidate(path)
       setTimeout(() => {
         router.push('/admincategories');
       }, 1500);
@@ -123,10 +125,10 @@ export default function AddCategoryForm({title, photo, id }: Props) {
         const imageDataUrl = event.target?.result?.toString() || "";
         fieldChange(imageDataUrl);
         setImg(imageDataUrl);
+        setImgChanged(true)
       };
 
       fileReader.readAsDataURL(file);
-      
     }
   };
 

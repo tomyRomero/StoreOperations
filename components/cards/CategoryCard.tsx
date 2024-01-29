@@ -1,15 +1,29 @@
-import React from 'react';
+"use client"
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getRes } from '@/lib/s3';
 
 interface Category{
     id: string,
-    media: string,
+    photo: string,
     title: string
 }
 
 const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
-    const media = category.media;
+
+    const [img, setImg] = useState("/assets/spinner.svg")
+  
+    useEffect(() => { 
+      const loadCategoryImage = async () => {
+      
+      setImg(await getRes(category.photo))
+    }
+  
+    loadCategoryImage()
+  
+  }, [])
 
   return (
     <Link href="/products" className='bg-gray-100 w-full px-10 py-6 rounded-lg max-sm:px-16 md:px-4 xl:px-20 lg:py-8 max-xxs:px-4'>
@@ -18,7 +32,7 @@ const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
             alt="Category"
             className="object-cover w-full h-60 rounded-lg max-sm:aspect-[4/3]"
             height={300}
-            src={`${media}`}
+            src={img}
             style={{
               aspectRatio: "300/300",
               objectFit: "cover",

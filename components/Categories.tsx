@@ -4,29 +4,15 @@ import CategoryCard from './cards/CategoryCard';
 
 interface Category{
     id: string,
-    media: string,
+    photo: string,
     title: string
 }
 
-const Categories = () => {
-
-const categoriesList = [
-{
-    id: "1",
-    media: "/assets/categories/canvas.jpg",
-    title: "Canvases"
-},
-{
-    id: "2",
-    media: "/assets/categories/brushes.jpg",
-    title: "Brushes"
-},
-{
-    id: "3",
-    media: "/assets/categories/paint.jpg",
-    title: "Paint"
-},
-]
+const Categories = ({data}: any) => {
+  if(!data || data.length === 0)
+  {
+    return null;
+  }
 
   return (
     <section className="px-8 md:px-16 lg:px-24 xl:px-36 mt-10 lg:mt-14 flex flex-col gap-8">
@@ -37,9 +23,13 @@ const categoriesList = [
         </Link>
       </div>
       <div className="grid gap-8 md:grid-cols-3">
-        {categoriesList.map((category: Category, index) => (
-          <CategoryCard key={index} category={category} />
-        ))}
+      {data.length > 0 && (
+        <>
+          {data.map((category: Category, index: any) => (
+            <CategoryCard key={index} category={category} />
+          ))}
+        </>
+      )} 
       </div>
     </section>
   );
