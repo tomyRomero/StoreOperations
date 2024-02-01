@@ -9,23 +9,17 @@ import { getRes } from '@/lib/s3'
 import { deleteCategoryById } from '@/lib/actions/user.actions'
 import { toast } from '../ui/use-toast'
 import { useRouter } from 'next/navigation'
-
-interface Props{
-  id: string;
-  image: string;
-  date: string;
-  title: string;
-}
+import { CategoryType } from '@/app/types/global'
 
 
-const CategoryRow = ({id, image, date, title}: Props) => {
+const CategoryRow = ({id, photo, date, title}: CategoryType) => {
   const [img, setImg] = useState("/assets/spinner.svg")
   const router = useRouter();
   
   useEffect(() => { 
     const loadCategoryImage = async () => {
     
-    setImg(await getRes(image))
+    setImg(await getRes(photo))
   }
 
   loadCategoryImage()
@@ -52,7 +46,7 @@ const deleteCategory = async () => {
           description: "Something went wrong!", 
           variant: "destructive",
         })
-        }
+    }
   }
 }
     

@@ -14,26 +14,23 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage
 } from "@/components/ui/form";
 import { getRes} from "@/lib/s3";
 import { toast } from "../ui/use-toast";
 import { useRouter, usePathname } from "next/navigation";
 import { revalidate } from "@/lib/actions/user.actions";
+import { CategoryType } from "@/app/types/global";
 
 
-interface Props{
-  title: string;
-  photo: string;
-  id: string
-}
-
-export default function AddCategoryForm({title, photo, id }: Props) {
+export default function AddCategoryForm({title, photo, id }: CategoryType) {
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [img, setImg] = useState("/assets/image.png");
   const [imgChanged, setImgChanged] = useState(false);
 
   const path = usePathname();
+  const router = useRouter();
 
   useEffect(()=> {
     const fetchData = async () => {
@@ -50,10 +47,9 @@ export default function AddCategoryForm({title, photo, id }: Props) {
     fetchData();
   }, [])
 
-  const router = useRouter();
-
   const FormSchema = z.object({
-    photo: z.string(),
+    photo: z.string()
+    .min(1, 'Photo is required'),
     title: z
       .string()
       .min(1, 'Category Title is required')
@@ -89,7 +85,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
     {
       toast({
         title: "Success!",
-        description: "Added New Category", 
+        description: "Added New/Edited Category", 
       })
 
       revalidate(path)
@@ -100,7 +96,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
     }else{
       setLoading(false)
        toast({
-        title: "Failed to Add Category",
+        title: "Failed to Add/Edit Category",
         description: "Something went wrong!", 
         variant: "destructive",
       })
@@ -148,7 +144,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
         </Button>
       </Link>
       <br />
-      <h1 className="text-2xl font-bold text-center mb-6">Add New Category</h1>
+      <h1 className="text-heading4-bold font-bold text-center mb-6">Add New Category</h1>
         <Form {...form}>
           <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}
            encType="multipart/form-data"
@@ -166,6 +162,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
                 {...field}
               />
               </FormControl>
+              <FormMessage />
             </FormItem>
             )}
             />
@@ -193,6 +190,7 @@ export default function AddCategoryForm({title, photo, id }: Props) {
                       onChange={(e) => handleImage(e, field.onChange)}
                     />
               </FormControl>
+              <FormMessage />
             </FormItem>
             )}
             />

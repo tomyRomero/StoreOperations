@@ -48,13 +48,16 @@ export default async function page() {
         <CategoryRow
         key={category.id}
         id={category.id} 
-        image={category.photo}
+        photo={category.photo}
         date={category.date}
         title={category.title}
       />
     ))}
     </TableBody>
   </Table>
+  {categories.length === 0 && <h1 className="p-10">
+  No categories Have been added, click on add category to get started
+   </h1>}
     </div>
 </section>
   )

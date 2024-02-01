@@ -3,6 +3,7 @@ import User from "../../../../lib/models/user.model";
 import {hash} from 'bcrypt';
 import * as z from 'zod';
 import { connectToDB } from "@/lib/mongoose";
+import { v4 as uuidv4 } from 'uuid';
 
 // Define schema for input validation
 const userSchema = z
@@ -40,20 +41,21 @@ export async function POST(req: Request){
         
         const hashedPassword = await hash(password, 10)
 
-        // Create a new user
-        const newUser =  await User.create({
-            // : username.toLowerCase(),
+        const newUser =  new User({
             username: username,
             email,
             password: hashedPassword
         }); 
+        
+        await newUser.save();
         
         const {password: newUserPassword, ...rest} = newUser;
 
         return NextResponse.json({ user: newUser, message: "User created successfully"}, {status: 201})
     }catch(error)
     {
-        return NextResponse.json({message: `Something went wrong! ${error}`}, {status: 500})
+        console.log(error)
+        return NextResponse.json({message: `${error}`}, {status: 500})
     }
 
 }

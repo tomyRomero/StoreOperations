@@ -4,11 +4,14 @@ import { getServerSession } from "next-auth";
 import Link from "next/link"
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import ProductsTable from "@/components/tables/ProductsTable";
+import { getAllProducts } from "@/lib/actions/user.actions";
+import ProductRow from "@/components/tables/ProductRow";
 
 export default async function page() {
 
   const session = await getServerSession(authOptions);
+
+  const products = await getAllProducts();
 
   if(session === undefined || session?.user.admin === false)
   {
@@ -16,7 +19,7 @@ export default async function page() {
   }
 
   return (
-    <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
+    <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
           <div className="flex items-center">
             <h1 className="font-semibold">Products</h1>
               <Link href="/adminaddproduct" className="ml-auto">
@@ -25,8 +28,39 @@ export default async function page() {
             </Button>
               </Link>
           </div>
-    <div className="mt-4 border shadow-sm rounded-lg">
-           <ProductsTable />
+          <div className="mt-4 border shadow-sm rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead className="max-w-[150px]">Name</TableHead>
+                <TableHead className="max-w-[150px]">Stripe ID</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Inventory</TableHead>
+                <TableHead>Creation Date</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map((product)=> (
+                 <ProductRow 
+                 key={product.stripeProductId}
+                 stripeProductId={product.stripeProductId} 
+                 name={product.name} 
+                 description={product.description}
+                 stock={product.stock}
+                 price={product.price}
+                 category={product.category}
+                 photo={product.photo}
+                 date={product.date}
+                 />
+              ))}
+            </TableBody>
+            </Table>
+            {products.length === 0 && <h1 className="p-10">
+              No products Have been added, click on add product to get started
+              </h1>}
           </div>
     </section>
   )
