@@ -4,10 +4,10 @@ import { revalidatePath} from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
 import Category from "../models/category.model";
-import mongoose from "mongoose";
 import { CategoryType, ProductType } from "@/app/types/global";
 import Product from "../models/product.model";
 import { Stripe } from 'stripe';
+import { SortOrder } from 'mongoose';
 
 // Function to fetch all users
 export const getAllUsers = async () => {
@@ -200,41 +200,55 @@ export const findProduct = async (id:string) => {
     }catch(error)
     {
       console.error("Error fetching category:", error);
-      throw error; 
+      return null; 
     }
   
 }
 
-//Get all products data
-export const getAllProducts = async () => {
+// Get all pagination products data with category filtering and sorting
+export const getAllProducts = async (pageNumber = 1, pageSize = 20, categories: string[] = [], sort = 'lowest') => {
   try {
-    // Use the find method on the Product model to retrieve all products
-    connectToDB();
-    const data = (await Product.find({}));
+    // Calculate the number of products to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
 
-    const products:ProductType[]= []
+    // Build the category filter
+    const categoryFilter = categories.length > 0 ? { category: { $in: categories } } : {};
 
-    //Transform server mongodb data to regular data so that i can pass it along to client components
-    data.forEach(element => {
-      products.push({
-        stripeProductId: element.stripeProductId,
-        name: element.name,
-        description: element.description,
-        stock: element.stock.toString(), 
-        price: element.price.toString(),
-        category: element.category,
-        photo: element.photo,
-        date: element.date
-      })
-    });
+    // Build the sort filter based on the 'sort' parameter
+    const sortFilter: Record<string, SortOrder> = sort === 'lowest' ? { price: 1 } : { price: -1 };
 
-    return products;
+    // Use the find method on the Product model to retrieve paginated products with category filtering and sorting
+    const data = await Product.find(categoryFilter)
+      .sort(sortFilter)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const products = data.map((element) => ({
+      stripeProductId: element.stripeProductId,
+      name: element.name,
+      description: element.description,
+      stock: element.stock.toString(),
+      price: element.price.toString(),
+      category: element.category,
+      photo: element.photo,
+      date: element.date,
+    }));
+
+    // Calculate total count of products with category filtering
+    const totalProductsCount = await Product.countDocuments(categoryFilter);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalProductsCount / pageSize); 
+
+    // Calculate if there are more products
+    const isNext = totalProductsCount > skipAmount + products.length;
+
+    return { results: products, isNext, totalPages };
   } catch (error) {
-    console.error("Error fetching categories:", error);
-    throw null;
+    console.error('Error fetching products:', error);
+    throw new Error('Failed to fetch products');
   }
 };
-
 
 // Archive Product and its Price in Stripe
 export const archiveStripeProduct = async (productId: string) => {
@@ -280,6 +294,7 @@ export const deleteProductById = async (stripeId : string) => {
     if (product) {
       await archiveStripeProduct(stripeId)
       await product.deleteOne();
+      revalidatePath("/adminproducts")
       return true
     } else {
       console.log('Product not found.');

@@ -15,9 +15,8 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "PaletteHub",
-  description: "Online Store for all things creative",
+  description: "Online Store with admin dashboard",
 };
-
 
 export default async function RootLayout({
   children,
@@ -32,7 +31,7 @@ export default async function RootLayout({
     <html lang="en">
     <AppProvider>
     <SessionProvider session={session}>
-    <body className={`${jost.className} flex flex-col min-h-screen`}>
+    <body className={`${jost.className} flex flex-col`}>
       <Nav/>
       <main className="flex flex-col items-center">
         <section className="main-container w-full">{children}</section>

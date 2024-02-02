@@ -14,7 +14,6 @@ export const getImageData = async (key: string) => {
       const result = match ? match[0] : 'jpg';
       
       let base64 = `data:image/${result};base64,` + getResponseData;
-      console.log('Success in Getting Image from server! Server response:', base64)
       return base64;
       
     } else {

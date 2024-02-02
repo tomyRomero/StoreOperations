@@ -26,7 +26,7 @@ const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
   }, [])
 
   return (
-    <Link href="/products" className='bg-gray-100 w-full px-10 py-6 rounded-lg max-sm:px-16 md:px-4 xl:px-20 lg:py-8 max-xxs:px-4'>
+    <Link href={`/products?categories=${category.title}`} className='bg-gray-100 w-full px-10 py-6 rounded-lg max-sm:px-16 md:px-4 xl:px-20 lg:py-8 max-xxs:px-4'>
     <div className="flex flex-col items-center">
           <Image
             alt="Category"

@@ -27,7 +27,7 @@ export const RadioButton: React.FC<RadioButtonProps> = ({
         type="radio"
         checked={isSelected}
         onChange={handleRadioChange}
-        className=" w-6 h-6 rounded-full border-2 border-black outline-none cursor-pointer"
+        className=" w-6 h-6 rounded-full border-2 border-black outline-none cursor-pointer accent-black"
         name={groupName}
       />
       {label}

@@ -1,21 +1,27 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RadioButton } from './Radio';
 import { Checkbox } from './Checkbox';
-import { useAppContext } from '@/lib/AppContext';
+import { useRouter } from 'next/navigation';
 
 interface Category{
   id: string,
   title: string
 }
 
-const Filters = ({serverProducts, categoriesList} : any) => {
+interface Props{
+  categoriesList: Category[],
+  categoryParams: string[],
+  sortParams: string
+}
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSort, setSelectedSort] = useState<string>("lowest");
+const Filters = ({categoriesList, categoryParams, sortParams}: Props) => {
 
-  const {globalProducts, setGlobalProducts} = useAppContext();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(categoryParams);
+  const [selectedSort, setSelectedSort] = useState<string>(sortParams? sortParams : "lowest");
+
+  const router = useRouter()
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategories((prevCategories) => {
@@ -27,70 +33,48 @@ const Filters = ({serverProducts, categoriesList} : any) => {
     });
   };
 
-  const filterProductsByCategories = () => {
-    // Check if there are no selected categories
-    if (selectedCategories.length === 0) {
-      // If no categories selected, return the entire serverProducts array
-      setGlobalProducts(serverProducts);
-    } else {
-      // Filter products based on selected categories
-      const filtered = serverProducts.filter((product: any) =>
-        selectedCategories.includes(product.category)
-      );
-  
-      // Set the filtered products to state
-      setGlobalProducts(filtered);
-    }
-  };
-  
   const handleSortChange = (value: string) => {
     setSelectedSort(value);
   };
 
-  // Sort products from lowest to highest price
-  const sortProductsByLowestPrice = (products: any) => {
-    const sorted = [...products].sort((a, b) => a.price - b.price);
-    setGlobalProducts(sorted)
-  };
-
-  // Sort products from highest to lowest price
-  const sortProductsByHighestPrice = (products: any) => {
-    const sorted = [...products].sort((a, b) => b.price - a.price);
-    setGlobalProducts(sorted)
-  };
+  const isMounted = useRef(true);
 
   useEffect(() => {
-    filterProductsByCategories();
-
-    if(selectedCategories.length > 0)
-    {
-      if(selectedSort === "lowest")
-      {
-        sortProductsByLowestPrice(globalProducts)
-      }else if(selectedSort === "highest")
-      {
-        sortProductsByHighestPrice(globalProducts)
+    // Skip the effect on initial render
+      if (isMounted.current) {
+        isMounted.current = false;
+        return;
       }
 
-    }else{
+    // query after 0.3s of no input
+      const delayDebounceFn = setTimeout(() => {
+      // Create a new URLSearchParams object
+      const params = new URLSearchParams();  
 
-      if(selectedSort === "lowest")
-      {
-        sortProductsByLowestPrice(serverProducts)
-      }else if(selectedSort === "highest")
-      {
-        sortProductsByHighestPrice(serverProducts)
-      }
+      // Add categories to the query parameters as a single parameter with comma-separated values
+      params.append('categories', selectedCategories.join(','));
 
-    }
-    
+      // Add the "sorted" parameter to the URLSearchParams
+      params.append('sorted', selectedSort);
+
+      // Get the final query string
+      const queryString = params.toString();
+
+      // Now you can include the queryString in your API request
+      const url = `/products?${queryString}`;
+
+      router.push(url)
+
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
 
   }, [selectedCategories, selectedSort]);
 
   
   return (
     <div className="flex flex-col gap-20 md:flex-row md:gap-40 md:mt-16 ">
-      <div>
+      <div> 
         <h6 className="whitespace-nowrap text-heading4-bold">Product Categories</h6>
         <div className="flex flex-col gap-4 md:flex-row mt-4 xl:flex-col">
           {categoriesList?.map((category: Category) => {

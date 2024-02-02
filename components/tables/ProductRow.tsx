@@ -43,7 +43,6 @@ const deleteProduct = async () => {
           description: "Product Deleted", 
         })
         
-        revalidate("/adminproducts")
       }else{
          toast({
           title: "Failed to Delete Product",
@@ -63,6 +62,7 @@ const deleteProduct = async () => {
             height="64"
             src={img}
             width="64"
+            priority
           />
         </TableCell>
         <TableCell className="font-medium">{name}</TableCell>

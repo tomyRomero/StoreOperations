@@ -19,7 +19,7 @@ export default function Page() {
         <div className="max-w-2xl w-full h-full p-8">
           <div className="flex flex-col items-center gap-4">
             <h3 className="text-heading1-bold text-center text-black bg-white p-1 rounded-xl">Welcome To Palette Hub!</h3>
-            <Image src="/assets/icon.png" alt="logo" width={30} height={30} className="bg-white rounded-full" />
+            <Image src="/assets/icon.png" alt="logo" width={30} height={30} className="bg-white rounded-full" priority/>
             <p className="text-white text-center max-lg:hidden">Sign-Up Here</p>
             <div className="max-xs:m-0 ml-4">
             <SignUpForm /> 

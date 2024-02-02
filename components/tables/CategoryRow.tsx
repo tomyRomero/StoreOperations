@@ -63,6 +63,7 @@ const redirect = () => {
           height="64"
           src={img}
           width="64"
+          priority
         />
       </TableCell>
         <TableCell className="font-medium">{id}</TableCell>
