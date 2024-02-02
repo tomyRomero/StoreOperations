@@ -18,8 +18,6 @@ export default async function page() {
     redirect("/")
   }
   
- 
-
   const categories = await getAllCategories();
 
   return (
@@ -44,7 +42,7 @@ export default async function page() {
       </TableRow>
     </TableHeader>
     <TableBody>
-    {categories.map((category)=> (
+    {categories?.map((category)=> (
         <CategoryRow
         key={category.id}
         id={category.id} 
@@ -55,7 +53,7 @@ export default async function page() {
     ))}
     </TableBody>
   </Table>
-  {categories.length === 0 && <h1 className="p-10">
+  {categories?.length === 0 || !categories  && <h1 className="p-10">
   No categories Have been added, click on add category to get started
    </h1>}
     </div>

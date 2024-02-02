@@ -28,7 +28,7 @@ const page = async ({ params }: { params: { id: string } }) => {
         category={product.category}
         />
         <div className="container mx-auto px-4 py-6">
-            <h2 className="text-heeading3-bold font-bold mb-4">Related Products</h2>
+            <h2 className="text-heading3-bold font-bold mb-4">Related Products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {serverProducts.results.map((product: any)=> (
                       <ProductCard key={product.stripeProductId} 

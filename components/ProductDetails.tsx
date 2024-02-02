@@ -42,26 +42,26 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
         </Button>
       </div>
       <div className="flex items-start lg:hidden">
-          <h1 className="font-bold text-heading4-bold">{name}</h1>
-          <div className="text-4xl font-bold ml-auto">${price}</div>
+          <h1 className="font-bold text-heading3-bold">{name}</h1>
+          <div className="text-heading3-bold font-bold ml-auto">${price}</div>
         </div>
         <div className="flex items-start lg:hidden">
           <small className="text-body-semibold leading-none text-gray-500">{category.toLocaleLowerCase()}</small>
           <h4 className={`ml-auto ${Number(stock) > 0 ? "text-green-500" : "text-red-500"}` }>{Number(stock) > 0 ? "In Stock" : "Out of stock"}</h4>
         </div>
         <div className="lg:hidden">
-          <p>
+          <p className="text-body-semibold">
             {description}
           </p>
         </div>
-        <Button className="flex px-6 border border-black w-full lg:hidden md:w-3/4 mx-auto" variant="ghost">
+        <Button className="flex px-6 border border-black lg:hidden w-3/4 mx-auto" variant="ghost">
           <span className="ml-2">Add To Cart</span>
         </Button>
       <div className="grid lg:grid-cols-5 gap-3 items-start">
         <div className="lg:col-span-4">
           <Image
             alt="Product Image"
-            className="aspect-square object-cover border border-gray-200 w-full rounded-lg overflow-hidden md:aspect-[3/5] max-h-[450px]"
+            className="aspect-square object-cover border border-gray-200 w-full rounded-lg overflow-hidden max-h-[450px]"
             height={400}
             src={img}
             width={600}
@@ -83,22 +83,22 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
       </div>
         <div className="hidden lg:flex items-start">
           <div className="grid gap-3">
-            <h1 className="font-bold">{name}</h1>
+            <h1 className="text-heading3-bold font-bold">{name}</h1>
 
         <div className="flex flex-col">
         <small className="text-body-semibold leading-none text-gray-500">{category.toLocaleLowerCase()}</small>
         <h4 className={`${Number(stock) > 0 ? "text-green-500" : "text-red-500"} pt-2` }>{Number(stock) > 0 ? "In Stock" : "Out of stock"}</h4>
         </div>
           </div>
-          <div className="font-bold ml-auto">${price}
+          <div className="text-heading3-bold font-bold ml-auto">${price}
           </div>
         </div>
         <div>
-        <p className="max-lg:hidden">
+        <p className="text-body-semibold max-lg:hidden">
             {description}
         </p>
         </div>
-        <Button className="flex px-6 border border-black w-full max-lg:hidden" variant="ghost">
+        <Button className="flex px-6 border border-black w-3/4 mx-auto max-lg:hidden" variant="ghost">
           <span className="ml-2">Add To Cart</span>
         </Button>
       </div>
