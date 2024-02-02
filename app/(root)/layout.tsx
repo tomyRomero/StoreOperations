@@ -15,7 +15,7 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "PaletteHub",
-  description: "Online Store with admin dashboard",
+  description: "Online Store Operations Manager App with Admin Dashboard",
 };
 
 export default async function RootLayout({

@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PaletteHub Auth",
-  description: "Auth for PaletteHub App",
+  description: "Auth for Online Store Operations Manager App with Admin Dashboard",
 };
 
 export default async function RootLayout({

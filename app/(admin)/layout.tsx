@@ -17,7 +17,7 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "PaletteHub Admin",
-  description: "Admin Panel for PaletteHub",
+  description: "Admin Panel for Online Store Operations Manager App with Admin Dashboard",
 };
 
 
