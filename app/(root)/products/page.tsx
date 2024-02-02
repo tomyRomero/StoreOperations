@@ -1,7 +1,7 @@
 
 import Filters from '@/components/shared/Filter'
 import React from 'react'
-import { getAllCategories, getAllProducts } from '@/lib/actions/user.actions'
+import { getAllCategories, getAllProducts } from '@/lib/actions/store.actions'
 import ProductCard from '@/components/cards/ProductCard'
 import Pagination from '@/components/shared/Pagination'
 

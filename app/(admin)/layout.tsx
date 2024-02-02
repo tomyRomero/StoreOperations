@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Jost } from "next/font/google";
+import { Jost } from "next/font/google";
 import "../globals.css";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
-import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/lib/AppContext";
 import AdminNav from "@/components/shared/AdminNav";
 import AdminDashboard from "@/components/shared/AdminDashboard";

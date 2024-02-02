@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { findProduct } from '@/lib/actions/user.actions'
+import { findProduct } from '@/lib/actions/store.actions'
 import AddProductForm from './AddProductForm'
 
 const ProductFormWrapper = ({id}: any) => {

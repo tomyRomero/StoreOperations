@@ -5,8 +5,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link"
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import CategoryTable from '@/components/tables/CategoryRow';
-import { getAllCategories } from '@/lib/actions/user.actions';
+import { getAllCategories } from '@/lib/actions/store.actions';
 import CategoryRow from '@/components/tables/CategoryRow';
 
 export default async function page() {

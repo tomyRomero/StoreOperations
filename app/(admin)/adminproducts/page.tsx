@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link"
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getAllProducts, getAllProductsWithoutSort } from "@/lib/actions/user.actions";
+import { getAllProducts, getAllProductsWithoutSort } from "@/lib/actions/store.actions";
 import ProductRow from "@/components/tables/ProductRow";
 
 export default async function page({

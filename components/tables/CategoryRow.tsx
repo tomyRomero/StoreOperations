@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { TableRow, TableCell} from "@/components/ui/table"
 import { getRes } from '@/lib/s3'
-import { deleteCategoryById } from '@/lib/actions/user.actions'
+import { deleteCategoryById } from '@/lib/actions/store.actions'
 import { toast } from '../ui/use-toast'
 import { useRouter } from 'next/navigation'
 import { CategoryType } from '@/app/types/global'

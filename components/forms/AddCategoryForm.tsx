@@ -19,7 +19,7 @@ import {
 import { getRes} from "@/lib/s3";
 import { toast } from "../ui/use-toast";
 import { useRouter, usePathname } from "next/navigation";
-import { revalidate } from "@/lib/actions/user.actions";
+import { revalidate } from "@/lib/actions/admin.actions";
 import { CategoryType } from "@/app/types/global";
 
 

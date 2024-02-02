@@ -3,7 +3,6 @@ import User from "../../../../lib/models/user.model";
 import {hash} from 'bcrypt';
 import * as z from 'zod';
 import { connectToDB } from "@/lib/mongoose";
-import { v4 as uuidv4 } from 'uuid';
 
 // Define schema for input validation
 const userSchema = z

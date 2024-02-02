@@ -47,12 +47,12 @@ export default function Nav() {
 
   return (
 
-    <header className="bg-white fixed flex z-50 w-full flex-wrap items-center xs:py-6 xs:px-4 sm:py-6 sm:px-14 px-4 py-4 md:py-8 md:px-18 lg:py-10 lg:px-32 xl:px-36">
+    <header className="bg-white fixed flex z-50 w-full flex-wrap items-center border-b border-black xs:py-6 xs:px-4 sm:py-6 sm:px-14 px-4 py-4 md:py-8 md:px-18 lg:py-10 lg:px-32 xl:px-36">
       <Link className="sm:mr-6 xs:mr-2 first-letter:flex" href="/">
         <h1 className="xs:px-0 px-1 text-heading2-bold max-md:text-heading3-bold justify-center">PaletteHub.</h1>
       </Link>
       <div className="max-sm:mr-auto ml-auto flex items-center gap-2 flex-wrap">
-        <Button className="flex sm:px-2 xs:px-0.5" variant="ghost">
+        <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={()=>{router.push("/products")}}>
           <Image
             src="/assets/price.png"
             alt="price icon"
@@ -62,7 +62,7 @@ export default function Nav() {
           />
           <span className="ml-2">Shop</span>
         </Button>
-        <Button className="flex sm:px-2 xs:px-0.5" variant="ghost">
+        <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={()=>{router.push("/cart")}}>
         <Image
             src="/assets/cart.png"
             alt="cart icon"

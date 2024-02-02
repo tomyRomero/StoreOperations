@@ -1,7 +1,6 @@
 "use client"
 
 import SignInForm from "@/components/forms/SignInForm";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import {useRouter } from "next/navigation";
 

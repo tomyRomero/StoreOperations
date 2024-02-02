@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 import { Stripe } from 'stripe';
-import { updateCreateProduct } from '@/lib/actions/user.actions';
+import { updateCreateProduct } from '@/lib/actions/store.actions';
 
 const key = process.env.STRIPE_SECRET_KEY
 

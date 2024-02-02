@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import AddCategoryForm from './AddCategoryForm'
-import { findCategory } from '@/lib/actions/user.actions'
+import { findCategory } from '@/lib/actions/store.actions'
 
 const CategoryFormWrapper = ({id}: any) => {
     const [title, setTitle] = useState("")

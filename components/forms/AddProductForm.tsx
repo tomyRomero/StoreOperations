@@ -21,10 +21,11 @@ import {
 import { getRes} from "@/lib/s3";
 import { toast } from "../ui/use-toast";
 import { useRouter, usePathname } from "next/navigation";
-import { getAllCategoriesForProduct, revalidate } from "@/lib/actions/user.actions";
+import { revalidate } from "@/lib/actions/admin.actions";
+import {getAllCategoriesForProduct} from "@/lib/actions/store.actions";
 import { ProductType } from "@/app/types/global"
 
-export default function AddProductForm({stripeProductId, name, description, stock, price, category, photo}: ProductType) {
+const AddProductForm = ({stripeProductId, name, description, stock, price, category, photo}: ProductType) => {
   const [categories, setCategories]= useState<string[]>([])
   const [dataFetched, setDataFetched]= useState(false)
   const [files, setFiles] = useState<File[]>([]);
@@ -338,3 +339,4 @@ export default function AddProductForm({stripeProductId, name, description, stoc
   )
 }
 
+export default AddProductForm;

@@ -5,7 +5,6 @@ import { Inter } from "next/font/google";
 
 import "../globals.css";
 import { getServerSession } from "next-auth";
-import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -28,9 +27,7 @@ export default async function RootLayout({
       <html lang='en'>
         <body className={`${inter.className} bg-white`}>
         <div className="mx-auto w-full">
-          {/* <SessionProvider session={session}>  */}
             {children}
-          {/* </SessionProvider>  */}
         </div>
         <Toaster />
         </body>

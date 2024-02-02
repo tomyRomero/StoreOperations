@@ -8,7 +8,8 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { toast } from "../ui/use-toast"
-import { deleteProductById, revalidate } from "@/lib/actions/user.actions"
+import { revalidate } from "@/lib/actions/admin.actions"
+import {deleteProductById} from "@/lib/actions/store.actions"
 
 
 const ProductRow = ({stripeProductId, name, description, stock, price, category, photo, date}: ProductType) => {

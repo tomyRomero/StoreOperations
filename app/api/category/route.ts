@@ -4,7 +4,7 @@ import { isBase64Image } from '@/lib/utils';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-import { updateCreateCategory } from '@/lib/actions/user.actions';
+import { updateCreateCategory } from '@/lib/actions/store.actions';
 
 //Use Axios to make api request amongst api, server to server
 const postImage = async (data: any) => {

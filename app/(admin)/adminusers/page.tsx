@@ -4,7 +4,7 @@ import UsersTable from "@/components/tables/UsersTable"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getAllUsers } from "@/lib/actions/user.actions";
+import { getAllUsers } from "@/lib/actions/admin.actions";
 
 export default async function page() {
   const session = await getServerSession(authOptions);

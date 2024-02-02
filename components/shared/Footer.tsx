@@ -2,7 +2,6 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { link } from "fs"
 
 export default function Footer() {
 

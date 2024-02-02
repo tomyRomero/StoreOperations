@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Jost } from "next/font/google";
+import { Jost } from "next/font/google";
 import "../globals.css";
 import Nav from "@/components/shared/Nav";
 import { getServerSession } from "next-auth/next";
@@ -34,7 +34,7 @@ export default async function RootLayout({
     <body className={`${jost.className} flex flex-col`}>
       <Nav/>
       <main className="flex flex-col items-center">
-        <section className="main-container w-full">{children}</section>
+        <section className="main-container w-full mp-4">{children}</section>
       </main>
       <Footer />
     </body>

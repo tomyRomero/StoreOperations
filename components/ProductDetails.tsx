@@ -29,7 +29,7 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-start mx-auto py-6">
+    <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-start mx-auto pt-4">
       <div className="flex lg:hidden mb-4">
          <Button className="flex px-2 border border-black" variant="ghost" onClick={goBack}>
           <Image

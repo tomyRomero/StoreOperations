@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Badge } from "../ui/badge";
 import {useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from 'next-auth/react';
 

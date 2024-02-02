@@ -1,5 +1,5 @@
 import ProductDetails from '@/components/ProductDetails'
-import { findProduct, getAllProductsWithoutSort } from '@/lib/actions/user.actions'
+import { findProduct, getAllProductsWithoutSort } from '@/lib/actions/store.actions'
 import React from 'react'
 import ProductCard from '@/components/cards/ProductCard'
 
@@ -15,7 +15,7 @@ const page = async ({ params }: { params: { id: string } }) => {
   )
 
   return (
-    <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-14 lg:px-20">
+    <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20">
        {product && (
         <div>
         <ProductDetails

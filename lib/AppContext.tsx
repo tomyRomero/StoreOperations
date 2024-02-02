@@ -2,7 +2,7 @@
 
 // Import necessary React modules
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { getAllProducts } from './actions/user.actions';
+import { getAllProducts } from './actions/store.actions';
 import { ProductType } from '@/app/types/global';
 
 // Define the types for the context
