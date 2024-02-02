@@ -14,7 +14,7 @@ const page = async ({
   //Seperate Logic for Getting Categories for building Filtering Checkboxes
   const categoriesData = await getAllCategories()
   const categories:any = []
-  categoriesData.forEach(element => {
+  categoriesData?.forEach(element => {
     categories.push({
       id: element.id,
       title: element.title
@@ -28,7 +28,7 @@ const page = async ({
     searchParams.page ? + searchParams.page : 1,
      8, 
     categoriesArray,
-    searchParams.sorted ? searchParams.sorted : "lowest"
+    searchParams.sorted ? searchParams.sorted : "lowest",
   )
 
   const createPaginationPath = ()=> {
@@ -53,7 +53,7 @@ const page = async ({
     <section className="mt-14 lg:mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20">
        <div className="grid xl:grid-cols-4 gap-10 items-start">
           <Filters categoriesList={categories} categoryParams={categoriesArray} sortParams={searchParams.sorted ? searchParams.sorted : ""}/>
-          <div className=" xl:col-span-3 lg:mt-4 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">
+          <div className="xl:col-span-3 lg:mt-6 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">
             <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
                     {serverProducts.results.map((product: any)=> (
                     <ProductCard key={product.stripeProductId} 

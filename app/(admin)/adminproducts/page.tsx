@@ -4,14 +4,21 @@ import { getServerSession } from "next-auth";
 import Link from "next/link"
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { getAllProducts } from "@/lib/actions/user.actions";
+import { getAllProducts, getAllProductsWithoutSort } from "@/lib/actions/user.actions";
 import ProductRow from "@/components/tables/ProductRow";
 
-export default async function page() {
+export default async function page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
 
   const session = await getServerSession(authOptions);
 
-  const products = await getAllProducts();
+  const products = await getAllProductsWithoutSort(
+    searchParams.page ? + searchParams.page : 1,
+     8,
+  );
 
   if(session === undefined || session?.user.admin === false)
   {
@@ -43,7 +50,7 @@ export default async function page() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product)=> (
+              {products.results.map((product)=> (
                  <ProductRow 
                  key={product.stripeProductId}
                  stripeProductId={product.stripeProductId} 
@@ -58,7 +65,7 @@ export default async function page() {
               ))}
             </TableBody>
             </Table>
-            {products.length === 0 && <h1 className="p-10">
+            {products.results.length === 0 && <h1 className="p-10">
               No products Have been added, click on add product to get started
               </h1>}
           </div>

@@ -45,7 +45,7 @@ export const getAllCategories = async () => {
     return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
-    throw null;
+    return null;
   }
 };
 
@@ -65,7 +65,7 @@ export const getAllCategoriesForProduct = async () => {
     return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
-    throw null;
+    return null
   }
 };
 
@@ -239,6 +239,59 @@ export const getAllProducts = async (pageNumber = 1, pageSize = 20, categories: 
 
     // Calculate total pages
     const totalPages = Math.ceil(totalProductsCount / pageSize); 
+
+    // Calculate if there are more products
+    const isNext = totalProductsCount > skipAmount + products.length;
+
+    return { results: products, isNext, totalPages };
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw new Error('Failed to fetch products');
+  }
+};
+
+//Get pagination products however this time include the option to exlcude a product and also dont do any sorting/lowest/highest logic
+//Used to find related products and also used for admin dashboard
+export const getAllProductsWithoutSort = async (
+  pageNumber = 1,
+  pageSize = 20,
+  categories: string[] = [],
+  excludeProductId?: string // Optional parameter for excluding a product by ID
+) => {
+  try {
+    // Calculate the number of products to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    // Build the category filter
+    const categoryFilter = categories.length > 0 ? { category: { $in: categories } } : {};
+
+    // Build the exclusion filter based on the 'excludeProductId' parameter
+    const exclusionFilter = excludeProductId ? { stripeProductId: { $ne: excludeProductId } } : {};
+
+    // Combine all filters
+    const combinedFilter: Record<string, any> = { ...categoryFilter, ...exclusionFilter };
+
+    // Use the find method on the Product model to retrieve paginated products with category filtering and exclusion
+    const data = await Product.find(combinedFilter)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const products = data.map((element) => ({
+      stripeProductId: element.stripeProductId,
+      name: element.name,
+      description: element.description,
+      stock: element.stock.toString(),
+      price: element.price.toString(),
+      category: element.category,
+      photo: element.photo,
+      date: element.date,
+    }));
+
+    // Calculate total count of products with category filtering and exclusion
+    const totalProductsCount = await Product.countDocuments(combinedFilter);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalProductsCount / pageSize);
 
     // Calculate if there are more products
     const isNext = totalProductsCount > skipAmount + products.length;
