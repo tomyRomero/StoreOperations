@@ -65,7 +65,7 @@ export const getAllCategoriesForProduct = async () => {
     return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
-    return null
+    return []
   }
 };
 
