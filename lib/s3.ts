@@ -43,29 +43,12 @@ export const getImageData = async (key: string) => {
   }
 
   export const getRes = async (imgUrl: string)=> {
-    const cachedImage = localStorage.getItem(imgUrl)
-
-    if(cachedImage)
-    {
-      return cachedImage;
-    }else{
+  
       try {
         let imgResult = '/assets/profile.png';
        
         const res = await getImageData(imgUrl);
         imgResult = res;
-        
-        try {
-          localStorage.setItem(imgUrl, imgResult);
-        } catch (e) {
-          // Handle QuotaExceededError
-          if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-            console.warn('LocalStorage quota exceeded. Removing some items from the cache.');
-            // Implement cache eviction policy here
-            removeOldestItemFromCache();
-
-          }
-        }
 
         return imgResult
         
@@ -75,7 +58,7 @@ export const getImageData = async (key: string) => {
       }
     }
     
-  }
+  
 
 
   const removeOldestItemFromCache = () => {

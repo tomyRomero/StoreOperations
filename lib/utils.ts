@@ -1,3 +1,4 @@
+
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -25,3 +26,4 @@ export function dollarsToCents(dollarAmount: number) {
   const cents = Math.round(dollarAmount * 100);
   return cents;
 }
+

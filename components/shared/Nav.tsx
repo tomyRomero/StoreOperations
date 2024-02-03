@@ -1,21 +1,56 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import {useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { useAppContext } from '@/lib/AppContext';
+import { getCartItems } from '@/lib/actions/store.actions';
 
 
-export default function Nav() {
+const Nav = () => {
 
+  const [cartNum, setCartNum] = useState(0)
+
+  const {productAdjusted, cart} = useAppContext();
   const router = useRouter();
+  const { data: session } = useSession();
+
+  useEffect(()=> {
+    const getCartItemsNum = async ()=> {
+
+      if(session)
+      {
+        console.log("logged in")
+        //If User is logged in check database for the cart
+     
+        const serverCart = await getCartItems(session.user.id)
+        setCartNum(serverCart.length)
+     
+      }else{
+         // If user is not logged, check localStorage
+         const localStorageCartString = localStorage.getItem('cart');
+         if (localStorageCartString) {
+           // If localStorage has cart data, parse it and check if the product is in the cart
+           const localStorageCart = JSON.parse(localStorageCartString);
+           console.log("Nav: Products from client local stroage: ", localStorageCart)
+           setCartNum(localStorageCart.length)
+         }else{
+          // If localStorage is empty check the cart global state as a final check
+          console.log("Products from global state: ", cart)
+          setCartNum(cart.length)
+         }
+      }
+    }
+
+    getCartItemsNum();
+
+  }, [productAdjusted])
 
   function AuthButton() {
-    const { data: session } = useSession();
-   
     if (session) {
       return (
         <>
@@ -71,7 +106,7 @@ export default function Nav() {
             className="px-1 w-8 h-6 max-md:hidden"
           />
           <span className="ml-2">Cart</span>  
-          <Badge className="ml-2 h-3 w-4 flex items-center justify-center rounded-full p-3">1</Badge>
+          <Badge className={`ml-2 h-3 w-4 hidden items-center justify-center rounded-full p-3 ${cartNum > 0 ? "flex" : ""}`}>{cartNum}</Badge>
         </Button>
         <AuthButton />
       </div>
@@ -79,4 +114,6 @@ export default function Nav() {
     
   );
 }
+
+export default Nav;
 

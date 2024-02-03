@@ -8,6 +8,7 @@ import { CategoryType, ProductType } from "@/app/types/global";
 import Product from "../models/product.model";
 import { Stripe } from 'stripe';
 import { SortOrder } from 'mongoose';
+import Cart from "../models/cart.model";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -319,7 +320,6 @@ export const getAllCategories = async () => {
     }
   };
   
-  
   //Delete Product
   export const deleteProductById = async (stripeId : string) => {
     try {
@@ -345,3 +345,166 @@ export const getAllCategories = async () => {
     }
   }
   
+// Function to add a product to a user's cart
+export const addProductToCart = async (userId: string, productId: string, quantity = 1) => {
+  try {
+    let addedToCart = false; // Flag to indicate whether the product was added to the cart
+
+      // User is signed in, follow the original logic
+      const user = await User.findById(userId);
+
+      if (!user) {
+        console.error('User not found');
+        return addedToCart;
+      } else {
+        console.log("User Found: ", user)
+      }
+
+      const product = await Product.findOne({ stripeProductId: productId });
+
+      if (!product) {
+        console.error('Product not found');
+        return addedToCart;
+      } else {
+        console.log("Product Found: ", product)
+      }
+
+        let cart = await Cart.findOne({ user: userId });
+
+        if (!cart) {
+          cart = await Cart.create({ user: userId, products: [] });
+          console.log("Cart not found, creating new one: ", cart)
+        } else {
+          console.log("Cart found associated with user, updating...")
+        }
+
+        const productToAdd = { product: productId, quantity };
+
+        const existingProductIndex = cart.products.findIndex(
+          (item: any) => item.product.toString() === productId.toString()
+        );
+
+        if (existingProductIndex !== -1) {
+          console.log("Found product in cart");
+          cart.products[existingProductIndex].quantity += quantity;
+          console.log(`Added ${quantity} more quantity to the product in cart`);
+          addedToCart = true;
+        } else {
+            console.log("Product not in cart, adding")
+            cart.products.push(productToAdd);
+            addedToCart = true;
+        }
+
+        await cart.save();
+        console.log(`Product added to cart for user ${userId}`);
+     
+    
+    return addedToCart; // Return the flag indicating whether the product was added to the cart
+  } catch (error) {
+    console.error('Error adding product to cart:', error);
+    return false; // Return false in case of an error
+  }
+}
+
+// Function to remove a product from a user's cart by its qunatatity or all together
+export const removeProductFromCart = async (
+  userId: string,
+  productId: string,
+  removeQuantity: number = 1,
+  removeAll: boolean = false
+) => {
+  try {
+      // User is signed in, follow the original logic
+      let cart = await Cart.findOne({ user: userId });
+
+      if (!cart) {
+        console.error('Cart not found for the user');
+        return;
+      } else {
+        console.log("Cart found associated with user, updating...")
+      }
+
+      // Find the index of the product in the cart
+      const productIndex = cart.products.findIndex(
+        (item: any) => item.product.toString() === productId.toString()
+      );
+
+      if (productIndex !== -1) {
+        // Product found in the cart
+
+        if (removeAll || cart.products[productIndex].quantity <= removeQuantity) {
+          // Remove the entire product from the cart if removeAll is true or if the remaining quantity is less than or equal to removeQuantity
+          cart.products.splice(productIndex, 1);
+          console.log(`Product removed from cart for user ${userId}`);
+        } else {
+          // Decrease the quantity
+          cart.products[productIndex].quantity -= removeQuantity;
+          console.log(`Decreased quantity by ${removeQuantity} for the product in cart`);
+        }
+
+        await cart.save();
+      } else {
+        console.log(`Product ${productId} not found in the cart.`);
+      }
+  } catch (error) {
+    console.error('Error removing product from cart:', error);
+  }
+}
+
+// Function to check if a product is inside a cart alreayd
+export const insideCart = async (userId: string, productId: string )=> {
+  try{
+    //Look for Cart that belongs to user
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      //Cart does not exist so therefore product is not found in cart
+      return false;
+    } else {
+      console.log("Cart found associated with user, checking to see if product is inside")
+
+      const existingProductIndex = cart.products.findIndex(
+      (item: any) => item.product.toString() === productId.toString()
+      );
+
+      if (existingProductIndex !== -1) {
+        console.log("Found product in cart");
+        return true;
+      } else {
+          console.log("Product not in cart")
+        return false;
+      }
+    }
+    
+  }catch(error)
+  {
+    console.log(error)
+    return false;
+  }
+}
+
+export const getCartItems = async (userId: string) => {
+  try {
+    // Look for Cart that belongs to the user
+    console.log("userId: ", userId)
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      // Cart does not exist
+      console.log("No cart found for logged in user")
+      return [];
+    } else {
+      console.log("cart found for logged in user")
+       // Serialize the products array to prevent circular references/max stack errors
+       const serializedProducts = JSON.stringify(cart.products);
+       
+       // Parse the serialized products back to an object
+       const parsedProducts = JSON.parse(serializedProducts);
+ 
+       return parsedProducts;
+    }
+  } catch (error) {
+    console.error("Error retrieving cart items:", error);
+    return [];
+  }
+};

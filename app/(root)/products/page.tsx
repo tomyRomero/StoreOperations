@@ -50,7 +50,7 @@ const page = async ({
   
   return (
     
-    <section className="mt-14 lg:mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20">
+    <section className="mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20">
        <div className="grid xl:grid-cols-4 gap-10 items-start">
           <Filters categoriesList={categories} categoryParams={categoriesArray} sortParams={searchParams.sorted ? searchParams.sorted : ""}/>
           <div className="xl:col-span-3 lg:mt-6 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">

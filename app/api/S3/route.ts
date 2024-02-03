@@ -7,9 +7,9 @@ export const GET = async (req: any, res: NextApiResponse) => {
     try {
       // Extract the value of the "name" parameter from QUERY
       const key = req.nextUrl.searchParams.get("key");
-      console.log("Encoded Key:", key)
+      // console.log("Encoded Key:", key)
       const decodedKey = decodeURIComponent(key);
-      console.log("Server Side KEY:" , decodedKey);
+      // console.log("Server Side KEY:" , decodedKey);
       // Define the parameters for getObject
       const command = new GetObjectCommand({
           Bucket: "tfr-palettehub-bucket",

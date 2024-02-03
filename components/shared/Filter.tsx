@@ -73,7 +73,7 @@ const Filters = ({categoriesList, categoryParams, sortParams}: Props) => {
 
   
   return (
-    <div className="flex flex-col gap-20 md:flex-row md:gap-40 md:mt-16 ">
+    <div className="flex flex-col gap-20 md:flex-row md:gap-40 md:mt-16 max-md:mt-6">
       <div> 
         <h6 className="whitespace-nowrap text-heading4-bold">Product Categories</h6>
         <div className="flex flex-col gap-4 md:flex-row mt-4 xl:flex-col">

@@ -1,7 +1,9 @@
 import ProductDetails from '@/components/ProductDetails'
-import { findProduct, getAllProductsWithoutSort } from '@/lib/actions/store.actions'
+import { findProduct, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
 import React from 'react'
 import ProductCard from '@/components/cards/ProductCard'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 const page = async ({ params }: { params: { id: string } }) => {
 
@@ -13,6 +15,15 @@ const page = async ({ params }: { params: { id: string } }) => {
     [product?.category],
     params.id
   )
+
+  const session = await getServerSession(authOptions);
+
+  const userId = session?.user.id
+
+  let result = false
+  if(userId)
+  result = await insideCart(userId, params.id)
+
 
   return (
     <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20">
@@ -26,22 +37,9 @@ const page = async ({ params }: { params: { id: string } }) => {
         photo={product.photo}
         price={product.price}
         category={product.category}
+        result={result}
+        serverProducts={serverProducts.results}
         />
-        <div className="container mx-auto px-4 py-6">
-            <h2 className="text-heading3-bold font-bold mb-4">Related Products</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {serverProducts.results.map((product: any)=> (
-                      <ProductCard key={product.stripeProductId} 
-                      stripeProductId={product.stripeProductId} 
-                      name={product.name}
-                      description={product.description} 
-                      stock={product.stock} 
-                      price={product.price}
-                      category={product.category} 
-                      photo={product.photo}/>
-                      ))}
-            </div>
-            </div>
         </div>
        )}
        {!product &&

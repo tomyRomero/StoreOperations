@@ -1,22 +1,16 @@
 "use client"
 
 // Import necessary React modules
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { getAllProducts } from './actions/store.actions';
-import { ProductType } from '@/app/types/global';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 // Define the types for the context
 type AppContextProps = {
-  // Define your state and methods here
-  cart: number;
+  // Define state and methods here
+  cart: any[];
   setCart: React.Dispatch<React.SetStateAction<any>>;
 
-  globalProducts: ProductType[];
-  setGlobalProducts: React.Dispatch<React.SetStateAction<any>>;
-  
-  globalLoading: boolean;
-  setGlobalLoading: React.Dispatch<React.SetStateAction<any>>;
-
+  productAdjusted: boolean;
+  setProductAdjusted: React.Dispatch<React.SetStateAction<any>>;
 };
 
 // Create the AppContext with an initial value of undefined
@@ -25,28 +19,23 @@ const AppContext = createContext<AppContextProps | undefined>(undefined);
 // Create the AppProvider component that will wrap your application
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Initialize the state using the useState hook
-  const [cart, setCart] = useState(0);
-  const [globalProducts, setGlobalProducts] = useState<ProductType[]>([])
-  const [globalLoading, setGlobalLoading] = useState(false)
 
-  useEffect(()=> {
-    const fetchServerProducts = async ()=> {
-      const products= await getAllProducts()
+  //Global cart array state synced with local storage, if local storage fails state still runs
+  const [cart, setCart] = useState(() => {
+    //Check to see if there is localstorage if not just set default as an empty array
+    
+    const localStorageCart = localStorage.getItem('cart');
+    return localStorageCart ? JSON.parse(localStorageCart) : [];
+    
+  });
 
-      setGlobalProducts(products.results)
-      setGlobalLoading(true);
-    }
-
-    fetchServerProducts()
-
-  }, [])
-
+  //Global marker that is called whenever an item in cart is updated, used for nav
+  const [productAdjusted, setProductAdjusted] = useState(false);
 
   // Provide the context value to the children components, include additional states if there are any
   const contextValue: AppContextProps = {
     cart, setCart,
-    globalProducts, setGlobalProducts, 
-    globalLoading, setGlobalLoading,
+    productAdjusted, setProductAdjusted
   };
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
