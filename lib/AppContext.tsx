@@ -22,10 +22,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   //Global cart array state synced with local storage, if local storage fails state still runs
   const [cart, setCart] = useState(() => {
-    //Check to see if there is localstorage if not just set default as an empty array
-    
-    const localStorageCart = localStorage.getItem('cart');
-    return localStorageCart ? JSON.parse(localStorageCart) : [];
+    // Check to see if localStorage is supported
+     if (typeof window !== 'undefined' && window.localStorage) {
+      //Check to see if there is localstorage if not just set default as an empty array
+      const localStorageCart = localStorage.getItem('cart');
+      return localStorageCart ? JSON.parse(localStorageCart) : [];
+    } else {
+      return [];
+    }
     
   });
 

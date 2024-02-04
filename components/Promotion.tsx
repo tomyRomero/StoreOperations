@@ -85,7 +85,7 @@ const deals= [{
   }, []);
 
   return (
-    <section className="px-20 lg:px-40 mt-10 mx-auto grid grid-cols-1 gap-6 md:gap-0 mb-6 md:mb-0">
+    <section className="max-xs:px-4 max-sm:px-8 px-20 lg:px-40 mt-10 mx-auto grid grid-cols-1 gap-6 md:gap-0 mb-6 md:mb-0">
     <div className="flex flex-col justify-center gap-6 p-6 bg-gradient-to-r from-green-400 to-blue rounded-lg shadow-lg text-white">
       <div>
         <h3 className="text-heading3-bold">Deals of the Month</h3>
@@ -131,7 +131,7 @@ const deals= [{
         ))}
     </div>
     <div className='mt-6'>
-    <ul className="grid grid-cols-2 justify-center gap-10 md:gap-0 lg:grid-cols-4 my-10 md:my-0">
+    <ul className="grid max-sm:grid-cols-1 grid-cols-2 justify-center gap-10 md:gap-0 lg:grid-cols-4 my-10 md:my-0">
           {inclusions.map((inclusion) => (
             <div className='md:p-4 lg:p-8' key={inclusion.id}>
             <li key={inclusion.id} className="text-center">

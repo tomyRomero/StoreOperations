@@ -5,19 +5,78 @@ import { Button } from "@/components/ui/button"
 import CartItem from "./CartItem";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Loading from "@/app/(auth)/loading";
+import { useSession } from "next-auth/react";
+import { getCartItems } from "@/lib/actions/store.actions";
+import { useAppContext } from "@/lib/AppContext";
+
+interface cartItem {
+  product: string;
+  quantity: number;
+
+}
 
 const Cart = () => {
-  const [total, setTotal] = useState()
+  const [cartItems, setCartItems] = useState<cartItem[]>([])
+  const [subtotals, setSubtotals] = useState<number[]>(
+    Array.from({ length: cartItems.length }, () => 0)
+  );;
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false);
+  const [update , setUpdate] = useState(false);
 
   const router = useRouter()
+  const { data: session } = useSession();
 
   const goBack = ()=> {
     router.back();
   }
+  const { cart } = useAppContext();
+
+  const updateTotal = (index: number, subTotal: number) => {
+    
+    subtotals[index] = subTotal
+
+    // Calculate the total by summing up all subtotals
+    const newTotal = subtotals.reduce((acc, subtotal) => acc + subtotal, 0);
+    setTotal(newTotal);
+  };
+
+  useEffect(()=> {
+    const getProducts = async ()=> {
+      if(session)
+      {
+        //If User is logged in check database for the cart
+        const serverCart = await getCartItems(session.user.id)
+        setCartItems(serverCart)
+      }else{
+         // If user is not logged, check localStorage
+         const localStorageCartString = localStorage.getItem('cart');
+         if (localStorageCartString) {
+           // If localStorage has cart data, parse it and set cartItems
+           const localStorageCart = JSON.parse(localStorageCartString);
+           setCartItems(localStorageCart)
+          
+         }else{
+          // If localStorage is empty check the cart global state as a final check
+          setCartItems(cart)
+         }
+      }
+
+      setLoading(true)
+      }
+
+      getProducts();   
+    }
+
+  , [update])
+  //added update dependency incase an product gets removed from cart i can refetch products to reflect the update 
+
 
   return (
-      <div>
+    <>
+    {loading ? (  <div >
           <div className="flex">
             <h1 className="text-heading3-bold font-semibold mb-6">Cart</h1>
             <Image
@@ -43,7 +102,13 @@ const Cart = () => {
 
           {/* Cart Items */}
           <div className="flex flex-col gap-2">
-          <CartItem />
+          {cartItems.map((cartItem, index) => (
+            <CartItem key={cartItem.product} product={cartItem.product} quantity={cartItem.quantity} updateTotal={updateTotal} index={index} update={update} setUpdate={setUpdate}/>
+          ))}
+
+          {cartItems.length === 0 && 
+            <h1 className="p-4 text-heading2-bold">Cart is empty</h1>
+          }
           </div>
 
 
@@ -53,7 +118,7 @@ const Cart = () => {
               <h2 className="font-semibold text-heading4-bold text-lg mb-4">Summary:</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal:</span>
-                <span className="font-medium">$179.98</span>
+                <span className="font-medium">${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Shipping:</span>
@@ -61,7 +126,7 @@ const Cart = () => {
               </div>
               <div className="flex justify-between mb-4">
                 <span>Total:</span>
-                <span className="font-medium">$189.98</span>
+                <span className="font-medium">${(total > 0 ? (total + 10.00) : (0)).toFixed(2)}</span>
               </div>
               <Button className="w-full">Checkout</Button>
             </div>
@@ -72,7 +137,12 @@ const Cart = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>) : (
+        <Loading />        
+      )}
+
+
+      </>
   )
 }
 

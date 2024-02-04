@@ -26,7 +26,7 @@ const page = async ({ params }: { params: { id: string } }) => {
 
 
   return (
-    <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20">
+    <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20 max-xs:pt-28">
        {product && (
         <div>
         <ProductDetails

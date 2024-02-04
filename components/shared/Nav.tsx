@@ -24,10 +24,9 @@ const Nav = () => {
 
       if(session)
       {
-        console.log("logged in")
         //If User is logged in check database for the cart
-     
         const serverCart = await getCartItems(session.user.id)
+        console.log("server cart: ", serverCart)
         setCartNum(serverCart.length)
      
       }else{
@@ -36,11 +35,9 @@ const Nav = () => {
          if (localStorageCartString) {
            // If localStorage has cart data, parse it and check if the product is in the cart
            const localStorageCart = JSON.parse(localStorageCartString);
-           console.log("Nav: Products from client local stroage: ", localStorageCart)
            setCartNum(localStorageCart.length)
          }else{
           // If localStorage is empty check the cart global state as a final check
-          console.log("Products from global state: ", cart)
           setCartNum(cart.length)
          }
       }
