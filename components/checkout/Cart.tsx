@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(auth)/loading";
 import { useSession } from "next-auth/react";
-import { getCartItems } from "@/lib/actions/store.actions";
+import { getCartItems, syncLocalStorageWithServerCart } from "@/lib/actions/store.actions";
 import { useAppContext } from "@/lib/AppContext";
 
 interface cartItem {
@@ -35,7 +35,8 @@ const Cart = () => {
   const { cart } = useAppContext();
 
   const updateTotal = (index: number, subTotal: number) => {
-    
+    //when this callback function is call in cartitem it takes its index and subtotal and stores it subtotal
+    //each cartitem and their respective index are stored in an array according to thier indexes when they were mapped
     subtotals[index] = subTotal
 
     // Calculate the total by summing up all subtotals
@@ -43,11 +44,12 @@ const Cart = () => {
     setTotal(newTotal);
   };
 
+
   useEffect(()=> {
     const getProducts = async ()=> {
       if(session)
       {
-        //If User is logged in check database for the cart
+        //If User is logged in check database for the cart with products
         const serverCart = await getCartItems(session.user.id)
         setCartItems(serverCart)
       }else{
@@ -72,7 +74,6 @@ const Cart = () => {
 
   , [update])
   //added update dependency incase an product gets removed from cart i can refetch products to reflect the update 
-
 
   return (
     <>

@@ -483,6 +483,7 @@ export const insideCart = async (userId: string, productId: string )=> {
   }
 }
 
+//get all the items within a cart
 export const getCartItems = async (userId: string) => {
   try {
     // Look for Cart that belongs to the user
@@ -508,3 +509,51 @@ export const getCartItems = async (userId: string) => {
     return [];
   }
 };
+
+// Function to sync local storage with the user's account cart
+export const syncLocalStorageWithServerCart = async (localStorageCart: {product: string, quantity: number}[], userId: string) => {
+  try {
+    // Get the user's cart from the server
+    let serverCart = await Cart.findOne({ user: userId });
+
+    if (!serverCart) {
+      console.log('Cart not found for the user, creating a new one...');
+      serverCart = new Cart({ user: userId, products: [] });
+    } else {
+      console.log('Cart found associated with user, updating...');
+    }
+
+    // Update the server cart based on the local storage cart
+    localStorageCart.forEach(({ product, quantity }: any) => {
+      const productIndex = serverCart.products.findIndex(
+        (item: any) => item.product.toString() === product.toString()
+      );
+
+      if (productIndex !== -1) {
+        // Product found in the server cart, update quantity if needed
+        serverCart.products[productIndex].quantity = Math.max(
+          serverCart.products[productIndex].quantity,
+          quantity
+        );
+      } else {
+        // Product not found in the server cart, add it
+        serverCart.products.push({ product, quantity });
+      }
+    });
+
+    // Save the updated server cart
+    await serverCart.save();
+
+    console.log('Cart synchronization complete.');
+    
+    // Return a success indicator
+    return { success: true, message: 'Cart synchronization successful' };
+  } catch (error) {
+    console.error('Error syncing local storage with server cart:', error);
+
+    // Return an error message
+    return { success: false, message: 'Error syncing cart with server' };
+  }
+};
+
+

@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
-import {useRouter } from "next/navigation";
+import {useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useAppContext } from '@/lib/AppContext';
-import { getCartItems } from '@/lib/actions/store.actions';
+import { getCartItems, syncLocalStorageWithServerCart } from '@/lib/actions/store.actions';
 
 
 const Nav = () => {
@@ -18,7 +18,9 @@ const Nav = () => {
   const {productAdjusted, cart} = useAppContext();
   const router = useRouter();
   const { data: session } = useSession();
+  const currentPath =  usePathname();
 
+ 
   useEffect(()=> {
     const getCartItemsNum = async ()=> {
 
@@ -26,9 +28,7 @@ const Nav = () => {
       {
         //If User is logged in check database for the cart
         const serverCart = await getCartItems(session.user.id)
-        console.log("server cart: ", serverCart)
         setCartNum(serverCart.length)
-     
       }else{
          // If user is not logged, check localStorage
          const localStorageCartString = localStorage.getItem('cart');
@@ -45,6 +45,7 @@ const Nav = () => {
 
     getCartItemsNum();
 
+   
   }, [productAdjusted])
 
   function AuthButton() {
@@ -63,7 +64,7 @@ const Nav = () => {
         </Button>
           <Button variant="destructive" className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut({
             redirect: true,
-            callbackUrl: `/`
+            callbackUrl: `${currentPath}`
           })}>
             LOGOUT
             </Button>
@@ -72,7 +73,14 @@ const Nav = () => {
     }
     return (
       <>
-        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" onClick={() => signIn()}>LOGIN</Button>
+        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" 
+          onClick={()=> {
+          // Set data in sessionStorage so user can navigate back to exact page after loggin in
+          sessionStorage.setItem('path', currentPath);
+          signIn()
+          }}>
+            LOGIN
+          </Button>
       </>
     );
   }

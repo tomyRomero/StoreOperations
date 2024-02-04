@@ -7,12 +7,6 @@ import { redirect } from "next/navigation";
 import { getAllUsers } from "@/lib/actions/admin.actions";
 
 export default async function page() {
-  const session = await getServerSession(authOptions);
-
-  if(session === undefined || session?.user.admin === false)
-  {
-    redirect("/")
-  }
 
   const Users = await getAllUsers();
 

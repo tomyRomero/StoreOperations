@@ -1,22 +1,12 @@
 import React from 'react'
 import { Button } from "@/components/ui/button"
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
-import { getServerSession } from "next-auth";
 import Link from "next/link"
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
 import { getAllCategories } from '@/lib/actions/store.actions';
 import CategoryRow from '@/components/tables/CategoryRow';
 
 export default async function page() {
 
-  const session = await getServerSession(authOptions);
-
-  if(session === undefined || session?.user.admin === false)
-  {
-    redirect("/")
-  }
-  
   const categories = await getAllCategories();
 
   return (

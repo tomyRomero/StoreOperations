@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 
 import { Button } from "../ui/button";
+import { useAppContext } from "@/lib/AppContext";
 
 
 interface Props {
@@ -13,7 +14,6 @@ interface Props {
 
 function Pagination({ pageNumber, isNext, path}: Props) {
   const router = useRouter();
-
   const currentPath = usePathname()
 
   const handleNavigation = (type: string) => {

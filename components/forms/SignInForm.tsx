@@ -30,6 +30,7 @@ const SignInForm = () => {
   const router = useRouter();
   const { toast } = useToast();
 
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -56,15 +57,23 @@ const SignInForm = () => {
       }else{
         toast({
           title: "Success!",
-          description: "Welcome back, heading home!", 
+          description: "Welcome back, redirecting!", 
         })
         
+        
         setTimeout(() => {
-          router.push('/');
+          const url = sessionStorage.getItem('path');
+          if(url)
+          {
+            router.push(url)
+          }else{
+            router.push("/");
+          }
         }, 1500);
       }
     
   };
+
   
 
   return (

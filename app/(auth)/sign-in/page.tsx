@@ -2,11 +2,8 @@
 
 import SignInForm from "@/components/forms/SignInForm";
 import Image from "next/image";
-import {useRouter } from "next/navigation";
 
 export default function Page() {
-
-  const router = useRouter();
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-2 h-screen">

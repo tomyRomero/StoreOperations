@@ -7,14 +7,6 @@ import { redirect } from "next/navigation";
 import { getAllCategories } from "@/lib/actions/store.actions";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
-
-  if(session?.user.admin)
-  {
-    redirect("/adminusers")
-  }
-
-  console.log(session?.user)
 
   const categories = await getAllCategories();
 

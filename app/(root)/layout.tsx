@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
 import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/lib/AppContext";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -24,22 +26,27 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
+
+  if(session?.user.admin)
+  {
+    redirect("/adminusers")
+  }
 
   return (
 
     <html lang="en">
-    <AppProvider>
     <SessionProvider session={session}>
-    <body className={`${jost.className} flex flex-col`}>
-      <Nav/>
-      <main className="flex flex-col items-center">
-        <section className="main-container w-full mp-4">{children}</section>
-      </main>
-      <Footer />
-    </body>
+      <AppProvider>
+      <body className={`${jost.className} flex flex-col`}>
+        <Nav/>
+        <main className="flex flex-col items-center">
+          <section className="main-container w-full mp-4">{children}</section>
+        </main>
+        <Footer />
+      </body>
+      </AppProvider>
     </SessionProvider>
-    </AppProvider>
   </html>
 
   );

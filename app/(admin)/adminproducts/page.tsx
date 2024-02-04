@@ -13,17 +13,10 @@ export default async function page({
   searchParams: { [key: string]: string | undefined };
 }) {
 
-  const session = await getServerSession(authOptions);
-
   const products = await getAllProductsWithoutSort(
     searchParams.page ? + searchParams.page : 1,
      8,
   );
-
-  if(session === undefined || session?.user.admin === false)
-  {
-    redirect("/")
-  }
 
   return (
     <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">

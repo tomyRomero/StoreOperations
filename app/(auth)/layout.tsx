@@ -6,6 +6,9 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { AppProvider } from "@/lib/AppContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +23,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
 
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
+
+  if(session)
+  {
+    redirect("/")
+  }
 
   return (
 

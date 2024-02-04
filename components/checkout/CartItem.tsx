@@ -37,7 +37,7 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
   const [img, setImg] = useState("/assets/spinner.svg")
   const [loading, setLoading] = useState(false)
   const { data: session } = useSession();
-  const {cart, setCart} = useAppContext();
+  const {setCart, setProductAdjusted , productAdjusted} = useAppContext();
 
   const addToCartLocally = ()=> {
     setCart((prevCart: {product: string, quantity:number}[]) => {
@@ -70,7 +70,7 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
         // If the product is found
         const updatedCart = [...prevCart];
         if (removeAll) {
-          // If removeAll is true, remove the item
+          // If removeAll is true, remove the item completely
           updatedCart.splice(productIndex, 1);
         } else if (prevCart[productIndex].quantity > 1) {
           // If quantity is greater than 1, decrement it
@@ -164,6 +164,9 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
       try{
         await removeProductFromCart(session.user.id, product, 1, true)
         updateTotal(index, 0);
+        //update the global state so nav bar can update
+        setProductAdjusted(!productAdjusted)
+        //set update so that the products can refresh on the main cart
         setUpdate(!update)
       }catch(error)
       {
@@ -172,6 +175,8 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
     }else{
       removeFromCartLocally(true)
       updateTotal(index, 0);
+      //update the global state so nav bar can update
+      setProductAdjusted(!productAdjusted)
       setUpdate(!update)
     }
 

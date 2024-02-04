@@ -8,6 +8,8 @@ import AdminNav from "@/components/shared/AdminNav";
 import AdminDashboard from "@/components/shared/AdminDashboard";
 import MobileAdminDashboard from "@/components/shared/MobileAdminDashboard";
 import { Toaster } from "@/components/ui/toaster";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -26,8 +28,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
 
-  const session = await getServerSession();
+  if(!session || session?.user.admin === false || session === undefined)
+  {
+    redirect("/")
+  }
 
   return (
 
