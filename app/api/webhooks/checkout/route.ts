@@ -31,9 +31,14 @@ const customer = await stripe.customers.create({
 
 
 // Define the webhook endpoint
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: any) {
 
     try{
+         // Check if req.body is null or undefined
+         if (!req.body) {
+            throw new Error("Request body is empty");
+        }
+
         // Read the request body stream and construct a buffer
         const chunks = [];
         for await (const chunk of req.body) {
