@@ -8,7 +8,8 @@ import { Badge } from "../ui/badge";
 import {useRouter, usePathname } from "next/navigation";
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useAppContext } from '@/lib/AppContext';
-import { getCartItems, syncLocalStorageWithServerCart } from '@/lib/actions/store.actions';
+import { getCartItems } from '@/lib/actions/store.actions';
+import { syncLocalStorageWithServerCartClient } from '@/lib/utils';
 
 
 const Nav = () => {
@@ -27,6 +28,7 @@ const Nav = () => {
       if(session)
       {
         //If User is logged in check database for the cart
+        await syncLocalStorageWithServerCartClient(session.user.id);
         const serverCart = await getCartItems(session.user.id)
         setCartNum(serverCart.length)
       }else{

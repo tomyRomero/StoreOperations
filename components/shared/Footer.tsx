@@ -16,11 +16,11 @@ export default function Footer() {
     },
     {
       title: "About Us",
-      link: ""
+      link: "/about"
     },
     {
       title: "Contact Us",
-      link: ""
+      link: "/contact"
     }
   ]
 

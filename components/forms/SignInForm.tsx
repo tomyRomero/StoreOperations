@@ -59,8 +59,7 @@ const SignInForm = () => {
           title: "Success!",
           description: "Welcome back, redirecting!", 
         })
-        
-        
+
         setTimeout(() => {
           const url = sessionStorage.getItem('path');
           if(url)
@@ -70,6 +69,7 @@ const SignInForm = () => {
             router.push("/");
           }
         }, 1500);
+
       }
     
   };

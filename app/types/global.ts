@@ -17,3 +17,15 @@ export interface ProductType{
     photo:  string,
     date?: string | "";
 }
+
+export type Address = {
+    name: string;
+    address: {
+        line1: string;
+        line2: string | null;
+        city: string;
+        country: string;
+        postal_code: string;
+        state: string;
+    };
+};

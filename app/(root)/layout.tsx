@@ -8,6 +8,7 @@ import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/lib/AppContext";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Toaster } from "@/components/ui/toaster";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -44,6 +45,7 @@ export default async function RootLayout({
           <section className="main-container w-full mp-4">{children}</section>
         </main>
         <Footer />
+        <Toaster />
       </body>
       </AppProvider>
     </SessionProvider>

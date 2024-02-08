@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react"
 import { useAppContext } from "@/lib/AppContext"
 import ProductCard from "./cards/ProductCard"
 import Loading from "@/app/(auth)/loading"
+import { toast } from "./ui/use-toast"
 
 type ProductDetailsType = ProductType & {
   result: boolean;
@@ -106,9 +107,16 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
           setInCart(true)
            //Call global state to let the app know a product in the cart was added
           setProductAdjusted(!productAdjusted)
+          toast({
+            title: "Added to Cart",
+          })
         }else
         {
-          alert("Error adding to cart")
+          toast({
+            title: "Error adding product to cart",
+            description: "There was an error and the item failed to be added onto the database. Please try again", 
+            variant: "destructive",
+          })
         }
       }else{
         //If user is not logged in, add the product to the cart to the local storage
@@ -116,6 +124,9 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
         setInCart(true)
          //Call global state to let the app know a product in the cart was added
         setProductAdjusted(!productAdjusted)
+        toast({
+          title: "Added to Cart",
+        })
       }
 
      

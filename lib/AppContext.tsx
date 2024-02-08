@@ -40,33 +40,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   //Global marker that is called whenever an item in cart is updated, used for nav
   const [productAdjusted, setProductAdjusted] = useState(false);
 
-  const { data: session } = useSession();
-
-  useEffect(()=> {
-    const syncLocalStorageWithServerCartClient = async (userId: string) => {
-      // Perform local storage operations to see if it exists
-      const localStorageCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-      if (localStorageCart) {
-        // Call the server-side function to handle server operations
-        const syncResult = await syncLocalStorageWithServerCart(localStorageCart, userId);
-    
-        if (syncResult.success) {
-          // Clear the local storage cart
-          localStorage.removeItem('cart');
-          console.log('Local storage cart cleared after successful synchronization.');
-        } else {
-          console.error('Failed to sync cart:', syncResult.message);
-        }
-      }
-    };
-
-    if(session)
-    {
-      syncLocalStorageWithServerCartClient(session.user.id);
-    }
-   
-  }, [])
 
   // Provide the context value to the children components, include additional states if there are any
   const contextValue: AppContextProps = {

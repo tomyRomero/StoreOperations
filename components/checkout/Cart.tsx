@@ -4,12 +4,14 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import CartItem from "./CartItem";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "@/app/(auth)/loading";
-import { useSession } from "next-auth/react";
-import { getCartItems, syncLocalStorageWithServerCart } from "@/lib/actions/store.actions";
+import { signIn, useSession } from "next-auth/react";
+import { findProduct, getCartItems, removeProductFromCart } from "@/lib/actions/store.actions";
 import { useAppContext } from "@/lib/AppContext";
+import { syncLocalStorageWithServerCartClient } from "@/lib/utils";
+import { toast } from "../ui/use-toast";
 
 interface cartItem {
   product: string;
@@ -19,40 +21,42 @@ interface cartItem {
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState<cartItem[]>([])
-  const [subtotals, setSubtotals] = useState<number[]>(
-    Array.from({ length: cartItems.length }, () => 0)
-  );;
+
+  //If all cartitems are in stock, procceed
+  const [proceed, setProceed] = useState(true);
+
+  //State for the overall total of the cart
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false);
-  const [update , setUpdate] = useState(false);
+
+  //For when an cartitem gets deleted, use this
+  const [update , setUpdate] = useState(false); 
+
+   //Added for pagination of cart items
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
   const router = useRouter()
+  const currentPath =  usePathname();
   const { data: session } = useSession();
 
   const goBack = ()=> {
     router.back();
   }
+
   const { cart } = useAppContext();
-
-  const updateTotal = (index: number, subTotal: number) => {
-    //when this callback function is call in cartitem it takes its index and subtotal and stores it subtotal
-    //each cartitem and their respective index are stored in an array according to thier indexes when they were mapped
-    subtotals[index] = subTotal
-
-    // Calculate the total by summing up all subtotals
-    const newTotal = subtotals.reduce((acc, subtotal) => acc + subtotal, 0);
-    setTotal(newTotal);
-  };
-
 
   useEffect(()=> {
     const getProducts = async ()=> {
       if(session)
       {
+        //sync localstorage cart with server cart if it exists 
+        await syncLocalStorageWithServerCartClient(session.user.id);
         //If User is logged in check database for the cart with products
         const serverCart = await getCartItems(session.user.id)
         setCartItems(serverCart)
       }else{
+        console.log("i ran")
          // If user is not logged, check localStorage
          const localStorageCartString = localStorage.getItem('cart');
          if (localStorageCartString) {
@@ -66,14 +70,72 @@ const Cart = () => {
          }
       }
 
-      setLoading(true)
+        setLoading(true)
       }
 
       getProducts();   
     }
 
   , [update])
-  //added update dependency incase an product gets removed from cart i can refetch products to reflect the update 
+  //added update dependency incase an product gets edited I can refetch the cart
+
+    useEffect(()=> {
+      const getPrices = async ()=> {
+        
+        let prices:number[] = []
+        let stocks:boolean[] = []
+          //set default prices
+        await Promise.all(cartItems.map(async (element) => {
+          const data = await findProduct(element.product);
+          
+          if(data)
+          {
+            prices.push(data?.price * element.quantity)
+            stocks.push(element.quantity > data?.stock ? false : true)
+          }else{
+            prices.push(0)
+            stocks.push(false)
+          }
+         
+        }));
+
+        const newTotal = prices.reduce((acc, subtotal) => acc + subtotal, 0);
+        const inStock =  stocks.every((item) => item === true);
+        setTotal(newTotal)
+        setProceed(inStock)
+      }
+
+      getPrices()
+    }, [cartItems])
+
+  const handleCheckout = ()=> {
+    if(!session){
+        // Set data in sessionStorage so user can navigate back to exact page after loggin in
+        sessionStorage.setItem('path', currentPath);
+        signIn()
+    }else{
+      if(proceed)
+      {
+        router.push("/address")
+      }else{
+        toast({
+          title: "Items Unavailable",
+          description: "Some cart items have exceeded stock, please remove those and try again.", 
+          variant: "destructive",
+        })
+      }
+      
+    }
+  }
+
+    // Calculate the index of the last item to be displayed on the current page
+  const indexOfLastItem = currentPage * itemsPerPage;
+
+  // Calculate the index of the first item to be displayed on the current page
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  // Slice the cartItems array to get the items for the current page
+  const currentCartItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <>
@@ -103,15 +165,41 @@ const Cart = () => {
 
           {/* Cart Items */}
           <div className="flex flex-col gap-2">
-          {cartItems.map((cartItem, index) => (
-            <CartItem key={cartItem.product} product={cartItem.product} quantity={cartItem.quantity} updateTotal={updateTotal} index={index} update={update} setUpdate={setUpdate}/>
+          {currentCartItems.map((cartItem, index) => (
+            <CartItem 
+            key={cartItem.product}
+            product={cartItem.product} 
+            quantity={cartItem.quantity} 
+            update={update} 
+            setUpdate={setUpdate}
+            />
+            
           ))}
 
           {cartItems.length === 0 && 
             <h1 className="p-4 text-heading2-bold">Cart is empty</h1>
           }
+
+          {/* Pagination */}
+          <div className={`pagination ${cartItems.length === 0 ? "!hidden" : ""}`}>
+            <Button
+              onClick={() => setCurrentPage((prevPage) => Math.max(1, prevPage - 1))}
+              disabled={currentPage === 1}
+              className="!text-small-regular text-light-2 bg-black"
+            >
+              Prev
+            </Button>
+            <p className="text-small-semibold text-black">{currentPage}</p>
+            <Button
+              onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
+              disabled={indexOfLastItem >= cartItems.length}
+              className={`!text-small-regular text-light-2 bg-black`}
+            >
+              Next
+            </Button>
           </div>
 
+          </div>
 
           {/* Total Section */}
           <div className="space-y-4">
@@ -126,10 +214,13 @@ const Cart = () => {
                 <span className="font-medium">$10.00</span>
               </div>
               <div className="flex justify-between mb-4">
-                <span>Total:</span>
+                <span>Total without Tax:</span>
                 <span className="font-medium">${(total > 0 ? (total + 10.00) : (0)).toFixed(2)}</span>
               </div>
-              <Button className="w-full">Checkout</Button>
+              <Button className="w-full" onClick={handleCheckout}>
+                {session ? "Checkout" :  "Login to Checkout"}
+              </Button>
+              <div className={`text-red-500 ${proceed ? 'hidden' : ''}`}>one or more items out of stock</div>
             </div>
             <div className="py-0.5">
             <Link className="text-sm hover:underline" href="/products" >
@@ -138,10 +229,10 @@ const Cart = () => {
             </div>
           </div>
         </div>
+
       </div>) : (
         <Loading />        
       )}
-
 
       </>
   )

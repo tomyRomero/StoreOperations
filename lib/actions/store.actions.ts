@@ -4,11 +4,13 @@ import { revalidatePath} from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
 import Category from "../models/category.model";
-import { CategoryType, ProductType } from "@/app/types/global";
+import { Address, CategoryType, ProductType } from "@/app/types/global";
 import Product from "../models/product.model";
 import { Stripe } from 'stripe';
 import { SortOrder } from 'mongoose';
 import Cart from "../models/cart.model";
+import { nanoid } from 'nanoid';
+import Addresses from "../models/addresses.model";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -176,7 +178,7 @@ export const getAllCategories = async () => {
   export const findProduct = async (id:string) => {
     try{
       connectToDB();
-      // Find the category by ID
+      // Find the product by ID
       const product = await Product.findOne({stripeProductId: id});
       
       const {name, description, stock, price, category, photo } = product
@@ -487,7 +489,6 @@ export const insideCart = async (userId: string, productId: string )=> {
 export const getCartItems = async (userId: string) => {
   try {
     // Look for Cart that belongs to the user
-    console.log("userId: ", userId)
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {
@@ -556,4 +557,149 @@ export const syncLocalStorageWithServerCart = async (localStorageCart: {product:
   }
 };
 
+//Take server cart and check all products inside have a quantity that do not pass the stock of the products
+//Basically make sure everything is in stock before processing the checkout
+export const cartItemsInStock = async (userId: string) => {
+  try {
+    // Look for Cart that belongs to the user
+    console.log("userId: ", userId);
+    const cart = await Cart.findOne({ user: userId });
 
+    if (!cart || !cart.products || cart.products.length === 0) {
+      // Cart does not exist or has no products
+      console.log("No cart found or cart has no products for the logged-in user");
+      return false;
+    } else {
+      console.log("Cart found for logged-in user");
+      let allStock = true;
+
+      // Use Promise.all to wait for all asynchronous operations in the loop
+      await Promise.all(cart.products.map(async (product: { product: string, quantity: number }, index: number) => {
+        // Access the current product
+        console.log(`Product at index ${index}:`, product);
+
+        // For each product in cart get its id and find it in the database
+        const dbProduct = await Product.findOne({ stripeProductId: product.product });
+
+        if (dbProduct) {
+          if (dbProduct.stock) {
+            product.quantity > dbProduct.stock
+              ? (allStock = false,
+                console.log(
+                  `product ${dbProduct.name} NOT in stock for cart quantity, stock: ${dbProduct.stock}, cart quantity: ${product.quantity}`
+                ))
+              : console.log(`product ${dbProduct.name} in stock, stock: ${dbProduct.stock}, cart quantity: ${product.quantity}`);
+          } else {
+            // If stock does not exist then all of the stock is not valid
+            allStock = false;
+          }
+        } else {
+          // Set the stock to false because I cannot find the product, it might've been removed
+          allStock = false;
+        }
+      }));
+
+      console.log(`Proceed to checkout? : ${allStock}`);
+      return allStock;
+    }
+  } catch (error) {
+    console.error("Error retrieving cart items:", error);
+    return false;
+  }
+};
+
+//create Checkout so that user can proceed to payment as well as store addresses the user wants 
+export const createCheckout = async (userId: string, address:Address, store: boolean) => {
+  try{
+    const existing = await User.findById(userId)
+
+    const orderId = nanoid(); 
+
+    const checkout= {
+      status: "readyForPayment",
+      address: address,
+      orderid: orderId
+    }
+
+    if(existing)
+    {
+      //if user exists update the checkout object that we will be using to ensure we can proceed to payment
+      existing.checkout = checkout;
+      await existing.save();
+
+      console.log("saved checkout")
+      console.log(existing)
+
+      if (store) {
+        // Check if the user already has addresses stored
+        let userAddresses = await Addresses.findOne({ user: userId });
+
+        if (!userAddresses) {
+            // If no addresses are stored, create a new document with the provided address
+            userAddresses = await new Addresses({
+                user: userId,
+                addresses: [{ address: address }]
+            });
+
+            console.log("created address list for user")
+        } else {
+            // If addresses are already stored, append the new address to the existing list
+            await userAddresses.addresses.push({ address: address });
+            console.log("added new address to address list")
+        }
+
+        await userAddresses.save();
+    }
+
+    return true;
+    }else{
+      console.log("Did not find user when updating checkout")
+      return false;
+    }
+
+  }catch(error)
+  {
+    console.log(`an error occured updating checkout: ${error}`)
+    return false;
+  }
+}
+
+//Get all addresses belonging to user
+export const getUserAddresses = async (userId: string) => {
+  try {
+      // Find the user's addresses based on the provided userId
+      const userAddresses = await Addresses.findOne({ user: userId });
+
+      if (userAddresses) {
+          // If addresses are found, return the addresses array
+          const myAddresses = userAddresses.addresses.map((item: any) => item.address);
+          console.log("user addresses: " , myAddresses)
+          return myAddresses
+      } else {
+          // If no addresses are found, return an empty array
+          return [];
+      }
+  } catch (error) {
+      console.log(`An error occurred while fetching user addresses: ${error}`);
+      return [];
+  }
+};
+
+//get address and orderId from checkout that was created when we selected our address.
+export const getAddressAndOrderIdFromCheckout = async (userId: string) => {
+  try {
+    const existing = await User.findById(userId);
+
+    if (existing && existing.checkout && existing.checkout.address && existing.checkout.orderid) {
+      console.log("success")
+      console.log({address: existing.checkout.address, orderId: existing.checkout.orderid})
+      return { address: existing.checkout.address, orderId: existing.checkout.orderid };
+    } else {
+      console.log("something wrong happened")
+      return false; // Either no user, no checkout, or no address in the checkout
+    }
+  } catch (error) {
+    console.log(`An error occurred while fetching address from checkout: ${error}`);
+    return false;
+  }
+};

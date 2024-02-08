@@ -1,9 +1,11 @@
 import ProductDetails from '@/components/ProductDetails'
 import { findProduct, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
 import React from 'react'
-import ProductCard from '@/components/cards/ProductCard'
+import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { Button } from '@/components/ui/button'
+import { redirect } from 'next/navigation'
 
 const page = async ({ params }: { params: { id: string } }) => {
 
@@ -24,6 +26,10 @@ const page = async ({ params }: { params: { id: string } }) => {
   if(userId)
   result = await insideCart(userId, params.id)
 
+  if(!product)
+  {
+    redirect("/products")
+  }
 
   return (
     <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20 max-xs:pt-28">
@@ -43,7 +49,10 @@ const page = async ({ params }: { params: { id: string } }) => {
         </div>
        )}
        {!product &&
-       <h1>No Product Found</h1>
+       <div>
+      <br></br>
+       <h1 className='text-red-500'>No Product Found</h1>
+       </div>
        }
     </section>
   )

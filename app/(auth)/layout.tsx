@@ -8,7 +8,6 @@ import { getServerSession } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { AppProvider } from "@/lib/AppContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,11 +33,11 @@ export default async function RootLayout({
 
       <html lang='en'>
         <body className={`${inter.className} bg-white`}>
-        <div className="mx-auto w-full">
-            {children}
-        </div>
-        <Toaster />
-        </body>
+          <div className="mx-auto w-full">
+              {children}
+          </div>
+          <Toaster />
+          </body>
       </html>
 
   );

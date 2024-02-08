@@ -3,27 +3,22 @@
 import React, {useState, useEffect} from 'react'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import Loading from '@/app/(auth)/loading'
 import { addProductToCart, findProduct, removeProductFromCart } from '@/lib/actions/store.actions'
-import { ProductType } from '@/app/types/global'
 import { getRes } from '@/lib/s3'
 import { Skeleton } from '../ui/skeleton'
-import { useRouter } from 'next/router'
 import { useAppContext } from '@/lib/AppContext'
 import { useSession } from 'next-auth/react'
-import { revalidate } from '@/lib/actions/admin.actions'
 import Link from 'next/link'
+import { toast } from '../ui/use-toast'
 
 interface cartItem {
   product: string;
   quantity: number;
-  updateTotal: Function;
-  index: number;
   update: boolean;
   setUpdate: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: cartItem) => {
+const CartItem = ({product, quantity , update, setUpdate}: cartItem) => {
   const [myProduct , setMyProduct] = useState<any>({
     name: "Product Not Found",
     description: "", 
@@ -32,14 +27,14 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
     category: "null",
     photo: ""
   })
-  const [subTotal, setSubTotal] = useState(0);
-  const [ insideQuantity , setInsideQuantity] = useState(quantity)
   const [img, setImg] = useState("/assets/spinner.svg")
   const [loading, setLoading] = useState(false)
+  const [edit, setEdit] = useState(false)
+  
   const { data: session } = useSession();
   const {setCart, setProductAdjusted , productAdjusted} = useAppContext();
 
-  const addToCartLocally = ()=> {
+  const addToCartLocally = async ()=> {
     setCart((prevCart: {product: string, quantity:number}[]) => {
       const productIndex = prevCart.findIndex((item) => item.product === product);
   
@@ -62,7 +57,7 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
     
   }
 
-  const removeFromCartLocally = (removeAll: boolean = false) => {
+  const removeFromCartLocally = async (removeAll: boolean = false) => {
     setCart((prevCart: { product: string; quantity: number }[]) => {
       const productIndex = prevCart.findIndex((item) => item.product === product);
   
@@ -99,86 +94,90 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
           category: data?.category,
           photo: data?.photo
         })
-      
-      setSubTotal(data?.price * quantity)
 
       setImg(await getRes(data?.photo))
       setLoading(true)
+   
     }
 
     getProduct();
   }, [])
 
-  useEffect(() => {
-    updateTotal(index, subTotal);
-    
-  }, [subTotal]);
-
   const add = async () => {
-    setInsideQuantity((prevInsideQuantity: number) => {
-      const newQuantity = prevInsideQuantity + 1;
-      const newSubTotal = myProduct.price * newQuantity;
-      setSubTotal(newSubTotal);
-      return newQuantity;
-    });
-
+    setEdit(true)
     if(session)
     {
       const added = await addProductToCart(session.user.id, product)
 
       if(!added)
       {
-        alert("Error adding product to cart in database")
+       toast({
+        title: "Error",
+        description: "Failed to add more items to server cart",
+        variant: "destructive"
+       })
       }
+      setUpdate(!update)
     }else{
-      addToCartLocally();
+      await addToCartLocally();
+      setUpdate(!update)
     }
 
+    setEdit(false)
   };
 
   const subtract = async () => {
-    setInsideQuantity((prevInsideQuantity: number) => {
-      const newQuantity = prevInsideQuantity <= 1 ? 1 : prevInsideQuantity - 1;
-      const newSubTotal = myProduct.price * newQuantity;
-      setSubTotal(newSubTotal);
-      return newQuantity;
-    });
-
+    setEdit(true)
     if(session)
     {
       try{
         await removeProductFromCart(session.user.id, product)
+        setUpdate(!update)
       }catch(error)
       {
-        alert("error removing product from cart in database")
+        toast({
+          title: "Error",
+          description: "Failed to remove product from cart in database",
+          variant: "destructive"
+         })
       }
     }else{
-      removeFromCartLocally();
+      await removeFromCartLocally();
+      setUpdate(!update)
     }
-
+    setEdit(false)
   };
 
   const deleteProduct = async () => {
+    setLoading(true)
     if(session)
     {
       try{
         await removeProductFromCart(session.user.id, product, 1, true)
-        updateTotal(index, 0);
         //update the global state so nav bar can update
         setProductAdjusted(!productAdjusted)
         //set update so that the products can refresh on the main cart
         setUpdate(!update)
       }catch(error)
       {
-        alert("error removing product from cart in database")
+        toast({
+          title: "Failure to remove from database",
+          description: "There was an error and the item failed to be removed. Please try again", 
+          variant: "destructive",
+        })
       }
     }else{
-      removeFromCartLocally(true)
-      updateTotal(index, 0);
+      await removeFromCartLocally(true)
       //update the global state so nav bar can update
       setProductAdjusted(!productAdjusted)
       setUpdate(!update)
     }
+
+    toast({
+      title: "Removed from cart",
+    })
+
+    setLoading(false)
 
   }
 
@@ -195,7 +194,9 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
       />
       <div className="flex-1 grid gap-2">
         <Link href={`/products/${product}`}>
-        <h2 className="font-semibold hover:underline hover:text-blue">{myProduct.name}</h2>
+        <h2 className="font-semibold hover:underline hover:text-blue">
+          {!myProduct.name  ? "Product Not Found" : myProduct.name}
+          </h2>
         </Link>
         <h2 className="text-base-regular">Quantity:</h2>
         <div className="flex items-center">
@@ -208,22 +209,29 @@ const CartItem = ({product, quantity , updateTotal, index , update, setUpdate}: 
             />
             <span className="sr-only">Subtract</span>
           </Button>
-          <h4 className='px-2'>{insideQuantity}</h4>
+          <h4 className={`px-2 ${edit? "hidden" : ""}`}>{quantity}</h4>
+          <Image 
+            src="/assets/lineloader.svg"
+            alt='loading animation'
+            width={24}
+            height={24}
+            className={`${!edit? "hidden" : "px-2"}`}
+          />
           <Button className='bg-white p-1.5' variant="outline" onClick={add}>
             <Image 
             src="/assets/plus.png"
             alt="add icon"
-            width={24}
-            height={24}
+            width={34}
+            height={34}
             />
             <span className="sr-only">Add</span>
           </Button>
         </div>
-        <div className={`text-red-500 ${insideQuantity > myProduct.stock ? '' : 'hidden'}`}>amount has exceeded stock</div>
+        <div className={`text-red-500 ${quantity > myProduct.stock ? '' : 'hidden'}`}>amount has exceeded stock</div>
         <div className={`text-red-500 ${myProduct.stock === 0 ? '' : 'hidden'}`}>item is out of stock</div>
-        <div className="font-semibold">${subTotal.toFixed(2)}</div>
+        <div className="font-semibold">${(myProduct.price * quantity).toFixed(2)}</div>
       </div>
-      <Button  size="icon" variant="outline" onClick={deleteProduct}>
+      <Button  size="icon" variant="outline" onClick={async()=> {await deleteProduct()}}>
         <Image 
         src="/assets/delete.png"
         alt="trash icon"
