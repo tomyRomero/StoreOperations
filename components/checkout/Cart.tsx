@@ -116,7 +116,7 @@ const Cart = () => {
     }else{
       if(proceed)
       {
-        router.push("/address")
+        router.push("/checkout")
       }else{
         toast({
           title: "Items Unavailable",
@@ -223,7 +223,7 @@ const Cart = () => {
               <div className={`text-red-500 ${proceed ? 'hidden' : ''}`}>one or more items out of stock</div>
             </div>
             <div className="py-0.5">
-            <Link className="text-sm hover:underline" href="/products" >
+            <Link className="hover:underline" href="/products" >
               Continue Shopping
             </Link>
             </div>

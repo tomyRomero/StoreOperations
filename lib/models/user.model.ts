@@ -7,6 +7,7 @@ const userSchema = new Schema({
     password: {type: String, required: true},
     admin: {type: Boolean, required:true , default: false},
     date: {type: String, default: getCurrentDate, required: true},
+    stripeId: {type: String, unique:true }, 
     cart: {
         type: Schema.Types.ObjectId,
         ref: 'Cart',

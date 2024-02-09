@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import { getCurrentDate } from "../utils";
 
 const ordersSchema = new Schema({
     orderId: {
@@ -37,7 +38,8 @@ const ordersSchema = new Schema({
   pricing: {
     type: Object,
     required: true,
-  }
+  },
+  date: {type: String, default: getCurrentDate, required: true},
 });
 
 const Orders = models.Orders || model('Orders', ordersSchema);

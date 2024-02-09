@@ -4,8 +4,6 @@
 import { revalidatePath} from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
-import Category from "../models/category.model";
-import { CategoryType, ProductType } from "@/app/types/global";
 
 // Function to fetch all users
 export const getAllUsers = async () => {
@@ -24,3 +22,14 @@ export const getAllUsers = async () => {
 export const revalidate = (path: string)=> {
   revalidatePath(path)
 }
+
+export const getAdminUser = async () => {
+  try {
+    // Use the findOne method on the User model to retrieve the admin user
+    const adminUser = await User.findOne({ admin: true });
+    return adminUser;
+  } catch (error) {
+    console.error("Error fetching admin user:", error);
+    throw error;
+  }
+};

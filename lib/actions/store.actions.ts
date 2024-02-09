@@ -11,6 +11,8 @@ import { SortOrder } from 'mongoose';
 import Cart from "../models/cart.model";
 import { nanoid } from 'nanoid';
 import Addresses from "../models/addresses.model";
+import Orders from "../models/orders.model";
+import Activity from "../models/activity.model";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -703,3 +705,100 @@ export const getAddressAndOrderIdFromCheckout = async (userId: string) => {
     return false;
   }
 };
+
+//Remove checkout object when payment is proccessed
+export const removeCheckout = async (userId: string) => {
+  try {
+    const existing = await User.findById(userId);
+
+    if (existing) {
+      // Remove the checkout object from the user document
+      existing.checkout = undefined;
+      await existing.save();
+
+      console.log("Removed checkout");
+      console.log(existing);
+
+      return true;
+    } else {
+      console.log("User not found when removing checkout");
+      return false;
+    }
+  } catch (error) {
+    console.log(`An error occurred while removing checkout: ${error}`);
+    return false;
+  }
+};
+
+//Remove the current cart associated with user when payment is proccessed
+export const removeUserCart = async (userId: string) => {
+  try {
+    // Find the user's cart document
+    const userCart = await Cart.findOne({ user: userId });
+
+    if (userCart) {
+      // If the cart document exists, remove it
+      await userCart.remove();
+      
+      console.log('User cart removed successfully.');
+      return { success: true, message: 'User cart removed successfully' };
+    } else {
+      // If the cart document does not exist, log a message indicating so
+      console.log('User cart not found.');
+      return { success: true, message: 'User cart not found' };
+    }
+  } catch (error) {
+    // If an error occurs during the process, log the error message
+    console.error('Error removing user cart:', error);
+    return { success: false, message: 'Error removing user cart' };
+  }
+};
+
+interface OrderParams {
+  orderId: string;
+  user: string;
+  items: { product: string; quantity: number }[];
+  status?: string;
+  address: object;
+  pricing: object;
+}
+
+export const createOrder = async (params: OrderParams): Promise<boolean> => {
+  try {
+      // Create a new instance of the Orders model with the provided parameters
+      const newOrder = new Orders({
+          orderId: params.orderId,
+          user: params.user,
+          items: params.items,
+          status: params.status || 'pending', // If status is not provided, default to 'pending'
+          address: params.address,
+          pricing: params.pricing
+      });
+
+      // Save the new order object to the database
+      await newOrder.save();
+
+      // Create a new activity entry to log the order creation
+        const newActivity = new Activity({
+          action: 'order_created',
+          timestamp: new Date(),
+          details: {
+              orderId: params.orderId,
+              user: params.user,
+              total: params.pricing,
+              status: params.status
+          }
+      });
+
+      // Save the new activity object to the database
+      await newActivity.save();
+
+      // If the order creation and activity logging are successful, return true
+      return true;
+  } catch (error) {
+      // If an error occurs during the process, log the error message and return false
+      console.error('Error creating order:', error);
+      return false;
+  }
+};
+

@@ -5,7 +5,6 @@ import {
   PaymentElement,
   useStripe,
   useElements,
-  AddressElement
 } from "@stripe/react-stripe-js";
 import { Layout } from "@stripe/stripe-js";
 import { Button } from "../ui/button";
@@ -16,8 +15,6 @@ const CheckoutForm = ()=> {
 
   const [message, setMessage] = useState<string | null | undefined>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("")
-  const [shippingAddress, setShippingAddress] = useState<any>(null); // Store the shipping address
 
   useEffect(() => {
     if (!stripe) {
@@ -66,7 +63,7 @@ const CheckoutForm = ()=> {
       confirmParams: {
         // link to payment completion page
         return_url: "http://localhost:3000/",
-        
+
       },
     });
 
