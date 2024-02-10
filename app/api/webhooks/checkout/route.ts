@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import Cors from "micro-cors";
 import Stripe from 'stripe';
 import { headers } from "next/headers";
-import { createOrder } from "@/lib/actions/store.actions";
+import { createOrder, removeCheckout, removeUserCart } from "@/lib/actions/store.actions";
+import axios from "axios";
+import { getUser } from "@/lib/actions/admin.actions";
 
 const cors = Cors({
     allowMethods: ["POST", "HEAD"],
@@ -21,32 +23,26 @@ const savePayment = async (customerId: string) => {
   });
 }
 
-const callCreateOrder = (orderId: string, userId:string, items: Object, address: Object, pricing: Object)=> {
-     // Define the order parameters
-     const orderParams = {
-        orderId: '123456789',
-        user: 'user123',
-        items: [
-            { product: 'prod_PTnGrkkqBubibe', quantity: 1 },
-            { product: 'prod_PUTi3fXB2PE52I', quantity: 1 },
-            { product: 'prod_PTnPdXB9uFvwRW', quantity: 1 },
-            { product: 'prod_PTnNUhUVhYlui9', quantity: 1 }
-        ],
-        address: {
-            street: '123 Main St',
-            city: 'Anytown',
-            state: 'CA',
-            zip: '12345'
-        },
-        pricing: {
-            subtotal: 100,
-            tax: 10,
-            total: 110
-        }
+const callCreateOrder = async (
+    orderId: string, userId: string, 
+    items: { product: string; quantity: number; }[],
+    address: { name: string, address: { line1: string, line2: string | null, city: string, country: string, postal_code: string, state: string } },
+    pricing: { total: string, subtotal: string, taxAmount: string, shipping: string, taxtId: string }
+) => {
+    // Define the order parameters
+    const orderParams = {
+        orderId: orderId,
+        user: userId,
+        items: items.map(item => ({
+            product: item.product,
+            quantity: item.quantity
+        })),
+        address: address,
+        pricing: pricing,
     };
 
     // Call the createOrder function with the order parameters
-    createOrder(orderParams)
+    await createOrder(orderParams)
         .then((success) => {
             if (success) {
                 console.log('Order created successfully.');
@@ -57,6 +53,13 @@ const callCreateOrder = (orderId: string, userId:string, items: Object, address:
         .catch((error) => {
             console.error('An error occurred:', error);
         });
+}
+
+const convertToDollar = (cents: string)=> {
+    const numCents = Number(cents)
+    const dollars = numCents / 100
+
+    return dollars.toFixed(2).toString();
 }
 
 
@@ -88,33 +91,62 @@ export async function POST(req: any) {
         // Check if the event is of type payment_intent.succeeded
         if (event.type === 'payment_intent.succeeded') {
             // Handle payment intent success event
-            const paymentIntent = event.data.object;
-            // Extract relevant data from paymentIntent
-            const paymentMethodId = paymentIntent.payment_method;
-            
+            const paymentIntent = event.data.object;    
             const metadata = paymentIntent.metadata;
-            console.log("metadata: ", metadata)
            
-            const {total, subtotal, userId, address , taxAmount, order, orderId , shipping} = metadata
+            //destructure data from metadata object
+            const {total, subtotal, userId, address , taxAmount, order, orderId , shipping, taxId} = metadata
+            //it all comes in strings so convert some of it back to objects
             const addressObject = JSON.parse(address);
             const orderObject = JSON.parse(order);
+            const pricingObject = {
+                total: convertToDollar(total),
+                subtotal: convertToDollar(subtotal),
+                taxAmount: convertToDollar(taxAmount),
+                shipping: convertToDollar(shipping),
+                taxtId: taxId
+            };
+
+            //Create and save order to database
+            await callCreateOrder(orderId, userId, orderObject, addressObject,pricingObject);
+
+            //Remove current checkout associated with user since it got completed
+            await removeCheckout(userId);
+
+            //Clear cart belonging to user because they were successfull in checkout
+            await removeUserCart(userId);
+
+            //Send Email to User with Order Details!
+            const currentURL = process.env.AXIOS_URL;
+            
+            //Get User Information to send Email
+            const user = await getUser(userId)
+
+            const nodeMailerData = {
+                email: user.email,
+                name: user.username,
+                items: orderObject,
+                event: "order",
+                pricing: pricingObject,
+                address: addressObject, 
+                orderId: orderId
+            }
+
+           await axios.post(`${currentURL}/api/nodemailer`, nodeMailerData);
+          
         }
         else if (event.type === 'payment_intent.payment_failed')
         {
             const data = event.data.object;
+            const metadata = data.metadata;
             console.log("Payment failed: ", data)
+            console.log("payment intent failed: ", metadata)
         }else if( event.type === 'payment_intent.created')
         {
-            // console.log("payment_intent created: ", event.data.object )
-            console.log("payment created metadata: ", event.data.object.metadata )
-
-            const metadata = event.data.object.metadata 
-            // Parse address string to object
-            const address = JSON.parse(metadata.address);
-            console.log("address object: ", address)
-            // Parse items string to JSON array
-            const order = JSON.parse(metadata.order);
-            console.log("order object: ", order)
+           // Handle payment intent success event
+           const paymentIntent = event.data.object;    
+           const metadata = paymentIntent.metadata;
+           console.log("payment intent created: ", metadata)
         }
 
         return NextResponse.json({ result: event, ok: true });

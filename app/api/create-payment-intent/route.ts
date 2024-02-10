@@ -66,7 +66,8 @@ const calculateOrderAmount = async (items:  {product: string, quantity: number}[
           subtotal: convertToCents(subtotal),
           taxAmount: convertToCents(tax.tax_amount_exclusive),
           myShipping: convertToCents(shipping),
-          total: totalAmount
+          total: totalAmount,
+          taxId: tax.id
       };
   } catch (error) {
       console.error("Error calculating order amount:", error);
@@ -86,7 +87,7 @@ export async function POST(req: Request, res: NextApiResponse) {
 
    
 
-    const { subtotal, taxAmount, total , myShipping } = await calculateOrderAmount(items, address, shipping);
+    const { subtotal, taxAmount, total , myShipping, taxId } = await calculateOrderAmount(items, address, shipping);
 
     // Create metadata object
    const metadata = {
@@ -97,7 +98,8 @@ export async function POST(req: Request, res: NextApiResponse) {
     total: total.toString(),
     subtotal: subtotal.toString(),
     taxAmount: taxAmount.toString(),
-    shipping: myShipping.toString()
+    shipping: myShipping.toString(),
+    taxId: taxId
   };
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
@@ -126,7 +128,8 @@ export async function POST(req: Request, res: NextApiResponse) {
       tax: taxAmountDollars,
       shipping: myShippingDollars,
       total: totalDollars, 
-      items: items
+      items: items, 
+      orderId: orderId
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating PaymentIntent:', error);

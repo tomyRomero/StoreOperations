@@ -50,11 +50,15 @@ const Nav = () => {
    
   }, [productAdjusted])
 
+  const goAccount = ()=> {
+    router.push("/account")
+  }
+
   function AuthButton() {
     if (session) {
       return (
         <>
-          <Button className="flex sm:px-2 xs:px-0.5" variant="ghost">
+          <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={goAccount}>
           <Image
             src="/assets/profile.png"
             alt="price icon"

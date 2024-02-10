@@ -14,11 +14,11 @@ const ordersSchema = new Schema({
     },
     items: [
         {
-            product: {
-                type: Schema.Types.ObjectId,
-                ref: 'Product',
-                required: true,
-            },
+          product: {
+            type: String,
+            ref: 'Product',
+            required: true,
+          },
             quantity: {
                 type: Number,
                 required: true,
@@ -26,7 +26,7 @@ const ordersSchema = new Schema({
             },
         },
     ],
-    status: {
+  status: {
       type: String,
       enum: ['pending', 'completed', 'shipped', 'cancelled'], // Define possible status values
       default: 'pending', // Set a default status if not provided

@@ -5,6 +5,8 @@ import * as z from 'zod';
 import { connectToDB } from "@/lib/mongoose";
 import sanitizeHtml from 'sanitize-html';
 import Stripe from "stripe";
+import axios from "axios";
+import Activity from "@/lib/models/activity.model";
 
 
 // Define schema for input validation for added secruity from brute force attacks
@@ -67,9 +69,36 @@ export async function POST(req: Request, res: NextResponse){
         }); 
         
         await newUser.save();
+
+         // Create a new activity entry to log the user creation
+         const newActivity = new Activity({
+            action: 'user_created',
+            timestamp: new Date(),
+            details: {
+                userId: newUser.id,
+            }
+        });
+
+        await newActivity.save();
+
+        console.log("Activity: ", newActivity)
         
         const {password: newUserPassword, ...rest} = newUser;
 
+        const nodeMailerData = {
+            email: sanitizedEmail,
+            name: sanitizedUsername,
+            items: {},
+            event: "newuser",
+            pricing: {},
+            address: {}, 
+            orderId: ""
+        }
+
+        //Send Email to User welcoming them
+        const currentURL = process.env.AXIOS_URL;
+
+        await axios.post(`${currentURL}/api/nodemailer`, nodeMailerData);
    
        // Set secure HTTP response headers
         const headers = {

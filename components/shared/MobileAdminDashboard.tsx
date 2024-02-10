@@ -41,6 +41,17 @@ const MobileAdminDashboard = () => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Pages</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <Link href={'/adminactivity'} >
+          <DropdownMenuItem className='flex gap-4'>
+            <Image 
+                src={"/assets/bell.png"}
+                alt={"bell icon"}
+                width={24}
+                height={24}
+                />
+              Recent Activity
+          </DropdownMenuItem>
+        </Link>
         <Link href={'/adminusers'} >
           <DropdownMenuItem className='flex gap-4'>
             <Image 

@@ -9,7 +9,7 @@ import {
 import { Layout } from "@stripe/stripe-js";
 import { Button } from "../ui/button";
 
-const CheckoutForm = ()=> {
+const CheckoutForm = ({orderID}: {orderID : string})=> {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -58,12 +58,13 @@ const CheckoutForm = ()=> {
 
     setIsLoading(true);
 
+    const currentURL = process.env.NEXT_PUBLIC_URL;
+    console.log("url: " , currentURL)
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // link to payment completion page
-        return_url: "http://localhost:3000/",
-
+        return_url: `${currentURL}ordersuccess`,
       },
     });
 

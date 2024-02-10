@@ -16,6 +16,8 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
+import { useState } from 'react';
+import Image from 'next/image';
 
 const FormSchema = z
 //Added strict password params to ensure safety from brute force attacks
@@ -42,6 +44,8 @@ const encodeHTML = (str: string) => {
 };
 
 const SignUpForm = () => {
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const { toast } = useToast();
 
@@ -56,7 +60,7 @@ const SignUpForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-
+  setLoading(true)
   try{
    const response = await fetch('/api/user', {
     method: 'POST', 
@@ -90,12 +94,20 @@ const SignUpForm = () => {
       description: `Something went wrong! ${responseData.message}`, 
       variant: "destructive",
     })
+    setLoading(false)
    }
   }catch(error)
   {
     console.error('Error during fetch:', error);
-    alert(`An unexpected error occurred. ${error}`);
+    toast({
+      title: "Error Creating Account",
+      description: `Something went wrong! ${error}`, 
+      variant: "destructive",
+    })
+    setLoading(false)
   }
+
+  
   };
 
   return (
@@ -164,8 +176,15 @@ const SignUpForm = () => {
             )}
           />
         </div>
-        <Button className='w-full mt-6' type='submit'>
-          Sign up
+        <Button className={`w-full mt-6 ${loading ? "border border-black bg-white" : ""}`} type='submit'>
+          {!loading? (<h1>Sign Up</h1>) : (
+          <Image 
+            src="/assets/lineloader.svg"
+            alt="loading image"
+            width={24}
+            height={24}
+          />
+          )}
         </Button>
       </form>
       <div className='mx-auto my-4 flex w-full items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400'>

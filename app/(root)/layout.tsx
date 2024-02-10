@@ -31,7 +31,7 @@ export default async function RootLayout({
 
   if(session?.user.admin)
   {
-    redirect("/adminusers")
+    redirect("/adminactivity")
   }
 
   return (

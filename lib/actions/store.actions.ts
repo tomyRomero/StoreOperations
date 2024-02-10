@@ -13,6 +13,7 @@ import { nanoid } from 'nanoid';
 import Addresses from "../models/addresses.model";
 import Orders from "../models/orders.model";
 import Activity from "../models/activity.model";
+import { redirect } from "next/navigation";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -564,7 +565,6 @@ export const syncLocalStorageWithServerCart = async (localStorageCart: {product:
 export const cartItemsInStock = async (userId: string) => {
   try {
     // Look for Cart that belongs to the user
-    console.log("userId: ", userId);
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart || !cart.products || cart.products.length === 0) {
@@ -693,12 +693,12 @@ export const getAddressAndOrderIdFromCheckout = async (userId: string) => {
     const existing = await User.findById(userId);
 
     if (existing && existing.checkout && existing.checkout.address && existing.checkout.orderid) {
-      console.log("success")
+      console.log("success in getting checkout")
       console.log({address: existing.checkout.address, orderId: existing.checkout.orderid})
       return { address: existing.checkout.address, orderId: existing.checkout.orderid };
     } else {
       console.log("something wrong happened")
-      return false; // Either no user, no checkout, or no address in the checkout
+      return false // Either no user, no checkout, or no address in the checkout
     }
   } catch (error) {
     console.log(`An error occurred while fetching address from checkout: ${error}`);
@@ -738,14 +738,13 @@ export const removeUserCart = async (userId: string) => {
 
     if (userCart) {
       // If the cart document exists, remove it
-      await userCart.remove();
-      
+      await Cart.deleteOne({ user: userId });
       console.log('User cart removed successfully.');
       return { success: true, message: 'User cart removed successfully' };
     } else {
       // If the cart document does not exist, log a message indicating so
       console.log('User cart not found.');
-      return { success: true, message: 'User cart not found' };
+      return { success: false, message: 'User cart not found' };
     }
   } catch (error) {
     // If an error occurs during the process, log the error message
@@ -757,12 +756,13 @@ export const removeUserCart = async (userId: string) => {
 interface OrderParams {
   orderId: string;
   user: string;
-  items: { product: string; quantity: number }[];
+  items: { product: string; quantity: number;}[];
   status?: string;
-  address: object;
-  pricing: object;
+  address: { name: string, address: {line1 : string, line2 : string | null, city: string, country: string, postal_code: string , state: string}};
+  pricing: { total: string, subtotal: string, taxAmount: string, shipping: string, taxtId: string };
 }
 
+//Create Order After Checkout is Completed
 export const createOrder = async (params: OrderParams): Promise<boolean> => {
   try {
       // Create a new instance of the Orders model with the provided parameters
@@ -772,7 +772,7 @@ export const createOrder = async (params: OrderParams): Promise<boolean> => {
           items: params.items,
           status: params.status || 'pending', // If status is not provided, default to 'pending'
           address: params.address,
-          pricing: params.pricing
+          pricing: params.pricing,
       });
 
       // Save the new order object to the database
@@ -785,7 +785,7 @@ export const createOrder = async (params: OrderParams): Promise<boolean> => {
           details: {
               orderId: params.orderId,
               user: params.user,
-              total: params.pricing,
+              pricing: params.pricing,
               status: params.status
           }
       });
@@ -802,3 +802,39 @@ export const createOrder = async (params: OrderParams): Promise<boolean> => {
   }
 };
 
+//Find Order for Individual Order Page
+export const findOrder = async (orderId: string) => {
+  try {
+    // Find the order in the database based on orderId
+    const order = await Orders.findOne({ orderId });
+
+    if (order) {
+      // If the order is found, return it
+      return order;
+    } else {
+      // If the order is not found, return null
+      return null;
+    }
+  } catch (error) {
+    // If an error occurs during the process, log the error message
+    console.error('Error finding order:', error);
+    // Return null to indicate an error occurred
+    return null;
+  }
+};
+
+//Get all orders that belong to user
+export const findAllOrdersForUser = async (userId: string) => {
+  try {
+    // Find all orders in the database belonging to the provided userId
+    const orders = await Orders.find({ user: userId });
+
+    // Return the array of orders
+    return orders;
+  } catch (error) {
+    // If an error occurs during the process, log the error message
+    console.error('Error finding all orders for user:', error);
+    // Return an empty array to indicate an error occurred
+    return [];
+  }
+};

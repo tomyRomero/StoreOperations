@@ -29,6 +29,7 @@ const page = () => {
   const [loading, setLoading] = useState(true)
   const [serverError, setServerError] = useState(false)
   const [cartItems, setCartItems] = useState([])
+  const [orderID, setOrderID] = useState("")
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -64,7 +65,8 @@ const page = () => {
       setSubTotal(data.subtotal.toFixed(2));
       setTax(data.tax.toFixed(2));
       setTotal(data.total.toFixed(2));
-      setCartItems(data.items)
+      setCartItems(data.items);
+
     } catch (error) {
       // Handle error and provide feedback to the user
       console.error("Error creating payment intent:", error);
@@ -76,6 +78,7 @@ const page = () => {
   useEffect(()=> {
     const initialize = async ()=> {
 
+      try{
       if(!session)
       {
         router.push("/cart")
@@ -91,7 +94,12 @@ const page = () => {
           //Users are suppose to provide address before payment for tax purposes, if there is no address povided, push to address page
           //Naturally users are directed to address after cart but there may be cases where someone might access the checkout url before doing so.
           const result = await getAddressAndOrderIdFromCheckout(session.user.id)
-          
+          if(!result)
+          {
+            router.push("/address")
+            return; 
+          }
+
           //Earlier we checked if all cartItems were in stock, now we can send them to our payment gateaway
           const items = await getCartItems(session.user.id)
 
@@ -104,17 +112,20 @@ const page = () => {
             const { address, orderId } = result;
              //load create payment intent from stripe and use custom payment flow
             await createPaymentIntent(address, items , session.user.id , orderId, shipping);
-          }else{
-            router.push("/address")
           }
          
           setLoading(false)
         }
       }
-
+    }catch(error){
+      console.log("Error Occured: ", error)
+    }
     } 
 
-    initialize();
+    // Execute only on the client side, after hydration. Instead of rendering first on the server
+    if (typeof window !== "undefined") {
+      initialize();
+    }
   }, [])
 
   const appearance: StripeElementsOptions['appearance'] = {
@@ -150,7 +161,7 @@ const page = () => {
               <div className="md:col-span-4 lg:col-span-3 xl:col-span-4 flex flex-col gap-6">
                 {clientSecret && (
                   <Elements options={options} stripe={stripePromise}>
-                    <CheckoutForm />
+                    <CheckoutForm orderID ={orderID}/>
                   </Elements>
                 )}
               </div>

@@ -23,18 +23,21 @@ const AdminDashboard = () => {
           />
           <span className="">Dashboard</span>
         </Link>
-        <Button className="ml-auto h-8 w-8" size="icon" variant="outline">
-          <Image 
-          src={"/assets/bell.png"}
-          alt={"bell icon"}
-          width={24}
-          height={24}
-          />
-          <span className="sr-only">Toggle notifications</span>
-        </Button>
       </div>
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-4 text-sm font-medium">
+        <Link
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 ${pathname === "/adminactivity" ? "bg-gray-300" : ""} hover:bg-gray-100`}
+            href="/adminactivity"
+          >
+             <Image 
+              src={"/assets/bell.png"}
+              alt={"bell icon"}
+              width={24}
+              height={24}
+              />
+            Recent Activity
+          </Link>
           <Link
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 ${pathname === "/adminusers" ? "bg-gray-300" : ""} hover:bg-gray-100`}
             href="/adminusers"
