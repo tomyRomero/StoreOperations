@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import Cors from "micro-cors";
 import Stripe from 'stripe';
 import { headers } from "next/headers";
-import { createOrder, removeCheckout, removeUserCart } from "@/lib/actions/store.actions";
+import { createOrder, removeCheckout, removeUserCart, updateProductStockAfterPurchase } from "@/lib/actions/store.actions";
 import axios from "axios";
 import { getUser } from "@/lib/actions/admin.actions";
 
@@ -106,6 +106,9 @@ export async function POST(req: any) {
                 shipping: convertToDollar(shipping),
                 taxtId: taxId
             };
+
+            //Update the stock of products
+            await updateProductStockAfterPurchase(orderObject)
 
             //Create and save order to database
             await callCreateOrder(orderId, userId, orderObject, addressObject,pricingObject);

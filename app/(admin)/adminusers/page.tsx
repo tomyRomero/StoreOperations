@@ -11,7 +11,7 @@ export default async function page() {
   const Users = await getAllUsers();
 
   return (
-    <div className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col h-full">
+    <section className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col h-full">
       <div className="grid grid-cols-1">
       <SearchUsers />
       </div>
@@ -20,7 +20,7 @@ export default async function page() {
             <UsersTable users={Users}/>
         </div>
       </main>
-    </div>
+    </section>
   )
 }
 

@@ -16,12 +16,12 @@ const UsersTable = ({users} : any) => {
     <Table>
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[100px]">ID</TableHead>
-        <TableHead>Username</TableHead>
-        <TableHead>Email</TableHead>
-        <TableHead>Role</TableHead>
-        <TableHead>Registration Date</TableHead>
-        <TableHead>Actions</TableHead>
+        <TableHead className="font-bold text-black w-[100px]">ID</TableHead>
+        <TableHead className='font-bold text-black'>Username</TableHead>
+        <TableHead className='font-bold text-black'>Email</TableHead>
+        <TableHead className='font-bold text-black'>Role</TableHead>
+        <TableHead className='font-bold text-black'>Registration Date</TableHead>
+        <TableHead className='font-bold text-black'>Actions</TableHead>
       </TableRow>
     </TableHeader>
     <TableBody>

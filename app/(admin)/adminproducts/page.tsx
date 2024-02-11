@@ -32,14 +32,14 @@ export default async function page({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[80px]">Image</TableHead>
-                <TableHead className="max-w-[150px]">Name</TableHead>
-                <TableHead className="max-w-[150px]">Stripe ID</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Inventory</TableHead>
-                <TableHead>Creation Date</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead className="font-bold text-black w-[80px]">Image</TableHead>
+                <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
+                <TableHead className="font-bold text-black max-w-[150px]">Stripe ID</TableHead>
+                <TableHead className="font-bold text-black">Price</TableHead>
+                <TableHead className="font-bold text-black">Category</TableHead>
+                <TableHead className="font-bold text-black">Inventory</TableHead>
+                <TableHead className="font-bold text-black">Creation Date</TableHead>
+                <TableHead className="font-bold text-black">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

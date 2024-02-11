@@ -838,3 +838,64 @@ export const findAllOrdersForUser = async (userId: string) => {
     return [];
   }
 };
+
+//Function that returns all activities with pagination
+export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 10): Promise<{ activities: typeof Activity[], isNext: boolean }> => {
+  try {
+    // Calculate the number of activities to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    // Use Mongoose's find() method to retrieve paginated activity entries
+    const activities = await Activity.find()
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    // Calculate total count of activities
+    const totalActivitiesCount = await Activity.countDocuments();
+
+    // Calculate if there are more activities
+    const isNext = totalActivitiesCount > skipAmount + activities.length;
+
+    // Return the retrieved activity entries and whether there are more activities
+    return { activities, isNext };
+  } catch (error) {
+    // If an error occurs during the process, log the error message and return an empty array
+    console.error('Error retrieving all activity:', error);
+    const activities: any = []
+    const isNext =  false
+    return { activities, isNext };
+  }
+};
+
+//Update the stock of products after purchase
+export const updateProductStockAfterPurchase = async (items: {product: string, quantity: number}[]) => {
+  try {
+      // Map each item to a promise that finds the corresponding product
+      const productPromises = items.map(async (item) => {
+          const product = await findProduct(item.product);
+          return { item, product };
+      });
+
+      // Execute all promises concurrently
+      const products = await Promise.all(productPromises);
+
+      // Map each product to a promise that updates the stock
+      const updatePromises = products.map(async ({ item, product }) => {
+          if (product) {
+              const newStock = product.stock - item.quantity;
+              // Update the stock of the product in the database
+              await Product.updateOne({ stripeProductId: item.product }, { stock: newStock });
+              console.log(`Updated stock for product ${product.name}: ${product.stock} -> ${newStock}`);
+          } else {
+              console.error(`Product not found for ID: ${item.product}`);
+          }
+      });
+
+      // Execute all update promises concurrently
+      await Promise.all(updatePromises);
+
+      console.log('All product stocks updated successfully.');
+  } catch (error) {
+      console.error('Error updating product stock after purchase:', error);
+  }
+};

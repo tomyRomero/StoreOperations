@@ -23,11 +23,11 @@ export default async function page() {
     <Table>
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[200px]">Image</TableHead>
-        <TableHead className="">ID</TableHead>
-        <TableHead className="">Title</TableHead>
-        <TableHead>Registration Date</TableHead>
-        <TableHead className="">Action</TableHead>
+        <TableHead className="font-bold text-black w-[200px]">Image</TableHead>
+        <TableHead className="font-bold text-black">ID</TableHead>
+        <TableHead className="font-bold text-black">Title</TableHead>
+        <TableHead className='font-bold text-black'>Registration Date</TableHead>
+        <TableHead className="font-bold text-black">Action</TableHead>
       </TableRow>
     </TableHeader>
     <TableBody>

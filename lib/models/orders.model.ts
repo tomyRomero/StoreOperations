@@ -39,6 +39,8 @@ const ordersSchema = new Schema({
     type: Object,
     required: true,
   },
+  trackingNumber: {type: String, unique: true},
+  deliveryDate: {type: String},
   date: {type: String, default: getCurrentDate, required: true},
 });
 

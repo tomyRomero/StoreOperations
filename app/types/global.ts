@@ -31,7 +31,7 @@ export type Address = {
 };
 
 export interface Order {
-    _id: string;
+    _id?: string;
     orderId: string;
     user: string;
     items: {
@@ -59,5 +59,7 @@ export interface Order {
       taxtId: string;
     };
     date: string;
-    __v: number;
+    trackingNumber?: string;
+    deliveryDate?: string;
+    __v?: number;
   }

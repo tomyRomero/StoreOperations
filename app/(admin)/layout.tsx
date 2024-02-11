@@ -42,12 +42,12 @@ export default async function RootLayout({
       <SessionProvider session={session}>
         <body className={`${jost.className} flex flex-col min-h-screen`}>
           <AdminNav/>
-            <div className="max-xxs:mt-16 mt-20 md:mt-24 lg:mt-32 grid h-screen min-h-screen w-full lg:grid-cols-[280px_1fr]">
+            <div className="max-xxs:pt-16 pt-20 md:pt-24 lg:pt-32 grid h-screen min-h-screen w-full lg:grid-cols-[280px_1fr]">
             <AdminDashboard />
               <div className="flex flex-col">
               <MobileAdminDashboard />
-                <main className="flex flex-1 p-4 flex-col max-xxs:mt-8 md:pt-0 sm:pt-20 lg:pt-4">
-                  <section>{children}</section>
+                <main className="flex flex-1 p-4 flex-col max-xxs:pt-16 md:pt-6 sm:pt-20 lg:pt-4">
+                    <section>{children}</section>
                 </main>
               </div>
             </div>
