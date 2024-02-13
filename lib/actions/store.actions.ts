@@ -770,7 +770,7 @@ export const createOrder = async (params: OrderParams): Promise<boolean> => {
           orderId: params.orderId,
           user: params.user,
           items: params.items,
-          status: params.status || 'pending', // If status is not provided, default to 'pending'
+          status: params.status || 'Pending', // If status is not provided, default to 'pending'
           address: params.address,
           pricing: params.pricing,
       });
@@ -822,6 +822,32 @@ export const findOrder = async (orderId: string) => {
     return null;
   }
 };
+
+//Find and update order status as seller
+export const updateOrderStatus = async (orderId: string , status: string, estimatedDelivery: string , tracking: string , path: string) =>
+{
+  try{
+  const existing = await Orders.findOne({ orderId });
+
+  if (existing) {
+    existing.status = status;
+    existing.deliveryDate = estimatedDelivery;
+    existing.trackingNumber = tracking;
+
+    await existing.save();
+    revalidatePath(path);
+    return true;
+  }else{
+    console.log("existing order not found")
+    return null;
+  }
+}catch(error)
+  {
+    console.log(error)
+    return null;
+  }
+
+}
 
 //Get all orders that belong to user
 export const findAllOrdersForUser = async (userId: string) => {

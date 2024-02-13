@@ -4,6 +4,7 @@ import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@
 import Image from 'next/image'
 import { Order } from '@/app/types/global'
 import OrderDetailsCardRow from '../tables/OrderDetailsCardRow'
+import UserDetailsCard from './CustomerDetailsCard'
 
 
 
@@ -18,37 +19,40 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
           <CardTitle>Order Summary</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2">
+          <UserDetailsCard userId={user.toString()} />
+        </CardContent>
+        <CardContent className="grid gap-2">
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Order:</div>
+            <div className="font-bold text-black dark:text-gray-400">Order ID:</div>
             <div className="ml-auto font-medium">#{orderId}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Date:</div>
+            <div className="font-bold text-black dark:text-gray-400">Date:</div>
             <div className="ml-auto font-medium">{date}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Shipping:</div>
+            <div className="font-bold text-black dark:text-gray-400">Shipping:</div>
             <div className="ml-auto font-medium">${pricing.shipping}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Subtotal:</div>
+            <div className="font-bold text-black dark:text-gray-400">Subtotal:</div>
             <div className="ml-auto font-medium">${pricing.subtotal}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Tax:</div>
+            <div className="font-bold text-black dark:text-gray-400">Tax:</div>
             <div className="ml-auto font-medium">${pricing.taxAmount}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Tax ID:</div>
+            <div className="font-bold text-black dark:text-gray-400">Tax ID:</div>
             <div className="ml-auto font-medium">{pricing.taxtId}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Total:</div>
+            <div className="font-bold text-black dark:text-gray-400">Total:</div>
             <div className="ml-auto font-medium">{pricing.total}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Status:</div>
-            <div className="ml-auto font-medium">{status === "pending" ? (<p className='text-red-500 font-extrabold'>Customer Awaiting Your Shipment</p>) : status}</div>
+            <div className="font-bold text-black dark:text-gray-400">Status:</div>
+            <div className="ml-auto font-bold">{status === "pending" || status === "Pending" ? (<p className='text-red-500 font-extrabold'>Customer Awaiting Your Shipment</p>) : status}</div>
           </div>
         </CardContent>
       </Card>
@@ -59,17 +63,17 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="flex items-center gap-14">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Address:</div>
+            <div className="font-bold text-black dark:text-gray-400">Address:</div>
             <div className="ml-auto font-medium flex flex-wrap">
             {`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Estimated delivery:</div>
+            <div className="font-bold text-black dark:text-gray-400">Estimated delivery:</div>
             <div className="ml-auto font-medium">{deliveryDate ? deliveryDate : "Click on Update to Change Once You Have Shipped"}</div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="font-bold text-gray-500 dark:text-gray-400">Tracking number:</div>
+            <div className="font-bold text-black dark:text-gray-400">Tracking number:</div>
             <div className="ml-auto font-medium">{trackingNumber ? trackingNumber : "Click on Update to Change Once You Have Shipped"}</div>
           </div>
         </CardContent>

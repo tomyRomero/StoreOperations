@@ -11,6 +11,7 @@ import Image from 'next/image';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,9 +19,12 @@ import {
 } from "@/components/ui/form";
 import { useRouter, usePathname } from "next/navigation";
 import { revalidate } from "@/lib/actions/admin.actions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { updateOrderStatus } from "@/lib/actions/store.actions";
+import { toast } from "../ui/use-toast";
 
 
-export default function AddCategoryForm({status,estimatedDelivery,trackingNumber}: any) {
+export default function AddCategoryForm({orderId, status, estimatedDelivery, trackingNumber}: any) {
   const [loading, setLoading] = useState(false);
 
   const path = usePathname();
@@ -37,21 +41,54 @@ export default function AddCategoryForm({status,estimatedDelivery,trackingNumber
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      status: "",
-      estimatedDelivery: "",
-      trackingNumber: ""
+      status: status ? status : "No Order Found",
+      estimatedDelivery: estimatedDelivery ? estimatedDelivery : "",
+      trackingNumber: trackingNumber ? trackingNumber : ""
     },
   });
 
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     setLoading(true);
+
+    try{
+    const updated = await updateOrderStatus(orderId, values.status, values.estimatedDelivery, values.trackingNumber , path);
+
+    if(updated)
+    {
+      toast({
+        title: "Success!",
+        description: "Updated Order Status!", 
+      })
+      
+      router.push(`/adminorders/${orderId}`)
+    }else{
+      setLoading(false);
+
+      toast({
+        title: "Failed to Update Order!",
+        description: "Something went wrong! Please try again later.", 
+        variant: "destructive",
+      })
+    }
+  }catch(error)
+  {
+    setLoading(false);
+
+      toast({
+        title: "Failed to Update Order!",
+        description: `Something went wrong! Error: ${error}`, 
+        variant: "destructive",
+      })
+  }
+
+
   }
    
 
   return (
     <div className="flex flex-col max-w-md mx-auto">
-      <Link href={`/adminorder/${""}`} className="w-0">
+      <Link href={`/adminorders/${orderId}`} className="w-0">
         <Button className="flex px-6 border border-black" variant="ghost">
           <Image
             src="/assets/back.png"
@@ -70,33 +107,43 @@ export default function AddCategoryForm({status,estimatedDelivery,trackingNumber
            encType="multipart/form-data"
           >
           <FormField
-              control={form.control}
-              name='status'
-              render={({ field }) => (
-            <FormItem className="space-y-2">
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
               <FormLabel>Order Status</FormLabel>
-              <FormControl>
-              <Input
-                type="text"
-                placeholder="Select Order Status"
-                {...field}
-              />
-              </FormControl>
+              <Select onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={field.value} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="Shipped">Shipped</SelectItem>
+                  <SelectItem value="Delivered">Delivered</SelectItem>
+                  <SelectItem value="Refunded">Refunded</SelectItem>
+                  <SelectItem value="Refunded">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Use this to update order status
+              </FormDescription>
               <FormMessage />
             </FormItem>
-            )}
-            />
+          )}
+        />
 
             <FormField
               control={form.control}
               name='estimatedDelivery'
               render={({ field }) => (
             <FormItem className="space-y-2">
-              <FormLabel>Estimated Delivery</FormLabel>
+              <FormLabel>Estimated Delivery Date</FormLabel>
               <FormControl>
               <Input
-                type="text"
-                placeholder="If applicable enter an estimated delivery"
+                type="date"
+                placeholder="If applicable enter an estimated delivery date"
                 {...field}
               />
               </FormControl>

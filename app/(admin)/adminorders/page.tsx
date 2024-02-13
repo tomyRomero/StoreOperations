@@ -22,13 +22,14 @@ const page = async ()=> {
             <Table >
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-bold text-black w-[100px]">Order</TableHead>
-                  <TableHead className="font-bold text-black text-center">Actions</TableHead>
-                  <TableHead className="font-bold text-black min-w-[150px]">Address</TableHead>
-                  <TableHead className="font-bold text-black text-left min-w-[115px]">Date</TableHead>
-                  <TableHead className="font-bold text-black text-center">Total</TableHead>
-                  <TableHead className="font-bold text-black text-center">Status</TableHead>
+                  <TableHead className="font-bold text-black">Order</TableHead>
+                  <TableHead className="font-bold text-black text-center">Details</TableHead>
+                  <TableHead className="font-bold text-black ">Status</TableHead>
+                  <TableHead className="font-bold text-black text-left">Total</TableHead>
+                  <TableHead className="font-bold text-black text-center">Address</TableHead>
                   <TableHead className="font-bold text-black text-center">Customer</TableHead>
+                  <TableHead className="font-bold text-black text-center w-[150px]" >Date</TableHead>
+                  
                 </TableRow>
               </TableHeader>
               <TableBody>

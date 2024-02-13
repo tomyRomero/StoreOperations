@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { findOrder } from "@/lib/actions/store.actions";
 import { Card } from "@/components/ui/card";
+import { Order } from "@/app/types/global";
 
 const page = async ({ params }: { params: { id: string } }) =>  {
 
-  const order = await findOrder(params.id)
+  const order:Order= await findOrder(params.id)
   console.log("order:", order)
 
   if(!order)

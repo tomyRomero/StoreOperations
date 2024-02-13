@@ -38,33 +38,17 @@ export const OrderRow = ({orderId, total, address, status, user, date}: Props) =
     <TableRow>
     <TableCell>#{orderId}</TableCell>
     <TableCell>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Image 
-             src="/assets/more.png"
-             alt="Horizontal icon"
-             width={24}
-             height={24}
-            />
-            <span className="sr-only">Actions</span>
+        <Link href={`/adminorders/${orderId}`}>
+          <Button  className="bg-black text-white border border-black" variant="ghost">
+            View
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="center">
-            <Link href={`/adminorders/${orderId}`}>
-          <DropdownMenuItem>View order</DropdownMenuItem>
           </Link>
-          <Link href={`/adminusers/${user}`}>
-          <DropdownMenuItem>Customer details</DropdownMenuItem>
-          </Link>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </TableCell>
-    <TableCell>{`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}</TableCell>
-    <TableCell>{date}</TableCell>
+    <TableCell>{status === "Pending" ? (<p className="font-extrabold">Waiting to be Shipped!</p>) : <p className="font-bold">{status}</p>}</TableCell>
     <TableCell><p className="text-green-400">${total}</p></TableCell>
-    <TableCell>{status ? (<p className="text-red-500 font-extrabold">Waiting to be Shipped!</p>) : status}</TableCell>
+    <TableCell>{`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}</TableCell>
     <TableCell>{customer}</TableCell>
+    <TableCell>{date}</TableCell>
   </TableRow>
   )
 }

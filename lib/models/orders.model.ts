@@ -28,8 +28,8 @@ const ordersSchema = new Schema({
     ],
   status: {
       type: String,
-      enum: ['pending', 'completed', 'shipped', 'cancelled'], // Define possible status values
-      default: 'pending', // Set a default status if not provided
+      enum: ['Pending', 'Delivered', 'Shipped', 'Cancelled' , 'Refunded'], // Define possible status values
+      default: 'Pending', // Set a default status if not provided
   },
   address: {
         type: Object,
