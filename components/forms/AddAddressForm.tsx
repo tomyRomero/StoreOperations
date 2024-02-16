@@ -1,30 +1,21 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AddressElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { AddressMode } from "@stripe/stripe-js";
 import { Button } from "../ui/button";
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { createCheckout} from "@/lib/actions/store.actions";
+import { saveAddress} from "@/lib/actions/store.actions";
 import { useSession } from "next-auth/react";
 import { toast } from "../ui/use-toast";
-import { Address } from "@/app/types/global";
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
-import { SelectValue, SelectTrigger, SelectItem, SelectContent, Select } from "@/components/ui/select"
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname} from "next/navigation";
 
-interface SavedAddresses{
-    savedAddresses: Address[];
-}
 
-const AddressForm = ({savedAddresses}: SavedAddresses) => {
+const AddAddressForm = () => {
   const [message, setMessage] = useState<string | null | undefined>(null);
   const [shippingAddress, setShippingAddress] = useState<any>(null); // Store the shipping address
-  const [saveAddress, setSaveAddress] = useState(false); // State variable for switch value
-  const [useExisting, setUseExisting] = useState(false);
-
   const router = useRouter();
+  const path = usePathname();
   const stripe = useStripe();
   const elements = useElements();
   const { data: session } = useSession();
@@ -48,15 +39,15 @@ const AddressForm = ({savedAddresses}: SavedAddresses) => {
     if(session?.user.id)
     {
        
-            const proccessed = await createCheckout(session.user.id, shippingAddress, saveAddress)
+            const proccessed = await saveAddress(session.user.id, shippingAddress ,path );
             if(proccessed){
                 toast({
-                    title: "Procceding to Payment",
+                    title: "Address Saved",
                 })
             }
 
             setTimeout(()=> {
-              router.push("/checkout")
+              router.push("/account/myaddresses")
             }, 
             1000)
        
@@ -87,54 +78,20 @@ const AddressForm = ({savedAddresses}: SavedAddresses) => {
     
   };
 
-  const handleSwitchToggle = () => {
-    setSaveAddress((prevValue) => !prevValue); 
-  };
-
-  const handleAddressSelectChange = (value: string) => {
-   
-    if (value === "no-address") {
-      // Reset the shipping address when "Select Address" is chosen
-      setShippingAddress(null);
-      setUseExisting(false);
-    } else {
-      // Handle the case when another address is selected
-      const myJSONAddress = JSON.parse(value)
-      setShippingAddress(myJSONAddress)
-      setUseExisting(true);
-    }
-  };
 
   return (
     <Card className="p-2">
       <CardHeader className="space-y-2">
         <CardTitle className="text-heading2-bold">Shipping Address</CardTitle>
-        <CardDescription>Select an existing address</CardDescription>
+        <CardDescription>Save New Address</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-2">
-          <div className="flex items-center gap-4">
-            <Select onValueChange={handleAddressSelectChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select an existing address" />
-              </SelectTrigger>
-              <SelectContent>
-                 <SelectItem value={`no-address`}>Enter New Address</SelectItem>
-                {savedAddresses.length > 0 &&
-                (
-                    savedAddresses.map((address, index) => 
-                    <SelectItem key={index} value={JSON.stringify(address)}>{`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}</SelectItem>
-                    ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="border-t border-gray-200 ">
+ <div className="border-t border-gray-200">
     <div>
         
-    <CardDescription className={`py-2`}>{ useExisting ? "Existing Address Selected: Click Above on the Select to Select Enter New Address If you prefer a new one." : "Or use a new one"}</CardDescription>
+    <CardDescription className={`py-2`}>{ "Enter a new address that you want to save"}</CardDescription>
       <form id="address-form" onSubmit={handleSubmit}>
-        <div className={`${useExisting ? "hidden" : ""}`}>
+       
         {/* Shipping Address Element */}
         <div className={"mt-4"}>
           <AddressElement
@@ -142,11 +99,6 @@ const AddressForm = ({savedAddresses}: SavedAddresses) => {
             options={shippingElementOptions}
             onChange={handleAddressChange}
           />
-        </div>
-        <div className="flex items-center space-x-2 py-2">
-          <Switch id="saveAddress" checked={saveAddress} onCheckedChange={handleSwitchToggle}  className="cursor-pointer"/>
-          <Label htmlFor="saveAddress">Save Address</Label>
-        </div>
         {message && (
           <div id="payment-message" className="text-center py-2">
             {message}
@@ -160,7 +112,7 @@ const AddressForm = ({savedAddresses}: SavedAddresses) => {
             className="max-sm:w-full sm:w-3/4 xl:w-2/5 !cursor-pointer"
             type="submit"
           >
-                Proceed to Payment
+                Save Address
           </Button>
         </div>
       </form>
@@ -171,4 +123,4 @@ const AddressForm = ({savedAddresses}: SavedAddresses) => {
   );
 }
 
-export default AddressForm;
+export default AddAddressForm;

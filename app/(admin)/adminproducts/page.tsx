@@ -21,7 +21,7 @@ export default async function page({
   return (
     <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
           <div className="flex items-center">
-            <h1 className="font-semibold">Products</h1>
+            <h1 className="font-semibold text-heading4-bold">Products</h1>
               <Link href="/adminaddproduct" className="ml-auto">
             <Button className="ml-auto" size="sm">
               Add product
@@ -34,12 +34,13 @@ export default async function page({
               <TableRow>
                 <TableHead className="font-bold text-black w-[80px]">Image</TableHead>
                 <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
-                <TableHead className="font-bold text-black max-w-[150px]">Stripe ID</TableHead>
-                <TableHead className="font-bold text-black">Price</TableHead>
-                <TableHead className="font-bold text-black">Category</TableHead>
-                <TableHead className="font-bold text-black">Inventory</TableHead>
-                <TableHead className="font-bold text-black">Creation Date</TableHead>
                 <TableHead className="font-bold text-black">Action</TableHead>
+                <TableHead className="font-bold text-black">Inventory</TableHead>
+                <TableHead className="font-bold text-black">Price</TableHead>
+                <TableHead className="font-bold text-black max-w-[150px]">Stripe ID</TableHead>
+                <TableHead className="font-bold text-black">Category</TableHead>
+                <TableHead className="font-bold text-black">Creation Date</TableHead>
+                
               </TableRow>
             </TableHeader>
             <TableBody>

@@ -1,6 +1,6 @@
 "use client"
 
-import { getUser } from '@/lib/actions/admin.actions'
+import { getUserClient } from '@/lib/actions/admin.actions'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
@@ -12,7 +12,7 @@ const UserDetailsCard = ({userId}: any) => {
     useEffect(()=> {
         const getData = async ()=> 
         {
-          const data = await getUser(userId);
+          const data = await getUserClient(userId);
 
           if(data){
             setUsername(data.username)
@@ -26,7 +26,7 @@ const UserDetailsCard = ({userId}: any) => {
 
 
   return (
-    <div>
+    <div className='grid grid-cols-1'>
          <div className="flex items-center">
             <div className="font-bold text-black">Customer:</div>
             
@@ -37,7 +37,7 @@ const UserDetailsCard = ({userId}: any) => {
             </div>
            
           </div>
-          <div className="flex items-center">
+          <div className="flex flex-wrap items-center">
             <div className="font-bold text-black">Customer's Email:</div>
             <div className="ml-auto font-medium">{email}</div>
           </div>

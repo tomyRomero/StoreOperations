@@ -1,8 +1,8 @@
-import Hero from "@/components/Hero";
+import Hero from "@/components/home/Hero";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Categories from "@/components/Categories";
-import Promotion from "@/components/Promotion";
+import Categories from "@/components/home/Categories";
+import Promotion from "@/components/home/Promotion";
 import { redirect } from "next/navigation";
 import { getAllCategories } from "@/lib/actions/store.actions";
 

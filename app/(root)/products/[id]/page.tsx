@@ -1,4 +1,4 @@
-import ProductDetails from '@/components/ProductDetails'
+import ProductDetails from '@/components/cards/ProductDetails'
 import { findProduct, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
 import React from 'react'
 import Image from 'next/image'

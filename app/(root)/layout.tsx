@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "../globals.css";
-import Nav from "@/components/shared/Nav";
+import Nav from "@/components/nav/Nav";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
 import Footer from "@/components/shared/Footer";
@@ -42,7 +42,9 @@ export default async function RootLayout({
       <body className={`${jost.className} flex flex-col`}>
         <Nav/>
         <main className="flex flex-col items-center">
-          <section className="main-container w-full mp-4">{children}</section>
+          <section className="main-container w-full mt-0.5 !z-10 overflow-auto">
+            {children}
+            </section>
         </main>
         <Footer />
         <Toaster />

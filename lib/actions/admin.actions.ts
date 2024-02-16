@@ -32,6 +32,28 @@ export const getUser = async (userId: string) => {
   }
 };
 
+//Function to fetch user by ID for Client 
+export const getUserClient = async (userId: string) => {
+  try {
+    // Use the find method on the User model to retrieve all users
+    connectToDB();
+    const user = await User.findById(userId)
+    const userObject = {
+      username : user.username,
+      email: user.email,
+      date: user.date
+    }
+    return userObject;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return {
+      username: "Error",
+      email: "Error",
+      date: "Error",
+    }
+  }
+};
+
 // Function modified for client components
 export const getUserForClient = async (userId: string) =>
 {
@@ -79,11 +101,11 @@ export const getAdminUser = async () => {
   }
 };
 
-//Get all orders to render on admin page
+// Get all orders to render on admin page, sorted by most recent
 export const findAllOrdersForAdmin = async () => {
   try {
-    // Find all orders in the database
-    const orders = await Orders.find();
+    // Find all orders in the database and sort them by createdAt field in descending order
+    const orders = await Orders.find().sort({ createdAt: -1 });
 
     // Return the array of orders
     return orders;

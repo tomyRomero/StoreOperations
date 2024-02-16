@@ -13,7 +13,6 @@ import { nanoid } from 'nanoid';
 import Addresses from "../models/addresses.model";
 import Orders from "../models/orders.model";
 import Activity from "../models/activity.model";
-import { redirect } from "next/navigation";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -291,8 +290,8 @@ export const getAllCategories = async () => {
       return { results: products, isNext, totalPages };
     } catch (error) {
       console.error('Error fetching products:', error);
-      throw new Error('Failed to fetch products');
-    }
+      return {results: [], isNext: false, totalPages: 0}
+    } 
   };
   
   // Archive Product and its Price in Stripe
@@ -666,27 +665,6 @@ export const createCheckout = async (userId: string, address:Address, store: boo
   }
 }
 
-//Get all addresses belonging to user
-export const getUserAddresses = async (userId: string) => {
-  try {
-      // Find the user's addresses based on the provided userId
-      const userAddresses = await Addresses.findOne({ user: userId });
-
-      if (userAddresses) {
-          // If addresses are found, return the addresses array
-          const myAddresses = userAddresses.addresses.map((item: any) => item.address);
-          console.log("user addresses: " , myAddresses)
-          return myAddresses
-      } else {
-          // If no addresses are found, return an empty array
-          return [];
-      }
-  } catch (error) {
-      console.log(`An error occurred while fetching user addresses: ${error}`);
-      return [];
-  }
-};
-
 //get address and orderId from checkout that was created when we selected our address.
 export const getAddressAndOrderIdFromCheckout = async (userId: string) => {
   try {
@@ -849,21 +827,147 @@ export const updateOrderStatus = async (orderId: string , status: string, estima
 
 }
 
-//Get all orders that belong to user
-export const findAllOrdersForUser = async (userId: string) => {
+// Function to find all orders for a user with pagination support
+export const findAllOrdersForUser = async (userId: string, pageNumber: number = 1, pageSize: number = 10) => {
   try {
-    // Find all orders in the database belonging to the provided userId
-    const orders = await Orders.find({ user: userId });
+    // Calculate the number of orders to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
 
-    // Return the array of orders
-    return orders;
+    // Find orders in the database belonging to the provided userId, with pagination
+    const orders = await Orders.find({ user: userId })
+      .skip(skipAmount) // Skip the specified number of orders
+      .limit(pageSize); // Limit the number of orders returned
+
+    // Calculate total count of orders for the user
+    const totalOrdersCount = await Orders.countDocuments({ user: userId });
+
+    // Calculate if there are more orders after the current page
+    const isNext = totalOrdersCount > skipAmount + orders.length;
+
+    // Return the retrieved orders and whether there are more orders
+    return { orders, isNext };
   } catch (error) {
     // If an error occurs during the process, log the error message
     console.error('Error finding all orders for user:', error);
     // Return an empty array to indicate an error occurred
-    return [];
+    return { orders: [], isNext: false };
   }
 };
+
+// Function to save an address for a user
+export const saveAddress = async (userId: string, address: Address, path: string) => {
+  try {
+    // Check if the user already has addresses stored
+    let userAddresses = await Addresses.findOne({ user: userId });
+
+    if (!userAddresses) {
+      // If no addresses are stored, create a new document with the provided address
+      userAddresses = await new Addresses({
+        user: userId,
+        addresses: [{ address: address }]
+      });
+    } else {
+      // If addresses are already stored, append the new address to the existing list
+      await userAddresses.addresses.push({ address: address });
+
+    }
+
+    // Save the updated addresses document
+    revalidatePath(path)
+    await userAddresses.save();
+
+    console.log("Address saved successfully");
+    return true;
+  } catch (error) {
+    console.error(`An error occurred while saving the address: ${error}`);
+    return false;
+  }
+};
+
+//Get all addresses belonging to user
+export const getUserAddresses = async (userId: string) => {
+  try {
+      // Find the user's addresses based on the provided userId
+      const userAddresses = await Addresses.findOne({ user: userId });
+
+      if (userAddresses) {
+          // If addresses are found, return the addresses array
+          const myAddresses = userAddresses.addresses.map((item: any) => item.address);
+          console.log("user addresses: " , myAddresses)
+          return myAddresses
+      } else {
+          // If no addresses are found, return an empty array
+          return [];
+      }
+  } catch (error) {
+      console.log(`An error occurred while fetching user addresses: ${error}`);
+      return [];
+  }
+};
+
+export const deleteAddress = async (userId: string, addressToDelete: Address, path: string) => {
+  try {
+    // Find the document containing the addresses array for the user
+    const query = { user: userId };
+
+    // Use the $pull operator to remove the specified address from the addresses array
+    const update = { $pull: { addresses: { address: addressToDelete } } };
+
+    // Set the `new` option to true to return the modified document after update
+    const options = { new: true };
+
+    // Perform the update operation
+    const updatedDocument = await Addresses.findOneAndUpdate(query, update, options);
+
+    if (updatedDocument) {
+      // Address deleted successfully
+      console.log('Address deleted successfully:', updatedDocument);
+      revalidatePath(path)
+      return true;
+    } else {
+      // Address not found or already deleted
+      console.log('Address not found or already deleted');
+      return null;
+    }
+  } catch (error) {
+    // Error occurred while deleting the address
+    console.error('Error deleting address:', error);
+    throw error; // You can handle this error in your application
+  }
+};
+
+// Function to delete user address by _id
+export const deleteAddressById = async (userId: string, addressId: string, path: string) => {
+  try {
+    // Find the document containing the addresses array for the user
+    const query = { user: userId };
+
+    // Use the $pull operator to remove the address with the specified _id from the addresses array
+    const update = { $pull: { addresses: { _id: addressId } } };
+
+    // Set the `new` option to true to return the modified document after update
+    const options = { new: true };
+
+    // Perform the update operation
+    const updatedDocument = await Addresses.findOneAndUpdate(query, update, options);
+
+    if (updatedDocument) {
+      // Address deleted successfully
+      console.log('Address deleted successfully:', updatedDocument);
+      revalidatePath(path);
+      return true;
+    } else {
+      // Address not found or already deleted
+      console.log('Address not found or already deleted');
+      return null;
+    }
+  } catch (error) {
+    // Error occurred while deleting the address
+    console.error('Error deleting address:', error);
+    return null; // You can handle this error in your application
+  }
+};
+
 
 //Function that returns all activities with pagination
 export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 10): Promise<{ activities: typeof Activity[], isNext: boolean }> => {
@@ -871,10 +975,13 @@ export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 
     // Calculate the number of activities to skip based on the page number and page size.
     const skipAmount = (pageNumber - 1) * pageSize;
 
-    // Use Mongoose's find() method to retrieve paginated activity entries
-    const activities = await Activity.find()
-      .skip(skipAmount)
-      .limit(pageSize);
+    // Aggregate pipeline to sort activities by date in descending order, to get most recent up on top.
+    // skip the specified number of documents, and limit the number of documents returned
+    const activities = await Activity.aggregate([
+      { $sort: { timestamp: -1 } }, // Sort by timestamp field in descending order
+      { $skip: skipAmount }, // Skip the specified number of documents
+      { $limit: pageSize } // Limit the number of documents returned
+    ]);
 
     // Calculate total count of activities
     const totalActivitiesCount = await Activity.countDocuments();
@@ -892,6 +999,7 @@ export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 
     return { activities, isNext };
   }
 };
+
 
 //Update the stock of products after purchase
 export const updateProductStockAfterPurchase = async (items: {product: string, quantity: number}[]) => {

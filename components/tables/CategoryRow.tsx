@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import Image from 'next/image'
-import Link from 'next/link'
 import { TableRow, TableCell} from "@/components/ui/table"
 import { getRes } from '@/lib/s3'
 import { deleteCategoryById } from '@/lib/actions/store.actions'
@@ -67,7 +66,7 @@ const redirect = () => {
         />
       </TableCell>
         <TableCell className="font-medium">{id}</TableCell>
-        <TableCell className="">{title}</TableCell>
+        <TableCell className="font-bold">{title}</TableCell>
         <TableCell className="">{date}</TableCell>
         <TableCell>
       <div className='flex'>

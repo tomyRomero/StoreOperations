@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getRes } from '@/lib/s3';
+import { set } from 'mongoose';
 
 interface Category{
     id: string,
@@ -18,11 +19,13 @@ const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
     useEffect(() => { 
       const loadCategoryImage = async () => {
       
+      {
       setImg(await getRes(category.photo))
-    }
+      }
+  }
   
     loadCategoryImage()
-  
+
   }, [])
 
   return (
@@ -38,6 +41,7 @@ const CategoryCard: React.FC<{ category: Category }> = ({ category }) => {
               objectFit: "cover",
             }}
             width={300}
+            loading="lazy"
           />
 
           <h3 className="text-body-bold mt-4 bg-black text-white py-2 rounded-md w-full text-center">{category.title}</h3>

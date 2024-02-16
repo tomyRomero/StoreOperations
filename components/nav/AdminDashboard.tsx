@@ -19,7 +19,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="hidden w-full border-r bg-gray-100/40 lg:block">
+    <div className="hidden w-full border-r lg:block">
       <div className="w-[17rem] fixed flex h-full max-h-screen flex-col gap-2">
         <div className="relative flex h-[60px] items-center border-b px-6">
           <div className="flex items-center gap-2 font-semibold">

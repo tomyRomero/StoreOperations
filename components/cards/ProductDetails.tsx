@@ -9,9 +9,9 @@ import { useRouter } from "next/navigation"
 import { addProductToCart } from "@/lib/actions/store.actions"
 import { useSession } from "next-auth/react"
 import { useAppContext } from "@/lib/AppContext"
-import ProductCard from "./cards/ProductCard"
+import ProductCard from "./ProductCard"
 import Loading from "@/app/(auth)/loading"
-import { toast } from "./ui/use-toast"
+import { toast } from "../ui/use-toast"
 
 type ProductDetailsType = ProductType & {
   result: boolean;

@@ -66,12 +66,7 @@ const deleteProduct = async () => {
             priority
           />
         </TableCell>
-        <TableCell className="font-medium">{name}</TableCell>
-        <TableCell>{stripeProductId}</TableCell>
-        <TableCell>{`$${price}`}</TableCell>
-        <TableCell>{category}</TableCell>
-        <TableCell>{stock}</TableCell>
-        <TableCell>{date}</TableCell>
+        <TableCell className="font-bold">{name}</TableCell>
         <TableCell>
             <div className='flex'>
              <Button size="sm" variant="outline" onClick={redirect}>
@@ -82,6 +77,11 @@ const deleteProduct = async () => {
              </Button>
              </div>
            </TableCell>
+        <TableCell className={`text-center font-bold ${stock === "0" ? "text-red-400" : ""}`}>{stock}</TableCell>
+        <TableCell className="text-center font-bold text-green-600">{`$${price}`}</TableCell>
+        <TableCell>{stripeProductId}</TableCell>
+        <TableCell className="font-semibold">{category}</TableCell>
+        <TableCell>{date}</TableCell>
       </TableRow>
   )
 }

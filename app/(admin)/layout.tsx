@@ -4,9 +4,9 @@ import "../globals.css";
 import { getServerSession } from "next-auth/next";
 import SessionProvider from "../../components/SessionProvider"
 import { AppProvider } from "@/lib/AppContext";
-import AdminNav from "@/components/shared/AdminNav";
-import AdminDashboard from "@/components/shared/AdminDashboard";
-import MobileAdminDashboard from "@/components/shared/MobileAdminDashboard";
+import AdminNav from "@/components/nav/AdminNav";
+import AdminDashboard from "@/components/nav/AdminDashboard";
+import MobileAdminDashboard from "@/components/nav/MobileAdminDashboard";
 import { Toaster } from "@/components/ui/toaster";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";

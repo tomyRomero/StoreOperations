@@ -1,57 +1,52 @@
 import React from 'react'
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card"
-import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
-import Image from 'next/image'
+import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components/ui/table"
 import { Order } from '@/app/types/global'
 import OrderDetailsCardRow from '../tables/OrderDetailsCardRow'
 import UserDetailsCard from './CustomerDetailsCard'
 
-
-
 const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date, trackingNumber, deliveryDate}: Order) => {
-
-  console.log("items:" ,items)
 
   return (
         <div className='grid grid-cols-1'>
            <Card>
         <CardHeader>
-          <CardTitle>Order Summary</CardTitle>
+          <CardTitle className='text-heading3-bold'>Order Summary</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2">
           <UserDetailsCard userId={user.toString()} />
         </CardContent>
-        <CardContent className="grid gap-2">
+        <CardContent className="grid gap-2 grid-cols-1">
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Order ID:</div>
+            <div className="!font-bold text-black ">Order ID:</div>
             <div className="ml-auto font-medium">#{orderId}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Date:</div>
+            <div className="!font-bold text-black ">Date:</div>
             <div className="ml-auto font-medium">{date}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Shipping:</div>
+            <div className="!font-bold text-black ">Shipping:</div>
             <div className="ml-auto font-medium">${pricing.shipping}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Subtotal:</div>
+            <div className="!font-bold text-black ">Subtotal:</div>
             <div className="ml-auto font-medium">${pricing.subtotal}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Tax:</div>
+            <div className="!font-bold text-black ">Tax:</div>
             <div className="ml-auto font-medium">${pricing.taxAmount}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Tax ID:</div>
+            <div className="!font-bold text-black ">Tax ID:</div>
             <div className="ml-auto font-medium">{pricing.taxtId}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Total:</div>
+            <div className="!font-bold text-black ">Total:</div>
             <div className="ml-auto font-medium">{pricing.total}</div>
           </div>
           <div className="flex items-center">
-            <div className="font-bold text-black dark:text-gray-400">Status:</div>
+            <div className="!font-bold text-black ">Status:</div>
             <div className="ml-auto font-bold">{status === "pending" || status === "Pending" ? (<p className='text-red-500 font-extrabold'>Customer Awaiting Your Shipment</p>) : status}</div>
           </div>
         </CardContent>

@@ -1,53 +1,39 @@
+import CustomerUserCard from "@/components/cards/CustomerUserCard"
+import ErrorMessage from "@/components/shared/Error"
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { getUser } from "@/lib/actions/admin.actions"
+import { authOptions } from "@/lib/auth"
+import { getServerSession } from "next-auth"
 
-export default function page() {
+const page = async () => {
+
+  const session = await getServerSession(authOptions);
+
+  let user = null;
+
+  if(session?.user.id)
+  {
+    user = await getUser(session.user.id) 
+  }
+  
+  if(!user)
+  {
+    <section className="md:pt-28 max-sm:pt-24 lg:pt-0 ">
+        <ErrorMessage />
+      </section>
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>User details</CardTitle>
-        <CardDescription>
-          Viewing user details for
-          <span className="font-semibold">olivia@example.com</span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold">Username</div>
-            <div>olivia</div>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold">Email</div>
-            <div>olivia@example.com</div>
-          </div>
-        </div>
-        <Separator />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold">Shipping address</div>
-            <div>
-              Olivia Martin
-              <br />
-              1234 Main St.
-              <br />
-              Anytown, CA 12345
-            </div>
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold">Billing address</div>
-            <div>Same as shipping address</div>
-          </div>
-        </div>
-        <Separator />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <div className="font-semibold">Date created</div>
-            <div>February 20, 2022</div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <section className="md:pt-28 max-md:pt-24 lg:pt-0 ">
+    <CustomerUserCard
+    username={user.username}
+    email={user.email} 
+    id={user.id} 
+    date={user.date}
+    />
+    </section>
   )
 }
 
+export default page;

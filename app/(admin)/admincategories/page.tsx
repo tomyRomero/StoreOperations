@@ -12,7 +12,7 @@ export default async function page() {
   return (
     <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
     <div className="flex items-center">
-      <h1 className="font-semibold">Categories</h1>
+      <h1 className="text-heading4-bold">Categories</h1>
         <Link href="/adminaddcategory" className="ml-auto">
           <Button className="ml-auto" size="sm">
             Add Category

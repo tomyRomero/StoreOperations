@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { findProduct } from '@/lib/actions/store.actions'
 import AddProductForm from './AddProductForm'
+import Loading from '@/app/(auth)/loading'
 
 const ProductFormWrapper = ({id}: any) => {
     const [name, setName] = useState("")
@@ -40,7 +41,7 @@ const ProductFormWrapper = ({id}: any) => {
     <>
     {dataFetched ? (
         <AddProductForm stripeProductId={id} name={name} description={description} stock={stock} price={price} category={category} photo={photo}/>
-    ): <h1>Loading</h1>}
+    ): <Loading />}
     </>
   )
 }

@@ -28,6 +28,7 @@
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "framer-motion": "^11.0.5",
     "lucide-react": "^0.312.0",
     "micro-cors": "^0.1.1",
     "mongodb": "^6.3.0",

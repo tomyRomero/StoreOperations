@@ -42,6 +42,7 @@ const ordersSchema = new Schema({
   trackingNumber: {type: String, unique: true},
   deliveryDate: {type: String},
   date: {type: String, default: getCurrentDate, required: true},
+  createdAt: {type: Date, default: Date.now, required: true }
 });
 
 const Orders = models.Orders || model('Orders', ordersSchema);

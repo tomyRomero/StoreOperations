@@ -116,7 +116,7 @@ const ActivityCard = ({action, details, timestamp}: any) => {
         height={22}
         className='max-xxs:mx-auto'
      />
-      <p className="font-medium text-center">{event}</p>
+      <p className="font-bold text-center">{event}</p>
     </div>
     { action === "order_created" &&
     <div className="flex items-center gap-2">

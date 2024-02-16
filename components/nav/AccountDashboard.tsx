@@ -5,13 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-
-  // Hardcoded user data
-  const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  };
-
   // Navigation items
   const navItems = [
     { title: 'Account', url: '/account' , img: "/assets/profilehome.png"},
@@ -19,25 +12,24 @@ import { usePathname } from 'next/navigation';
     { title: "Addresses" , url: "/account/myaddresses", img: "/assets/address.png"},
   ];
 
-const AccountDashboard = () => {
+const AccountDashboard = ({username, email} : {username: string, email:string}) => {
 
     const pathname = usePathname();
 
     return(
-    <div className="hidden w-full border-r bg-gray-100/40 lg:block">
+    <div className="hidden w-full border-r lg:block">
 
-    <div className="w-[17rem] fixed flex h-full max-h-screen flex-col gap-5 p-3">
+    <div className="w-[17rem] fixed flex h-full min-h-screen flex-col gap-5 p-3">
+        <Link href="/account">
             <div className="flex items-center mb-4 p-2">
-                <div className="rounded-full overflow-hidden">
-                  <Image src="/assets/profile.png" alt="profile" width={50} height={50} />
-                </div>
                 <div className="ml-4">
-                  <p className="text-lg font-semibold">{user.name}</p>
-                  <p className="text-sm text-gray-600">{user.email}</p>
+                  <p className="font-bold">{username}</p>
+                  <p className="font-bold text-black">{email}</p>
             </div>
         </div>
+        </Link>
       <div className="flex-1 overflow-auto py-2">
-        <nav className="grid gap-4 items-start px-4 text-sm font-medium">
+        <nav className="grid gap-4 items-start px-4">
           {navItems.map((item) => (
             <Link
               key={item.url}
@@ -52,7 +44,7 @@ const AccountDashboard = () => {
                 height={24}
                 
               />
-              <p className='text-body-semibold'>{item.title}</p>
+              <p className='text-body-semibold font-bold'>{item.title}</p>
               </div>
             </Link>
           ))}

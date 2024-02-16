@@ -24,6 +24,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { revalidate } from "@/lib/actions/admin.actions";
 import {getAllCategoriesForProduct} from "@/lib/actions/store.actions";
 import { ProductType } from "@/app/types/global"
+import Loading from "@/app/(auth)/loading"
 
 const AddProductForm = ({stripeProductId, name, description, stock, price, category, photo}: ProductType) => {
   const [categories, setCategories]= useState<string[]>([])
@@ -333,7 +334,7 @@ const AddProductForm = ({stripeProductId, name, description, stock, price, categ
       </div>
     </div>
     ) : (
-      <h1>Loading...</h1>
+      <Loading />
     )}
     </>
   )

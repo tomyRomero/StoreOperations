@@ -8,13 +8,6 @@ import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, Dropdown
 import { usePathname } from 'next/navigation'
 
 
-
-  // Hardcoded user data
-  const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  };
-
   // Navigation items
   const navItems = [
     { title: 'Account', url: '/account' , img: "/assets/profilehome.png"},
@@ -22,20 +15,19 @@ import { usePathname } from 'next/navigation'
     { title: "Addresses" , url: "/account/myaddresses", img: "/assets/address.png"},
   ];
 
-const MobileAccountDashboard = () => {
+const MobileAccountDashboard = ({username} : {username: string}) => {
 
     const pathname = usePathname();
 
     return (
-        <header className="z-50 w-full bg-white lg:hidden flex items-center gap-4 border-y bg-gray-100/40 p-3 fixed flex-wrap">
-          <Link href={"/adminusers"}>
-
+        <header className="mt-1 z-10 w-full bg-white lg:hidden flex items-center gap-4 border-y bg-gray-100/40 px-3  pt-4 fixed">
+          <Link href={"/account"}>
             <div className="flex items-center mb-4 px-2">
                 <div className="rounded-full overflow-hidden">
                   <Image src="/assets/profile.png" alt="profile" width={50} height={50} />
                 </div>
                 <div className="ml-4">
-                  <p className="text-lg font-semibold">{user.name}</p>
+                  <p className="text-lg font-semibold">{username}</p>
             </div>
            </div>
           </Link>
