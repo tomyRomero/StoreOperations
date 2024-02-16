@@ -56,7 +56,6 @@ const Cart = () => {
         const serverCart = await getCartItems(session.user.id)
         setCartItems(serverCart)
       }else{
-        console.log("i ran")
          // If user is not logged, check localStorage
          const localStorageCartString = localStorage.getItem('cart');
          if (localStorageCartString) {
