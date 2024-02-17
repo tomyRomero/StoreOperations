@@ -5,19 +5,54 @@ import { revalidatePath} from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose"
 import Orders from "../models/orders.model";
+import { ObjectId } from "mongodb";
 
-// Function to fetch all users
-export const getAllUsers = async () => {
+//Pagination and Search Supported User Fetch Function
+export const fetchUsers = async ({
+  searchString = "",
+  pageNumber = 1,
+  pageSize = 20,
+  sortBy = "desc",
+}: {
+  searchString?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: "asc" | "desc";
+}) => {
   try {
-    // Use the find method on the User model to retrieve all users
-    connectToDB();
-    const users = await User.find({});
-    return users;
+    // Calculate the number of users to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    // Create a case-insensitive regular expression for the provided search string.
+    const regex = new RegExp(searchString, "i");
+
+    // Construct the query to find users matching the search criteria
+    const query = {
+      $or: [
+        { username: { $regex: regex } },
+        {email: { $regex: regex }},
+        { _id: ObjectId.isValid(searchString) ? new ObjectId(searchString) : null },
+      ],
+    };
+
+    // Find users based on the query, apply pagination and sorting
+    const users = await User.find(query)
+      .skip(skipAmount)
+      .limit(pageSize)
+
+    // Count the total number of users matching the search criteria
+    const totalUsersCount = await User.countDocuments(query);
+
+    // Determine if there are more users beyond the current page
+    const isNext = totalUsersCount > skipAmount + users.length;
+
+    return { users, isNext };
   } catch (error) {
     console.error("Error fetching users:", error);
-    throw error; 
+   return { users:[], isNext:false}
   }
 };
+
 
 // Function to fetch user by ID
 export const getUser = async (userId: string) => {

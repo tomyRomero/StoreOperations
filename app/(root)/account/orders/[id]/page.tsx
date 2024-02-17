@@ -1,10 +1,10 @@
-import OrderDetailsCards from "@/components/cards/OrderDetailsCards";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { findOrder } from "@/lib/actions/store.actions";
 import { Card } from "@/components/ui/card";
 import { Order } from "@/app/types/global";
+import CustomerOrderDetailsCards from "@/components/cards/CustomerOrderDetailsCards";
 
 const page = async ({ params }: { params: { id: string } }) =>  {
 
@@ -62,7 +62,7 @@ const page = async ({ params }: { params: { id: string } }) =>  {
         <br></br>
       <br></br>
      
-      <OrderDetailsCards 
+      <CustomerOrderDetailsCards 
       pricing={order.pricing}
       address={order.address} 
       status={order.status} 

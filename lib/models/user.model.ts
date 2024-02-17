@@ -13,9 +13,7 @@ const userSchema = new Schema({
         ref: 'Cart',
       },
     checkout: {
-        status: { type: String }, 
         address: { type: Object}, 
-        orderid: { type: String}
     }, 
     addresses: {
         type: Schema.Types.ObjectId,
@@ -24,7 +22,8 @@ const userSchema = new Schema({
     orders: {
         type: Schema.Types.ObjectId,
         ref: 'Orders'
-    }
+    },
+    createdAt: {type: Date, default: Date.now, required: true }
 }); 
 
 const User = models.User || model('User', userSchema);

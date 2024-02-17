@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { nanoid } from 'nanoid';
 import { NextResponse } from "next/server";
 import Cors from "micro-cors";
 import Stripe from 'stripe';
@@ -95,7 +95,7 @@ export async function POST(req: any) {
             const metadata = paymentIntent.metadata;
            
             //destructure data from metadata object
-            const {total, subtotal, userId, address , taxAmount, order, orderId , shipping, taxId} = metadata
+            const {total, subtotal, userId, address , taxAmount, order, shipping, taxId} = metadata
             //it all comes in strings so convert some of it back to objects
             const addressObject = JSON.parse(address);
             const orderObject = JSON.parse(order);
@@ -107,17 +107,20 @@ export async function POST(req: any) {
                 taxtId: taxId
             };
 
+            //Generate Order ID
+            const orderId = nanoid(); 
+
+            //Create and save order to database
+            await callCreateOrder(orderId, userId, orderObject, addressObject, pricingObject);
+
             //Update the stock of products
             await updateProductStockAfterPurchase(orderObject)
 
-            //Create and save order to database
-            await callCreateOrder(orderId, userId, orderObject, addressObject,pricingObject);
+            //Clear cart belonging to user because they were successfull in checkout
+            await removeUserCart(userId);
 
             //Remove current checkout associated with user since it got completed
             await removeCheckout(userId);
-
-            //Clear cart belonging to user because they were successfull in checkout
-            await removeUserCart(userId);
 
             //Send Email to User with Order Details!
             const currentURL = process.env.AXIOS_URL;

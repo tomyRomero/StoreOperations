@@ -14,7 +14,7 @@ const page = async ({
   //Get Activity Pagination Results
   const results = await getAllActivity(
     searchParams.page ? + searchParams.page : 1,
-     6, 
+     5, 
   )
 
   return (
@@ -29,7 +29,6 @@ const page = async ({
                 <div className="border-b border-gray-300 w-full"></div>
             </div>
             {results.activities.map((activity: any, index) => (
-              
               <ActivityCard key={index} action={activity.action} details={activity.details} timestamp={activity.timestamp}/>
             ))}
           </CardContent>

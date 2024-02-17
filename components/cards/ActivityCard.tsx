@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { getUserForClient } from '@/lib/actions/admin.actions'
 import { calculateTimeAgo } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { useAppContext } from '@/lib/AppContext'
 
 const ActivityCard = ({action, details, timestamp}: any) => {
 
@@ -26,6 +27,8 @@ const ActivityCard = ({action, details, timestamp}: any) => {
       stripeId: string,
       date: string
     }
+
+    const {pageChanged} = useAppContext()
 
     useEffect(()=> {
 
@@ -61,7 +64,7 @@ const ActivityCard = ({action, details, timestamp}: any) => {
         }
 
         initialize()
-    }, [])
+    }, [[pageChanged]])
 
     const handleView = ()=> {
         if(action === "user_created")

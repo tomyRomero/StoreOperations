@@ -1,25 +1,56 @@
 
-import SearchUsers from "@/components/forms/SearchUsers"
 import UsersTable from "@/components/tables/UsersTable"
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { getAllUsers } from "@/lib/actions/admin.actions";
+import { fetchUsers } from "@/lib/actions/admin.actions";
+import Pagination from "@/components/shared/Pagination";
+import SearchBar from "@/components/forms/SearchBar";
 
-export default async function page() {
+export default async function page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
 
-  const Users = await getAllUsers();
+  const searchString = searchParams.q; //search string
+  const pageNumber = searchParams.page ? + searchParams.page : 1; //page number
+  const pageSize = 7; 
+  const sortBy = "desc"; 
+
+  const { users, isNext } = await fetchUsers({
+    searchString,
+    pageNumber,
+    pageSize,
+    sortBy,
+  });
+
+  const createPaginationPath = ()=> {
+    // Create a new URLSearchParams object
+   const params = new URLSearchParams();  
+
+   //Add the search parameter to the URLSearchParams
+   params.append('q', searchParams.q ? searchParams.q || searchParams.q : "");
+
+   // Get the final query string
+   const queryString = params.toString();
+
+   //include the queryString in pagination
+   return `/adminusers?${queryString}&`
+  }
 
   return (
     <section className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col h-full">
       <div className="grid grid-cols-1">
-      <SearchUsers />
+        <SearchBar routeType="adminusers" placeholder={"Search For Users By Their Username, Email, or ID"}/>
       </div>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
         <div className="grid grid-cols-1 border shadow-sm rounded-lg overflow-x-hidden">
-            <UsersTable users={Users}/>
+            <UsersTable users={users}/>
         </div>
       </main>
+      <Pagination
+          path={createPaginationPath()}
+          pageNumber={searchParams?.page ? + searchParams.page : 1}
+          isNext={isNext}
+        />
     </section>
   )
 }

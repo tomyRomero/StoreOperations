@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { getAllProducts, getAllProductsWithoutSort } from "@/lib/actions/store.actions";
 import ProductRow from "@/components/tables/ProductRow";
+import Pagination from "@/components/shared/Pagination";
 
 export default async function page({
   searchParams,
@@ -13,9 +14,9 @@ export default async function page({
   searchParams: { [key: string]: string | undefined };
 }) {
 
-  const products = await getAllProductsWithoutSort(
+  const results = await getAllProductsWithoutSort(
     searchParams.page ? + searchParams.page : 1,
-     8,
+     6,
   );
 
   return (
@@ -44,7 +45,7 @@ export default async function page({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.results.map((product)=> (
+              {results.results.map((product)=> (
                  <ProductRow 
                  key={product.stripeProductId}
                  stripeProductId={product.stripeProductId} 
@@ -59,10 +60,15 @@ export default async function page({
               ))}
             </TableBody>
             </Table>
-            {products.results.length === 0 && <h1 className="p-10">
+            {results.results.length === 0 && <h1 className="p-10">
               No products Have been added, click on add product to get started
               </h1>}
           </div>
+          <Pagination
+          path={"/adminproducts?"}
+          pageNumber={searchParams?.page ? + searchParams.page : 1}
+          isNext={results.isNext}
+        />
     </section>
   )
 }

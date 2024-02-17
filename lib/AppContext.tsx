@@ -14,7 +14,8 @@ type AppContextProps = {
   productAdjusted: boolean;
   setProductAdjusted: React.Dispatch<React.SetStateAction<any>>;
 
-
+  pageChanged: boolean;
+  setPageChanged: React.Dispatch<React.SetStateAction<any>>;
 };
 
 // Create the AppContext with an initial value of undefined
@@ -40,11 +41,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   //Global marker that is called whenever an item in cart is updated, used for nav
   const [productAdjusted, setProductAdjusted] = useState(false);
 
+  //Global marker that is called when page is changed to update state
+  const [pageChanged, setPageChanged] = useState(false);
 
   // Provide the context value to the children components, include additional states if there are any
   const contextValue: AppContextProps = {
     cart, setCart,
-    productAdjusted, setProductAdjusted
+    productAdjusted, setProductAdjusted , pageChanged, setPageChanged
   };
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;

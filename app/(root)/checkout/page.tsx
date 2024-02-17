@@ -1,6 +1,6 @@
 "use client"
 
-import { cartItemsInStock, getAddressAndOrderIdFromCheckout, getCartItems } from '@/lib/actions/store.actions';
+import { cartItemsInStock, getAddressFromCheckout, getCartItems } from '@/lib/actions/store.actions';
 import React, { useEffect, useState } from 'react'
 import CheckoutForm from '@/components/checkout/CheckoutForm';
 import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
@@ -41,7 +41,6 @@ const page = () => {
       quantity: number
   }[],
     user: string,
-    orderId: string,
     shipping: number
   ) => {
     try {
@@ -49,7 +48,7 @@ const page = () => {
       const response = await fetch("/api/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, user, address, orderId, shipping }),
+        body: JSON.stringify({ items, user, address, shipping }),
       });
   
       if (!response.ok) {
@@ -93,7 +92,7 @@ const page = () => {
         }else{
           //Users are suppose to provide address before payment for tax purposes, if there is no address povided, push to address page
           //Naturally users are directed to address after cart but there may be cases where someone might access the checkout url before doing so.
-          const result = await getAddressAndOrderIdFromCheckout(session.user.id)
+          const result = await getAddressFromCheckout(session.user.id)
           if(!result)
           {
             router.push("/address")
@@ -109,9 +108,9 @@ const page = () => {
           if(result)
           {
             //result will return an address and a unique orderID that was created when the checkout procedure started in address page
-            const { address, orderId } = result;
+            const { address } = result;
              //load create payment intent from stripe and use custom payment flow
-            await createPaymentIntent(address, items , session.user.id , orderId, shipping);
+            await createPaymentIntent(address, items , session.user.id ,shipping);
           }
          
           setLoading(false)
@@ -161,7 +160,7 @@ const page = () => {
               <div className="md:col-span-4 lg:col-span-3 xl:col-span-4 flex flex-col gap-6">
                 {clientSecret && (
                   <Elements options={options} stripe={stripePromise}>
-                    <CheckoutForm orderID ={orderID}/>
+                    <CheckoutForm />
                   </Elements>
                 )}
               </div>

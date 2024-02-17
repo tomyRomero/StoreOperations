@@ -80,7 +80,7 @@ export async function POST(req: Request, res: NextApiResponse) {
 
    // Extract the items from the request body
    const body = await req.json();
-   const { address , items, user, orderId, shipping } = body;
+   const { address , items, user, shipping } = body;
 
    // Stringify the items array
    const stringifiedItems = JSON.stringify(items);
@@ -93,7 +93,6 @@ export async function POST(req: Request, res: NextApiResponse) {
    const metadata = {
     userId: user,
     order: stringifiedItems,
-    orderId: orderId,
     address: JSON.stringify(address),
     total: total.toString(),
     subtotal: subtotal.toString(),
@@ -129,7 +128,6 @@ export async function POST(req: Request, res: NextApiResponse) {
       shipping: myShippingDollars,
       total: totalDollars, 
       items: items, 
-      orderId: orderId
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating PaymentIntent:', error);

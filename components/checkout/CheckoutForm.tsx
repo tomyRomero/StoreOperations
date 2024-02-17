@@ -9,7 +9,7 @@ import {
 import { Layout } from "@stripe/stripe-js";
 import { Button } from "../ui/button";
 
-const CheckoutForm = ({orderID}: {orderID : string})=> {
+const CheckoutForm = ()=> {
   const stripe = useStripe();
   const elements = useElements();
 

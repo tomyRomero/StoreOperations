@@ -16,7 +16,13 @@ function Pagination({ pageNumber, isNext, path}: Props) {
   const router = useRouter();
   const currentPath = usePathname()
 
+  const {pageChanged, setPageChanged} = useAppContext()
+
   const handleNavigation = (type: string) => {
+    
+    //Let global state know that a page has changed
+    setPageChanged(!pageChanged)
+
     let nextPageNumber = pageNumber;
 
     if (type === "prev") {

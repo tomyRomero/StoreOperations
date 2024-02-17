@@ -9,7 +9,6 @@ import Product from "../models/product.model";
 import { Stripe } from 'stripe';
 import { SortOrder } from 'mongoose';
 import Cart from "../models/cart.model";
-import { nanoid } from 'nanoid';
 import Addresses from "../models/addresses.model";
 import Orders from "../models/orders.model";
 import Activity from "../models/activity.model";
@@ -614,12 +613,8 @@ export const createCheckout = async (userId: string, address:Address, store: boo
   try{
     const existing = await User.findById(userId)
 
-    const orderId = nanoid(); 
-
     const checkout= {
-      status: "readyForPayment",
-      address: address,
-      orderid: orderId
+      address: address
     }
 
     if(existing)
@@ -666,14 +661,14 @@ export const createCheckout = async (userId: string, address:Address, store: boo
 }
 
 //get address and orderId from checkout that was created when we selected our address.
-export const getAddressAndOrderIdFromCheckout = async (userId: string) => {
+export const getAddressFromCheckout = async (userId: string) => {
   try {
     const existing = await User.findById(userId);
 
-    if (existing && existing.checkout && existing.checkout.address && existing.checkout.orderid) {
+    if (existing && existing.checkout && existing.checkout.address) {
       console.log("success in getting checkout")
-      console.log({address: existing.checkout.address, orderId: existing.checkout.orderid})
-      return { address: existing.checkout.address, orderId: existing.checkout.orderid };
+      console.log({address: existing.checkout.address})
+      return { address: existing.checkout.address };
     } else {
       console.log("something wrong happened")
       return false // Either no user, no checkout, or no address in the checkout
@@ -983,53 +978,51 @@ export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 
       { $limit: pageSize } // Limit the number of documents returned
     ]);
 
-    // Calculate total count of activities
-    const totalActivitiesCount = await Activity.countDocuments();
-
     // Calculate if there are more activities
-    const isNext = totalActivitiesCount > skipAmount + activities.length;
+    const totalActivitiesCount = await Activity.countDocuments();
+    const isNext = totalActivitiesCount > skipAmount + pageSize;
 
     // Return the retrieved activity entries and whether there are more activities
     return { activities, isNext };
   } catch (error) {
     // If an error occurs during the process, log the error message and return an empty array
     console.error('Error retrieving all activity:', error);
-    const activities: any = []
-    const isNext =  false
-    return { activities, isNext };
+    return { activities: [], isNext: false };
   }
 };
+
 
 
 //Update the stock of products after purchase
 export const updateProductStockAfterPurchase = async (items: {product: string, quantity: number}[]) => {
   try {
-      // Map each item to a promise that finds the corresponding product
-      const productPromises = items.map(async (item) => {
-          const product = await findProduct(item.product);
-          return { item, product };
-      });
+    // Iterate through each item in the list and update the stock for the corresponding product
 
-      // Execute all promises concurrently
-      const products = await Promise.all(productPromises);
+    console.log("stock items: ", items)
 
-      // Map each product to a promise that updates the stock
-      const updatePromises = products.map(async ({ item, product }) => {
-          if (product) {
-              const newStock = product.stock - item.quantity;
-              // Update the stock of the product in the database
-              await Product.updateOne({ stripeProductId: item.product }, { stock: newStock });
-              console.log(`Updated stock for product ${product.name}: ${product.stock} -> ${newStock}`);
-          } else {
-              console.error(`Product not found for ID: ${item.product}`);
-          }
-      });
+    for (const item of items) {
+      const product = await findProduct(item.product);
 
-      // Execute all update promises concurrently
-      await Promise.all(updatePromises);
+      console.log("product stock: ", product)
 
-      console.log('All product stocks updated successfully.');
+      if (!product) {
+        console.error(`Product not found for ID: ${item.product}`);
+        continue;
+      }
+
+      // Calculate new stock
+
+      console.log("product stock number: ", product.stock)
+      console.log("item quantity: ", item.quantity)
+      const newStock = product.stock - item.quantity;
+      console.log("new stock cal: ", newStock)
+      // Update the stock of the product in the database
+      await Product.updateOne({ stripeProductId: item.product }, { stock: newStock });
+      console.log(`Updated stock for product ${product.name}: ${product.stock} -> ${newStock}`);
+    }
+
+    console.log('All product stocks updated successfully.');
   } catch (error) {
-      console.error('Error updating product stock after purchase:', error);
+    console.error('Error updating product stock after purchase:', error);
   }
 };
