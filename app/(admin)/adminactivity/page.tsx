@@ -17,6 +17,7 @@ const page = async ({
      5, 
   )
 
+
   return (
     <section className="md:pt-24 max-sm:pt-20 lg:pt-0 ">
        <div className="grid grid-cols-1  max-w-2xl mx-auto">

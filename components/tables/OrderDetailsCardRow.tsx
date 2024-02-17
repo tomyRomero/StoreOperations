@@ -8,30 +8,25 @@ import { getRes } from '@/lib/s3';
 
 interface Props{
   
-product: string;
+productId: string;
 quantity: number;
-
+productName: string;
+productImage: string;
+productPrice: string;
 }
 
-const OrderDetailsCardRow = ({product, quantity} : Props) => {
-    const [price, setPrice] = useState(0)
+const OrderDetailsCardRow = ({productId, productName, quantity, productImage, productPrice} : Props) => {
+
     const [img, setImg]= useState("/assets/spinner.svg")
-    const [name, setName] = useState("product")
+
 
     useEffect(()=> {
-        const fetchProduct = async ()=> {
-         const data = await findProduct(product)
+        const fetchImage = async ()=> {
 
-         if(data)
-         {
-            setPrice(data.price)
-            setImg( await getRes(data.photo))
-            setName(data.name)
+            setImg( await getRes(productImage))
          }
 
-        }
-
-        fetchProduct();
+        fetchImage();
 
     }, [])
 
@@ -46,11 +41,11 @@ const OrderDetailsCardRow = ({product, quantity} : Props) => {
         width="85"
       />
     </TableCell>
-    <TableCell className="font-medium">{product}</TableCell>
-    <TableCell className="font-medium">{name}</TableCell>
+    <TableCell className="font-medium">{productId}</TableCell>
+    <TableCell className="font-medium">{productName}</TableCell>
     <TableCell>{quantity}</TableCell>
-    <TableCell>${price}</TableCell>
-    <TableCell>${(price * quantity).toFixed(2)}</TableCell>
+    <TableCell>${productPrice}</TableCell>
+    <TableCell>${(Number(productPrice) * quantity).toFixed(2)}</TableCell>
   </TableRow>
   )
 }

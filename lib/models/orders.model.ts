@@ -14,7 +14,7 @@ const ordersSchema = new Schema({
     },
     items: [
         {
-          product: {
+          productId: {
             type: String,
             ref: 'Product',
             required: true,
@@ -24,6 +24,18 @@ const ordersSchema = new Schema({
                 required: true,
                 default: 1, // Set a default quantity if not provided
             },
+          productName: {
+            type: String,
+            required: true,
+          },
+          productPrice: {
+            type: String,
+            required: true,
+          },
+          productImage: {
+            type: String,
+            reuqired: true
+          },
         },
     ],
   status: {

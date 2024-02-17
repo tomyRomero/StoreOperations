@@ -26,31 +26,18 @@ const page = async ({
     isNext = results.isNext
   }
 
-  const getProducts = async (items:{ product: string; quantity: number; }[]) => {
+  const getProducts = (items:{ productName: string; quantity: number; }[]) => {
     const data:{
-      product: string;
+      productName: string;
       quantity: number;
   }[] = [];
-    await Promise.all(
-      items.map(async (item) => {
-        try {
-          const product = await findProduct(item.product);
-          if (product) {
+      items.map((item) => {
             data.push({
-              product: product.name,
+              productName: item.productName,
               quantity: item.quantity,
             });
-          } else {
-            data.push({
-              product: "Product not found",
-              quantity: 0,
-            });
-          }
-        } catch (error) {
-          console.log(error);
-        }
+        
       })
-    );
     return data;
   };
 
@@ -96,7 +83,7 @@ const page = async ({
             <CustomerOrder
               key={index}
               orderId={order.orderId}
-              items={await getProducts(order.items)}
+              items={getProducts(order.items)}
               date={order.date}
               status={order.status}
               tracking={order.trackingNumber}

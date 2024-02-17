@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button"
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
-import { getServerSession } from "next-auth";
 import Link from "next/link"
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import { getAllProducts, getAllProductsWithoutSort } from "@/lib/actions/store.actions";
 import ProductRow from "@/components/tables/ProductRow";
 import Pagination from "@/components/shared/Pagination";
+import { findProductsAdmin } from "@/lib/actions/admin.actions";
+import SearchBar from "@/components/forms/SearchBar";
 
 export default async function page({
   searchParams,
@@ -14,10 +12,32 @@ export default async function page({
   searchParams: { [key: string]: string | undefined };
 }) {
 
-  const results = await getAllProductsWithoutSort(
-    searchParams.page ? + searchParams.page : 1,
-     6,
-  );
+  const searchString = searchParams.q; //search string
+  const pageNumber = searchParams.page ? + searchParams.page : 1; //page number
+  const pageSize = 5; 
+  const sortBy = "desc"; 
+
+  const { products, isNext } = await findProductsAdmin({
+    searchString,
+    pageNumber,
+    pageSize,
+    sortBy,
+  });
+
+  const createPaginationPath = ()=> {
+    // Create a new URLSearchParams object
+   const params = new URLSearchParams();  
+
+   //Add the search parameter to the URLSearchParams
+   params.append('q', searchParams.q ? searchParams.q || searchParams.q : "");
+
+   // Get the final query string
+   const queryString = params.toString();
+
+   //include the queryString in pagination
+   return `/adminproducts?${queryString}&`
+  }
+
 
   return (
     <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
@@ -29,6 +49,8 @@ export default async function page({
             </Button>
               </Link>
           </div>
+          <br></br>
+          <SearchBar routeType="adminproducts" placeholder={"Search for Products by Name, ID, Category or Price(Full Price)"}/>
           <div className="mt-4 border shadow-sm rounded-lg">
           <Table>
             <TableHeader>
@@ -45,7 +67,7 @@ export default async function page({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.results.map((product)=> (
+              {products.map((product)=> (
                  <ProductRow 
                  key={product.stripeProductId}
                  stripeProductId={product.stripeProductId} 
@@ -60,14 +82,15 @@ export default async function page({
               ))}
             </TableBody>
             </Table>
-            {results.results.length === 0 && <h1 className="p-10">
+            {products.length === 0 && <h1 className="p-10">
               No products Have been added, click on add product to get started
               </h1>}
           </div>
+
           <Pagination
-          path={"/adminproducts?"}
+          path={createPaginationPath()}
           pageNumber={searchParams?.page ? + searchParams.page : 1}
-          isNext={results.isNext}
+          isNext={isNext}
         />
     </section>
   )

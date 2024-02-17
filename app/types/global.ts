@@ -35,8 +35,11 @@ export interface Order {
     orderId: string;
     user: string;
     items: {
-      product: string;
+      productId: string;
       quantity: number;
+      productName: string;
+      productPrice: string;
+      productImage: string;
       _id: string;
     }[];
     status: string;

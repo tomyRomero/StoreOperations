@@ -91,8 +91,8 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
-                <OrderDetailsCardRow key={item._id.toString()} product={item.product} quantity={item.quantity}/>
+            {items.map((item) => (
+                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
               ))}
             </TableBody>
           </Table>

@@ -27,7 +27,7 @@ const CategoryRow = ({id, photo, date, title}: CategoryType) => {
 
 const deleteCategory = async () => {
 
-  const userConfirmed = window.confirm(`Are you sure you want to delete this category?`);
+  const userConfirmed = window.confirm(`WARNING: All products in this category will be deleted!!! Are you sure you want to delete this category?`);
   if(userConfirmed)
   {
     const deleted = await deleteCategoryById(id)

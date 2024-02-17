@@ -3,9 +3,8 @@ import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components/ui/table"
 import { Order } from '@/app/types/global'
 import OrderDetailsCardRow from '../tables/OrderDetailsCardRow'
-import UserDetailsCard from './CustomerDetailsCard'
 
-const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date, trackingNumber, deliveryDate}: Order) => {
+const OrderDetailsCards = ({pricing, address, status, items, orderId, date, trackingNumber, deliveryDate}: Order) => {
 
   return (
         <div className='grid grid-cols-1'>
@@ -89,7 +88,7 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <OrderDetailsCardRow key={item._id.toString()} product={item.product} quantity={item.quantity}/>
+                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
               ))}
             </TableBody>
           </Table>

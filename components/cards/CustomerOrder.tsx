@@ -8,7 +8,7 @@ import Link from 'next/link';
 interface Props{
     orderId: string;
     items: {
-        product: string;
+        productName: string;
         quantity: number;
     }[];
     date: string;
@@ -42,7 +42,7 @@ const CustomerOrder = ({orderId , items, date, status, tracking, pricing} : Prop
             {items.map((item, index)=> (
                   <div className="flex items-center gap-2" key={index}>
                     <div className="grid gap-0.5">
-                      <div className="font-medium">{item.product}</div>
+                      <div className="font-medium">{item.productName}</div>
                       <div className="text-sm text-gray-500">x{item.quantity}</div>
                     </div>
                   </div>

@@ -38,10 +38,11 @@ export default async function page({
 
   return (
     <section className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col h-full">
-      <div className="grid grid-cols-1">
-        <SearchBar routeType="adminusers" placeholder={"Search For Users By Their Username, Email, or ID"}/>
-      </div>
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
+      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-4 md:p-6">
+      <h1 className="text-heading3-bold">Users</h1>
+        <div className="grid grid-cols-1">
+        <SearchBar routeType="adminusers" placeholder={"Search for Users by Username, Email, or ID"}/>
+        </div>
         <div className="grid grid-cols-1 border shadow-sm rounded-lg overflow-x-hidden">
             <UsersTable users={users}/>
         </div>

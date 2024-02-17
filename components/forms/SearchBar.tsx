@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAppContext } from "@/lib/AppContext";
 
 import { Input } from "../ui/input";
 
@@ -14,7 +15,6 @@ interface Props {
 function SearchBar({ routeType, placeholder }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState("");
-
 
   // query after 0.3s of no input
   useEffect(() => {

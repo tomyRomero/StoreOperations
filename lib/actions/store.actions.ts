@@ -39,6 +39,7 @@ export const getAllCategories = async () => {
     }
   };
   
+
   //Function to fetch all categories
   export const getAllCategoriesForProduct = async () => {
     try {
@@ -78,28 +79,43 @@ export const getAllCategories = async () => {
     }
   
   }
-  
-  //Delete Category 
-  export const deleteCategoryById = async(categoryId: string) => {
-    try {
-      // Step 1: Find the category by its id
-      connectToDB();
-      const category = await Category.findOne({ id: categoryId });
-  
-      // Step 2: If the category is found, delete it
-      if (category) {
-        await category.deleteOne();
-        revalidatePath("/admincategories")
-        return true
-      } else {
-        console.log('Category not found.');
-        return false
-      }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      return false
+
+  // Delete Category and all the products in that category
+// Delete Category
+export const deleteCategoryById = async (categoryId: string) => {
+  try {
+    // Step 1: Find the category by its id
+    connectToDB();
+    const category = await Category.findOne({ id: categoryId });
+
+    // Step 2: If the category is found, delete associated products
+    if (category) {
+      // Step 3: Find all products associated with the category
+      const productsToDelete = await Product.find({ category: category.title });
+      console.log("products to delete: ", productsToDelete)
+
+      // Step 4: Archive products from Stripe and delete them from the database
+      await Promise.all(productsToDelete.map(async (product) => {
+        await archiveStripeProduct(product.stripeProductId);
+        await product.deleteOne();
+      }));
+
+      // Step 5: Delete the category
+      await category.deleteOne();
+
+      revalidatePath("/admincategories");
+
+      console.log(`Deleted ${productsToDelete.length} products associated with the category and archived them from Stripe.`);
+      return true;
+    } else {
+      console.log('Category not found.');
+      return false;
     }
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    return false;
   }
+};
   
   //For Category creation
   export const updateCreateCategory = async (id: string, title: string, photo: string) =>{
@@ -292,6 +308,82 @@ export const getAllCategories = async () => {
       return {results: [], isNext: false, totalPages: 0}
     } 
   };
+
+// Get all pagination products data with category filtering, sorting, and search
+export const getAllProductsWithSearch = async ({
+  pageNumber = 1,
+  pageSize = 20,
+  categories = [],
+  sort = 'lowest',
+  searchQuery = ''
+}: {
+  pageNumber?: number;
+  pageSize?: number;
+  categories?: string[];
+  sort?: string; // Define sort parameter to accept only 'lowest' or 'highest'
+  searchQuery?: string;
+}) => {
+  try {
+    // Calculate the number of products to skip based on the page number and page size.
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    // Build the category filter
+    const categoryFilter = categories.length > 0 ? { category: { $in: categories } } : {};
+
+    // Build the sort filter based on the 'sort' parameter
+    const sortFilter: Record<string, 1 | -1> = sort === 'lowest' ? { price: 1 } : { price: -1 }; // Use direct objects for sortFilter
+
+    // Create a case-insensitive regular expression for the provided search query.
+    const searchRegex = new RegExp(searchQuery, 'i');
+
+    // Construct the query to find products matching the search criteria
+    const searchQueryFilter = searchQuery && searchQuery.trim() !== ''
+  ? {
+      $or: [
+        { name: { $regex: searchRegex } },
+      ],
+    }
+  : {};
+
+    // Combine category filter, search query filter, and sort filter
+    const combinedFilter = { ...categoryFilter, ...searchQueryFilter };
+
+    // Use the find method on the Product model to retrieve paginated products with category filtering, sorting, and search
+    const data = await Product.find(combinedFilter)
+      .sort(sortFilter)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const products = data.map((element) => ({
+      stripeProductId: element.stripeProductId,
+      name: element.name,
+      description: element.description,
+      stock: element.stock.toString(),
+      price: element.price.toString(),
+      category: element.category,
+      photo: element.photo,
+      date: element.date,
+    }));
+
+    // Calculate total count of products with category filtering and search
+    const totalProductsCount = await Product.countDocuments(combinedFilter);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalProductsCount / pageSize);
+
+    // Calculate if there are more products
+    const isNext = totalProductsCount > skipAmount + products.length;
+
+    return { results: products, isNext, totalPages };
+  } catch (error) {
+  console.error('Error fetching products:', error);
+  const results: any[] = [];
+  const isNext = false;
+  const totalPages = 0;
+  return { results, isNext, totalPages };
+  }
+};
+
   
   // Archive Product and its Price in Stripe
   export const archiveStripeProduct = async (productId: string) => {
@@ -738,40 +830,67 @@ interface OrderParams {
 //Create Order After Checkout is Completed
 export const createOrder = async (params: OrderParams): Promise<boolean> => {
   try {
-      // Create a new instance of the Orders model with the provided parameters
-      const newOrder = new Orders({
-          orderId: params.orderId,
-          user: params.user,
-          items: params.items,
-          status: params.status || 'Pending', // If status is not provided, default to 'pending'
-          address: params.address,
-          pricing: params.pricing,
-      });
+    // Fetch product details for each item in the order
+    const orderItems = await Promise.all(params.items.map(async (item) => {
+      try {
+        const product = await Product.findOne({ stripeProductId: item.product });
+        if (!product) {
+          throw new Error(`Product not found for ID: ${item.product}`);
+        }
+        return {
+          productId: product._id, // Extract the product ID
+          productName: product.name, // Extract the product name
+          productPrice: product.price.toString(), // Convert product price to string and extract
+          productImage: product.photo, // Extract the product image
+          quantity: item.quantity,
+        };
+      } catch (error) {
+        console.error(`Error fetching product for ID: ${item.product}`, error);
+        // Return a placeholder item with the product ID and quantity
+        return {
+          productId: item.product, // Provide product ID as is
+          productName: 'Product Not Found', // Provide default product name
+          productPrice: '0', // Provide default product price as string
+          productImage: '', // Provide empty product image
+          quantity: item.quantity,
+        };
+      }
+    }));
 
-      // Save the new order object to the database
-      await newOrder.save();
+    // Create a new instance of the Orders model with the provided parameters
+    const newOrder = new Orders({
+      orderId: params.orderId,
+      user: params.user,
+      items: orderItems,
+      status: params.status || 'Pending', // If status is not provided, default to 'pending'
+      address: params.address,
+      pricing: params.pricing,
+    });
 
-      // Create a new activity entry to log the order creation
-        const newActivity = new Activity({
-          action: 'order_created',
-          timestamp: new Date(),
-          details: {
-              orderId: params.orderId,
-              user: params.user,
-              pricing: params.pricing,
-              status: params.status
-          }
-      });
+    // Save the new order object to the database
+    await newOrder.save();
 
-      // Save the new activity object to the database
-      await newActivity.save();
+    // Create a new activity entry to log the order creation
+    const newActivity = new Activity({
+      action: 'order_created',
+      timestamp: new Date(),
+      details: {
+        orderId: params.orderId,
+        user: params.user,
+        pricing: params.pricing,
+        status: params.status,
+      },
+    });
 
-      // If the order creation and activity logging are successful, return true
-      return true;
+    // Save the new activity object to the database
+    await newActivity.save();
+
+    // If the order creation and activity logging are successful, return true
+    return true;
   } catch (error) {
-      // If an error occurs during the process, log the error message and return false
-      console.error('Error creating order:', error);
-      return false;
+    // If an error occurs during the process, log the error message and return false
+    console.error('Error creating order:', error);
+    return false;
   }
 };
 
@@ -963,7 +1082,6 @@ export const deleteAddressById = async (userId: string, addressId: string, path:
   }
 };
 
-
 //Function that returns all activities with pagination
 export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 10): Promise<{ activities: typeof Activity[], isNext: boolean }> => {
   try {
@@ -990,8 +1108,6 @@ export const getAllActivity = async (pageNumber: number = 1, pageSize: number = 
     return { activities: [], isNext: false };
   }
 };
-
-
 
 //Update the stock of products after purchase
 export const updateProductStockAfterPurchase = async (items: {product: string, quantity: number}[]) => {

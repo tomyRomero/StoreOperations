@@ -128,12 +128,9 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
           title: "Added to Cart",
         })
       }
-
-     
     }
     
     setLoading(false)
-    
   }
 
   return (

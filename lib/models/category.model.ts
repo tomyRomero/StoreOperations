@@ -6,7 +6,8 @@ const categorySchema = new Schema({
     id: { type: String, default: () => nanoid(), unique: true },
     title: {type: String, required: true, unique: true},
     photo: {type: String, required: true, unique: true},
-    date: {type: String, default: getCurrentDate, required: true}
+    date: {type: String, default: getCurrentDate, required: true},
+    createdAt: {type: Date, default: Date.now, required: true }
 }); 
 
 // Register the 'Category' model

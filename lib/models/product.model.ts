@@ -9,7 +9,8 @@ const productSchema = new Schema({
     price: { type: Number, required: true },
     category: { type: String, required: true},
     photo: { type: String, required: true},
-    date: {type: String, default: getCurrentDate, required: true}
+    date: {type: String, default: getCurrentDate, required: true},
+    createdAt: {type: Date, default: Date.now, required: true }
 })
 
 // Register the 'Product' model

@@ -9,7 +9,6 @@ import CustomerOrderDetailsCards from "@/components/cards/CustomerOrderDetailsCa
 const page = async ({ params }: { params: { id: string } }) =>  {
 
   const order:Order= await findOrder(params.id)
-  console.log("order:", order)
 
   if(!order)
   {

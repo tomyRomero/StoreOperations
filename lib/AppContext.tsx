@@ -16,6 +16,7 @@ type AppContextProps = {
 
   pageChanged: boolean;
   setPageChanged: React.Dispatch<React.SetStateAction<any>>;
+
 };
 
 // Create the AppContext with an initial value of undefined
@@ -47,7 +48,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Provide the context value to the children components, include additional states if there are any
   const contextValue: AppContextProps = {
     cart, setCart,
-    productAdjusted, setProductAdjusted , pageChanged, setPageChanged
+    productAdjusted, setProductAdjusted , pageChanged, setPageChanged,
+   
   };
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;

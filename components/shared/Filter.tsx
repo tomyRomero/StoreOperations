@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RadioButton } from './Radio';
 import { Checkbox } from './Checkbox';
 import { useRouter } from 'next/navigation';
-import { useAppContext } from '@/lib/AppContext';
 
 interface Category{
   id: string,
