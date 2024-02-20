@@ -16,6 +16,7 @@ export interface ProductType{
     category: string,
     photo:  string,
     date?: string | "";
+    deal? : boolean
 }
 
 export type Address = {

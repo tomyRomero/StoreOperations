@@ -6,16 +6,9 @@ import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, Dropdown
 import { Button } from '../ui/button'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { navItems } from '@/lib/constants'
 
-const navItems = [
-  { title: 'Recent Activity', url: '/adminactivity', img: '/assets/bell.png' },
-  { title: 'Users', url: '/adminusers', img: '/assets/users.png' },
-  { title: 'Categories', url: '/admincategories', img: '/assets/categories.png' },
-  { title: 'Products', url: '/adminproducts', img: '/assets/products.png' },
-  { title: 'Orders', url: '/adminorders', img: '/assets/orders.png' },
-  { title: 'Announcements', url: '/adminannoucements', img: '/assets/speaker.png' },
-  { title: 'Layout', url: '/adminlayout', img: '/assets/layout.png' },
-];
+
 
 const MobileAdminDashboard = () => {
 

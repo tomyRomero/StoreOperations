@@ -65,10 +65,7 @@ const redirect = () => {
           priority
         />
       </TableCell>
-        <TableCell className="font-medium">{id}</TableCell>
-        <TableCell className="font-bold">{title}</TableCell>
-        <TableCell className="">{date}</TableCell>
-        <TableCell>
+      <TableCell>
       <div className='flex'>
         <Button size="sm" variant="outline" onClick={redirect}>
         Edit
@@ -78,6 +75,9 @@ const redirect = () => {
       </Button>
       </div>
     </TableCell>
+    <TableCell className="font-bold">{title}</TableCell>
+        <TableCell className="font-medium">{id}</TableCell>
+        <TableCell className="">{date}</TableCell>
   </TableRow>
   )
 }

@@ -176,7 +176,10 @@ const SignUpForm = () => {
             )}
           />
         </div>
-        <Button className={`w-full mt-6 ${loading ? "border border-black bg-white" : ""}`} type='submit'>
+        <Button 
+        variant={"ghost"}
+        className={`w-full mt-6 bg-black text-white border border-black ${loading ? "bg-white" : ""}`} 
+        type='submit'>
           {!loading? (<h1>Sign Up</h1>) : (
           <Image 
             src="/assets/lineloader.svg"
@@ -193,7 +196,8 @@ const SignUpForm = () => {
       <Button
             type="button"
             onClick={() => router.push('/')}
-            className="w-full mt-3"
+            className="w-full mt-3 bg-black text-white border border-black"
+            variant={"ghost"}
       >
         Home
       </Button>

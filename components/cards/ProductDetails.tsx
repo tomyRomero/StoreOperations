@@ -15,11 +15,12 @@ import { toast } from "../ui/use-toast"
 
 type ProductDetailsType = ProductType & {
   result: boolean;
+  oldPrice: string;
   serverProducts: ProductType[]
 };
 
 
-const ProductDetails = ({stripeProductId, name, description, stock, photo, price, category, result, serverProducts}: ProductDetailsType)=> {
+const ProductDetails = ({stripeProductId, name, description, stock, photo, price, category, result, serverProducts , deal, oldPrice}: ProductDetailsType)=> {
  
     const { data: session } = useSession();
     const [inCart, setInCart] = useState(result);
@@ -151,7 +152,10 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
       </div>
       <div className="flex items-start lg:hidden">
           <h1 className="font-bold text-heading3-bold">{name}</h1>
-          <div className="text-heading3-bold font-bold ml-auto">${price}</div>
+          {deal ? ( 
+          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">${oldPrice}</span>  <span className="text-green-500">${price}</span></div>) 
+          : 
+           <div className="text-heading3-bold font-bold ml-auto text-green-500">${price}</div>}
         </div>
         <div className="flex items-start lg:hidden">
           <small className="text-body-semibold leading-none text-gray-500">{category.toLocaleLowerCase()}</small>
@@ -210,8 +214,10 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
         <h4 className={`${Number(stock) > 0 ? "text-green-500" : "text-red-500"} pt-2` }>{Number(stock) > 0 ? "In Stock" : "Out of stock"}</h4>
         </div>
           </div>
-          <div className="text-heading3-bold font-bold ml-auto">${price}
-          </div>
+          {deal ? ( 
+          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">${oldPrice}</span>  <span className="text-green-500">${price}</span></div>) 
+          : 
+           <div className="text-heading3-bold font-bold ml-auto text-green-500">${price}</div>}
         </div>
         <div>
         <p className="text-body-semibold max-lg:hidden">

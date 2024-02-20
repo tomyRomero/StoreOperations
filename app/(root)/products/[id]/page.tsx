@@ -1,5 +1,5 @@
 import ProductDetails from '@/components/cards/ProductDetails'
-import { findProduct, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
+import { findProductWithDeal, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
 import React from 'react'
 import Image from 'next/image'
 import { getServerSession } from 'next-auth'
@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation'
 
 const page = async ({ params }: { params: { id: string } }) => {
 
-  const product = await findProduct(params.id)
+  const product = await findProductWithDeal(params.id)
 
   const serverProducts= await getAllProductsWithoutSort(
     1,
@@ -45,6 +45,8 @@ const page = async ({ params }: { params: { id: string } }) => {
         category={product.category}
         result={result}
         serverProducts={serverProducts.results}
+        deal={product.deal}
+        oldPrice={product.oldPrice}
         />
         </div>
        )}

@@ -4,7 +4,9 @@ import React from 'react'
 import { getAllCategories, getAllProducts } from '@/lib/actions/store.actions'
 import ProductCard from '@/components/cards/ProductCard'
 import Pagination from '@/components/shared/Pagination'
-import SearchBar from '@/components/forms/SearchBar'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 const page = async ({
   searchParams,
@@ -55,6 +57,19 @@ const page = async ({
        <div className="grid xl:grid-cols-4 gap-10 items-start">
           <Filters categoriesList={categories} categoryParams={categoriesArray} sortParams={searchParams.sorted ? searchParams.sorted : ""}/>
           <div className="xl:col-span-3 lg:mt-6 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">
+            <div className='max-sm:px-8'>
+          <Link href="/search">
+                <Button className="flex px-2 border border-black" variant="ghost">
+                  <Image
+                    src="/assets/searchblack.png"
+                    alt="search icon"
+                    width={28}
+                    height={28}
+                  />
+                  <span className="ml-2">Search Products</span>
+                </Button>
+              </Link>
+              </div>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
                     {serverProducts.results.map((product: any)=> (
                     <ProductCard key={product.stripeProductId} 

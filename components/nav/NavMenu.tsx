@@ -26,6 +26,11 @@ const router = useRouter();
         image: "/assets/layout.png"
     },
     {
+      title: "Search",
+      path: "/search", 
+      image: "/assets/searchblack.png"
+    },
+    {
         title: "Shop",
         path: "/products", 
         image: "/assets/price.png"
@@ -45,6 +50,11 @@ const router = useRouter();
         title: "Home",
         path: "/", 
         image: "/assets/layout.png"
+    },
+    {
+      title: "Search",
+      path: "/search", 
+      image: "/assets/searchblack.png"
     },
     {
         title: "Shop",

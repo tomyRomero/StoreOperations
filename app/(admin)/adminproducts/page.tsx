@@ -50,14 +50,14 @@ export default async function page({
               </Link>
           </div>
           <br></br>
-          <SearchBar routeType="adminproducts" placeholder={"Search for Products by Name, ID, Category or Price(Full Price)"}/>
+          <SearchBar routeType="adminproducts" placeholder={"Search for Products by Name, Stripe ID, Category or Price(Full Price)"}/>
           <div className="mt-4 border shadow-sm rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="font-bold text-black w-[80px]">Image</TableHead>
                 <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
-                <TableHead className="font-bold text-black">Action</TableHead>
+                <TableHead className="font-bold text-black text-center">Action</TableHead>
                 <TableHead className="font-bold text-black">Inventory</TableHead>
                 <TableHead className="font-bold text-black">Price</TableHead>
                 <TableHead className="font-bold text-black max-w-[150px]">Stripe ID</TableHead>
@@ -78,6 +78,7 @@ export default async function page({
                  category={product.category}
                  photo={product.photo}
                  date={product.date}
+                 deal={product.deal}
                  />
               ))}
             </TableBody>

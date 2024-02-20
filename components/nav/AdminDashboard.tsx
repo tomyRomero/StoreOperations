@@ -4,19 +4,12 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
+import { navItems } from '@/lib/constants'
 
 const AdminDashboard = () => {
   const pathname = usePathname();
 
-  const navItems = [
-    { title: 'Recent Activity', url: '/adminactivity', img: '/assets/bell.png' },
-    { title: 'Users', url: '/adminusers', img: '/assets/users.png' },
-    { title: 'Categories', url: '/admincategories', img: '/assets/categories.png' },
-    { title: 'Products', url: '/adminproducts', img: '/assets/products.png' },
-    { title: 'Orders', url: '/adminorders', img: '/assets/orders.png' },
-    { title: 'Announcements', url: '/adminannoucements', img: '/assets/speaker.png' },
-    { title: 'Layout', url: '/adminlayout', img: '/assets/layout.png' },
-  ];
+
 
   return (
     <div className="hidden w-full border-r lg:block">

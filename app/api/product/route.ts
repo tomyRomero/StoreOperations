@@ -50,7 +50,7 @@ const postImage = async (data: any) => {
     }
   };
 
-  const createOrUpdateStripeProduct = async (productId: string, name: string, productprice: number, image: string, description: string) => {
+  export const createOrUpdateStripeProduct = async (productId: string, name: string, productprice: number, image: string, description: string) => {
     try {
 
         // If productId is provided, it's an update; otherwise, it's a create

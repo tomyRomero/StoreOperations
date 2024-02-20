@@ -14,6 +14,7 @@ import MenuToggle from './MenuToggle';
 import { AnimatePresence } from 'framer-motion';
 import { motion as m } from 'framer-motion';
 import NavMenu from './NavMenu';
+import { storeDetails } from '@/lib/constants';
 
 
 const Nav = () => {
@@ -100,9 +101,19 @@ const Nav = () => {
     <div className='relative'>
     <header className="bg-white fixed flex z-50 w-full top-0 items-center border-b border-black xs:py-6 xs:px-4 sm:py-6 sm:px-14 px-4 py-4 md:py-8 md:px-18 lg:py-10 lg:px-32 xl:px-36">
       <Link className="sm:mr-6 xs:mr-2 first-letter:flex" href="/">
-        <h1 className="xs:px-0 px-1 text-heading2-bold max-md:text-heading3-bold max-xxs:text-heading4-bold justify-center">PaletteHub.</h1>
+        <h1 className="xs:px-0 px-1 text-heading2-bold max-md:text-heading3-bold max-xxs:text-heading4-bold justify-center">{storeDetails.title}</h1>
       </Link>
       <div className="max-md:hidden ml-auto flex items-center gap-2">
+      <Button className="flex" variant="ghost" onClick={()=>{router.push("/search")}}>
+          <Image
+            src="/assets/searchblack.png"
+            alt="search icon"
+            width={32}
+            height={32}
+            className="px-1 max-md:hidden"
+          />
+          <span className="ml-2">Search</span>
+        </Button>
         <Button className="flex" variant="ghost" onClick={()=>{router.push("/products")}}>
           <Image
             src="/assets/price.png"
@@ -152,7 +163,7 @@ const Nav = () => {
 {isActive && (
   <m.div
     initial={{ scaleY: 0, originY: 0 }}
-    animate={{ scaleY: session? 0.6 : 0.5 }}
+    animate={{ scaleY: session? 0.7 : 0.6 }}
     exit={{ scaleY: 0 }}
     transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
     onClick={() => setIsActive(false)}

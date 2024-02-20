@@ -12,6 +12,9 @@ import Cart from "../models/cart.model";
 import Addresses from "../models/addresses.model";
 import Orders from "../models/orders.model";
 import Activity from "../models/activity.model";
+import { createOrUpdateStripeProduct } from "@/app/api/product/route";
+import { dollarsToCents } from "../utils";
+import Store from "../models/store.model";
 
 //Function to fetch all categories
 export const getAllCategories = async () => {
@@ -210,8 +213,140 @@ export const deleteCategoryById = async (categoryId: string) => {
       }
     
   }
+
+  //find product with deal details if applicable
+
+    //Find Product by id
+    export const findProductWithDeal = async (id:string) => {
+      try{
+        connectToDB();
+        // Find the product by ID
+        const product = await Product.findOne({stripeProductId: id});
+        
+        const {name, description, stock, price, category, photo , oldPrice, deal, dealDescription } = product
+    
+        //destructure the object because objects can't be passed from server to client 
+        return {name, description, stock, price, category, photo, oldPrice, deal, dealDescription }
+        
+        }catch(error)
+        {
+          console.error("Error fetching category:", error);
+          return null; 
+        }
+      
+    }
+
+//Find Product by ID and include ID and other Deal Params
+  export const findProductForDeal = async (id:string) => {
+    try{
+      connectToDB();
+      // Find the product by ID
+      const product = await Product.findOne({stripeProductId: id});
+      
+      const {stripeProductId, name, description, stock, price, category, photo, deal , oldPrice , dealDescription} = product
   
-  // Get all pagination products data with category filtering and sorting
+      //destructure the object because objects can't be passed from server to client 
+      return {name, description, stock, price, category, photo, stripeProductId, deal , oldPrice, dealDescription}
+      
+      }catch(error)
+      {
+        console.error("Error fetching product:", error);
+        return null; 
+      }
+    
+  }
+
+
+  //Make Deal for Product
+  export const makeDeal = async (id: string, newPrice: string, dealDescription: string) => {
+    try{
+    const existingProduct = await Product.findOne({stripeProductId: id});
+
+    if(existingProduct)
+    {
+
+      //Update Stripe Product with new price 
+      await createOrUpdateStripeProduct(id, existingProduct.name, dollarsToCents(Number(newPrice)), existingProduct.photo, existingProduct.description)
+
+      existingProduct.deal = true;
+      existingProduct.oldPrice = existingProduct.price
+      existingProduct.price = Number(newPrice);
+      existingProduct.dealDescription = dealDescription;
+
+      await existingProduct.save()
+
+      console.log("made new deal: ", existingProduct)
+      return true;
+    }else{
+      console.log("Product does not exist for deal")
+      return false;
+    }
+
+    }catch(error){
+      console.error("Error making deal:", error);
+      return false;
+    }
+  }
+
+  //Remove Deal from Product
+  export const removeDeal = async (id: string) => {
+    try{
+    const existingProduct = await Product.findOne({stripeProductId: id});
+
+    if(existingProduct)
+    {
+
+      //Update Stripe Product with old price before deal
+      await createOrUpdateStripeProduct(id, existingProduct.name, dollarsToCents(Number(existingProduct.oldPrice)), existingProduct.photo, existingProduct.description)
+
+      existingProduct.deal = false;
+      existingProduct.price = Number(existingProduct.oldPrice);
+      existingProduct.oldPrice = 0
+      existingProduct.dealDescription = "";
+
+      await existingProduct.save()
+
+      console.log("removed deal: ", existingProduct)
+      return true;
+    }else{
+      console.log("Product does not exist for deal")
+      return false;
+    }
+
+    }catch(error){
+      console.error("Error removing deal:", error);
+      return false;
+    }
+  }
+
+  //Function that returns all products with deals
+  export const getDeals = async () => {
+    try {
+      // Use the find method on the Product model to retrieve products with a "deal" property set to true
+      const data = await Product.find({ deal: true });
+  
+      const deals = data.map((element) => ({
+        stripeProductId: element.stripeProductId,
+        name: element.name,
+        description: element.description,
+        stock: element.stock.toString(),
+        price: element.price.toString(),
+        category: element.category,
+        photo: element.photo,
+        date: element.date,
+        oldPrice: element.oldPrice,
+        dealDescription: element.dealDescription,
+      }));
+  
+      return deals;
+    } catch (error) {
+      console.error('Error fetching deals:', error);
+      return [];
+    }
+  };
+  
+
+  // Get all pagination products data with category filtering and sorting , used for products page
   export const getAllProducts = async (pageNumber = 1, pageSize = 20, categories: string[] = [], sort = 'lowest') => {
     try {
       // Calculate the number of products to skip based on the page number and page size.
@@ -257,7 +392,7 @@ export const deleteCategoryById = async (categoryId: string) => {
   };
   
   //Get pagination products however this time include the option to exlcude a product and also dont do any sorting/lowest/highest logic
-  //Used to find related products and also used for admin dashboard
+  //Used to find related products 
   export const getAllProductsWithoutSort = async (
     pageNumber = 1,
     pageSize = 20,
@@ -309,82 +444,74 @@ export const deleteCategoryById = async (categoryId: string) => {
     } 
   };
 
-// Get all pagination products data with category filtering, sorting, and search
-export const getAllProductsWithSearch = async ({
-  pageNumber = 1,
-  pageSize = 20,
-  categories = [],
-  sort = 'lowest',
-  searchQuery = ''
-}: {
-  pageNumber?: number;
-  pageSize?: number;
-  categories?: string[];
-  sort?: string; // Define sort parameter to accept only 'lowest' or 'highest'
-  searchQuery?: string;
-}) => {
-  try {
-    // Calculate the number of products to skip based on the page number and page size.
-    const skipAmount = (pageNumber - 1) * pageSize;
+  // Get all pagination products data with search and pagination, used for search page
+  export const getAllProductsWithSearch = async ({
+    pageNumber = 1,
+    pageSize = 20,
+    searchQuery = '',
+    sortOrder = 'desc' // Default sort order is descending
+  }: {
+    pageNumber?: number;
+    pageSize?: number;
+    searchQuery?: string;
+    sortOrder?: 'asc' | 'desc'; // Define sortOrder parameter to accept only 'asc' or 'desc'
+  }) => {
+    try {
+      // Calculate the number of products to skip based on the page number and page size.
+      const skipAmount = (pageNumber - 1) * pageSize;
 
-    // Build the category filter
-    const categoryFilter = categories.length > 0 ? { category: { $in: categories } } : {};
+      // Create a case-insensitive regular expression for the provided search query.
+      const searchRegex = new RegExp(searchQuery, 'i');
 
-    // Build the sort filter based on the 'sort' parameter
-    const sortFilter: Record<string, 1 | -1> = sort === 'lowest' ? { price: 1 } : { price: -1 }; // Use direct objects for sortFilter
+      // Construct the query to find products matching the search criteria
+      const searchQueryFilter = searchQuery && searchQuery.trim() !== ''
+        ? {
+          $or: [
+            { name: { $regex: searchRegex } },
+            { category: { $regex: searchRegex } }, 
+          ],
+        }
+        : {};
 
-    // Create a case-insensitive regular expression for the provided search query.
-    const searchRegex = new RegExp(searchQuery, 'i');
+      // Build the sort filter based on the 'sortOrder' parameter
+      const sortFilter: Record<string, 1 | -1> = sortOrder === 'asc' ? { createdAt: 1 } : { createdAt: -1 };
 
-    // Construct the query to find products matching the search criteria
-    const searchQueryFilter = searchQuery && searchQuery.trim() !== ''
-  ? {
-      $or: [
-        { name: { $regex: searchRegex } },
-      ],
+      // Use the find method on the Product model to retrieve paginated products with search and sorting
+      const data = await Product.find(searchQueryFilter)
+        .sort(sortFilter)
+        .skip(skipAmount)
+        .limit(pageSize);
+
+      const products = data.map((element) => ({
+        stripeProductId: element.stripeProductId,
+        name: element.name,
+        description: element.description,
+        stock: element.stock.toString(),
+        price: element.price.toString(),
+        category: element.category,
+        photo: element.photo,
+        date: element.date,
+      }));
+
+      // Calculate total count of products with search
+      const totalProductsCount = await Product.countDocuments(searchQueryFilter);
+
+      // Calculate total pages
+      const totalPages = Math.ceil(totalProductsCount / pageSize);
+
+      // Calculate if there are more products
+      const isNext = totalProductsCount > skipAmount + products.length;
+
+      return { results: products, isNext, totalPages };
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      const results: any[] = [];
+      const isNext = false;
+      const totalPages = 0;
+      return { results, isNext, totalPages };
     }
-  : {};
+  };
 
-    // Combine category filter, search query filter, and sort filter
-    const combinedFilter = { ...categoryFilter, ...searchQueryFilter };
-
-    // Use the find method on the Product model to retrieve paginated products with category filtering, sorting, and search
-    const data = await Product.find(combinedFilter)
-      .sort(sortFilter)
-      .skip(skipAmount)
-      .limit(pageSize);
-
-    const products = data.map((element) => ({
-      stripeProductId: element.stripeProductId,
-      name: element.name,
-      description: element.description,
-      stock: element.stock.toString(),
-      price: element.price.toString(),
-      category: element.category,
-      photo: element.photo,
-      date: element.date,
-    }));
-
-    // Calculate total count of products with category filtering and search
-    const totalProductsCount = await Product.countDocuments(combinedFilter);
-
-    // Calculate total pages
-    const totalPages = Math.ceil(totalProductsCount / pageSize);
-
-    // Calculate if there are more products
-    const isNext = totalProductsCount > skipAmount + products.length;
-
-    return { results: products, isNext, totalPages };
-  } catch (error) {
-  console.error('Error fetching products:', error);
-  const results: any[] = [];
-  const isNext = false;
-  const totalPages = 0;
-  return { results, isNext, totalPages };
-  }
-};
-
-  
   // Archive Product and its Price in Stripe
   export const archiveStripeProduct = async (productId: string) => {
     try {
@@ -1019,6 +1146,7 @@ export const getUserAddresses = async (userId: string) => {
   }
 };
 
+//Delete address for user
 export const deleteAddress = async (userId: string, addressToDelete: Address, path: string) => {
   try {
     // Find the document containing the addresses array for the user
@@ -1140,5 +1268,99 @@ export const updateProductStockAfterPurchase = async (items: {product: string, q
     console.log('All product stocks updated successfully.');
   } catch (error) {
     console.error('Error updating product stock after purchase:', error);
+  }
+};
+
+//subscribe to Newseletter for admin to send messages
+// subscribe to Newsletter for admin to send messages
+export const subscribeToNewsletter = async (email: string) => {
+  try {
+    // Find the first document in the Store collection
+    let store = await Store.findOne();
+
+    // If no store document exists, create a new one
+    if (!store) {
+      store = new Store();
+    }
+
+    // Check if the newsletter array exists in the store
+    if (!store.newsletter) {
+      // If the newsletter array doesn't exist, create it and add the email
+      store.newsletter = [email];
+    } else {
+      // If the newsletter array exists, check if the email already exists
+      if (store.newsletter.includes(email)) {
+        return 'Email already exists in the newsletter';
+      }
+      // If the email doesn't exist, push it to the newsletter array
+      store.newsletter.push(email);
+    }
+
+    // Save the updated store document
+    await store.save();
+
+    // Log the activity of user subscribing
+    const activity = new Activity({
+      action: 'user_subscribed',
+      details: { userEmail: email }, // Include user's email in the activity details
+    });
+    await activity.save();
+
+    return 'Email added to newsletter';
+  } catch (error) {
+    console.error('Error adding email to newsletter:', error);
+    return 'Failed to add email to newsletter';
+  }
+};
+
+
+
+//unsubscribe from Newseletter that admin to send messages from
+export const unsubscribeFromNewsletter = async (email: string, path: string) => {
+  try {
+    // Find the first document in the Store collection
+    const store = await Store.findOne();
+
+    if (!store) {
+      console.log('No store doucment found that contains emails for newsletter');
+      return false
+    }
+
+    // Check if the newsletter array exists in the store
+    if (!store.newsletter || store.newsletter.length === 0) {
+      console.log('No emails in the newsletter');
+      return false;
+    }
+
+    // Filter out the email from the newsletter array
+    store.newsletter = store.newsletter.filter((item: string) => item !== email);
+
+    // Save the updated store document
+    await store.save();
+    revalidatePath(path)
+    console.log('Email removed from newsletter:', email);
+    return true;
+  } catch (error) {
+    console.error('Error removing email from newsletter:', error);
+    return false;
+  }
+};
+
+// Function to get all subscribed emails from the store
+export const getAllSubscribedEmails = async () => {
+  try {
+    // Find the first document in the Store collection
+    const store = await Store.findOne();
+
+    // If no store document exists or the newsletter array is empty, return an empty array
+    if (!store || !store.newsletter || store.newsletter.length === 0) {
+      return [];
+    }
+
+    // Return the array of subscribed emails
+    return store.newsletter;
+  } catch (error) {
+    console.error('Error fetching subscribed emails:', error);
+    return []
   }
 };

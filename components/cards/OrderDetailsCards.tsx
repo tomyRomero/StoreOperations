@@ -9,7 +9,33 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
 
   return (
         <div className='grid grid-cols-1'>
-           <Card>
+        <Card>
+        <CardHeader>
+          <CardTitle>Items Ordered</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[150px]">Image</TableHead>
+                <TableHead className="max-w-[150px]">Product ID</TableHead>
+                <TableHead className="max-w-[150px]">Name</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Subtotal</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+            {items.map((item) => (
+                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      <br/>
+        <Card>
+            
         <CardHeader>
           <CardTitle className='text-heading3-bold'>Order Summary</CardTitle>
         </CardHeader>
@@ -74,30 +100,6 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
         </CardContent>
       </Card>
       <br></br>
-      <Card>
-        <CardHeader>
-          <CardTitle>Items Ordered</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[150px]">Image</TableHead>
-                <TableHead className="max-w-[150px]">Product ID</TableHead>
-                <TableHead className="max-w-[150px]">Name</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Subtotal</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-            {items.map((item) => (
-                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
 
     </div>
   )

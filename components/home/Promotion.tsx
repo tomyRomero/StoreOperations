@@ -3,53 +3,25 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import DealCard from '../cards/DealCard';
+import { promotionInclusions } from '@/lib/constants';
 
-interface deal{
-    id: string,
-    image: string,
-    product: string,
-    description: string,
-    oldprice: string,
-    newprice: string
+interface Deal {
+  stripeProductId: string;
+  name: string;
+  description: string;
+  stock: string;
+  price: string;
+  category: string;
+  photo: string;
+  date: string;
+  oldPrice: string; 
+  dealDescription: string; 
 }
 
-const Promotion = () => {
-const deals= [{
-    id: "egwrehtt",
-    image: "/assets/sale.jpg",
-    product: "Deal 1",
-    description: "Brief description of the deal.",
-    oldprice: "$70.99",
-    newprice: "$49.99"
-    }]
+const Promotion = ({ deals }: { deals: Deal[] }) => {
 
-    const inclusions = [
-      {   
-          id: "ewfgrhty",
-          title: "Free Shipping",
-          icon: "/assets/box.png",
-          description: "Free shipping for order above $150"
-      },
-      {
-          id: "egrhtrjy",
-          title: "Money Guarantee",
-          icon: "/assets/dollar.png",
-          description: "Within 30 days for an exchange"
-      },
-      {
-          id: "uewfgirgho",
-          title: "Online Support",
-          icon: "/assets/support.png",
-          description: "24 hours a day, 7 days a week"
-      },
-      {
-          id: "uergethgt9o",
-          title: "Flexible Payment",
-          icon: "/assets/card.png",
-          description: "Pay with multiple credit cards"
-      }
-  
-    ];
+
 
   const [time, setTime] = useState({
     days: 0,
@@ -58,8 +30,12 @@ const deals= [{
     seconds: 0,
   });
 
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + 3);
+  // Calculate target date for the end of the current month
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); // Last day of the current month
+  const targetDate = new Date(currentYear, currentMonth, lastDayOfMonth);
 
   useEffect(() => {
     const timerInterval = setInterval(() => {
@@ -102,39 +78,15 @@ const deals= [{
       </ul>
     </div>
     <div className="mx-auto mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {deals.map((deal: deal) => (
-           <div key={deal.id} className="rounded-lg shadow-lg overflow-hidden">
-           <Image
-             alt="Deal Image"
-             className="w-full h-64 object-cover"
-             height="300"
-             src={`${deal.image}`}
-             style={{
-               aspectRatio: "500/300",
-               objectFit: "cover",
-             }}
-             width="500"
-           />
-           <div className="p-6">
-             <h3 className="font-bold">{deal.product} <span className='text-red-500 line-through'> {deal.oldprice}</span> <span className='text-green-500'> {deal.newprice}</span> </h3>
-             <p className="text-gray-500">{deal.description}</p>
-             <Link
-               className={`inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 font-medium text-gray-50 
-               shadow transition-colors hover:bg-white  hover:text-black focus-visible:outline-none 
-                mt-4`}
-               href="#"
-             >
-               Learn more
-             </Link>
-           </div>
-         </div>
+        {deals.map((deal: Deal, index) => (
+         <DealCard key={index} id={deal.stripeProductId} photo={deal.photo} name={deal.name} oldPrice={deal.oldPrice} price={deal.price} dealDescription={deal.dealDescription} />
         ))}
     </div>
     <div className='mt-6'>
     <ul className="grid max-sm:grid-cols-1 grid-cols-2 justify-center gap-10 md:gap-0 lg:grid-cols-4 my-10 md:my-0">
-          {inclusions.map((inclusion) => (
-            <div className='md:p-4 lg:p-8' key={inclusion.id}>
-            <li key={inclusion.id} className="text-center">
+          {promotionInclusions.map((inclusion, index) => (
+            <div className='md:p-4 lg:p-8' key={index}>
+            <li key={index} className="text-center">
               <Image
                 src={inclusion.icon}
                 alt={inclusion.title}

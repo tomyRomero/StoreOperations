@@ -12,7 +12,7 @@ import { revalidate } from "@/lib/actions/admin.actions"
 import {deleteProductById} from "@/lib/actions/store.actions"
 
 
-const ProductRow = ({stripeProductId, name, description, stock, price, category, photo, date}: ProductType) => {
+const ProductRow = ({stripeProductId, name, description, stock, price, category, photo, date, deal}: ProductType) => {
   const [img, setImg] = useState("/assets/spinner.svg")
   const router = useRouter();
 
@@ -28,6 +28,10 @@ const ProductRow = ({stripeProductId, name, description, stock, price, category,
 
 const redirect = () => {
   router.push(`/adminaddproduct/${stripeProductId}`)
+}
+
+const redirectDeal  = ()=> {
+  router.push(`/adminaddproduct/deal/${stripeProductId}`)
 }
 
 const deleteProduct = async () => {
@@ -72,6 +76,11 @@ const deleteProduct = async () => {
              <Button size="sm" variant="outline" onClick={redirect}>
                Edit
              </Button>
+             {deal === true ? ( <Button className="ml-2"  size="sm" variant="outline" onClick={redirectDeal}>
+               View Deal
+             </Button>) : (<Button className="ml-2"  size="sm" variant="outline" onClick={redirectDeal}>
+               Make Deal
+             </Button>)}
              <Button className="ml-2" size="sm" variant="outline" onClick={deleteProduct}>
                Delete
              </Button>

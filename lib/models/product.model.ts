@@ -10,7 +10,11 @@ const productSchema = new Schema({
     category: { type: String, required: true},
     photo: { type: String, required: true},
     date: {type: String, default: getCurrentDate, required: true},
-    createdAt: {type: Date, default: Date.now, required: true }
+    createdAt: {type: Date, default: Date.now, required: true },
+
+    deal: { type: Boolean},
+    oldPrice: { type: Number},
+    dealDescription: { type: String}, 
 })
 
 // Register the 'Product' model

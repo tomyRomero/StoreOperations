@@ -112,7 +112,10 @@ const SignInForm = () => {
             )}
           />
         </div>
-        <Button className='w-full mt-6' type='submit'>
+        <Button 
+        variant={"ghost"}
+        className='w-full mt-6 bg-black text-white border border-black'
+         type='submit'>
           Sign in
         </Button>
       </form>
@@ -123,7 +126,8 @@ const SignInForm = () => {
       <Button
             type="button"
             onClick={() => router.push('/')}
-            className="w-full mt-3"
+            className="w-full mt-3 bg-black text-white border border-black"
+            variant={"ghost"}
       >
         Home
       </Button>

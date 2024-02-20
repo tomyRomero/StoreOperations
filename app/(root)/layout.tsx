@@ -45,7 +45,9 @@ export default async function RootLayout({
           <section className="main-container w-full mt-0.5 !z-10 overflow-auto">
             {children}
             </section>
+            <br/>
         </main>
+
         <Footer />
         <Toaster />
       </body>

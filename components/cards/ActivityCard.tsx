@@ -56,6 +56,10 @@ const ActivityCard = ({action, details, timestamp}: any) => {
                    setUsername(user.username)
                    setEmail(user.email)
                 }
+            }else if(action === "user_subscribed")
+            {
+              setEvent("New Subscription to Newsletter!")
+              setEmail(details.userEmail)
             }
 
             const getCurrentDate = new Date(); // Get the current date when the component is rendered
@@ -73,6 +77,9 @@ const ActivityCard = ({action, details, timestamp}: any) => {
         }else if(action === "order_created")
         {
           router.push(`/adminorders/${details.orderId}`)
+        }else if(action === "user_subscribed")
+        {
+          router.push(`/adminnewsletter`)
         }
     }
 
@@ -132,7 +139,7 @@ const ActivityCard = ({action, details, timestamp}: any) => {
       <p className="font-medium text-center text-green-500">${total}</p>
     </div>
     }
-    { action === "user_created" &&
+    { action === "user_created" || action === "user_subscribed" &&
     <div className="flex flex-wrap items-center gap-2">
     <Image 
         src="/assets/email.png"

@@ -18,8 +18,8 @@ const UsersTable = ({users} : any) => {
     <Table>
     <TableHeader>
       <TableRow>
-        <TableHead className="font-bold text-black w-[100px]">ID</TableHead>
         <TableHead className='font-bold text-black'>Details</TableHead>
+        <TableHead className="font-bold text-black w-[100px]">ID</TableHead>
         <TableHead className='font-bold text-black'>Username</TableHead>
         <TableHead className='font-bold text-black text-center'>Email</TableHead>
         <TableHead className='font-bold text-black'>Role</TableHead>
@@ -29,14 +29,14 @@ const UsersTable = ({users} : any) => {
     <TableBody>
     {users?.map((user: User, index: any) => (
            <TableRow key={index}>
-           <TableCell className='text-black'>{user.id}</TableCell>
-           <TableCell>
+             <TableCell>
             <Link href={`/adminusers/${user.id}`}>
             <Button className='bg-black text-white border border-black' variant={"ghost"}>
               View
             </Button>
             </Link>
             </TableCell>
+           <TableCell className='text-black'>{user.id}</TableCell>
            <TableCell className="font-medium">{user.username}</TableCell>
            <TableCell>{user.email}</TableCell>
            <TableCell>{user.admin? "Admin" : "User"}</TableCell>
