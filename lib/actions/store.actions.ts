@@ -1068,14 +1068,15 @@ export const updateOrderStatus = async (orderId: string , status: string, estima
 
 }
 
-// Function to find all orders for a user with pagination support
+// Function to find all orders for a user with pagination support and sorted by createdAt
 export const findAllOrdersForUser = async (userId: string, pageNumber: number = 1, pageSize: number = 10) => {
   try {
     // Calculate the number of orders to skip based on the page number and page size.
     const skipAmount = (pageNumber - 1) * pageSize;
 
-    // Find orders in the database belonging to the provided userId, with pagination
+    // Find orders in the database belonging to the provided userId, with pagination and sorted by createdAt
     const orders = await Orders.find({ user: userId })
+      .sort({ createdAt: -1 }) // Sort in descending order of createdAt
       .skip(skipAmount) // Skip the specified number of orders
       .limit(pageSize); // Limit the number of orders returned
 
@@ -1271,47 +1272,55 @@ export const updateProductStockAfterPurchase = async (items: {product: string, q
   }
 };
 
-//subscribe to Newseletter for admin to send messages
 // subscribe to Newsletter for admin to send messages
 export const subscribeToNewsletter = async (email: string) => {
   try {
     // Find the first document in the Store collection
+    console.log('Finding store document...');
     let store = await Store.findOne();
 
     // If no store document exists, create a new one
     if (!store) {
+      console.log('No store document found, creating a new one...');
       store = new Store();
     }
 
     // Check if the newsletter array exists in the store
     if (!store.newsletter) {
       // If the newsletter array doesn't exist, create it and add the email
+      console.log('Creating newsletter array and adding email...');
       store.newsletter = [email];
     } else {
       // If the newsletter array exists, check if the email already exists
       if (store.newsletter.includes(email)) {
+        console.log('Email already exists in the newsletter.');
         return 'Email already exists in the newsletter';
       }
       // If the email doesn't exist, push it to the newsletter array
+      console.log('Adding email to newsletter...');
       store.newsletter.push(email);
     }
 
     // Save the updated store document
+    console.log('Saving store document...');
     await store.save();
 
     // Log the activity of user subscribing
+    console.log('Logging user subscription activity...');
     const activity = new Activity({
       action: 'user_subscribed',
       details: { userEmail: email }, // Include user's email in the activity details
     });
     await activity.save();
 
+    console.log('Email added to newsletter successfully.');
     return 'Email added to newsletter';
   } catch (error) {
     console.error('Error adding email to newsletter:', error);
     return 'Failed to add email to newsletter';
   }
 };
+
 
 
 

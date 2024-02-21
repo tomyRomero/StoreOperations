@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useForm} from 'react-hook-form';
@@ -12,12 +12,13 @@ import {
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
   } from "@/components/ui/form";
 import { subscribeToNewsletter } from '@/lib/actions/store.actions';
 import { toast } from '../ui/use-toast';
+import Image from 'next/image';
 
 const SubscribeForm = () => {
+    const [loading, setLoading] = useState(false)
 
     const FormSchema = z.object({
         email: z.string().min(1, 'Email is required').email('Invalid email'),
@@ -31,7 +32,7 @@ const SubscribeForm = () => {
       });
 
       const onSubmit = async (values: z.infer<typeof FormSchema>)=> {
-
+        setLoading(true)
         const result = await subscribeToNewsletter(values.email);
 
         if(result === 'Failed to add email to newsletter')
@@ -46,7 +47,7 @@ const SubscribeForm = () => {
                 description: `${result}`, 
               })
         }
-
+        setLoading(false)
         form.reset();
       }
 
@@ -69,7 +70,19 @@ const SubscribeForm = () => {
             )}
           />
             <div className='pt-8'>
-            <Button className="border border-white text-white" variant={"ghost"} type="submit">Subscribe</Button>
+            <Button className={` ${loading ? "bg-white" : "bg-black border border-white text-white"}`} variant={"ghost"} type="submit">
+              
+              {loading ?  (
+              <Image
+             src={"/assets/lineloader.svg"}
+             alt={"loader"}
+             width={30}
+             height={30}
+             className={`${loading ? "" : "hidden"} mx-auto`}
+             />
+             ) : "Subscribe"}
+              
+              </Button>
             </div>
             
           </form>
