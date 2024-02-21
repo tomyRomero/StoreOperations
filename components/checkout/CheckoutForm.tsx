@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Layout } from "@stripe/stripe-js";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 const CheckoutForm = ()=> {
   const stripe = useStripe();
@@ -95,9 +96,15 @@ const CheckoutForm = ()=> {
         {message && <div id="payment-message" className="text-center py-2">{message}</div>}
           <div className="mt-4 flex justify-center">
           {/* Show any error or success messages */}
-          <Button disabled={isLoading || !stripe || !elements} id="submit" className="max-sm:w-full sm:w-3/4 xl:w-2/5">
+          <Button disabled={isLoading || !stripe || !elements} id="submit" className={`max-sm:w-full sm:w-3/4 xl:w-2/5 ${isLoading ? "bg-white border border-black" : "bg-black"}`}>
             <span id="button-text">
-              {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+              {isLoading ?     <Image
+             src={"/assets/lineloader.svg"}
+             alt={"loader"}
+             width={100}
+             height={100}
+             className={`${isLoading ? "" : "hidden"} mx-auto`}
+           /> : "Pay now"}
             </span>
           </Button>
         </div>

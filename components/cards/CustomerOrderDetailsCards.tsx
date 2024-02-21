@@ -8,6 +8,31 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, date, trac
 
   return (
         <div className='grid grid-cols-1'>
+            <Card>
+        <CardHeader>
+          <CardTitle>Items Ordered</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[150px]">Image</TableHead>
+                <TableHead className="max-w-[150px]">Product ID</TableHead>
+                <TableHead className="max-w-[150px]">Name</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Subtotal</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      <br/>
            <Card>
         <CardHeader>
           <CardTitle className='text-heading3-bold'>Order Summary</CardTitle>
@@ -32,10 +57,6 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, date, trac
           <div className="flex items-center">
             <div className="!font-bold text-black ">Tax:</div>
             <div className="ml-auto font-medium">${pricing.taxAmount}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Tax ID:</div>
-            <div className="ml-auto font-medium">{pricing.taxtId}</div>
           </div>
           <div className="flex items-center">
             <div className="!font-bold text-black ">Total:</div>
@@ -70,31 +91,6 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, date, trac
         </CardContent>
       </Card>
       <br></br>
-      <Card>
-        <CardHeader>
-          <CardTitle>Items Ordered</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[150px]">Image</TableHead>
-                <TableHead className="max-w-[150px]">Product ID</TableHead>
-                <TableHead className="max-w-[150px]">Name</TableHead>
-                <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Subtotal</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
     </div>
   )
 }

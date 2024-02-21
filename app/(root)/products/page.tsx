@@ -57,7 +57,7 @@ const page = async ({
        <div className="grid xl:grid-cols-4 gap-10 items-start">
           <Filters categoriesList={categories} categoryParams={categoriesArray} sortParams={searchParams.sorted ? searchParams.sorted : ""}/>
           <div className="xl:col-span-3 lg:mt-6 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">
-            <div className='max-sm:px-8'>
+            <div>
           <Link href="/search">
                 <Button className="flex px-2 border border-black" variant="ghost">
                   <Image

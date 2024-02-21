@@ -36,7 +36,6 @@ export const OrderRow = ({orderId, total, address, status, user, date}: Props) =
 
   return (
     <TableRow>
-    <TableCell>#{orderId}</TableCell>
     <TableCell>
         <Link href={`/adminorders/${orderId}`}>
           <Button  className="bg-black text-white border border-black" variant="ghost">
@@ -44,6 +43,7 @@ export const OrderRow = ({orderId, total, address, status, user, date}: Props) =
           </Button>
           </Link>
     </TableCell>
+    <TableCell>#{orderId}</TableCell>
     <TableCell>{status === "Pending" ? (<p className="font-extrabold">Waiting to be Shipped!</p>) : <p className="font-bold">{status}</p>}</TableCell>
     <TableCell><p className="text-green-400">${total}</p></TableCell>
     <TableCell>{`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}</TableCell>

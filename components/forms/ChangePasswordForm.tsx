@@ -134,6 +134,7 @@ const ChangePasswordForm = ({userId} : {userId: string}) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
         <div className='space-y-2'>
+          <h1>Password must contain at least one capitalized letter, at least one number, at least one special character and be at least nine characters long</h1>
           <FormField
             control={form.control}
             name='password'

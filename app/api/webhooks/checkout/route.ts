@@ -125,7 +125,7 @@ export async function POST(req: any) {
             //Send Email to User with Order Details!
             const currentURL = process.env.AXIOS_URL;
             
-            //Get User Information to send Email
+            //Get User Information to send Email to Customer
             const user = await getUser(userId)
 
             const nodeMailerData = {
@@ -135,10 +135,26 @@ export async function POST(req: any) {
                 event: "order",
                 pricing: pricingObject,
                 address: addressObject, 
-                orderId: orderId
+                orderId: orderId,
+                message: ""
             }
 
            await axios.post(`${currentURL}/api/nodemailer`, nodeMailerData);
+
+           //Send Order Email to admin/store owner
+           const adminNodeMailerData = {
+            email: user.email,
+            name: user.username,
+            items: orderObject,
+            event: "adminorder",
+            pricing: pricingObject,
+            address: addressObject, 
+            orderId: orderId,
+            message: ""
+        }
+
+        await axios.post(`${currentURL}/api/nodemailer`, adminNodeMailerData);
+
           
         }
         else if (event.type === 'payment_intent.payment_failed')

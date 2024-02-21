@@ -5,6 +5,7 @@ import React, { useEffect } from 'react'
 import { Button } from '../ui/button'
 import Image from 'next/image'
 import { useAppContext } from '@/lib/AppContext'
+import { adminEmail, storeDetails } from '@/lib/constants'
 
 const OrderSuccess = () => {
 
@@ -36,27 +37,25 @@ const OrderSuccess = () => {
       <div className="flex items-start justify-between">
         <span className="text-gray-600">Store Address:</span>
         <span className="font-medium">
-          1234 Main St.
-          <br />
-          Anytown, CA 12345
+         {storeDetails.location}
         </span>
       </div>
       <div className="flex items-start justify-between">
         <span className="text-gray-600">Contact Information:</span>
         <span className="font-medium">
-          Phone: (123) 456-7890
+          Phone: {storeDetails.contact}
           <br />
-          Email: info@example.com
+          Email: {adminEmail}
         </span>
       </div>
       <div className="flex items-start justify-between">
         <span className="text-gray-600">Store Hours:</span>
         <span className="font-medium">
-          Monday - Friday: 9:00 AM - 6:00 PM
+          Monday - Friday: {storeDetails.hours.mondayToFriday}
           <br />
-          Saturday: 10:00 AM - 4:00 PM
+          Saturday: {storeDetails.hours.saturday}
           <br />
-          Sunday: Closed
+          Sunday: {storeDetails.hours.sunday}
         </span>
       </div>
     </div>
@@ -66,12 +65,12 @@ const OrderSuccess = () => {
   </p>
   <div className="flex flex-wrap gap-4 justify-center">
     <Link href="/products">
-    <Button className="mt-8 max-w-md h-12">
+    <Button className="mt-8 max-w-md h-12 bg-black text-white border border-black" variant={"ghost"}>
       Continue Shopping
     </Button>
     </Link>
     <Link href="/account/orders">
-    <Button className="mt-8 max-w-md h-12">
+    <Button className="mt-8 max-w-md h-12 bg-black text-white border border-black" variant={"ghost"}>
       View Orders
     </Button>
     </Link>

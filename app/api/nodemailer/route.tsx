@@ -1,20 +1,20 @@
-import { getAdminUser } from '@/lib/actions/admin.actions';
 import { findProduct } from '@/lib/actions/store.actions';
+import { adminEmail, storeDetails } from '@/lib/constants';
 import nodemailer from 'nodemailer';
 
 export const POST = async (req: any) => {
-  const { email, name, items, event , pricing, address , orderId} = await req.json();
-  const storeName = "PaletteHub"
-  const contact = "123-456-7890"
-  const location = "US Virgin Islands, St.Thomas 00802"
+  const { email, name, items, event , pricing, address , orderId , message} = await req.json();
+  const storeName = storeDetails.title;
+  const contact = storeDetails.contact;
+  const location = storeDetails.location;
 
-  const admin = await getAdminUser();
-
-
+  //Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
+  const admin = {
+    email: adminEmail
+  }
 
   const getProduct = async (productId: string) => {
     const data = await findProduct(productId);
-    console.log("data:", data);
     return data ? data.name : null;
   };
   
@@ -121,7 +121,7 @@ export const POST = async (req: any) => {
   
         <!-- See Details button -->
         <div style="text-align: center; margin-top: 20px;">
-          <a href="https://palettehub.vercel.app/account/orders" style="padding: 10px 20px; background-color: black; color: #fff; text-decoration: none; border-radius: 4px;">View Orders</a>
+          <a href="${`${process.env.NEXT_PUBLIC_URL}/orders` ?? ""}" style="padding: 10px 20px; background-color: black; color: #fff; text-decoration: none; border-radius: 4px;">View Orders</a>
         </div>
       </div>
     </div>
@@ -164,11 +164,159 @@ export const POST = async (req: any) => {
 
     <!-- Call-to-action button -->
     <div style="text-align: center; margin-top: 20px;">
-      <a href="https://example.com/shop" style="padding: 12px 24px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">Start Shopping</a>
+      <a href="${process.env.NEXT_PUBLIC_URL ?? ""}" style="padding: 12px 24px; background-color: #000; color: #fff; text-decoration: none; border-radius: 4px;">Start Shopping</a>
     </div>
   </div>
 </div>
 `
+  }else if(event === "adminorder")
+  {
+    subject = `New Order Has Been Made`
+
+    emailContent = `<div style="font-family: Arial, sans-serif; width: 100%; font-size: 16px; color: #333;">
+    <!-- Header section -->
+    <div style="padding: 20px;">
+      <div style="margin: 0 auto; max-width: 600px;">
+        <div style="font-size: 24px; font-weight: bold; color: #333; text-align: center;">New Order Notification</div>
+        <div style="font-size: 16px; color: #555; text-align: center;">An order has been made on ${storeName}</div>
+        <div style="font-size: 16px; color: #555; text-align: center;">Contact the customer at ${email}</div>
+      </div>
+    </div>
+
+  
+  
+    <!-- Order details section -->
+    <div style="margin: 0 auto; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px;">Order Details:</div>
+      
+
+      <!-- Customer information -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-weight: bold;">Customer Information:</div>
+        <div>Name: ${name}</div>
+        <div>Email: ${email}</div>
+      </div>
+
+      <!-- Order items -->
+      <!-- Products section -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-weight: bold; margin-bottom: 10px;">Products</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <div style="flex: 1; font-weight: bold;">Product Name</div>
+            <div style="flex: 1; font-weight: bold;">Quantity</div>
+          </div>
+          ${await generateProductsContent()}
+        </div>
+      </div>
+
+      <!-- Shipping Address section -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-weight: bold; margin-bottom: 10px;">Shipping Address</div>
+        <div style="margin-left: 20px;">
+          <div>${address.name}</div>
+          <div>${address.address.line1}</div>
+          <div>${address.address.city}, ${address.address.state} ${address.address.postal_code}</div>
+          <div>${address.address.country}</div>
+        </div>
+      </div>
+
+       <!-- Subtotal section -->
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold;">Subtotal</div>
+          <div>$${pricing.subtotal}</div>
+        </div>
+  
+        <!-- Shipping section -->
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold;">Shipping</div>
+          <div>$${pricing.shipping}</div>
+        </div>
+  
+        <!-- Tax section -->
+        <div style="margin-bottom: 20px;">
+          <div style="font-weight: bold;">Tax</div>
+          <div>$${pricing.taxAmount}</div>
+        </div>
+  
+        <!-- Total section -->
+        <div style="text-align: center;">
+          <div style="font-weight: bold;">Total</div>
+          <div>$${pricing.total}</div>
+        </div>
+  
+      <!-- Call-to-action button -->
+      <div style="text-align: center;">
+        <a href="${process.env.NEXT_PUBLIC_URL ?? ""}" style="display: inline-block; padding: 12px 24px; background-color: #000; color: #fff; text-decoration: none; border-radius: 4px;">Go to Site</a>
+      </div>
+    </div>
+  </div>
+  `
+  }else if(event === "support")
+  {
+    subject = `New Support Request`
+
+    emailContent = `
+    <div style="font-family: Arial, sans-serif; width: 100%; font-size: 16px; color: #333;">
+  <!-- Header section -->
+  <div style="padding: 20px;">
+    <div style="margin: 0 auto; max-width: 600px;">
+      <div style="font-size: 24px; font-weight: bold; color: #333; text-align: center;">Support Request</div>
+      <div style="font-size: 16px; color: #555; text-align: center;">A customer has contacted support</div>
+      <div style="font-size: 16px; color: #555; text-align: center;">Reply to ${email}</div>
+    </div>
+  </div>
+
+  <!-- Support details section -->
+  <div style="margin: 0 auto; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px;">Support Details:</div>
+    
+    <!-- Customer information -->
+    <div style="margin-bottom: 20px;">
+      <div style="font-weight: bold;">Customer Information:</div>
+      <div>Name: ${name}</div>
+      <div>Email: ${email}</div>
+    </div>
+
+    <!-- Message -->
+    <div style="margin-bottom: 20px;">
+      <div style="font-weight: bold;">Message:</div>
+      <div>${message}</div>
+    </div>
+
+  </div>
+</div>
+`
+  }else if(event === "newsletter")
+  {
+    subject = `${storeName} Newsletter`
+
+    emailContent =`
+    <div style="font-family: Arial, sans-serif; width: 100%; font-size: 16px; color: #333;">
+   <!-- Header section -->
+    <div style="padding: 20px;">
+      <div style="margin: 0 auto; max-width: 600px;">
+        <div style="font-size: 24px; font-weight: bold; color: #333; text-align: center;"> Newsletter - ${storeName}</div>
+        <div style="font-size: 16px; color: #555; text-align: center;">Stay updated with the latest news and offers!</div>
+      </div>
+    </div>
+
+  <!-- Newsletter content section -->
+  <div style="margin: 0 auto; max-width: 600px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+    <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px;">Featured Content:</div>
+    
+    <div style="margin-bottom: 20px;">
+      <div style="font-weight: bold; font-size: 18px;">Content</div>
+      <div>${message}</div>
+    </div>
+
+    <!-- Call-to-action button -->
+    <div style="text-align: center;">
+      <a href="${process.env.NEXT_PUBLIC_URL ?? ""}" style="display: inline-block; padding: 12px 24px; background-color: #000; color: #fff; text-decoration: none; border-radius: 4px;">Visit Our Store</a>
+    </div>
+  </div>
+</div>
+    `
   }
 
   // Function to extract domain from email address
@@ -221,6 +369,7 @@ export const POST = async (req: any) => {
       service: smtpServiceConfig.service,
       // Port will be automatically determined by nodemailer based on the service
       auth: {
+        //Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
         user: admin.email,
         pass: process.env.ADMIN_EMAIL_PASSWORD || '', // Don't forget to handle environment variable
       },
@@ -230,8 +379,10 @@ export const POST = async (req: any) => {
     // Function to send the email
     const sendEmail = async (emailContent: any, userEmail: string, subject: string) => {
       const mailOptions = {
+        //Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
         from: admin.email,
-        to: userEmail,
+        //If the event is adminorder or support let the email come from the admin to themselves alerting themselves
+        to: event === "adminorder" || event === "support" ? adminEmail : userEmail,
         html: emailContent,
         subject: subject,
       };

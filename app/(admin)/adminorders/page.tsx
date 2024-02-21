@@ -57,8 +57,8 @@ const page = async ({
             <Table >
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-bold text-black">Order</TableHead>
                   <TableHead className="font-bold text-black text-center">Details</TableHead>
+                  <TableHead className="font-bold text-black">Order</TableHead>
                   <TableHead className="font-bold text-black ">Status</TableHead>
                   <TableHead className="font-bold text-black text-left">Total</TableHead>
                   <TableHead className="font-bold text-black text-center">Address</TableHead>

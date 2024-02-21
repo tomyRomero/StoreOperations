@@ -32,7 +32,7 @@ const CustomerOrder = ({orderId , items, date, status, tracking, pricing} : Prop
       <div className="border rounded-lg overflow-hidden">
         <div className="flex flex-wrap items-center p-4">
           <div className="font-bold flex-wrap">Order #{orderId}</div>
-          <div className="px-3 mr-auto sm:ml-auto text-gray-500 ">{status}</div>
+          <div className="px-3 ml-auto text-gray-500 ">{status}</div>
         </div>
         <div className="border-t" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start p-4 gap-4 text-sm">
@@ -63,7 +63,7 @@ const CustomerOrder = ({orderId , items, date, status, tracking, pricing} : Prop
           <h1>
             Track Order:{tracking ? tracking : "Has Not Shipped"}
           </h1>
-          <Link href={`/account/orders/${orderId}`} className='mr-auto sm:ml-auto'>
+          <Link href={`/account/orders/${orderId}`} className='ml-auto'>
           <Button className="bg-black text-white border border-black"  variant="ghost">
             View details
           </Button>

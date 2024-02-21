@@ -141,12 +141,14 @@ const SignUpForm = () => {
               </FormItem>
             )}
           />
+          
           <FormField
             control={form.control}
             name='password'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
+                <h1 className='text-gray-500 text-subtle-medium'>Password must contain at least one capitalized letter, at least one number, at least one special character and be at least nine characters long</h1>
                 <FormControl>
                   <Input
                     type='password'

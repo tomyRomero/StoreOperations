@@ -2,10 +2,10 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import { footerNavLinks, footerSocials } from "@/lib/constants"
+import { footerNavLinks, footerSocials, storeDetails } from "@/lib/constants"
 import SubscribeForm from "../forms/SubscribeForm"
 
-export default function Footer() {
+const Footer = ()=> {
 
   return (
     <footer className=" w-full bg-black text-white py-12">
@@ -16,7 +16,7 @@ export default function Footer() {
             {footerNavLinks.map((navLink, index) => (
               <div key={index}>
                 <li key={index}>
-                  <Link className="text-white hover:text-white" href={`${navLink.link}`}>
+                  <Link className="text-white cursor-pointer" href={`${navLink.link}`}>
                     {navLink.title}
                   </Link>
                 </li>
@@ -44,9 +44,9 @@ export default function Footer() {
         </div>
        <SubscribeForm />
       </div>
-      <div className="mt-8 text-center text-body-bold text-white">© 2024 PaletteHub. All rights reserved.</div>
+      <div className="mt-8 text-center text-body-bold text-white">© 2024 {storeDetails.title} All rights reserved.</div>
     </footer>
   )
 }
 
-
+export default Footer;

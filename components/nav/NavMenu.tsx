@@ -5,6 +5,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { loggedInNavLinks, loggedOutNavLinks } from '@/lib/constants';
 
 
 interface Props {
@@ -19,54 +20,7 @@ const { data: session } = useSession();
 const router = useRouter(); 
 
 
-  const navLinks = session? [
-    {
-        title: "Home",
-        path: "/", 
-        image: "/assets/layout.png"
-    },
-    {
-      title: "Search",
-      path: "/search", 
-      image: "/assets/searchblack.png"
-    },
-    {
-        title: "Shop",
-        path: "/products", 
-        image: "/assets/price.png"
-    },
-    {
-        title: "Account",
-        path: "/account",
-        image: "/assets/profile.png"
-    },
-    {
-        title: "Logout",
-        path: "/logout",
-        image: "/assets/logout.png"
-    }
-  ] : [
-    {
-        title: "Home",
-        path: "/", 
-        image: "/assets/layout.png"
-    },
-    {
-      title: "Search",
-      path: "/search", 
-      image: "/assets/searchblack.png"
-    },
-    {
-        title: "Shop",
-        path: "/products", 
-        image: "/assets/price.png"
-    },
-    {
-        title: "Login",
-        path: "/login",
-        image: "/assets/login.png"
-    },
-  ]
+  const navLinks = session? loggedInNavLinks : loggedOutNavLinks;
 
   const pathname = usePathname();
 
