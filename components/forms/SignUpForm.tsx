@@ -68,7 +68,7 @@ const SignUpForm = () => {
       'Content-Type' : 'application/json'
     },
     body: JSON.stringify({
-      // Encode the username before sending it to the server fro added security to prevent XSS attacks.
+      // Encode the username before sending it to the server for added security to prevent XSS attacks.
       username: encodeHTML(values.username), 
       email: encodeHTML(values.email), 
       password: encodeHTML(values.password), 
