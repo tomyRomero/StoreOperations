@@ -46,15 +46,15 @@ StoreOps is a full-stack E-Commerce Platform designed to provide a seamless onli
 
 ## Project Features
 
-- **Product Management**: Browse, search, and purchase products with ease. Administrators have full control to edit, add, or delete products based on business needs. Products come with stock management capabilities, ensuring seamless reflection of stock changes in the store. Admins can also create deals for products and more.
+- **Product Management**: Browse, search, filter and purchase products with ease. Administrators have full control to edit, add, or delete products based on business needs. Products come with stock management capabilities, ensuring seamless reflection of stock changes in the store. Admins can also create deals for products and more.
 
-- **Category Management**: Easily browse, filter, and associate products to categories. Admins have the authority to manage categories by editing, adding, or deleting them as needed.
+- **Category Management**: Easily browse, filter, and associate products to categories. Admins have the authority to manage categories by editing, adding, or deleting them as needed, deleting a category would delete all products associated.
 
 - **Cart**: Seamlessly add items to your cart, and resume your shopping experience right where you left off. The cart functionality is powered by local storage and a cart database schema, ensuring synchronization once a user creates or logs into an account. Real-time dynamic calculations ensure accurate subtotals, and users are promptly notified if a product is out of stock or if the desired quantity exceeds availability.
 
-- **User Authentication**: Secure login and registration are facilitated through NextAuth.js and MongoDB database integration. The sign-up form, fortified with bcrypt encryption, ensures password security. Additionally, a dedicated admin account grants special permissions and access to an exclusive interface. Users can securely change their passwords at any time.
+- **User Authentication**: Secure login and registration built through NextAuth.js and MongoDB database integration. The sign-up form, is backed with bcrypt encryption, ensures password security. Users can securely change their passwords at any time.
 
-- **Payment Processing**: Integration with Stripe ensures seamless transactions. Products are registered through Stripe, including archiving of deleted products. The checkout and address forms leverage Stripe's security features, while tax calculations are dynamically adjusted based on user addresses.
+- **Payment Processing**: Integration with Stripe, using my very own custom payment flow. Products are registered through Stripe, including archiving of deleted products. The checkout and address pages leverage Stripe's security features, while tax calculations are dynamically adjusted based on user addresses. If products are out of stock or have been deleted users are thrown back to cart page, ensuring site integrity.  
 
  - For testing Stripe purchases, you can use the following test card details:
     - Card number: 4242 4242 4242 4242
@@ -65,15 +65,15 @@ StoreOps is a full-stack E-Commerce Platform designed to provide a seamless onli
 
 - **Order Management**: Users can view order history and track order status, while admins can update order statuses to keep customers informed of order progress.
 
-- **Responsive Design**: The platform is optimized for various devices and screen sizes, ensuring a consistent user experience across platforms.
+- **Responsive Design**: The platform is optimized for all devices and screen sizes, ensuring a consistent user experience across platforms.
 
 - **Image Storage System**: AWS S3 is employed for storing and serving product images, enabling administrators to upload and edit products and categories from anywhere, without the need to manage image storage locally.
 
 - **Database Management**: MongoDB Atlas is utilized to store and manage data, including carts, addresses, users, products, categories, activity logs, orders, and newsletter subscribers.
 
-- **Admin Panel**: Administrators can manage products, orders, and user accounts with ease, leveraging features such as pagination and search functionalities. Dedicated sections for recent activity and newsletter updates ensure administrators stay informed and connected with users.
+- **Admin Panel**: Administrators can manage products, orders, and user accounts with ease. Dedicated sections for recent activity and newsletter updates ensure administrators stay informed and connected with users.
 
-- **Search Functionality and Pagination**: Robust search functionality and pagination facilitate quick access to desired products and other date such as orders, ensuring fast performance and efficient navigation.
+- **Search Functionality and Pagination For All Pages**: Robust search functionality and pagination facilitate quick access to desired products and other data such as orders, users and addresses. ensuring fast performance and efficient navigation.
 
 - **Security**: Multiple security measures are implemented, including encoded HTML to prevent XSS attacks, server-side data validation, strict password parameters to thwart brute force attacks, and HTML sanitization to prevent potential injection attacks.
 
@@ -198,7 +198,7 @@ Shout out to https://unsplash.com/ for all the pictures that were not user submi
 Shout out to https://icons8.com/ for all provided icons. 
 
 ## <a name="status">📊 Project Status</a>
-The project is currently in Stripe test mode, but all functionalities are fully operational. The business logic is the only aspect that requires adjustments.
+The project is currently in Stripe test mode, but all functionalities are fully operational. The business logic is the only aspect that requires adjustments. 
 
 ## Setup
 
