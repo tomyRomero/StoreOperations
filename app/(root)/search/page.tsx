@@ -13,12 +13,15 @@ const page = async ({
     searchParams: { [key: string]: string | undefined };
   }) => {
 
+    try{
     const searchString = searchParams.q; //search string
     const pageNumber = searchParams.page ? + searchParams.page : 1; //page number
     const pageSize = 6; 
     const sortBy = "desc"; 
+    
+    
 
-    const {results, isNext, totalPages} = await getAllProductsWithSearch(
+    let {results, isNext, totalPages} = await getAllProductsWithSearch(
         {  
             pageNumber,
             pageSize,
@@ -85,6 +88,32 @@ const page = async ({
         <br></br>
     </section>
   )
+    } catch(error)
+    {
+      return(
+        <section className="w-full max-md:pt-36 md:pt-36 px-16 lg:px-40 max-sm:px-8 max-xs:px-4 max-xs:pt-20 sm:pt-24">
+        <h1 className='text-heading3-bold pb-4'>Search</h1>
+        <Link href="/products">
+        <Button className="flex px-2 border border-black" variant="ghost">
+              <Image
+                src="/assets/back.png"
+                alt="go back icon"
+                width={28}
+                height={28}
+              />
+              <span className="ml-2">All Products</span>
+            </Button>
+            </Link>
+            <br></br>
+         <SearchBar routeType='search' placeholder='Search For Products By Name or Category' />
+        <br></br>
+           
+        <div className="grid gap-10 items-start">
+        <h1>Error Occured , Try Refreshing</h1>
+        </div>
+          </section>
+      )
+    }
 }
 
 export default page
