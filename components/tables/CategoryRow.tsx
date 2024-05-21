@@ -9,6 +9,7 @@ import { deleteCategoryById } from '@/lib/actions/store.actions'
 import { toast } from '../ui/use-toast'
 import { useRouter } from 'next/navigation'
 import { CategoryType } from '@/app/types/global'
+import Link from 'next/link'
 
 
 const CategoryRow = ({id, photo, date, title}: CategoryType) => {
@@ -56,6 +57,7 @@ const redirect = () => {
   return (
     <TableRow>
       <TableCell>
+        <Link href={`/adminaddcategory/${id}`}>
         <Image
           alt="Category image"
           className="aspect-square rounded-md object-cover"
@@ -64,6 +66,7 @@ const redirect = () => {
           width="64"
           priority
         />
+        </Link>
       </TableCell>
       <TableCell>
       <div className='flex'>
@@ -75,7 +78,7 @@ const redirect = () => {
       </Button>
       </div>
     </TableCell>
-    <TableCell className="font-bold">{title}</TableCell>
+    <TableCell className="font-bold hover:underline"> <Link href={`/adminaddcategory/${id}`}>{title}</Link></TableCell>
         <TableCell className="font-medium">{id}</TableCell>
         <TableCell className="">{date}</TableCell>
   </TableRow>

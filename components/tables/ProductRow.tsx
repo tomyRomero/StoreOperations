@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "../ui/use-toast"
 import { revalidate } from "@/lib/actions/admin.actions"
 import {deleteProductById} from "@/lib/actions/store.actions"
+import Link from "next/link"
 
 
 const ProductRow = ({stripeProductId, name, description, stock, price, category, photo, date, deal}: ProductType) => {
@@ -61,6 +62,7 @@ const deleteProduct = async () => {
   return (
       <TableRow>
         <TableCell>
+        <Link href={`/adminaddproduct/${stripeProductId}`}>
           <Image
             alt="Product image"
             className="aspect-square rounded-md object-cover"
@@ -69,8 +71,12 @@ const deleteProduct = async () => {
             width="64"
             priority
           />
+          </Link>
         </TableCell>
-        <TableCell className="font-bold">{name}</TableCell>
+        
+       
+        <TableCell className="font-bold hover:underline"> <Link href={`/adminaddproduct/${stripeProductId}`}>{name}</Link></TableCell>
+        
         <TableCell>
             <div className='flex'>
              <Button size="sm" variant="outline" onClick={redirect}>

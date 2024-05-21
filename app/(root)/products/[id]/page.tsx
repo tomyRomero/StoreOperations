@@ -1,16 +1,17 @@
 import ProductDetails from '@/components/cards/ProductDetails'
 import { findProductWithDeal, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
 import React from 'react'
-import Image from 'next/image'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { Button } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 
 const page = async ({ params }: { params: { id: string } }) => {
 
+  try{
+  // Fetch product data
   const product = await findProductWithDeal(params.id)
 
+  // Fetch server products
   const serverProducts= await getAllProductsWithoutSort(
     1,
     4, 
@@ -18,10 +19,12 @@ const page = async ({ params }: { params: { id: string } }) => {
     params.id
   )
 
+  // Fetch user session
   const session = await getServerSession(authOptions);
 
   const userId = session?.user.id
 
+  // Check if the product is in the user's cart
   let result = false
   if(userId)
   result = await insideCart(userId, params.id)
@@ -57,7 +60,16 @@ const page = async ({ params }: { params: { id: string } }) => {
        </div>
        }
     </section>
-  )
+  ) }catch(error){
+    return(
+    <section className="mt-14 max-sm:mt-12 mx-auto px-4 md:px-14 pt-20 lg:px-20 max-xs:pt-28">
+       <div>
+          <br></br>
+          <h1 className='text-red-500'>An Error Occurred: {String(error)}. Please Refresh the Page.</h1>
+       </div>
+    </section>
+    )
+  }
 }
 
 export default page

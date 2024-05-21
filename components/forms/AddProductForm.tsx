@@ -199,7 +199,7 @@ const AddProductForm = ({stripeProductId, name, description, stock, price, categ
         </Button>
       </Link>
       <br />
-      <h1 className="text-heading4-bold font-bold text-center mb-6">Add New Product</h1>
+      <h1 className="text-heading4-bold font-bold text-center mb-6">{stripeProductId ? "Edit Product" : "Add New Product"}</h1>
       <div className="flex flex-col">
       <Form {...form} >
           <form onSubmit={form.handleSubmit(onSubmit)}

@@ -47,7 +47,6 @@ export default async function RootLayout({
             </section>
             <br/>
         </main>
-
         <Footer />
         <Toaster />
       </body>

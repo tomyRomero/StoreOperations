@@ -144,7 +144,7 @@ export default function AddCategoryForm({title, photo, id }: CategoryType) {
         </Button>
       </Link>
       <br />
-      <h1 className="text-heading4-bold font-bold text-center mb-6">Add New Category</h1>
+      <h1 className="text-heading4-bold font-bold text-center mb-6">{id ? "Edit Category" : "Add New Category"}</h1>
         <Form {...form}>
           <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}
            encType="multipart/form-data"

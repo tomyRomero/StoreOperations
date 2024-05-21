@@ -93,7 +93,7 @@ const page = async ({
                       pageNumber={searchParams?.page ? + searchParams.page : 1}
                       isNext={serverProducts.isNext}
                     />
-                </div>
+              </div>
       </div>
       </div>
   </section>

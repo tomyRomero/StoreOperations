@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ProductType } from "@/app/types/global"
 import Image from "next/image"
 import { useEffect, useState } from "react"
-import { getRes } from "@/lib/s3"
+import { getImageData, getRes } from "@/lib/s3"
 import { useRouter } from "next/navigation"
 import { addProductToCart } from "@/lib/actions/store.actions"
 import { useSession } from "next-auth/react"
@@ -34,7 +34,16 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
 
     useEffect(() => { 
       const load = async () => {
-      setImg(await getRes(photo))
+      
+      let res = '/assets/profile.png'
+      try{
+      res = await getImageData(photo)
+      }catch(error)
+      {
+        console.warn('Error fetching image from server')
+      }
+
+      setImg(res);
 
       if (!result && !session) {
         // If result is false, check localStorage
