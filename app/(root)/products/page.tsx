@@ -13,7 +13,7 @@ const page = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  try{
   //Seperate Logic for Getting Categories for building Filtering Checkboxes
   const categoriesData = await getAllCategories()
   const categories:any = []
@@ -98,6 +98,15 @@ const page = async ({
       </div>
   </section>
   )
+}catch(error)
+{
+  console.error("Failed to fetch categories or products:", error);
+    return (
+      <section className="mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20">
+        <h1 className="text-red-500">Failed to load products. Please try again later.</h1>
+      </section>
+    );
+}
 }
 
 
