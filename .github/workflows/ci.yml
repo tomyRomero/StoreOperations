@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, upgrade]
+  pull_request:
+
+# Cancel an in-progress run when a newer commit arrives on the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, typecheck, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # The tests start an in-memory MongoDB; cache its binary between runs
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-7.0.14
+
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+      # No secrets are needed: settings are validated when the server first uses them, not at build time
+      - run: npm run build
