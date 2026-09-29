@@ -55,18 +55,21 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+// Validates a set of variables and lists every problem in one error
+export function parseEnv(source: Record<string, string | undefined>): Env {
+  const result = envSchema.safeParse(source);
+  if (!result.success) {
+    const problems = result.error.issues
+      .map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`)
+      .join("\n");
+    throw new Error(`Invalid environment variables (see .env.example):\n${problems}`);
+  }
+  return result.data;
+}
+
 let cached: Env | undefined;
 
 export function getEnv(): Env {
-  if (!cached) {
-    const result = envSchema.safeParse(process.env);
-    if (!result.success) {
-      const problems = result.error.issues
-        .map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`)
-        .join("\n");
-      throw new Error(`Invalid environment variables (see .env.example):\n${problems}`);
-    }
-    cached = result.data;
-  }
+  if (!cached) cached = parseEnv(process.env);
   return cached;
 }
