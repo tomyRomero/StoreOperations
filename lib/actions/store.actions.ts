@@ -12,7 +12,7 @@ import Cart from "../models/cart.model";
 import Addresses from "../models/addresses.model";
 import Orders from "../models/orders.model";
 import Activity from "../models/activity.model";
-import { createOrUpdateStripeProduct } from "@/app/api/product/route";
+import { createOrUpdateStripeProduct } from "../stripe-products";
 import { dollarsToCents } from "../utils";
 import Store from "../models/store.model";
 
