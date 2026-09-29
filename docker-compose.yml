@@ -1,0 +1,41 @@
+# Local services for development. No external accounts needed.
+#   docker compose up -d     start everything
+#   docker compose down      stop (data is kept in named volumes)
+#   docker compose down -v   stop and delete all local data
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # S3-compatible image storage for development (Adobe S3Mock).
+  # Creates the private image bucket on start. API: http://localhost:9090
+  s3:
+    image: adobe/s3mock:5.2.3
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: palettehub-dev
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3mockroot
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+    ports:
+      - "9090:9090"
+    volumes:
+      - s3-data:/s3mockroot
+
+  # Catches every outgoing email. Inbox: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.24
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  mongo-data:
+  s3-data:

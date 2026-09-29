@@ -1,6 +1,7 @@
 import { findProduct } from '@/lib/actions/store.actions';
 import { adminEmail, storeDetails } from '@/lib/constants';
 import nodemailer from 'nodemailer';
+import { getEnv } from '@/lib/env';
 
 export const POST = async (req: any) => {
   const { email, name, items, event , pricing, address , orderId , message} = await req.json();
@@ -319,92 +320,41 @@ export const POST = async (req: any) => {
     `
   }
 
-  // Function to extract domain from email address
-  const getDomainFromEmail = (email: string) => {
-    return email.split('@')[1];
-  };
+  // SMTP settings come from the environment (Mailpit locally, a real provider in production)
+  const env = getEnv();
+  const transporter = nodemailer.createTransport({
+    pool: true,
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_PORT === 465,
+    auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined,
+    maxConnections: 5,
+  });
 
-  // Define type for SMTP service configuration
-  type SmtpServiceConfig = {
-    service: string;
-    // port: number;
-  };
-
-  // Function to determine SMTP service based on domain
-  const getSmtpServiceFromDomain = (domain: string): SmtpServiceConfig | undefined => {
-    // Map email domains to SMTP services
-    const smtpServices: Record<string, SmtpServiceConfig> = {
-      'gmail.com': {
-        service: 'gmail',
-      },
-      'hotmail.com': {
-        service: 'hotmail',
-      },
-      // Add more mappings as needed
-      'yahoo.com': {
-        service: 'yahoo',
-      },
-      'outlook.com': {
-        service: 'outlook',
-      },
-    };
-
-    // Return the SMTP service configuration for the given domain
-    return smtpServices[domain];
-  };
-
-
-  // Get the domain from the admin's email
-  const domain = getDomainFromEmail(admin.email);
-  console.log("Domain: ", domain);
-
-  // Get the SMTP service configuration based on the domain
-  const smtpServiceConfig = getSmtpServiceFromDomain(domain);
-  console.log("smtpServiceConfig: ", smtpServiceConfig);
-
-  // Create the nodemailer transporter using the SMTP service configuration
-  if (smtpServiceConfig) {
-    const transporter = nodemailer.createTransport({
-      pool: true,
-      service: smtpServiceConfig.service,
-      // Port will be automatically determined by nodemailer based on the service
-      auth: {
-        //Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
-        user: admin.email,
-        pass: process.env.ADMIN_EMAIL_PASSWORD || '', // Don't forget to handle environment variable
-      },
-      maxConnections: 5,
-    });
-
-    // Function to send the email
-    const sendEmail = async (emailContent: any, userEmail: string, subject: string) => {
-      const mailOptions = {
-        //Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
-        from: admin.email,
-        //If the event is adminorder or support let the email come from the admin to themselves alerting themselves
-        to: event === "adminorder" || event === "support" ? adminEmail : userEmail,
-        html: emailContent,
-        subject: subject,
-      };
-
-      try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent: ', info);
-      } catch (error) {
-        console.error('Error sending mail: ', error);
-        throw new Error("Mail Failed to Send");
-      }
+  // Function to send the email
+  const sendEmail = async (emailContent: any, userEmail: string, subject: string) => {
+    const mailOptions = {
+      from: env.EMAIL_FROM,
+      //If the event is adminorder or support let the email come from the admin to themselves alerting themselves
+      to: event === "adminorder" || event === "support" ? adminEmail : userEmail,
+      html: emailContent,
+      subject: subject,
     };
 
     try {
-      // Send the email
-      await sendEmail(emailContent, email, subject);
-      return new Response(JSON.stringify({ message: "Successfully sent email. Thanks for contacting me! I will get back to you ASAP :)" }), { status: 201 });
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent: ', info);
     } catch (error) {
-      return new Response(JSON.stringify({ message: "Error sending email. Please try again and ensure your email is correct" }), { status: 501 });
+      console.error('Error sending mail: ', error);
+      throw new Error("Mail Failed to Send");
     }
-  } else {
-    console.error('SMTP service configuration not found for domain:', domain);
-    return new Response(JSON.stringify({ message: "Error sending email. SMTP service configuration not found for domain" }), { status: 501 });
+  };
+
+  try {
+    // Send the email
+    await sendEmail(emailContent, email, subject);
+    return new Response(JSON.stringify({ message: "Successfully sent email. Thanks for contacting me! I will get back to you ASAP :)" }), { status: 201 });
+  } catch (error) {
+    return new Response(JSON.stringify({ message: "Error sending email. Please try again and ensure your email is correct" }), { status: 501 });
   }
 };

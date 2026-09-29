@@ -1,7 +1,25 @@
 import { NextApiResponse } from 'next';
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getEnv } from "@/lib/env";
 
-const client = new S3Client({ region: 'us-east-2' });
+// Created on first use so a missing setting fails the request, not the build.
+// S3_ENDPOINT points at an S3-compatible server such as S3Mock in local development.
+let client: S3Client | undefined;
+const getClient = () => {
+  if (!client) {
+    const env = getEnv();
+    client = new S3Client({
+      region: env.AWS_REGION,
+      endpoint: env.S3_ENDPOINT,
+      forcePathStyle: Boolean(env.S3_ENDPOINT),
+      credentials: {
+        accessKeyId: env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+  }
+  return client;
+};
 
 export const GET = async (req: any, res: NextApiResponse) => {
     try {
@@ -12,12 +30,12 @@ export const GET = async (req: any, res: NextApiResponse) => {
       // console.log("Server Side KEY:" , decodedKey);
       // Define the parameters for getObject
       const command = new GetObjectCommand({
-          Bucket: "tfr-palettehub-bucket",
+          Bucket: getEnv().BUCKET_NAME,
           Key: `${decodedKey}`,
         });
 
       // Retrieve the image from S3
-      const response = await client.send(command);
+      const response = await getClient().send(command);
       //Take the response and parse it
       const streamToString = (stream: any) =>
       new Promise((resolve, reject) => {
@@ -57,19 +75,17 @@ export const POST = async (req: any, res: NextApiResponse) => {
   try {
     // Define the parameters for the upload
     const command = new PutObjectCommand({
-      Bucket: "tfr-palettehub-bucket",
+      Bucket: getEnv().BUCKET_NAME,
       Key: filename, // Provide the desired filename
       Body: binaryImageData, // Use the Buffer containing the image data
       ContentType: `image/${contentType}`, // Use the determined content type
     });
 
     // Upload the image to S3
-    const response = await client.send(command);
-    // console.log("Success! :", response);
-    const imageURL = `https://s3.amazonaws.com/tfr-palettehub-bucket/${filename}`;
-    return new Response(JSON.stringify({ message: "Successfully uploaded Image To S3 Bucket!", imageURL, filename }), { status: 201 });
+    await getClient().send(command);
+    return new Response(JSON.stringify({ message: "Successfully uploaded Image To S3 Bucket!", filename }), { status: 201 });
   } catch (error) {
-    console.log("Error S3 Object:", client);
+    console.error("Error uploading image to S3:", error);
     return new Response("Error uploading Image to S3:", { status: 500 });
   }
 };

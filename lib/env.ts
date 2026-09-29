@@ -38,7 +38,7 @@ const envSchema = z.object({
     z.string().regex(/^whsec_/, "must start with whsec_").optional()
   ),
 
-  // Image storage: AWS S3, or any S3-compatible server such as MinIO locally
+  // Image storage: AWS S3, or any S3-compatible server such as S3Mock locally
   AWS_REGION: z.string().min(1),
   AWS_ACCESS_KEY_ID: z.string().min(1),
   AWS_SECRET_ACCESS_KEY: z.string().min(1),
