@@ -103,7 +103,7 @@ const FormSchema = z
     <div className="space-y-2">
       <h2 className="text-heading3-bold tracking-tighter pt-4">Contact Us</h2>
       <p className="mx-auto text-gray-500 md:text-xl">
-        Fill out the form below and we'll get back to you as soon as possible.
+        Fill out the form below and we&apos;ll get back to you as soon as possible.
       </p>
     </div>
 

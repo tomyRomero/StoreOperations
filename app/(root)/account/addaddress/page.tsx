@@ -24,7 +24,7 @@ const appearance: StripeElementsOptions['appearance'] = {
   };
 
 
-const page = ()=> {
+const Page = ()=> {
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -61,4 +61,4 @@ const page = ()=> {
   )
 }
 
-export default page;
+export default Page;

@@ -67,7 +67,7 @@ const Promotion = ({ deals }: { deals: Deal[] }) => {
         <h3 className="text-heading3-bold">Deals of the Month</h3>
         <p className='text-body-semibold'>
           Discover Deals like never before with our Deals of the Month! Every Sale comes with
-          exclusive offers and perks. Don't miss out!
+          exclusive offers and perks. Don&apos;t miss out!
         </p>
       </div>
       <ul className="grid grid-cols-2 md:grid-cols-4 gap-6">

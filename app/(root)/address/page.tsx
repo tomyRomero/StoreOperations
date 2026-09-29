@@ -24,7 +24,7 @@ const appearance: StripeElementsOptions['appearance'] = {
   };
 
 
-const page = ()=> {
+const Page = ()=> {
   const [addresses, setAddress] = useState<Address[]>([])
 
   const { data: session } = useSession();
@@ -67,4 +67,4 @@ const page = ()=> {
   )
 }
 
-export default page;
+export default Page;

@@ -19,7 +19,7 @@ import OrderDetails from '@/components/checkout/OrderDetails';
 //call loadStripe outside of a component’s render to avoid recreating the Stripe object on every render.
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
-const page = () => {
+const Page = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [subtotal, setSubTotal] = useState(0);
   const [tax, setTax] = useState(0);
@@ -231,4 +231,4 @@ const page = () => {
   
 }
 
-export default page
+export default Page

@@ -38,7 +38,7 @@ const UserDetailsCard = ({userId}: any) => {
            
           </div>
           <div className="flex flex-wrap items-center">
-            <div className="font-bold text-black">Customer's Email:</div>
+            <div className="font-bold text-black">Customer&apos;s Email:</div>
             <div className="ml-auto font-medium">{email}</div>
           </div>
           <div className="flex items-center">
