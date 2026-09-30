@@ -60,6 +60,15 @@ public sealed class AdminProductsController(ProductAdminService products) : Admi
     public async Task<IActionResult> Restore(int id, CancellationToken ct) =>
         Respond(await products.RestoreAsync(id, AdminId, ct));
 
+    // The table's bulk bar. Each product is changed on its own; the answer says which ones worked.
+    [HttpPost("bulk")]
+    [ProducesResponseType<BulkResult<int>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Bulk(ProductBulkRequest request, CancellationToken ct)
+    {
+        var (result, error) = await products.BulkAsync(request, AdminId, ct);
+        return error is not null ? this.ErrorResponse(error) : Ok(result);
+    }
+
     private IActionResult Respond((AdminProductResponse? Product, ApiError? Error) result) =>
         result.Error is not null ? this.ErrorResponse(result.Error) : Ok(result.Product);
 }

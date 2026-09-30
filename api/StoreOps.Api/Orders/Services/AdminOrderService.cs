@@ -80,6 +80,28 @@ public sealed class AdminOrderService(AppDbContext db, StoreEmails emails, TimeP
         return error is not null ? (null, error) : (await GetAsync(orderNumber, ct), null);
     }
 
+    // The same status change for many orders, each checked and saved on its own with its shipping
+    // details as they are. An order already in that status counts as done.
+    public async Task<BulkResult<string>> BulkChangeStatusAsync(BulkOrderStatusRequest request, int adminId, CancellationToken ct) =>
+        await Bulk.RunAsync(db, request.OrderNumbers, async orderNumber =>
+        {
+            if (await GetAsync(orderNumber, ct) is not { } current)
+                return ApiError.NotFound;
+            if (current.Status == request.Status)
+                return null;
+
+            var (_, error) = await UpdateAsync(orderNumber, new UpdateOrderRequest
+            {
+                Status = request.Status,
+                Carrier = current.Carrier,
+                TrackingNumber = current.TrackingNumber,
+                EstimatedDeliveryDate = current.EstimatedDeliveryDate,
+                EmailCustomer = request.EmailCustomer,
+                RowVersion = current.RowVersion,
+            }, adminId, ct);
+            return error;
+        });
+
     private async Task<ApiError?> ApplyAsync(string orderNumber, UpdateOrderRequest request, int adminId, CancellationToken ct)
     {
         var order = await db.Orders

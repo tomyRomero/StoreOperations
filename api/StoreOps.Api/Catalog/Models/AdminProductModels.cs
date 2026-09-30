@@ -68,3 +68,22 @@ public sealed record AdminProductResponse(
     DateTime UpdatedAtUtc,
     DateTime? ArchivedAtUtc,
     byte[] RowVersion);
+
+public enum ProductBulkAction
+{
+    Archive,
+    EndDeal,
+    Move,
+}
+
+// A product table's bulk bar: archive, end deals, or move to another category
+public sealed record ProductBulkRequest
+{
+    [Required, MinLength(1), MaxLength(100)]
+    public int[] Ids { get; init; } = [];
+
+    public ProductBulkAction Action { get; init; }
+
+    // Where Move puts them
+    public int? CategoryId { get; init; }
+}

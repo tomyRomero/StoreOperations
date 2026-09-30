@@ -61,3 +61,15 @@ public sealed record UpdateOrderRequest
     [Required, MinLength(8), MaxLength(8)]
     public byte[] RowVersion { get; init; } = [];
 }
+
+// An orders table's bulk bar: mark shipped, mark delivered, cancel
+public sealed record BulkOrderStatusRequest
+{
+    [Required, MinLength(1), MaxLength(100)]
+    public string[] OrderNumbers { get; init; } = [];
+
+    public OrderStatus Status { get; init; }
+
+    // Null follows the store's default in Store settings
+    public bool? EmailCustomer { get; init; }
+}

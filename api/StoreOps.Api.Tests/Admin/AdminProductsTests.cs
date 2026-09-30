@@ -181,6 +181,63 @@ public class AdminProductsTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal([$"Gone {suffix}", $"Kept {suffix}"], NamesIn(all));
     }
 
+    [Fact]
+    public async Task Products_are_archived_in_bulk_with_a_report_of_each()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var first = await api.AddProductAsync();
+        var second = await api.AddProductAsync();
+
+        var response = await admin.PostAsJsonAsync("/api/admin/products/bulk",
+            new { ids = new[] { first, second, 999_999 }, action = "archive" }, Ct);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await BodyOf(response);
+        Assert.Equal(new[] { first, second }, result.GetProperty("succeeded").EnumerateArray().Select(id => id.GetInt32()));
+        var failed = Assert.Single(result.GetProperty("failed").EnumerateArray());
+        Assert.Equal((999_999, "NOT_FOUND"), (failed.GetProperty("id").GetInt32(), failed.GetProperty("code").GetString()));
+        var store = api.Factory.CreateClient();
+        Assert.Equal(HttpStatusCode.NotFound, (await store.GetAsync($"/api/products/{first}", Ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await store.GetAsync($"/api/products/{second}", Ct)).StatusCode);
+    }
+
+    [Fact]
+    public async Task Deals_are_ended_in_bulk()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var id = await api.AddProductAsync(priceCents: 1000);
+        await admin.PutAsJsonAsync($"/api/admin/products/{id}/deal", new { dealPriceCents = 750 }, Ct);
+
+        await admin.PostAsJsonAsync("/api/admin/products/bulk", new { ids = new[] { id }, action = "end_deal" }, Ct);
+
+        var product = await GetAsync(admin, id);
+        Assert.Equal(1000, product.GetProperty("priceCents").GetInt32());
+        Assert.Equal(JsonValueKind.Null, product.GetProperty("compareAtPriceCents").ValueKind);
+    }
+
+    [Fact]
+    public async Task Products_are_moved_to_another_category_in_bulk()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var first = await api.AddProductAsync();
+        var second = await api.AddProductAsync();
+        int brushes;
+        await using (var db = api.CreateContext())
+        {
+            var category = db.Categories.Add(new Category { Name = $"Brushes {Guid.NewGuid():N}"[..20], ImageKey = "seed/categories/paint.jpg" }).Entity;
+            await db.SaveChangesAsync(Ct);
+            brushes = category.Id;
+        }
+
+        var nowhere = await admin.PostAsJsonAsync("/api/admin/products/bulk", new { ids = new[] { first }, action = "move" }, Ct);
+        await admin.PostAsJsonAsync("/api/admin/products/bulk", new { ids = new[] { first, second }, action = "move", categoryId = brushes }, Ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, nowhere.StatusCode);
+        Assert.True((await BodyOf(nowhere)).GetProperty("errors").TryGetProperty("categoryId", out _));
+        Assert.Equal(brushes, (await GetAsync(admin, first)).GetProperty("categoryId").GetInt32());
+        Assert.Equal(brushes, (await GetAsync(admin, second)).GetProperty("categoryId").GetInt32());
+    }
+
     private sealed record NewProduct(string Name, string Description, int CategoryId, int PriceCents, int Stock, string ImageKey);
 
     private async Task<NewProduct> NewProductAsync(HttpClient admin, string name, int priceCents = 1000, int stock = 10)

@@ -219,6 +219,39 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task Several_orders_move_on_at_once_and_each_follows_the_rules()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (_, first) = await PlacedOrderAsync();
+        var (_, second) = await PlacedOrderAsync();
+        var (_, cancelled) = await PlacedOrderAsync();
+        await UpdateAsync(admin, cancelled, await GetAsync(admin, cancelled), "cancelled");
+
+        var response = await admin.PostAsJsonAsync("/api/admin/orders/bulk-status",
+            new { orderNumbers = new[] { first, second, cancelled, "ZZZZZZZZ" }, status = "shipped" }, Ct);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await BodyOf(response);
+        Assert.Equal(new[] { first, second }, result.GetProperty("succeeded").EnumerateArray().Select(n => n.GetString()));
+        var failed = result.GetProperty("failed").EnumerateArray().ToDictionary(f => f.GetProperty("id").GetString()!, f => f.GetProperty("code").GetString());
+        Assert.Equal("STATUS_NOT_ALLOWED", failed[cancelled]);
+        Assert.Equal("NOT_FOUND", failed["ZZZZZZZZ"]);
+        Assert.Equal("shipped", (await GetAsync(admin, first)).GetProperty("status").GetString());
+        Assert.Equal("cancelled", (await GetAsync(admin, cancelled)).GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task Cancelling_in_bulk_puts_stock_back_as_one_at_a_time_does()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (sale, number) = await PlacedOrderAsync(quantity: 2, stock: 5);
+
+        await admin.PostAsJsonAsync("/api/admin/orders/bulk-status", new { orderNumbers = new[] { number }, status = "cancelled" }, Ct);
+
+        Assert.Equal(5, await StockOfAsync(sale.ProductId));
+    }
+
+    [Fact]
     public async Task An_unknown_order_is_not_found()
     {
         var admin = await api.CreateAdminClientAsync();

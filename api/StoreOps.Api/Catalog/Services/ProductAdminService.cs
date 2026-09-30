@@ -173,6 +173,45 @@ public sealed class ProductAdminService(AppDbContext db, ImageStorage images, Ti
         return await SaveAsync(product, ct);
     }
 
+    // Moves the product to another category. Moving it where it already is changes nothing.
+    public async Task<(AdminProductResponse? Product, ApiError? Error)> MoveAsync(
+        int id, int categoryId, int adminId, CancellationToken ct)
+    {
+        var product = await db.Products.SingleOrDefaultAsync(p => p.Id == id, ct);
+        if (product is null)
+            return (null, ApiError.NotFound);
+        if (product.ArchivedAtUtc is not null)
+            return (null, CatalogErrors.ProductArchived);
+        if (product.CategoryId == categoryId)
+            return (await GetAsync(id, ct), null);
+        if (!await db.Categories.AnyAsync(c => c.Id == categoryId, ct))
+            return (null, CatalogErrors.UnknownCategory);
+
+        product.CategoryId = categoryId;
+        db.ActivityLog.Add(Activity.Entry(
+            ActivityAction.ProductUpdated, ActivityEntity.Product, id, adminId, new { name = product.Name, categoryId }, clock));
+
+        return await SaveAsync(product, ct);
+    }
+
+    // The same actions for many products at once, with a report of what each one did
+    public async Task<(BulkResult<int>? Result, ApiError? Error)> BulkAsync(ProductBulkRequest request, int adminId, CancellationToken ct)
+    {
+        if (request.Action == ProductBulkAction.Move)
+        {
+            if (request.CategoryId is not { } categoryId || !await db.Categories.AnyAsync(c => c.Id == categoryId, ct))
+                return (null, CatalogErrors.UnknownCategory);
+        }
+
+        var result = await Bulk.RunAsync(db, request.Ids, async id => (request.Action switch
+        {
+            ProductBulkAction.Archive => await ArchiveAsync(id, adminId, ct),
+            ProductBulkAction.EndDeal => await EndDealAsync(id, adminId, ct),
+            _ => await MoveAsync(id, request.CategoryId!.Value, adminId, ct),
+        }).Error);
+        return (result, null);
+    }
+
     // Puts an archived product back in the store, unless another product has taken its name
     public async Task<(AdminProductResponse? Product, ApiError? Error)> RestoreAsync(int id, int adminId, CancellationToken ct)
     {

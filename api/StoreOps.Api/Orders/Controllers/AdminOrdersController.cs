@@ -25,6 +25,12 @@ public sealed class AdminOrdersController(AdminOrderService orders) : AdminContr
     public async Task<ActionResult<AdminOrderResponse>> Get([StringLength(20)] string orderNumber, CancellationToken ct) =>
         await orders.GetAsync(orderNumber, ct) is { } order ? order : NotFound();
 
+    // The table's bulk bar. Each order follows the same rules as on its own page; the answer says
+    // which ones changed and why the others didn't.
+    [HttpPost("bulk-status")]
+    public async Task<BulkResult<string>> BulkStatus(BulkOrderStatusRequest request, CancellationToken ct) =>
+        await orders.BulkChangeStatusAsync(request, AdminId, ct);
+
     [HttpPut("{orderNumber}")]
     [ProducesResponseType<AdminOrderResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update([StringLength(20)] string orderNumber, UpdateOrderRequest request, CancellationToken ct)
