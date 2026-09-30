@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table"
 import { OrderRow } from "@/components/tables/OrderRow"
-import { findAllOrdersForAdmin } from "@/lib/actions/admin.actions"
+import { findAllOrdersForAdmin } from "@/lib/data/admin"
 import SearchBar from "@/components/forms/SearchBar"
 import Pagination from "@/components/shared/Pagination"
 

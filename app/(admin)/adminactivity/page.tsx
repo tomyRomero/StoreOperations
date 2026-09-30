@@ -1,6 +1,6 @@
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import ActivityCard from "@/components/cards/ActivityCard";
-import { getAllActivity } from "@/lib/actions/store.actions";
+import { getAllActivity } from "@/lib/data/admin";
 import Pagination from "@/components/shared/Pagination";
 
 const Page = async ({

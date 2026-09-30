@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 import Cors from "micro-cors";
 import Stripe from 'stripe';
 import { headers } from "next/headers";
-import { createOrder, removeCheckout, removeUserCart, updateProductStockAfterPurchase } from "@/lib/actions/store.actions";
+import { createOrder, getUserContact, removeCheckout, removeUserCart, updateProductStockAfterPurchase } from "@/lib/orders";
 import axios from "axios";
-import { getUser } from "@/lib/actions/admin.actions";
 
 const cors = Cors({
     allowMethods: ["POST", "HEAD"],
@@ -126,7 +125,7 @@ export async function POST(req: any) {
             const currentURL = process.env.AXIOS_URL;
             
             //Get User Information to send Email to Customer
-            const user = await getUser(userId)
+            const user = (await getUserContact(userId)) ?? { email: "", username: "" }
 
             const nodeMailerData = {
                 email: user.email,

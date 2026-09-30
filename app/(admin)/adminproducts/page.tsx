@@ -3,7 +3,7 @@ import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components
 import Link from "next/link";
 import ProductRow from "@/components/tables/ProductRow";
 import Pagination from "@/components/shared/Pagination";
-import { findProductsAdmin } from "@/lib/actions/admin.actions";
+import { findProductsAdmin } from "@/lib/data/admin";
 import SearchBar from "@/components/forms/SearchBar";
 
 export default async function Page({

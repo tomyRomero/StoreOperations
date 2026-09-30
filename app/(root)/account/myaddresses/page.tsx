@@ -3,7 +3,7 @@ import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card }
 import { Button } from "@/components/ui/button"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getUserAddresses } from "@/lib/actions/store.actions";
+import { getCurrentUserAddresses } from "@/lib/data/account";
 import AddressCard from "@/components/cards/AddressCard";
 import Link from "next/link";
 import { Address } from "@/app/types/global";
@@ -15,7 +15,7 @@ const page = async () => {
   let user = ""
   if(session)
   {
-    addresses = await getUserAddresses(session.user.id)
+    addresses = await getCurrentUserAddresses()
     
     user = session.user.id
 

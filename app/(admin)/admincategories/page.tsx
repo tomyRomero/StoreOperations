@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table";
 import Link from "next/link";
-import { getAllCategoriesAdmin } from '@/lib/actions/admin.actions';
+import { getAllCategoriesAdmin } from '@/lib/data/admin';
 import CategoryRow from '@/components/tables/CategoryRow';
 import Pagination from '@/components/shared/Pagination';
 import SearchBar from '@/components/forms/SearchBar';

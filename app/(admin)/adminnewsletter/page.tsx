@@ -1,6 +1,6 @@
 import NewsletterSubscribers from "@/components/cards/NewsletterSubscribers";
 import NewsletterForm from "@/components/forms/NewsletterForm";
-import { getAllSubscribedEmails } from "@/lib/actions/store.actions";
+import { getAllSubscribedEmails } from "@/lib/data/admin";
 
 const page = async ()=> {
 

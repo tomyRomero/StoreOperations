@@ -2,9 +2,7 @@ import { CardTitle, CardHeader, Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CustomerOrder from "@/components/cards/CustomerOrder";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { findAllOrdersForUser } from "@/lib/actions/store.actions";
+import { findOrdersForCurrentUser } from "@/lib/data/account";
 import Pagination from "@/components/shared/Pagination";
 
 const page = async ({
@@ -16,20 +14,13 @@ const page = async ({
   let isNext = false;
 
   try {
-    // Attempt to get session
-    const session = await getServerSession(authOptions);
+    const results = await findOrdersForCurrentUser(
+      searchParams.page ? +searchParams.page : 1,
+      2
+    );
 
-    if (session) {
-      // Attempt to get orders for the user
-      const results = await findAllOrdersForUser(
-        session.user.id,
-        searchParams.page ? +searchParams.page : 1,
-        2
-      );
-      
-      userOrders = results.orders;
-      isNext = results.isNext;
-    }
+    userOrders = results.orders;
+    isNext = results.isNext;
   } catch (error) {
     console.error("Failed to fetch session or orders:", error);
     return (

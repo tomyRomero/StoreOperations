@@ -1,7 +1,7 @@
 import DeleteDeal from '@/components/cards/DealDetails';
 import MakeDealForm from '@/components/forms/MakeDealForm';
 import ErrorMessage from '@/components/shared/Error';
-import { findProductForDeal } from '@/lib/actions/store.actions';
+import { findProductForDeal } from '@/lib/data/admin';
 import { redirect } from 'next/navigation';
 import React from 'react'
 

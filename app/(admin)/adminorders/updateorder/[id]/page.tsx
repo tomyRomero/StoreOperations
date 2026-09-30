@@ -1,10 +1,10 @@
 import OrderForm from "@/components/forms/OrderForm"
 import ErrorMessage from "@/components/shared/Error"
-import { findOrder } from "@/lib/actions/store.actions"
+import { findOrderForAdmin } from "@/lib/data/admin"
 
 const page = async ({ params }: { params: { id: string } }) => {
 
-  const order = await findOrder(params.id)
+  const order = await findOrderForAdmin(params.id)
 
   if(!order)
   {

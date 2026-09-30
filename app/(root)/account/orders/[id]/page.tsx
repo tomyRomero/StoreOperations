@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { findOrder } from "@/lib/actions/store.actions";
+import { findOrderForCurrentUser } from "@/lib/data/account";
 import { Card } from "@/components/ui/card";
 import { Order } from "@/app/types/global";
 import CustomerOrderDetailsCards from "@/components/cards/CustomerOrderDetailsCards";
 
 const page = async ({ params }: { params: { id: string } }) =>  {
 
-  const order:Order= await findOrder(params.id)
+  const order:Order= await findOrderForCurrentUser(params.id)
 
   if(!order)
   {

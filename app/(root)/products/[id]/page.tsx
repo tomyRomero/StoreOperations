@@ -1,8 +1,7 @@
 import ProductDetails from '@/components/cards/ProductDetails'
-import { findProductWithDeal, getAllProductsWithoutSort, insideCart } from '@/lib/actions/store.actions'
+import { findProductWithDeal, getAllProductsWithoutSort } from '@/lib/data/catalog'
+import { isInCurrentUserCart } from '@/lib/data/account'
 import React from 'react'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 const page = async ({ params }: { params: { id: string } }) => {
@@ -19,15 +18,8 @@ const page = async ({ params }: { params: { id: string } }) => {
     params.id
   )
 
-  // Fetch user session
-  const session = await getServerSession(authOptions);
-
-  const userId = session?.user.id
-
-  // Check if the product is in the user's cart
-  let result = false
-  if(userId)
-  result = await insideCart(userId, params.id)
+  // Check if the product is in the signed-in user's cart (false for guests)
+  const result = await isInCurrentUserCart(params.id)
 
   if(!product)
   {

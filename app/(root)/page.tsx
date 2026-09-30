@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import Categories from "@/components/home/Categories";
 import Promotion from "@/components/home/Promotion";
 import { redirect } from "next/navigation";
-import { getAllCategories, getDeals } from "@/lib/actions/store.actions";
+import { getAllCategories, getDeals } from "@/lib/data/catalog";
 
 export default async function Home() {
 

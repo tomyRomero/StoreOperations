@@ -1,7 +1,7 @@
 import SearchBar from '@/components/forms/SearchBar'
 import Pagination from '@/components/shared/Pagination'
 import { Button } from '@/components/ui/button';
-import { getAllProductsWithSearch } from '@/lib/actions/store.actions';
+import { getAllProductsWithSearch } from '@/lib/data/catalog';
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react'

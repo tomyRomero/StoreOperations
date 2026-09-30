@@ -1,5 +1,5 @@
 import UsersTable from "@/components/tables/UsersTable";
-import { fetchUsers } from "@/lib/actions/admin.actions";
+import { fetchUsers } from "@/lib/data/admin";
 import Pagination from "@/components/shared/Pagination";
 import SearchBar from "@/components/forms/SearchBar";
 

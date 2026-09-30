@@ -2,13 +2,13 @@ import OrderDetailsCards from "@/components/cards/OrderDetailsCards";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { findOrder } from "@/lib/actions/store.actions";
+import { findOrderForAdmin } from "@/lib/data/admin";
 import { Card } from "@/components/ui/card";
 import { Order } from "@/app/types/global";
 
 const page = async ({ params }: { params: { id: string } }) =>  {
 
-  const order:Order= await findOrder(params.id)
+  const order:Order= await findOrderForAdmin(params.id)
   console.log("order:", order)
 
   if(!order)
