@@ -1,13 +1,23 @@
+using System.Globalization;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StoreOps.Api.Data;
+using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Tests.Infrastructure;
 
 // The whole API running in memory against its own test database
 public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : DatabaseFixture(sql)
 {
+    // The password of every account the helpers below create
+    public const string Password = "Paint-Brush-2026!";
+
     private Task? _demoStore;
 
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
@@ -23,6 +33,44 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
     }
 
     public override async ValueTask DisposeAsync() => await Factory.DisposeAsync();
+
+    // A new customer account, already signed in
+    public async Task<HttpClient> CreateCustomerClientAsync()
+    {
+        var client = Factory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/auth/register", new
+        {
+            username = $"u-{Guid.NewGuid():N}"[..20],
+            email = $"{Guid.NewGuid():N}@example.test",
+            password = Password,
+        });
+        response.EnsureSuccessStatusCode();
+        return client;
+    }
+
+    // A new admin account, already signed in. The API re-reads roles from the database on every
+    // request in tests, so the new role applies straight away.
+    public async Task<HttpClient> CreateAdminClientAsync()
+    {
+        var client = await CreateCustomerClientAsync();
+        var id = (await client.GetFromJsonAsync<JsonElement>("/api/auth/me")).GetProperty("id").GetInt32();
+
+        await using var scope = Factory.Services.CreateAsyncScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var added = await users.AddToRoleAsync((await users.FindByIdAsync(id.ToString(CultureInfo.InvariantCulture)))!, Roles.Admin);
+        Assert.True(added.Succeeded);
+        return client;
+    }
+
+    // Uploads a tiny JPEG as the given admin and returns its key
+    public async Task<string> UploadImageAsync(HttpClient admin)
+    {
+        var file = new ByteArrayContent([0xFF, 0xD8, 0xFF, 0xE0, .. "test image"u8]);
+        file.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+        var response = await admin.PostAsync("/api/admin/images", new MultipartFormDataContent { { file, "file", "test.jpg" } });
+        response.EnsureSuccessStatusCode();
+        return (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("key").GetString()!;
+    }
 
     private sealed class ApiFactory(string connectionString, string s3ServiceUrl) : WebApplicationFactory<Program>
     {
