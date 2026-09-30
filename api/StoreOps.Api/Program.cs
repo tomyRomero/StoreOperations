@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Auth;
+using StoreOps.Api.Catalog.Services;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 using StoreOps.Api.Images;
@@ -37,6 +38,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 builder.Services.AddImageStorage();
+builder.Services.AddScoped<CatalogService>();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);

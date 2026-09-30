@@ -1,13 +1,20 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Logging;
+using StoreOps.Api.Data;
 
 namespace StoreOps.Api.Tests.Infrastructure;
 
 // The whole API running in memory against its own test database
 public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : DatabaseFixture(sql)
 {
+    private Task? _demoStore;
+
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
+
+    // For test classes that read the demo store: builds it the first time it's asked for, then reuses
+    // it. Tests in one class run one at a time, so there is no race.
+    public Task SeedDemoStoreAsync() => _demoStore ??= DevSeeder.RunAsync(Factory.Services);
 
     public override async ValueTask InitializeAsync()
     {
