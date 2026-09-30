@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StoreOps.Api.Data;
@@ -60,6 +61,36 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
         var added = await users.AddToRoleAsync((await users.FindByIdAsync(id.ToString(CultureInfo.InvariantCulture)))!, Roles.Admin);
         Assert.True(added.Succeeded);
         return client;
+    }
+
+    // Signs in to an existing account, such as the demo customer
+    public async Task<HttpClient> SignInAsync(string email, string password)
+    {
+        var client = Factory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/auth/login", new { email, password });
+        response.EnsureSuccessStatusCode();
+        return client;
+    }
+
+    // A product in the store (or archived), straight in the database, for tests that aren't about the catalog
+    public async Task<int> AddProductAsync(int priceCents = 1000, int stock = 10, bool archived = false)
+    {
+        await using var db = CreateContext();
+        var category = await db.Categories.FirstOrDefaultAsync(c => c.Name == "Test supplies")
+            ?? db.Categories.Add(new Category { Name = "Test supplies", ImageKey = "seed/categories/paint.jpg" }).Entity;
+        var product = new Product
+        {
+            Category = category,
+            Name = $"Test product {Guid.NewGuid():N}",
+            Description = "Made for a test.",
+            PriceCents = priceCents,
+            Stock = stock,
+            ImageKey = "seed/products/oilpaint.jpg",
+            ArchivedAtUtc = archived ? DateTime.UtcNow : null,
+        };
+        db.Products.Add(product);
+        await db.SaveChangesAsync();
+        return product.Id;
     }
 
     // Uploads a tiny JPEG as the given admin and returns its key
