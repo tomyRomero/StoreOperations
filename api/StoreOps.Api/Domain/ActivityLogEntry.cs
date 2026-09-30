@@ -32,6 +32,7 @@ public enum ActivityAction
     ProductCreated,
     ProductUpdated,
     ProductArchived,
+    ProductRestored,
     DealStarted,
     DealEnded,
     CategoryCreated,
