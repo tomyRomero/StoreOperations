@@ -13,6 +13,16 @@ public static class ApiProblems
         return result;
     }
 
+    // A refusal decided by a service: a coded problem, or a field error when it belongs to one input
+    public static IActionResult ErrorResponse(this ControllerBase controller, ApiError error)
+    {
+        if (error.Field is null)
+            return controller.CodedProblem(error.Status, error.Code, error.Message);
+
+        controller.ModelState.AddModelError(error.Field, error.Message);
+        return controller.ValidationProblem(controller.ModelState);
+    }
+
     // For responses written outside a controller (authentication events, the rate limiter)
     public static async Task WriteAsync(HttpContext context, int statusCode, string code, string detail)
     {
@@ -25,8 +35,16 @@ public static class ApiProblems
     }
 }
 
+// A request a service refused: its status, a stable code and a message. With a Field, it is
+// reported as a validation error on that input instead, so a form can show it in place.
+public sealed record ApiError(int Status, string Code, string Message, string? Field = null)
+{
+    public static readonly ApiError NotFound = new(StatusCodes.Status404NotFound, ErrorCodes.NotFound, "That doesn't exist.");
+}
+
 public static class ErrorCodes
 {
+    public const string NotFound = "NOT_FOUND";
     public const string NotSignedIn = "NOT_SIGNED_IN";
     public const string Forbidden = "FORBIDDEN";
     public const string InvalidCredentials = "INVALID_CREDENTIALS";

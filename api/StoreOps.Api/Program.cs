@@ -39,6 +39,7 @@ builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 builder.Services.AddImageStorage();
 builder.Services.AddScoped<CatalogService>();
+builder.Services.AddScoped<CategoryAdminService>();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
