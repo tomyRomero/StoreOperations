@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
@@ -49,6 +50,7 @@ public static class AdminCommands
             EntityType = ActivityEntity.User,
             EntityId = user.Id,
             OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
+            DetailsJson = JsonSerializer.Serialize(new { username = user.UserName }),
         });
 
         // Identity saves through the same database context, so the role and the activity entry are saved together

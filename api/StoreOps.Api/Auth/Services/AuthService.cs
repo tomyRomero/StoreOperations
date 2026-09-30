@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -119,6 +120,7 @@ public sealed class AuthService(
                     EntityType = ActivityEntity.User,
                     EntityId = user.Id,
                     OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
+                    DetailsJson = JsonSerializer.Serialize(new { username = user.UserName }),
                 });
                 await emails.AddWelcomeAsync(user.UserName!, user.Email!, ct);
                 await db.SaveChangesAsync(ct);
