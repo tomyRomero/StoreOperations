@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace StoreOps.Api.Domain;
 
 // A paid order. Created only by the Stripe webhook, from a completed checkout.
@@ -83,6 +85,8 @@ public enum Carrier
 {
     Ups,
     Usps,
+    // "fedex" in JSON rather than the naming policy's "fed_ex"
+    [JsonStringEnumMemberName("fedex")]
     FedEx,
     Dhl,
     Other,

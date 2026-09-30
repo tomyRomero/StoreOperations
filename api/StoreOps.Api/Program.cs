@@ -9,6 +9,7 @@ using StoreOps.Api.Catalog.Services;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 using StoreOps.Api.Images;
+using StoreOps.Api.Orders.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,7 @@ builder.Services.AddScoped<CategoryAdminService>();
 builder.Services.AddScoped<ProductAdminService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<OrderHistoryService>();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
