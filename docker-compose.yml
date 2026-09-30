@@ -2,11 +2,43 @@
 #   docker compose up -d     start everything
 #   docker compose down      stop (data is kept in named volumes)
 #   docker compose down -v   stop and delete all local data
+#
+# Every port is bound to 127.0.0.1, so these services are reachable from this
+# machine only. The project name keeps containers and volumes separate from
+# other local projects (for example another project's SQL Server on port 1433).
+name: storeops
+
 services:
+  # SQL Server for the .NET API. Port 14330 on this machine, not the default 1433.
+  # The image is x64 only. On Apple Silicon it needs Docker Desktop's
+  # "Use Rosetta for x86_64/amd64 emulation" setting (it crashes under QEMU).
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      # Read from the gitignored .env next to this file. There is deliberately no default.
+      MSSQL_SA_PASSWORD: ${STOREOPS_SQL_PASSWORD:?Set STOREOPS_SQL_PASSWORD in .env (copy .env.example)}
+    ports:
+      - "127.0.0.1:14330:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    # A hard cap, so this container can never take memory from other projects' containers.
+    # SQL Server refuses to start with less than 2 GB.
+    mem_limit: 2g
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q \"SELECT 1\" > /dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 60s
+
+  # MongoDB for the Next.js app until the move to the API is finished
   mongo:
     image: mongo:7
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
@@ -25,7 +57,7 @@ services:
       COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3mockroot
       COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - s3-data:/s3mockroot
 
@@ -33,9 +65,10 @@ services:
   mailpit:
     image: axllent/mailpit:v1.24
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
 
 volumes:
+  sqlserver-data:
   mongo-data:
   s3-data:
