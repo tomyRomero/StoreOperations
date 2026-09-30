@@ -6,6 +6,7 @@ using StoreOps.Api.Account.Services;
 using StoreOps.Api.Auth;
 using StoreOps.Api.Cart.Services;
 using StoreOps.Api.Catalog.Services;
+using StoreOps.Api.Checkouts.Services;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 using StoreOps.Api.Images;
@@ -49,6 +50,7 @@ builder.Services.AddScoped<ProductAdminService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<OrderHistoryService>();
+builder.Services.AddScoped<CheckoutService>();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);

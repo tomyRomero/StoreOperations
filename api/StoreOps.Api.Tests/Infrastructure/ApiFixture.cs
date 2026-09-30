@@ -5,11 +5,13 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
+using StoreOps.Api.Payments;
 
 namespace StoreOps.Api.Tests.Infrastructure;
 
@@ -23,6 +25,9 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
 
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
 
+    // Stripe, as the API sees it in tests
+    public FakePayments Payments { get; } = new();
+
     // For test classes that read the demo store: builds it the first time it's asked for, then reuses
     // it. Tests in one class run one at a time, so there is no race.
     public Task SeedDemoStoreAsync() => _demoStore ??= DevSeeder.RunAsync(Factory.Services);
@@ -30,7 +35,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
     public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
-        Factory = new ApiFactory(ConnectionString, s3.ServiceUrl);
+        Factory = new ApiFactory(ConnectionString, s3.ServiceUrl, Payments);
     }
 
     public override async ValueTask DisposeAsync() => await Factory.DisposeAsync();
@@ -103,7 +108,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
         return (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("key").GetString()!;
     }
 
-    private sealed class ApiFactory(string connectionString, string s3ServiceUrl) : WebApplicationFactory<Program>
+    private sealed class ApiFactory(string connectionString, string s3ServiceUrl, FakePayments payments) : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -115,6 +120,10 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
             builder.UseSetting("Storage:ForcePathStyle", "true");
             builder.UseSetting("Storage:AccessKey", "test");
             builder.UseSetting("Storage:SecretKey", "test");
+            // A test-mode key, so checkout is switched on; every Stripe call goes to FakePayments
+            builder.UseSetting("Stripe:SecretKey", "sk_test_not_a_real_key");
+            builder.UseSetting("Stripe:WebhookSecret", StripeEvents.WebhookSecret);
+            builder.ConfigureTestServices(services => services.AddSingleton<IPayments>(payments));
             // Re-check sign-in cookies on every request, so signing out other sessions is visible at once
             builder.UseSetting("Auth:SecurityStampValidationInterval", "00:00:00");
             // Every test request comes from the same in-memory address, so the per-address limit is
