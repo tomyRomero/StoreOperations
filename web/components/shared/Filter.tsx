@@ -5,10 +5,7 @@ import { RadioButton } from './Radio';
 import { Checkbox } from './Checkbox';
 import { useRouter } from 'next/navigation';
 
-interface Category{
-  id: string,
-  title: string
-}
+import type { Category } from '@/lib/api/types';
 
 interface Props{
   categoriesList: Category[],
@@ -19,7 +16,7 @@ interface Props{
 const Filters = ({categoriesList, categoryParams, sortParams}: Props) => {
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(categoryParams);
-  const [selectedSort, setSelectedSort] = useState<string>(sortParams? sortParams : "lowest");
+  const [selectedSort, setSelectedSort] = useState<string>(sortParams? sortParams : "cheapest");
 
   const router = useRouter()
 
@@ -78,14 +75,14 @@ const Filters = ({categoriesList, categoryParams, sortParams}: Props) => {
       <div> 
         <h6 className="whitespace-nowrap text-heading4-bold">Product Categories</h6>
         <div className="flex flex-col gap-4 md:flex-row mt-4 xl:flex-col">
-          {categoriesList?.map((category: Category) => {
+          {categoriesList?.map((category) => {
             return (
               <Checkbox
                 key={category.id}
-                label={category.title}
-                value={category.id}
-                isSelected={selectedCategories.includes(category.title)}
-                onClickHandler={() => handleCategoryClick(category.title)}
+                label={category.name}
+                value={String(category.id)}
+                isSelected={selectedCategories.includes(String(category.id))}
+                onClickHandler={() => handleCategoryClick(String(category.id))}
               />
             );
           })}
@@ -98,15 +95,15 @@ const Filters = ({categoriesList, categoryParams, sortParams}: Props) => {
           <RadioButton
             label="Lowest"
             value="Lowest"
-            isSelected={selectedSort === "lowest"}
-            onRadioChange={() => handleSortChange("lowest")}
+            isSelected={selectedSort === "cheapest"}
+            onRadioChange={() => handleSortChange("cheapest")}
             groupName="sort"
           />
           <RadioButton
             label="Highest"
             value="Highest"
-            isSelected={selectedSort === "highest"}
-            onRadioChange={() => handleSortChange("highest")}
+            isSelected={selectedSort === "priciest"}
+            onRadioChange={() => handleSortChange("priciest")}
             groupName="sort"
           />
         </div>

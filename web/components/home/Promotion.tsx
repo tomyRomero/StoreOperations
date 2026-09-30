@@ -5,21 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import DealCard from '../cards/DealCard';
 import { promotionInclusions } from '@/lib/constants';
+import type { Product } from '@/lib/api/types';
 
-interface Deal {
-  stripeProductId: string;
-  name: string;
-  description: string;
-  stock: string;
-  price: string;
-  category: string;
-  photo: string;
-  date: string;
-  oldPrice: string; 
-  dealDescription: string; 
-}
-
-const Promotion = ({ deals }: { deals: Deal[] }) => {
+const Promotion = ({ deals }: { deals: Product[] }) => {
 
 
 
@@ -78,8 +66,8 @@ const Promotion = ({ deals }: { deals: Deal[] }) => {
       </ul>
     </div>
     <div className="mx-auto mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {deals.map((deal: Deal, index) => (
-         <DealCard key={index} id={deal.stripeProductId} photo={deal.photo} name={deal.name} oldPrice={deal.oldPrice} price={deal.price} dealDescription={deal.dealDescription} />
+        {deals.map((deal) => (
+         <DealCard key={deal.id} product={deal} />
         ))}
     </div>
     <div className='mt-6'>

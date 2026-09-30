@@ -1,151 +1,48 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ProductType } from "@/app/types/global"
 import Image from "next/image"
-import { useEffect, useState } from "react"
-import { getImageData, getRes } from "@/lib/s3"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { addProductToCart } from "@/lib/actions/store.actions"
-import { useSession } from "next-auth/react"
-import { useAppContext } from "@/lib/AppContext"
+import type { Product } from "@/lib/api/types"
+import { formatMoney } from "@/lib/money"
+import { useCart } from "../cart/CartProvider"
 import ProductCard from "./ProductCard"
-import Loading from "@/app/(auth)/loading"
 import { toast } from "../ui/use-toast"
 
-type ProductDetailsType = ProductType & {
-  result: boolean;
-  oldPrice: string;
-  serverProducts: ProductType[]
-};
-
-
-const ProductDetails = ({stripeProductId, name, description, stock, photo, price, category, result, serverProducts , deal, oldPrice}: ProductDetailsType)=> {
- 
-    const { data: session } = useSession();
-    const [inCart, setInCart] = useState(result);
-    const [img, setImg] = useState("/assets/spinner.svg")
+const ProductDetails = ({ product, related }: { product: Product; related: Product[] }) => {
     const router = useRouter();
-    const {cart, setCart} = useAppContext();
+    const cart = useCart();
     const [loading, setLoading] = useState(false);
-    const [mounted, setMounted] = useState(false)
 
-    const {productAdjusted, setProductAdjusted} = useAppContext()
-
-    useEffect(() => { 
-      const load = async () => {
-      
-      let res = '/assets/profile.png'
-      try{
-      res = await getImageData(photo)
-      }catch(error)
-      {
-        console.warn('Error fetching image from server')
-      }
-
-      setImg(res);
-
-      if (!result && !session) {
-        // If result is false, check localStorage
-        const localStorageCartString = localStorage.getItem('cart');
-        if (localStorageCartString) {
-          // If localStorage has cart data, parse it and check if the product is in the cart
-          const localStorageCart = JSON.parse(localStorageCartString);
-          console.log("localstorage: ", localStorageCart)
-          
-         
-          setInCart(localStorageCart?.some((item: { product: string }) => item.product === stripeProductId));
-          
-        } else {
-          // If localStorage doesn't have cart data, check the global state cart
-          setInCart(cart.some(item => item.product === stripeProductId));
-        }
-      }
-
-      setMounted(true)
-    }
-    
-    load()
-  
-  }, [])
+    const { name, description, stock, categoryName: category, imageUrl: img } = product;
+    const deal = product.compareAtPriceCents !== null;
+    const price = formatMoney(product.priceCents);
+    const oldPrice = product.compareAtPriceCents !== null ? formatMoney(product.compareAtPriceCents) : "";
+    const inCart = cart.isInCart(product.id);
 
   const goBack = ()=> {
     router.back();
   }
 
- 
-  const addToCartLocally = ()=> {
-    setCart((prevCart: {product: string, quantity:number}[]) => {
-      const productIndex = prevCart.findIndex((item) => item.product === stripeProductId);
-  
-      if (productIndex !== -1) {
-        // If the product is found, adjust the quantity
-        const updatedCart = [...prevCart];
-        updatedCart[productIndex] = { ...prevCart[productIndex], quantity: prevCart[productIndex].quantity + 1 };
-        
-        // Save the updated cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(updatedCart));
-        return updatedCart;
-      } else {
-        // If the product is not found, add a new product
-        const newCart = [...prevCart, { product: stripeProductId, quantity: 1 }];
-        // Save the new cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(newCart));
-        return newCart;
-      }
-    });
-    
-  }
-  
-
+  // The cart checks stock ("Only 3 left") and says why when it can't add
   const addToCart = async ()=> {
-    setLoading(true)
-
-    //If item is already in cart redirect to the cart
     if(inCart)
     {
       router.push("/cart")
-    }else{
-
-      //If User is logged in, add product to the cart on the server to the database
-      if(session)
-      {
-        const added = await addProductToCart(session.user.id, stripeProductId)
-
-        if(added)
-        {
-          setInCart(true)
-           //Call global state to let the app know a product in the cart was added
-          setProductAdjusted(!productAdjusted)
-          toast({
-            title: "Added to Cart",
-          })
-        }else
-        {
-          toast({
-            title: "Error adding product to cart",
-            description: "There was an error and the item failed to be added onto the database. Please try again", 
-            variant: "destructive",
-          })
-        }
-      }else{
-        //If user is not logged in, add the product to the cart to the local storage
-        addToCartLocally();
-        setInCart(true)
-         //Call global state to let the app know a product in the cart was added
-        setProductAdjusted(!productAdjusted)
-        toast({
-          title: "Added to Cart",
-        })
-      }
+      return;
     }
-    
+
+    setLoading(true)
+    if (await cart.add(product.id)) {
+      toast({
+        title: "Added to Cart",
+      })
+    }
     setLoading(false)
   }
 
   return (
-    <>
-    {mounted ?  (
       <>
     <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-start mx-auto pt-4 max-md:pt-6">
       <div className="flex lg:hidden mb-4">
@@ -162,13 +59,13 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
       <div className="flex items-start lg:hidden">
           <h1 className="font-bold text-heading3-bold">{name}</h1>
           {deal ? ( 
-          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">${oldPrice}</span>  <span className="text-green-500">${price}</span></div>) 
+          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">{oldPrice}</span>  <span className="text-green-500">{price}</span></div>) 
           : 
-           <div className="text-heading3-bold font-bold ml-auto text-green-500">${price}</div>}
+           <div className="text-heading3-bold font-bold ml-auto text-green-500">{price}</div>}
         </div>
         <div className="flex items-start lg:hidden">
           <small className="text-body-semibold leading-none text-gray-500">{category.toLocaleLowerCase()}</small>
-          <h4 className={`ml-auto ${Number(stock) > 0 ? "text-green-500" : "text-red-500"}` }>{Number(stock) > 0 ? "In Stock" : "Out of stock"}</h4>
+          <h4 className={`ml-auto ${stock > 0 ? "text-green-500" : "text-red-500"}` }>{stock > 0 ? "In Stock" : "Out of stock"}</h4>
         </div>
         <div className="lg:hidden">
           <p className="text-body-semibold">
@@ -220,13 +117,13 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
 
         <div className="flex flex-col">
         <small className="text-body-semibold leading-none text-gray-500">{category.toLocaleLowerCase()}</small>
-        <h4 className={`${Number(stock) > 0 ? "text-green-500" : "text-red-500"} pt-2` }>{Number(stock) > 0 ? "In Stock" : "Out of stock"}</h4>
+        <h4 className={`${stock > 0 ? "text-green-500" : "text-red-500"} pt-2` }>{stock > 0 ? "In Stock" : "Out of stock"}</h4>
         </div>
           </div>
           {deal ? ( 
-          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">${oldPrice}</span>  <span className="text-green-500">${price}</span></div>) 
+          <div className="text-heading3-bold font-bold ml-auto"><span className="text-red-500 line-through">{oldPrice}</span>  <span className="text-green-500">{price}</span></div>) 
           : 
-           <div className="text-heading3-bold font-bold ml-auto text-green-500">${price}</div>}
+           <div className="text-heading3-bold font-bold ml-auto text-green-500">{price}</div>}
         </div>
         <div>
         <p className="text-body-semibold max-lg:hidden">
@@ -253,23 +150,12 @@ const ProductDetails = ({stripeProductId, name, description, stock, photo, price
         <div className="container mx-auto px-4 py-6">
         <h2 className="text-heading3-bold font-bold mb-4">Related Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {serverProducts.map((product: any)=> (
-                  <ProductCard key={product.stripeProductId} 
-                  stripeProductId={product.stripeProductId} 
-                  name={product.name}
-                  description={product.description} 
-                  stock={product.stock} 
-                  price={product.price}
-                  category={product.category} 
-                  photo={product.photo}/>
+        {related.map((item)=> (
+                  <ProductCard key={item.id} product={item} />
                   ))}
         </div>
         </div>
         </>
-    ) : 
-    (<Loading />)
-    }
-    </>
   )
 }
 

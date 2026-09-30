@@ -8,6 +8,7 @@ import { AppProvider } from "@/lib/AppContext";
 import { redirect } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
+import { CartProvider } from "@/components/cart/CartProvider";
 import { getCurrentUser } from "@/lib/session";
 
 const jost = Jost({
@@ -39,6 +40,7 @@ export default async function RootLayout({
 
     <html lang="en">
     <CurrentUserProvider user={user}>
+    <CartProvider>
     <SessionProvider session={null}>
       <AppProvider>
       <body className={`${jost.className} flex flex-col`}>
@@ -54,6 +56,7 @@ export default async function RootLayout({
       </body>
       </AppProvider>
     </SessionProvider>
+    </CartProvider>
     </CurrentUserProvider>
   </html>
 

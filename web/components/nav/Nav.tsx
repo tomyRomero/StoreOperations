@@ -1,18 +1,15 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import {useRouter, usePathname } from "next/navigation";
-import { useSession } from 'next-auth/react';
 import { useCurrentUser } from '../CurrentUserProvider';
+import { useCart } from '../cart/CartProvider';
 import { useSignOut } from '@/lib/use-sign-out';
 import { signInPath } from '@/lib/sign-in-path';
-import { useAppContext } from '@/lib/AppContext';
-import { getCartItems } from '@/lib/actions/store.actions';
-import { syncLocalStorageWithServerCartClient } from '@/lib/utils';
 import MenuToggle from './MenuToggle';
 import { AnimatePresence } from 'framer-motion';
 import { motion as m } from 'framer-motion';
@@ -23,44 +20,12 @@ import { storeDetails } from '@/lib/constants';
 const Nav = () => {
 
   const [isActive, setIsActive] = useState(false);
-  const [cartNum, setCartNum] = useState(0)
+  const { itemCount: cartNum } = useCart();
 
-  const {productAdjusted, cart} = useAppContext();
   const router = useRouter();
-  // The cart count still reads the old session until the cart moves to the API
-  const { data: session } = useSession();
   const user = useCurrentUser();
   const signOut = useSignOut();
   const currentPath =  usePathname();
-
- 
-  useEffect(()=> {
-    const getCartItemsNum = async ()=> {
-
-      if(session)
-      {
-        //If User is logged in check database for the cart
-        await syncLocalStorageWithServerCartClient(session.user.id);
-        const serverCart = await getCartItems(session.user.id)
-        setCartNum(serverCart.length)
-      }else{
-         // If user is not logged, check localStorage
-         const localStorageCartString = localStorage.getItem('cart');
-         if (localStorageCartString) {
-           // If localStorage has cart data, parse it and check if the product is in the cart
-           const localStorageCart = JSON.parse(localStorageCartString);
-           setCartNum(localStorageCart.length)
-         }else{
-          // If localStorage is empty check the cart global state as a final check
-          setCartNum(cart.length)
-         }
-      }
-    }
-
-    getCartItemsNum();
-
-   
-  }, [productAdjusted])
 
   const goAccount = ()=> {
     router.push("/account")
@@ -162,7 +127,7 @@ const Nav = () => {
 {isActive && (
   <m.div
     initial={{ scaleY: 0, originY: 0 }}
-    animate={{ scaleY: session? 0.7 : 0.6 }}
+    animate={{ scaleY: user? 0.7 : 0.6 }}
     exit={{ scaleY: 0 }}
     transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
     onClick={() => setIsActive(false)}

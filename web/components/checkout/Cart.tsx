@@ -4,141 +4,46 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import CartItem from "./CartItem";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Loading from "@/app/(auth)/loading";
-import { signIn, useSession } from "next-auth/react";
-import { findProduct, getCartItems, removeProductFromCart } from "@/lib/actions/store.actions";
-import { useAppContext } from "@/lib/AppContext";
-import { syncLocalStorageWithServerCartClient } from "@/lib/utils";
 import { toast } from "../ui/use-toast";
+import { useCart } from "../cart/CartProvider";
+import { useCurrentUser } from "../CurrentUserProvider";
+import { formatMoney } from "@/lib/money";
+import { signInPath } from "@/lib/sign-in-path";
 
-interface cartItem {
-  product: string;
-  quantity: number;
+type Props = {
+  shippingFlatRateCents: number | null;
+  freeShippingThresholdCents: number | null;
+};
 
-}
-
-const Cart = () => {
-  const [cartItems, setCartItems] = useState<cartItem[]>([])
-
-  //If all cartitems are in stock, procceed
-  const [proceed, setProceed] = useState(true);
-
-  //State for the overall total of the cart
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false);
-
-  //For when an cartitem gets deleted, use this
-  const [update , setUpdate] = useState(false); 
-
-   //Added for pagination of cart items
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-
+// The cart, priced by the API. Checkout opens once every line can be bought as it is.
+const Cart = ({ shippingFlatRateCents, freeShippingThresholdCents }: Props) => {
   const router = useRouter()
-  const currentPath =  usePathname();
-  const { data: session } = useSession();
+  const user = useCurrentUser();
+  const { cart } = useCart();
 
-  const goBack = ()=> {
-    router.back();
-  }
+  if (!cart) return <Loading />;
 
-  const { cart } = useAppContext();
-
-  useEffect(()=> {
-    const getProducts = async ()=> {
-      if(session)
-      {
-        //sync localstorage cart with server cart if it exists 
-        await syncLocalStorageWithServerCartClient(session.user.id);
-        //If User is logged in check database for the cart with products
-        const serverCart = await getCartItems(session.user.id)
-        setCartItems(serverCart)
-      }else{
-         // If user is not logged, check localStorage
-         const localStorageCartString = localStorage.getItem('cart');
-         if (localStorageCartString) {
-           // If localStorage has cart data, parse it and set cartItems
-           const localStorageCart = JSON.parse(localStorageCartString);
-           setCartItems(localStorageCart)
-          
-         }else{
-          // If localStorage is empty check the cart global state as a final check
-          setCartItems(cart)
-         }
-      }
-
-        setLoading(true)
-      }
-
-      getProducts();   
-    }
-
-  , [update])
-  //added update dependency incase an product gets edited I can refetch the cart
-
-    useEffect(()=> {
-      const getPrices = async ()=> {
-        
-        let prices:number[] = []
-        let stocks:boolean[] = []
-          //set default prices
-        await Promise.all(cartItems.map(async (element) => {
-          const data = await findProduct(element.product);
-          
-          if(data)
-          {
-            prices.push(data?.price * element.quantity)
-            stocks.push(element.quantity > data?.stock ? false : true)
-          }else{
-            prices.push(0)
-            stocks.push(false)
-          }
-         
-        }));
-
-        const newTotal = prices.reduce((acc, subtotal) => acc + subtotal, 0);
-        const inStock =  stocks.every((item) => item === true);
-        setTotal(newTotal)
-        setProceed(inStock)
-      }
-
-      getPrices()
-    }, [cartItems])
+  const freeShipping = freeShippingThresholdCents !== null && cart.subtotalCents >= freeShippingThresholdCents;
+  const shippingCents = cart.lines.length === 0 || freeShipping ? 0 : shippingFlatRateCents;
 
   const handleCheckout = ()=> {
-    if(!session){
-        // Set data in sessionStorage so user can navigate back to exact page after loggin in
-        sessionStorage.setItem('path', currentPath);
-        signIn()
-    }else{
-      if(proceed)
-      {
-        router.push("/checkout")
-      }else{
-        toast({
-          title: "Items Unavailable",
-          description: "Some cart items have exceeded stock, please remove those and try again.", 
-          variant: "destructive",
-        })
-      }
-      
+    if (!user) {
+      router.push(signInPath("/cart"))
+    } else if (cart.canCheckout) {
+      router.push("/checkout")
+    } else {
+      toast({
+        title: "Some items can't be bought",
+        description: "Change or remove the items marked in your cart, then try again.",
+        variant: "destructive",
+      })
     }
   }
 
-    // Calculate the index of the last item to be displayed on the current page
-  const indexOfLastItem = currentPage * itemsPerPage;
-
-  // Calculate the index of the first item to be displayed on the current page
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  // Slice the cartItems array to get the items for the current page
-  const currentCartItems = cartItems.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
-    <>
-    {loading ? (  <div >
+    <div>
           <div className="flex">
             <h1 className="text-heading3-bold font-semibold mb-6">Cart</h1>
             <Image
@@ -150,7 +55,7 @@ const Cart = () => {
           />
           </div>
         <div className="flex mb-4">
-         <Button className="flex px-2 border border-black" variant="ghost" onClick={goBack}>
+         <Button className="flex px-2 border border-black" variant="ghost" onClick={() => router.back()}>
           <Image
             src="/assets/back.png"
             alt="go back icon"
@@ -162,64 +67,35 @@ const Cart = () => {
       </div>
         <div className="grid gap-6 md:grid-cols-[2fr_1fr] md:gap-8">
 
-          {/* Cart Items */}
           <div className="flex flex-col gap-2">
-          {currentCartItems.map((cartItem, index) => (
-            <CartItem 
-            key={cartItem.product}
-            product={cartItem.product} 
-            quantity={cartItem.quantity} 
-            update={update} 
-            setUpdate={setUpdate}
-            />
-            
+          {cart.lines.map((line) => (
+            <CartItem key={line.productId} line={line} />
           ))}
 
-          {cartItems.length === 0 && 
+          {cart.lines.length === 0 &&
             <h1 className="p-4 text-heading2-bold">Cart is empty</h1>
           }
-
-          {/* Pagination */}
-          <div className={`pagination ${cartItems.length === 0 ? "!hidden" : ""}`}>
-            <Button
-              onClick={() => setCurrentPage((prevPage) => Math.max(1, prevPage - 1))}
-              disabled={currentPage === 1}
-              className="!text-small-regular text-light-2 bg-black"
-            >
-              Prev
-            </Button>
-            <p className="text-small-semibold text-black">{currentPage}</p>
-            <Button
-              onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
-              disabled={indexOfLastItem >= cartItems.length}
-              className={`!text-small-regular text-light-2 bg-black`}
-            >
-              Next
-            </Button>
           </div>
 
-          </div>
-
-          {/* Total Section */}
           <div className="space-y-4">
             <div className="p-4 rounded-lg border">
               <h2 className="font-semibold text-heading4-bold text-lg mb-4">Summary:</h2>
               <div className="flex justify-between mb-2">
                 <span>Subtotal:</span>
-                <span className="font-medium">${total.toFixed(2)}</span>
+                <span className="font-medium">{formatMoney(cart.subtotalCents)}</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Shipping:</span>
-                <span className="font-medium">$10.00</span>
+                <span className="font-medium">{shippingCents === null ? "At checkout" : shippingCents === 0 ? "Free" : formatMoney(shippingCents)}</span>
               </div>
               <div className="flex justify-between mb-4">
-                <span>Total without Tax:</span>
-                <span className="font-medium">${(total > 0 ? (total + 10.00) : (0)).toFixed(2)}</span>
+                <span>Total before tax:</span>
+                <span className="font-medium">{formatMoney(cart.subtotalCents + (shippingCents ?? 0))}</span>
               </div>
-              <Button className="w-full" onClick={handleCheckout}>
-                {session ? "Checkout" :  "Login to Checkout"}
+              <Button className="w-full" onClick={handleCheckout} disabled={cart.lines.length === 0}>
+                {user ? "Checkout" :  "Sign in to Checkout"}
               </Button>
-              <div className={`text-red-500 ${proceed ? 'hidden' : ''}`}>one or more items out of stock</div>
+              <div className={`text-red-500 ${cart.canCheckout || cart.lines.length === 0 ? 'hidden' : ''}`}>One or more items can&apos;t be bought as they are</div>
             </div>
             <div className="py-0.5">
             <Link className="hover:underline" href="/products" >
@@ -228,12 +104,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
-
-      </div>) : (
-        <Loading />        
-      )}
-
-      </>
+      </div>
   )
 }
 

@@ -1,14 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import CategoryCard from '../cards/CategoryCard';
+import type { Category } from '@/lib/api/types';
 
-interface Category{
-    id: string,
-    photo: string,
-    title: string
-}
-
-const Categories = ({data}: any) => {
+const Categories = ({data}: { data: Category[] }) => {
   if(!data || data.length === 0)
   {
     return null;
@@ -25,8 +20,8 @@ const Categories = ({data}: any) => {
       <div className="grid gap-8 md:grid-cols-3">
       {data.length > 0 && (
         <>
-          {data.map((category: Category, index: any) => (
-            <CategoryCard key={index} category={category} />
+          {data.map((category) => (
+            <CategoryCard key={category.id} category={category} />
           ))}
         </>
       )} 

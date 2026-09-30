@@ -1,7 +1,6 @@
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { syncLocalStorageWithServerCart } from "./actions/store.actions";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -27,25 +26,6 @@ export function dollarsToCents(dollarAmount: number) {
   const cents = Math.round(dollarAmount * 100);
   return cents;
 }
-
-export const syncLocalStorageWithServerCartClient = async (userId: string) => {
-  // Perform local storage operations to see if it exists
-  const localStorageCart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-  if (localStorageCart) {
-    // Call the server-side function to handle server operations
-    const syncResult = await syncLocalStorageWithServerCart(localStorageCart, userId);
-
-    if (syncResult.success) {
-      // Clear the local storage cart
-      localStorage.removeItem('cart');
-      console.log('Local storage cart cleared after successful synchronization.');
-    } else {
-      console.error('Failed to sync cart:', syncResult.message);
-    }
-  }
-};
-
 
 export const calculateTimeAgo = (currentDate: Date, eventTimestamp: string): string => {
   const eventDate = new Date(eventTimestamp);
