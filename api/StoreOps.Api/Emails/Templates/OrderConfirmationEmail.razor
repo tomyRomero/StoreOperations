@@ -1,0 +1,12 @@
+<EmailLayout StoreName="@Model.StoreName" SupportEmail="@Model.SupportEmail">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">Thanks for your order!</div>
+    <p style="text-align:center;color:#444444;">
+        Hello @Model.ShipTo.RecipientName, we've received your order and will let you know when it ships.
+    </p>
+    <OrderSummary Model="Model" />
+    <EmailButton Href="@Model.OrderUrl" Text="View your order" />
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public OrderEmailModel Model { get; set; } = null!;
+}

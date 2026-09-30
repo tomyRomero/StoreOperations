@@ -16,7 +16,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task A_paid_checkout_becomes_an_order()
     {
-        var sale = await PaidCheckoutAsync(priceCents: 1500, quantity: 2, stock: 5);
+        var sale = await api.PaidCheckoutAsync(priceCents: 1500, quantity: 2, stock: 5);
 
         var response = await StripeEvents.SendAsync(api.Factory.CreateClient(), StripeEvents.PaymentSucceeded(sale.Intent));
 
@@ -46,7 +46,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task A_webhook_delivered_again_or_twice_at_once_creates_exactly_one_order()
     {
-        var sale = await PaidCheckoutAsync(quantity: 1, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 1, stock: 5);
         var payload = StripeEvents.PaymentSucceeded(sale.Intent);
 
         var responses = await Task.WhenAll(
@@ -63,7 +63,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task If_the_last_item_sold_meanwhile_the_payment_is_refunded()
     {
-        var sale = await PaidCheckoutAsync(quantity: 2, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 2, stock: 5);
         // Someone else bought most of it between this customer's checkout and payment
         await SetStockAsync(sale.ProductId, 1);
 
@@ -89,7 +89,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
         var scarce = await api.AddProductAsync(stock: 1);
         await customer.PostAsJsonAsync("/api/cart/items", new { productId = plenty, quantity = 3 }, Ct);
         await customer.PostAsJsonAsync("/api/cart/items", new { productId = scarce, quantity = 1 }, Ct);
-        var sale = await PayAsync(customer, plenty);
+        var sale = await api.PayForCartAsync(customer, plenty);
         await SetStockAsync(scarce, 0);
 
         await StripeEvents.SendAsync(api.Factory.CreateClient(), StripeEvents.PaymentSucceeded(sale.Intent));
@@ -101,7 +101,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task A_payment_that_does_not_match_its_quote_is_refunded()
     {
-        var sale = await PaidCheckoutAsync(quantity: 1, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 1, stock: 5);
 
         await StripeEvents.SendAsync(api.Factory.CreateClient(),
             StripeEvents.PaymentSucceeded(sale.Intent, amountReceivedCents: sale.Intent.AmountCents - 100));
@@ -116,7 +116,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task If_recording_tax_fails_stripes_retry_finishes_the_job()
     {
-        var sale = await PaidCheckoutAsync(quantity: 1, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 1, stock: 5);
         var payload = StripeEvents.PaymentSucceeded(sale.Intent);
         api.Payments.FailNextTaxRecording();
 
@@ -134,7 +134,7 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task Events_without_stripes_signature_are_refused()
     {
-        var sale = await PaidCheckoutAsync(quantity: 1, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 1, stock: 5);
 
         var forged = await StripeEvents.SendAsync(api.Factory.CreateClient(), StripeEvents.PaymentSucceeded(sale.Intent), secret: "whsec_guessed");
 
@@ -159,35 +159,9 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Fact]
     public async Task Until_the_webhook_arrives_the_confirmation_page_waits()
     {
-        var sale = await PaidCheckoutAsync(quantity: 1, stock: 5);
+        var sale = await api.PaidCheckoutAsync(quantity: 1, stock: 5);
 
         Assert.Equal("processing", (await ResultAsync(sale)).GetProperty("result").GetString());
-    }
-
-    private sealed record Sale(HttpClient Customer, int ProductId, PaymentIntentState Intent);
-
-    // A customer who checked out and paid, before Stripe's webhook arrives
-    private async Task<Sale> PaidCheckoutAsync(int priceCents = 1000, int quantity = 1, int stock = 10)
-    {
-        var customer = await api.CreateCustomerClientAsync();
-        var productId = await api.AddProductAsync(priceCents: priceCents, stock: stock);
-        var added = await customer.PostAsJsonAsync("/api/cart/items", new { productId, quantity }, Ct);
-        Assert.Equal(HttpStatusCode.OK, added.StatusCode);
-        return await PayAsync(customer, productId);
-    }
-
-    private async Task<Sale> PayAsync(HttpClient customer, int productId)
-    {
-        var address = await customer.PostAsJsonAsync("/api/account/addresses", new
-        {
-            recipientName = "Test shopper", line1 = "1 Easel Way", city = "Portland", state = "OR", postalCode = "97201", countryCode = "US",
-        }, Ct);
-        var addressId = (await address.Content.ReadFromJsonAsync<JsonElement>(Ct)).GetProperty("id").GetInt32();
-        var checkout = await customer.PostAsJsonAsync("/api/checkout", new { addressId }, Ct);
-        Assert.Equal(HttpStatusCode.OK, checkout.StatusCode);
-        var clientSecret = (await checkout.Content.ReadFromJsonAsync<JsonElement>(Ct)).GetProperty("clientSecret").GetString()!;
-
-        return new Sale(customer, productId, api.Payments.Pay(clientSecret.Split("_secret_")[0]));
     }
 
     private static async Task<JsonElement> ResultAsync(Sale sale) =>

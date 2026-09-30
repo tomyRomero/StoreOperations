@@ -9,6 +9,7 @@ using StoreOps.Api.Catalog.Services;
 using StoreOps.Api.Checkouts.Services;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
+using StoreOps.Api.Emails;
 using StoreOps.Api.Images;
 using StoreOps.Api.Orders.Services;
 using StoreOps.Api.Payments;
@@ -44,6 +45,7 @@ builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 builder.Services.AddImageStorage();
 builder.Services.AddPayments();
+builder.Services.AddEmails();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<CategoryAdminService>();
 builder.Services.AddScoped<ProductAdminService>();

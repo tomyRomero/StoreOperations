@@ -3,16 +3,18 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
+using StoreOps.Api.Emails;
 using StoreOps.Api.Payments;
 
 namespace StoreOps.Api.Checkouts.Services;
 
 public sealed record PlacedOrder(int Id, string OrderNumber, OrderStatus Status, string StripeTaxCalculationId, string? StripeTaxTransactionId);
 
-// Turns a paid checkout into an order. Stripe may deliver the same webhook more than once, or two
+// Turns a paid checkout into an order and queues its emails. Stripe may deliver the same webhook more than once, or two
 // deliveries at the same moment; every step is safe to repeat, and the unique PaymentIntent id on
 // orders means there is only ever one order per payment.
-public sealed class OrderPlacement(AppDbContext db, IPayments payments, TimeProvider clock, ILogger<OrderPlacement> logger)
+public sealed class OrderPlacement(
+    AppDbContext db, IPayments payments, StoreEmails emails, TimeProvider clock, ILogger<OrderPlacement> logger)
 {
     // No 0/O or 1/I, so a number read out over the phone can't be misheard
     private const string OrderNumberAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -134,6 +136,11 @@ public sealed class OrderPlacement(AppDbContext db, IPayments payments, TimeProv
             DetailsJson = JsonSerializer.Serialize(
                 new { order.OrderNumber, order.TotalCents, refunded = refundNote is not null }, DetailsJson),
         });
+
+        // Queued in this transaction: sent only if the order is really saved
+        var customerEmail = await db.Users.Where(u => u.Id == checkout.UserId).Select(u => u.Email!).SingleAsync(ct);
+        await emails.AddForPlacedOrderAsync(order, customerEmail, ct);
+
         await db.SaveChangesAsync(ct);
 
         return new PlacedOrder(order.Id, order.OrderNumber, order.Status, order.StripeTaxCalculationId, null);

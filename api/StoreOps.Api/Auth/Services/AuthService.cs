@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Auth.Models;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
+using StoreOps.Api.Emails;
 
 namespace StoreOps.Api.Auth.Services;
 
@@ -42,6 +43,7 @@ public sealed class AuthService(
     SignInManager<ApplicationUser> signIn,
     LoginThrottle throttle,
     AppDbContext db,
+    StoreEmails emails,
     TimeProvider clock,
     ILogger<AuthService> logger)
 {
@@ -86,7 +88,8 @@ public sealed class AuthService(
         return new LoginResult(LoginOutcome.Succeeded, user);
     }
 
-    // Creates the account and records it in the activity log in one transaction, then signs in
+    // Creates the account, records it in the activity log and queues the welcome email in one
+    // transaction, then signs in
     public async Task<RegisterResult> RegisterAsync(RegisterRequest request, CancellationToken ct)
     {
         var username = request.Username.Trim().ToLowerInvariant();
@@ -117,6 +120,7 @@ public sealed class AuthService(
                     EntityId = user.Id,
                     OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
                 });
+                await emails.AddWelcomeAsync(user.UserName!, user.Email!, ct);
                 await db.SaveChangesAsync(ct);
                 await transaction.CommitAsync(ct);
                 return RegisterResult.Created(user);

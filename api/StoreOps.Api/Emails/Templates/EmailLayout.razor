@@ -1,0 +1,20 @@
+@* The frame every email shares: the store's name above a white card. Inline styles only, because
+   many mail apps drop <style> blocks. *@
+<div style="background:#f5f5f5;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;font-size:16px;color:#222222;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e6e6e6;border-radius:8px;padding:28px 24px;">
+        <div style="font-size:22px;font-weight:bold;text-align:center;margin-bottom:20px;">@StoreName</div>
+        @ChildContent
+        @if (SupportEmail is not null)
+        {
+            <div style="margin-top:28px;font-size:13px;color:#666666;text-align:center;">
+                Questions? Write to <a href="mailto:@SupportEmail" style="color:#222222;">@SupportEmail</a>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string StoreName { get; set; } = "";
+    [Parameter] public string? SupportEmail { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

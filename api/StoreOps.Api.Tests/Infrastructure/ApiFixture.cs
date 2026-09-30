@@ -78,7 +78,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
     }
 
     // A product in the store (or archived), straight in the database, for tests that aren't about the catalog
-    public async Task<int> AddProductAsync(int priceCents = 1000, int stock = 10, bool archived = false)
+    public async Task<int> AddProductAsync(int priceCents = 1000, int stock = 10, bool archived = false, string? name = null)
     {
         await using var db = CreateContext();
         var category = await db.Categories.FirstOrDefaultAsync(c => c.Name == "Test supplies")
@@ -86,7 +86,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
         var product = new Product
         {
             Category = category,
-            Name = $"Test product {Guid.NewGuid():N}",
+            Name = name ?? $"Test product {Guid.NewGuid():N}",
             Description = "Made for a test.",
             PriceCents = priceCents,
             Stock = stock,
@@ -124,6 +124,8 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
             builder.UseSetting("Stripe:SecretKey", "sk_test_not_a_real_key");
             builder.UseSetting("Stripe:WebhookSecret", StripeEvents.WebhookSecret);
             builder.ConfigureTestServices(services => services.AddSingleton<IPayments>(payments));
+            // Emails stay in the outbox; EmailTests sends them to a Mailpit container when it chooses
+            builder.UseSetting("Email:SendInBackground", "false");
             // Re-check sign-in cookies on every request, so signing out other sessions is visible at once
             builder.UseSetting("Auth:SecurityStampValidationInterval", "00:00:00");
             // Every test request comes from the same in-memory address, so the per-address limit is

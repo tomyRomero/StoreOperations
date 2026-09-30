@@ -1,0 +1,10 @@
+<EmailLayout StoreName="@Model.StoreName">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">New order @Model.OrderNumber</div>
+    <p style="text-align:center;color:#444444;">A customer just paid. It's waiting for you to ship.</p>
+    <OrderSummary Model="Model" />
+    <EmailButton Href="@Model.OrderUrl" Text="Open it in the admin" />
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public OrderEmailModel Model { get; set; } = null!;
+}
