@@ -33,4 +33,5 @@ public static class ErrorCodes
     public const string AccountLocked = "ACCOUNT_LOCKED";
     public const string AccountDisabled = "ACCOUNT_DISABLED";
     public const string AccountExists = "ACCOUNT_EXISTS";
+    public const string RateLimited = "RATE_LIMITED";
 }

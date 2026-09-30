@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StoreOps.Api.Auth.Models;
 using StoreOps.Api.Auth.Services;
 using StoreOps.Api.Common;
@@ -20,6 +21,7 @@ public sealed class AuthController(
     TimeProvider clock) : ControllerBase
 {
     [HttpPost("register")]
+    [EnableRateLimiting(RateLimitPolicies.Credentials)]
     [AllowAnonymous]
     [ProducesResponseType<CurrentUserResponse>(StatusCodes.Status201Created)]
     public async Task<IActionResult> Register(RegisterRequest request, CancellationToken ct)
@@ -42,6 +44,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimitPolicies.Credentials)]
     [AllowAnonymous]
     [ProducesResponseType<CurrentUserResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken ct)
@@ -88,6 +91,7 @@ public sealed class AuthController(
     }
 
     [HttpPost("change-password")]
+    [EnableRateLimiting(RateLimitPolicies.Credentials)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken ct)
     {

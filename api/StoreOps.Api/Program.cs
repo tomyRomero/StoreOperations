@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Auth;
+using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
+builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
@@ -49,8 +51,14 @@ if (args is ["seed"])
     return;
 }
 
+// First, so everything after it sees the browser's address instead of the Next server's
+app.UseForwardedHeaders();
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+
+// Before authentication, so a refused request costs as little as possible
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

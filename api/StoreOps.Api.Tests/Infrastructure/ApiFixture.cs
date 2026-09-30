@@ -26,6 +26,9 @@ public sealed class ApiFixture(SqlServerFixture sql) : DatabaseFixture(sql)
             builder.UseSetting("ConnectionStrings:Database", connectionString);
             // Re-check sign-in cookies on every request, so signing out other sessions is visible at once
             builder.UseSetting("Auth:SecurityStampValidationInterval", "00:00:00");
+            // Every test request comes from the same in-memory address, so the per-address limit is
+            // lifted here. RateLimitTests checks the limiter with a low one.
+            builder.UseSetting("RateLimits:Credentials:PermitLimit", "100000");
             // Only warnings and errors, so a failing test's output isn't buried under SQL
             builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
         }
