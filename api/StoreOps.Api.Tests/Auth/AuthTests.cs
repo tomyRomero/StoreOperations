@@ -200,6 +200,66 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task Changing_the_password_keeps_this_session_and_signs_out_the_others()
+    {
+        var email = NewEmail();
+        var thisDevice = api.Factory.CreateClient();
+        await RegisterAsync(thisDevice, email);
+        var otherDevice = api.Factory.CreateClient();
+        await LoginAsync(otherDevice, email, Password);
+
+        var response = await ChangePasswordAsync(thisDevice, Password, "New-Canvas-2026!");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await thisDevice.GetAsync("/api/auth/me", Ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await otherDevice.GetAsync("/api/auth/me", Ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await LoginAsync(api.Factory.CreateClient(), email, Password)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, "New-Canvas-2026!")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_wrong_current_password_is_a_field_error_and_changes_nothing()
+    {
+        var email = NewEmail();
+        var client = api.Factory.CreateClient();
+        await RegisterAsync(client, email);
+
+        var response = await ChangePasswordAsync(client, "Wrong-Password-1", "New-Canvas-2026!");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True((await ErrorsOf(response)).TryGetProperty("currentPassword", out _));
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/auth/me", Ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, Password)).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_weak_new_password_is_rejected_on_the_new_password_field()
+    {
+        var client = api.Factory.CreateClient();
+        await RegisterAsync(client, NewEmail());
+
+        var response = await ChangePasswordAsync(client, Password, "weak");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True((await ErrorsOf(response)).TryGetProperty("newPassword", out _));
+    }
+
+    [Fact]
+    public async Task Wrong_current_passwords_count_towards_the_sign_in_lockout()
+    {
+        var email = NewEmail();
+        var client = api.Factory.CreateClient();
+        await RegisterAsync(client, email);
+
+        HttpResponseMessage last = null!;
+        for (var i = 0; i < 5; i++)
+            last = await ChangePasswordAsync(client, "Wrong-Password-1", "New-Canvas-2026!");
+
+        Assert.Equal((HttpStatusCode)423, last.StatusCode);
+        Assert.Equal((HttpStatusCode)423, (await LoginAsync(api.Factory.CreateClient(), email, Password)).StatusCode);
+    }
+
+    [Fact]
     public async Task Endpoints_require_a_signed_in_user_by_default()
     {
         var response = await api.Factory.CreateClient().GetAsync("/api/auth/me", Ct);
@@ -243,6 +303,9 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
 
     private static Task<HttpResponseMessage> LoginAsync(HttpClient client, string email, string password) =>
         client.PostAsJsonAsync("/api/auth/login", new { email, password }, Ct);
+
+    private static Task<HttpResponseMessage> ChangePasswordAsync(HttpClient client, string currentPassword, string newPassword) =>
+        client.PostAsJsonAsync("/api/auth/change-password", new { currentPassword, newPassword }, Ct);
 
     private static Task<JsonElement> BodyOf(HttpResponseMessage response) =>
         response.Content.ReadFromJsonAsync<JsonElement>(Ct);

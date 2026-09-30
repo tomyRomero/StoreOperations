@@ -25,4 +25,13 @@ public sealed record LoginRequest
     public string Password { get; init; } = "";
 }
 
+public sealed record ChangePasswordRequest
+{
+    [Required, StringLength(128)]
+    public string CurrentPassword { get; init; } = "";
+
+    [Required, StringLength(128)]
+    public string NewPassword { get; init; } = "";
+}
+
 public sealed record CurrentUserResponse(int Id, string Username, string Email, bool IsAdmin);

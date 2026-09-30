@@ -17,6 +17,17 @@ public enum LoginOutcome
 
 public sealed record LoginResult(LoginOutcome Outcome, ApplicationUser? User = null, DateTimeOffset? LockedUntil = null);
 
+public enum ChangePasswordOutcome
+{
+    Changed,
+    WrongPassword,
+    Locked,
+    Invalid,
+}
+
+public sealed record ChangePasswordResult(
+    ChangePasswordOutcome Outcome, DateTimeOffset? LockedUntil = null, IReadOnlyDictionary<string, string[]>? Errors = null);
+
 public sealed record RegisterResult(ApplicationUser? User, bool AccountExists, IReadOnlyDictionary<string, string[]> Errors)
 {
     public static RegisterResult Created(ApplicationUser user) => new(user, false, new Dictionary<string, string[]>());
@@ -24,7 +35,7 @@ public sealed record RegisterResult(ApplicationUser? User, bool AccountExists, I
     public static RegisterResult Invalid(IReadOnlyDictionary<string, string[]> errors) => new(null, false, errors);
 }
 
-// Sign-up and sign-in. Every sign-in failure looks the same to the caller: nothing reveals whether
+// Sign-up, sign-in and password changes. Every sign-in failure looks the same to the caller: nothing reveals whether
 // an email is registered, whether the password was close, or which check failed.
 public sealed class AuthService(
     UserManager<ApplicationUser> users,
@@ -120,6 +131,42 @@ public sealed class AuthService(
         if (result.User is not null)
             await signIn.SignInAsync(result.User, isPersistent: true);
         return result;
+    }
+
+    // Wrong current passwords count towards the same lockout as sign-in, so a stolen session
+    // can't be used to guess the password. Changing it signs out every other session but keeps this one.
+    public async Task<ChangePasswordResult> ChangePasswordAsync(
+        ApplicationUser user, ChangePasswordRequest request, CancellationToken ct)
+    {
+        var email = user.Email!;
+        if (await throttle.LockedUntilAsync(email, ct) is { } lockedUntil)
+            return new ChangePasswordResult(ChangePasswordOutcome.Locked, lockedUntil);
+
+        // Checks the current password first, then the new one against the rules. Success replaces
+        // the security stamp, which is what invalidates the other sessions' cookies.
+        var changed = await users.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+
+        if (changed.Errors.Any(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch)))
+        {
+            var nowLockedUntil = await throttle.RecordFailureAsync(email, ct);
+            logger.LogWarning("Wrong current password on a password change. Locked: {Locked}", nowLockedUntil is not null);
+            return nowLockedUntil is { } until
+                ? new ChangePasswordResult(ChangePasswordOutcome.Locked, until)
+                : new ChangePasswordResult(ChangePasswordOutcome.WrongPassword);
+        }
+
+        await throttle.ClearAsync(email, ct);
+
+        if (!changed.Succeeded)
+            return new ChangePasswordResult(ChangePasswordOutcome.Invalid, Errors: new Dictionary<string, string[]>
+            {
+                ["newPassword"] = changed.Errors.Select(e => e.Description).ToArray(),
+            });
+
+        // A fresh cookie with the new stamp, so this session stays signed in
+        await signIn.RefreshSignInAsync(user);
+        logger.LogInformation("User {UserId} changed their password", user.Id);
+        return new ChangePasswordResult(ChangePasswordOutcome.Changed);
     }
 
     private bool VerifyAgainstNobody(string password)

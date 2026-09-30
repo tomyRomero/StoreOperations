@@ -9,7 +9,7 @@ using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Auth.Controllers;
 
-// Sign-up, sign-in and the session cookie. Responses are never cached anywhere.
+// Sign-up, sign-in, password changes and the session cookie. Responses are never cached anywhere.
 [ApiController]
 [Route("api/auth")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
@@ -54,10 +54,7 @@ public sealed class AuthController(
                 return Ok(await ToResponseAsync(result.User!));
 
             case LoginOutcome.Locked:
-                var seconds = Math.Max(1, (int)Math.Ceiling((result.LockedUntil!.Value - clock.GetUtcNow()).TotalSeconds));
-                Response.Headers.RetryAfter = seconds.ToString(CultureInfo.InvariantCulture);
-                return this.CodedProblem(StatusCodes.Status423Locked, ErrorCodes.AccountLocked,
-                    "Too many failed sign-in attempts. Try again later.");
+                return Locked(result.LockedUntil!.Value);
 
             case LoginOutcome.Disabled:
                 return this.CodedProblem(StatusCodes.Status403Forbidden, ErrorCodes.AccountDisabled,
@@ -85,13 +82,55 @@ public sealed class AuthController(
     {
         var user = await users.GetUserAsync(User);
         if (user is null)
-        {
-            // The cookie outlived its account
-            await signIn.SignOutAsync();
-            return this.CodedProblem(StatusCodes.Status401Unauthorized, ErrorCodes.NotSignedIn, "Please sign in.");
-        }
+            return await AccountGoneAsync();
 
         return Ok(await ToResponseAsync(user));
+    }
+
+    [HttpPost("change-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken ct)
+    {
+        var user = await users.GetUserAsync(User);
+        if (user is null)
+            return await AccountGoneAsync();
+
+        var result = await auth.ChangePasswordAsync(user, request, ct);
+
+        switch (result.Outcome)
+        {
+            case ChangePasswordOutcome.Changed:
+                return NoContent();
+
+            case ChangePasswordOutcome.Locked:
+                return Locked(result.LockedUntil!.Value);
+
+            // A field error, not a 401: the session is still valid, only the typed password is wrong
+            case ChangePasswordOutcome.WrongPassword:
+                ModelState.AddModelError("currentPassword", "Your current password is incorrect.");
+                return ValidationProblem(ModelState);
+
+            default:
+                foreach (var (field, messages) in result.Errors!)
+                    foreach (var message in messages)
+                        ModelState.AddModelError(field, message);
+                return ValidationProblem(ModelState);
+        }
+    }
+
+    private IActionResult Locked(DateTimeOffset until)
+    {
+        var seconds = Math.Max(1, (int)Math.Ceiling((until - clock.GetUtcNow()).TotalSeconds));
+        Response.Headers.RetryAfter = seconds.ToString(CultureInfo.InvariantCulture);
+        return this.CodedProblem(StatusCodes.Status423Locked, ErrorCodes.AccountLocked,
+            "Too many failed password attempts. Try again later.");
+    }
+
+    // The cookie outlived its account
+    private async Task<IActionResult> AccountGoneAsync()
+    {
+        await signIn.SignOutAsync();
+        return this.CodedProblem(StatusCodes.Status401Unauthorized, ErrorCodes.NotSignedIn, "Please sign in.");
     }
 
     // Read from the database, not the cookie, so a role change shows up immediately
