@@ -12,6 +12,11 @@ public class EmailOutboxMessage : ICreatedAt
     public required string HtmlBody { get; set; }
     public required string TextBody { get; set; }
 
+    // Where a reply goes, when not to the store's own address (a contact form message: the customer)
+    public string? ReplyToAddress { get; set; }
+    // A newsletter's one-click unsubscribe link, sent as the List-Unsubscribe header mail apps show
+    public string? UnsubscribeUrl { get; set; }
+
     public EmailStatus Status { get; set; } = EmailStatus.Pending;
     public byte Attempts { get; set; }
     public DateTime NextAttemptAtUtc { get; set; }

@@ -42,18 +42,20 @@ public sealed class MailpitFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
-    // Every message delivered to this address: its subject and HTML
-    public async Task<IReadOnlyList<(string Subject, string Html)>> MessagesToAsync(string address)
+    // Every message delivered to this address: its subject, HTML and headers
+    public async Task<IReadOnlyList<(string Subject, string Html, JsonElement Headers)>> MessagesToAsync(string address)
     {
+        var ct = TestContext.Current.CancellationToken;
         var search = await _api.GetFromJsonAsync<JsonElement>(
-            $"/api/v1/search?query={Uri.EscapeDataString($"to:\"{address}\"")}", TestContext.Current.CancellationToken);
+            $"/api/v1/search?query={Uri.EscapeDataString($"to:\"{address}\"")}", ct);
 
-        var messages = new List<(string, string)>();
+        var messages = new List<(string, string, JsonElement)>();
         foreach (var summary in search.GetProperty("messages").EnumerateArray())
         {
-            var message = await _api.GetFromJsonAsync<JsonElement>(
-                $"/api/v1/message/{summary.GetProperty("ID").GetString()}", TestContext.Current.CancellationToken);
-            messages.Add((message.GetProperty("Subject").GetString()!, message.GetProperty("HTML").GetString()!));
+            var id = summary.GetProperty("ID").GetString();
+            var message = await _api.GetFromJsonAsync<JsonElement>($"/api/v1/message/{id}", ct);
+            var headers = await _api.GetFromJsonAsync<JsonElement>($"/api/v1/message/{id}/headers", ct);
+            messages.Add((message.GetProperty("Subject").GetString()!, message.GetProperty("HTML").GetString()!, headers));
         }
         return messages;
     }

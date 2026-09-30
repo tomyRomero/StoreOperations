@@ -88,7 +88,8 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             $"{model.Headline} ({order.OrderNumber})", model, text.ToString());
     }
 
-    private async Task AddAsync<TTemplate>(EmailKind kind, string to, string subject, object model, string text)
+    private async Task AddAsync<TTemplate>(
+        EmailKind kind, string to, string subject, object model, string text, string? replyTo = null, string? unsubscribeUrl = null)
         where TTemplate : IComponent
     {
         db.EmailOutbox.Add(new EmailOutboxMessage
@@ -98,6 +99,8 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             Subject = subject,
             HtmlBody = await renderer.RenderAsync<TTemplate>(new() { ["Model"] = model }),
             TextBody = text,
+            ReplyToAddress = replyTo,
+            UnsubscribeUrl = unsubscribeUrl,
             NextAttemptAtUtc = clock.GetUtcNow().UtcDateTime,
         });
     }

@@ -86,6 +86,8 @@ public class EmailOutboxMessageConfiguration : IEntityTypeConfiguration<EmailOut
             t.HasCheckConstraint("CK_EmailOutbox_Status", Sql.InEnum<EmailStatus>("Status")));
 
         message.Property(m => m.ToAddress).HasMaxLength(256);
+        message.Property(m => m.ReplyToAddress).HasMaxLength(256);
+        message.Property(m => m.UnsubscribeUrl).HasMaxLength(500).IsUnicode(false);
         message.Property(m => m.Subject).HasMaxLength(200);
         message.Property(m => m.LastError).HasMaxLength(1000);
         message.Property(m => m.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");

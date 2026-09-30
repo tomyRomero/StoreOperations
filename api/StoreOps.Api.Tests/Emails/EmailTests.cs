@@ -130,10 +130,16 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
             .UseSetting("Email:Security", "None")
             .UseSetting("Email:FromAddress", "orders@palettehub.test"));
 
+    // Batch after batch until nothing more goes out, as the background worker would
     private static async Task SendDueAsync(WebApplicationFactory<Program> factory)
     {
-        await using var scope = factory.Services.CreateAsyncScope();
-        await scope.ServiceProvider.GetRequiredService<EmailOutboxSender>().SendDueAsync(Ct);
+        int sent;
+        do
+        {
+            await using var scope = factory.Services.CreateAsyncScope();
+            sent = await scope.ServiceProvider.GetRequiredService<EmailOutboxSender>().SendDueAsync(Ct);
+        }
+        while (sent > 0);
     }
 
     private async Task<List<EmailOutboxMessage>> QueuedToAsync(string address)

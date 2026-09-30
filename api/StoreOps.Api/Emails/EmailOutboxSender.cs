@@ -97,6 +97,14 @@ public sealed class EmailOutboxSender(
         var mime = new MimeMessage { Subject = message.Subject };
         mime.From.Add(new MailboxAddress(email.FromName, email.FromAddress));
         mime.To.Add(MailboxAddress.Parse(message.ToAddress));
+        if (message.ReplyToAddress is not null)
+            mime.ReplyTo.Add(MailboxAddress.Parse(message.ReplyToAddress));
+        if (message.UnsubscribeUrl is not null)
+        {
+            // RFC 8058 one-click unsubscribe: mail apps show an Unsubscribe button that POSTs to the link
+            mime.Headers.Add("List-Unsubscribe", $"<{message.UnsubscribeUrl}>");
+            mime.Headers.Add("List-Unsubscribe-Post", "List-Unsubscribe=One-Click");
+        }
         mime.Body = new BodyBuilder { HtmlBody = message.HtmlBody, TextBody = message.TextBody }.ToMessageBody();
         return mime;
     }
