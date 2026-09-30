@@ -24,15 +24,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Every error, expected or not, is returned as RFC 9457 problem details (application/problem+json)
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi();
+
+// The contract the web app generates its TypeScript types from. The same wherever it's served (no
+// server address in it), so the copy committed in web/lib/api can be compared with it in a test.
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
+{
+    document.Servers?.Clear();
+    return Task.CompletedTask;
+}));
+
+// Enums travel as readable strings ("no_returns"), the same convention as Clareion's API, and numbers
+// only as JSON numbers. Set for the controllers and for the OpenAPI document, which reads its own copy.
+static void UseStoreJson(JsonSerializerOptions json)
+{
+    json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower));
+    json.NumberHandling = JsonNumberHandling.Strict;
+}
+builder.Services.ConfigureHttpJsonOptions(options => UseStoreJson(options.SerializerOptions));
 
 builder.Services
     .AddControllers(options =>
         // Validation errors are keyed by the JSON names the client sent ("email", not "Email")
         options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
-    .AddJsonOptions(options =>
-        // Enums travel as readable strings ("no_returns"), the same convention as Clareion's API
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
+    .AddJsonOptions(options => UseStoreJson(options.JsonSerializerOptions));
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<TimestampInterceptor>();

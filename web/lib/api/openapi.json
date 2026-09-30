@@ -1,0 +1,5256 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "StoreOps.Api | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/admin/settings": {
+      "get": {
+        "tags": [
+          "AdminSettings"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminSettings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStoreSettingsRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStoreSettingsRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStoreSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/store": {
+      "get": {
+        "tags": [
+          "Store"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicStoreSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicStoreSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicStoreSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/orders": {
+      "get": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminOrderSummaryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminOrderSummaryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminOrderSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/orders/{orderNumber}": {
+      "get": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/orders/bulk-status": {
+      "post": {
+        "tags": [
+          "AdminOrders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkOrderStatusRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkOrderStatusRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkOrderStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfstring"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfstring"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfstring"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfOrderSummaryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfOrderSummaryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfOrderSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/orders/{orderNumber}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/newsletter/subscribers": {
+      "get": {
+        "tags": [
+          "AdminNewsletter"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfSubscriberResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfSubscriberResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfSubscriberResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/newsletter/subscribers/remove": {
+      "post": {
+        "tags": [
+          "AdminNewsletter"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveSubscribersRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveSubscribersRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveSubscribersRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemovedSubscribersResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemovedSubscribersResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemovedSubscribersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/newsletter/send": {
+      "post": {
+        "tags": [
+          "AdminNewsletter"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/newsletter/send-test": {
+      "post": {
+        "tags": [
+          "AdminNewsletter"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsletterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsletterQueuedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/newsletter": {
+      "post": {
+        "tags": [
+          "Newsletter"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/newsletter/unsubscribe/{token}": {
+      "post": {
+        "tags": [
+          "Newsletter"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/admin/images": {
+      "post": {
+        "tags": [
+          "AdminImages"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadedImageResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadedImageResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadedImageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/images/{key}": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/dashboard": {
+      "get": {
+        "tags": [
+          "AdminDashboard"
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "maximum": 365,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers": {
+      "get": {
+        "tags": [
+          "AdminCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/AccountRole"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminCustomerSummaryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminCustomerSummaryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminCustomerSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers/{id}": {
+      "get": {
+        "tags": [
+          "AdminCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers/{id}/disable": {
+      "post": {
+        "tags": [
+          "AdminCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/customers/{id}/enable": {
+      "post": {
+        "tags": [
+          "AdminCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contact": {
+      "post": {
+        "tags": [
+          "Contact"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/checkout": {
+      "post": {
+        "tags": [
+          "Checkout"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCheckoutRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCheckoutRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/checkout/result": {
+      "get": {
+        "tags": [
+          "Checkout"
+        ],
+        "parameters": [
+          {
+            "name": "paymentIntentId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stripe/webhook": {
+      "post": {
+        "tags": [
+          "StripeWebhook"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories": {
+      "get": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCategoryResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCategoryResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminCategoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/categories/{id}": {
+      "get": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/admin/products": {
+      "get": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "default": "active",
+              "$ref": "#/components/schemas/ProductStatus"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfAdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/products/{id}": {
+      "get": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/products/{id}/deal": {
+      "put": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/products/{id}/archive": {
+      "post": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/products/{id}/restore": {
+      "post": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/products/bulk": {
+      "post": {
+        "tags": [
+          "AdminProducts"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductBulkRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductBulkRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductBulkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfint"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfint"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkResultOfint"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "minLength": 0,
+              "type": "string"
+            }
+          },
+          {
+            "name": "onDeal",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "$ref": "#/components/schemas/ProductSort"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfProductResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfProductResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfProductResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/{id}/related": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 4
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cart": {
+      "get": {
+        "tags": [
+          "Cart"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cart/items": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToCartRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cart/items/{productId}": {
+      "put": {
+        "tags": [
+          "Cart"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetQuantityRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetQuantityRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetQuantityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cart"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cart/merge": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cart/preview": {
+      "post": {
+        "tags": [
+          "Cart"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartLinesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/admin/activity": {
+      "get": {
+        "tags": [
+          "AdminActivity"
+        ],
+        "parameters": [
+          {
+            "name": "entityType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ActivityEntity"
+            }
+          },
+          {
+            "name": "entityId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfActivityEntryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfActivityEntryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedOfActivityEntryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/addresses": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Addresses"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewAddressRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewAddressRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/addresses/{id}": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Addresses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Addresses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/addresses/{id}/default": {
+      "post": {
+        "tags": [
+          "Addresses"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountRole": {
+        "enum": [
+          "customer",
+          "admin",
+          null
+        ]
+      },
+      "ActivityAction": {
+        "enum": [
+          "user_registered",
+          "customer_disabled",
+          "customer_enabled",
+          "admin_role_granted",
+          "admin_role_removed",
+          "newsletter_subscribed",
+          "newsletter_unsubscribed",
+          "subscribers_removed",
+          "newsletter_sent",
+          "order_created",
+          "order_status_changed",
+          "product_created",
+          "product_updated",
+          "product_archived",
+          "product_restored",
+          "deal_started",
+          "deal_ended",
+          "category_created",
+          "category_updated",
+          "category_deleted",
+          "settings_changed"
+        ]
+      },
+      "ActivityEntity": {
+        "enum": [
+          "user",
+          "order",
+          "product",
+          "category",
+          "store_settings",
+          "newsletter_subscriber",
+          null
+        ]
+      },
+      "ActivityEntryResponse": {
+        "required": [
+          "id",
+          "occurredAtUtc",
+          "action",
+          "entityType",
+          "entityId",
+          "actor",
+          "details"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "occurredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "action": {
+            "$ref": "#/components/schemas/ActivityAction"
+          },
+          "entityType": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ActivityEntity"
+              }
+            ]
+          },
+          "entityId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "actor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "details": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonElement"
+              }
+            ]
+          }
+        }
+      },
+      "AddressRequest": {
+        "required": [
+          "recipientName",
+          "line1",
+          "city",
+          "countryCode"
+        ],
+        "type": "object",
+        "properties": {
+          "recipientName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "line1": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "line2": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "state": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "maxLength": 20,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "countryCode": {
+            "pattern": "^[A-Za-z]{2}$",
+            "type": "string"
+          }
+        }
+      },
+      "AddressResponse": {
+        "required": [
+          "id",
+          "recipientName",
+          "line1",
+          "line2",
+          "city",
+          "state",
+          "postalCode",
+          "countryCode",
+          "isDefault"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recipientName": {
+            "type": "string"
+          },
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AddToCartRequest": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "maximum": 99,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminCategoryResponse": {
+        "required": [
+          "id",
+          "name",
+          "imageKey",
+          "imageUrl",
+          "productCount",
+          "canDelete"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageKey": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "productCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canDelete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdminCustomerResponse": {
+        "required": [
+          "id",
+          "username",
+          "email",
+          "joinedAtUtc",
+          "isAdmin",
+          "isDisabled",
+          "orderCount",
+          "spentCents",
+          "addresses",
+          "recentOrders"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "joinedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          },
+          "isDisabled": {
+            "type": "boolean"
+          },
+          "orderCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "spentCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressResponse"
+            }
+          },
+          "recentOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderSummaryResponse"
+            }
+          }
+        }
+      },
+      "AdminCustomerSummaryResponse": {
+        "required": [
+          "id",
+          "username",
+          "email",
+          "joinedAtUtc",
+          "isAdmin",
+          "isDisabled",
+          "orderCount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "joinedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          },
+          "isDisabled": {
+            "type": "boolean"
+          },
+          "orderCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminOrderResponse": {
+        "required": [
+          "orderNumber",
+          "status",
+          "nextStatuses",
+          "placedAtUtc",
+          "customerId",
+          "customerName",
+          "customerEmail",
+          "lines",
+          "subtotalCents",
+          "shippingCents",
+          "taxCents",
+          "totalCents",
+          "shipTo",
+          "carrier",
+          "trackingNumber",
+          "trackingUrl",
+          "estimatedDeliveryDate",
+          "timeline",
+          "stripePaymentIntentId",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "nextStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
+          },
+          "placedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineResponse"
+            }
+          },
+          "subtotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shippingCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taxCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shipTo": {
+            "$ref": "#/components/schemas/PostalAddress"
+          },
+          "carrier": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Carrier"
+              }
+            ]
+          },
+          "trackingNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "trackingUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "estimatedDeliveryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "timeline": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderStepResponse"
+            }
+          },
+          "stripePaymentIntentId": {
+            "type": "string"
+          },
+          "rowVersion": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "AdminOrderStepResponse": {
+        "required": [
+          "status",
+          "changedAtUtc",
+          "note",
+          "changedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "changedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "changedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "AdminOrderSummaryResponse": {
+        "required": [
+          "orderNumber",
+          "status",
+          "placedAtUtc",
+          "customerName",
+          "customerEmail",
+          "itemCount",
+          "totalCents"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "placedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string"
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCents": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminProductResponse": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "categoryId",
+          "categoryName",
+          "priceCents",
+          "compareAtPriceCents",
+          "dealDescription",
+          "stock",
+          "imageKey",
+          "imageUrl",
+          "createdAtUtc",
+          "updatedAtUtc",
+          "archivedAtUtc",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "priceCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "compareAtPriceCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "dealDescription": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageKey": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "archivedAtUtc": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "rowVersion": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "BulkFailureOfint": {
+        "required": [
+          "id",
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "BulkFailureOfstring": {
+        "required": [
+          "id",
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "BulkOrderStatusRequest": {
+        "required": [
+          "orderNumbers"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumbers": {
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "emailCustomer": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "confirmRefund": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BulkResultOfint": {
+        "required": [
+          "succeeded",
+          "failed"
+        ],
+        "type": "object",
+        "properties": {
+          "succeeded": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulkFailureOfint"
+            }
+          }
+        }
+      },
+      "BulkResultOfstring": {
+        "required": [
+          "succeeded",
+          "failed"
+        ],
+        "type": "object",
+        "properties": {
+          "succeeded": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulkFailureOfstring"
+            }
+          }
+        }
+      },
+      "Carrier": {
+        "enum": [
+          "ups",
+          "usps",
+          "fedex",
+          "dhl",
+          "other",
+          null
+        ]
+      },
+      "CartLineIssue": {
+        "enum": [
+          "unavailable",
+          "out_of_stock",
+          "not_enough_stock",
+          null
+        ]
+      },
+      "CartLineRequest": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "maximum": 99,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CartLineResponse": {
+        "required": [
+          "productId",
+          "name",
+          "priceCents",
+          "compareAtPriceCents",
+          "imageUrl",
+          "quantity",
+          "stock",
+          "lineTotalCents",
+          "issue"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "priceCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "compareAtPriceCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lineTotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "issue": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CartLineIssue"
+              }
+            ]
+          }
+        }
+      },
+      "CartLinesRequest": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartLineRequest"
+            }
+          }
+        }
+      },
+      "CartResponse": {
+        "required": [
+          "lines",
+          "itemCount",
+          "subtotalCents",
+          "canCheckout"
+        ],
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartLineResponse"
+            }
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subtotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canCheckout": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CategoryRequest": {
+        "required": [
+          "name",
+          "imageKey"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "imageKey": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "CategoryResponse": {
+        "required": [
+          "id",
+          "name",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "maxLength": 128,
+            "minLength": 0,
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 128,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "CheckoutLineResponse": {
+        "required": [
+          "productId",
+          "name",
+          "unitPriceCents",
+          "quantity",
+          "lineTotalCents",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "unitPriceCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lineTotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "CheckoutResponse": {
+        "required": [
+          "checkoutId",
+          "clientSecret",
+          "lines",
+          "shipTo",
+          "subtotalCents",
+          "shippingCents",
+          "taxCents",
+          "totalCents"
+        ],
+        "type": "object",
+        "properties": {
+          "checkoutId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckoutLineResponse"
+            }
+          },
+          "shipTo": {
+            "$ref": "#/components/schemas/PostalAddress"
+          },
+          "subtotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shippingCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "taxCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCents": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Comparison": {
+        "required": [
+          "value",
+          "previous"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "previous": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ContactRequest": {
+        "required": [
+          "name",
+          "email",
+          "subject",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          },
+          "subject": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 5000,
+            "minLength": 10,
+            "type": "string"
+          }
+        }
+      },
+      "CurrentUserResponse": {
+        "required": [
+          "id",
+          "username",
+          "email",
+          "isAdmin"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DailyRevenue": {
+        "required": [
+          "date",
+          "revenueCents",
+          "orders"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "revenueCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orders": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DashboardKpis": {
+        "required": [
+          "revenueCents",
+          "orders",
+          "averageOrderCents",
+          "newCustomers",
+          "toShip",
+          "lowStock"
+        ],
+        "type": "object",
+        "properties": {
+          "revenueCents": {
+            "$ref": "#/components/schemas/Comparison"
+          },
+          "orders": {
+            "$ref": "#/components/schemas/Comparison"
+          },
+          "averageOrderCents": {
+            "$ref": "#/components/schemas/Comparison"
+          },
+          "newCustomers": {
+            "$ref": "#/components/schemas/Comparison"
+          },
+          "toShip": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lowStock": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DashboardResponse": {
+        "required": [
+          "first",
+          "last",
+          "timeZoneId",
+          "kpis",
+          "revenueByDay",
+          "ordersByStatus",
+          "topProducts",
+          "lowStockProducts"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "string",
+            "format": "date"
+          },
+          "last": {
+            "type": "string",
+            "format": "date"
+          },
+          "timeZoneId": {
+            "type": "string"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/DashboardKpis"
+          },
+          "revenueByDay": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyRevenue"
+            }
+          },
+          "ordersByStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusCount"
+            }
+          },
+          "topProducts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopProduct"
+            }
+          },
+          "lowStockProducts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LowStockProduct"
+            }
+          }
+        }
+      },
+      "DealRequest": {
+        "type": "object",
+        "properties": {
+          "dealPriceCents": {
+            "maximum": 10000000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
+      },
+      "JsonElement": {},
+      "LoginRequest": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "LowStockProduct": {
+        "required": [
+          "productId",
+          "name",
+          "stock"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "NewAddressRequest": {
+        "required": [
+          "recipientName",
+          "line1",
+          "city",
+          "countryCode"
+        ],
+        "type": "object",
+        "properties": {
+          "isDefault": {
+            "type": "boolean"
+          },
+          "recipientName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "line1": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": "string"
+          },
+          "line2": {
+            "maxLength": 200,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "state": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "maxLength": 20,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "countryCode": {
+            "pattern": "^[A-Za-z]{2}$",
+            "type": "string"
+          }
+        }
+      },
+      "NewsletterQueuedResponse": {
+        "required": [
+          "recipients"
+        ],
+        "type": "object",
+        "properties": {
+          "recipients": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "NewsletterRequest": {
+        "required": [
+          "subject",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "body": {
+            "maxLength": 10000,
+            "minLength": 20,
+            "type": "string"
+          }
+        }
+      },
+      "OrderLineResponse": {
+        "required": [
+          "productId",
+          "name",
+          "unitPriceCents",
+          "quantity",
+          "lineTotalCents",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "unitPriceCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lineTotalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderStatus": {
+        "enum": [
+          "pending",
+          "shipped",
+          "delivered",
+          "cancelled",
+          "refunded"
+        ]
+      },
+      "OrderSummaryResponse": {
+        "required": [
+          "orderNumber",
+          "status",
+          "placedAtUtc",
+          "itemCount",
+          "totalCents",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "placedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PagedOfActivityEntryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityEntryResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfAdminCustomerSummaryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCustomerSummaryResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfAdminOrderSummaryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOrderSummaryResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfAdminProductResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminProductResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfOrderSummaryResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderSummaryResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfProductResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedOfSubscriberResponse": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriberResponse"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PostalAddress": {
+        "required": [
+          "recipientName",
+          "line1",
+          "line2",
+          "city",
+          "state",
+          "postalCode",
+          "countryCode"
+        ],
+        "type": "object",
+        "properties": {
+          "recipientName": {
+            "type": "string"
+          },
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postalCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "countryCode": {
+            "type": "string"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ProductBulkAction": {
+        "enum": [
+          "archive",
+          "end_deal",
+          "move"
+        ]
+      },
+      "ProductBulkRequest": {
+        "required": [
+          "ids"
+        ],
+        "type": "object",
+        "properties": {
+          "ids": {
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "action": {
+            "$ref": "#/components/schemas/ProductBulkAction"
+          },
+          "categoryId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "ProductRequest": {
+        "required": [
+          "name",
+          "description",
+          "imageKey"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string"
+          },
+          "categoryId": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "priceCents": {
+            "maximum": 10000000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "stock": {
+            "maximum": 100000,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageKey": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "ProductResponse": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "priceCents",
+          "compareAtPriceCents",
+          "dealDescription",
+          "stock",
+          "categoryId",
+          "categoryName",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "priceCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "compareAtPriceCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "dealDescription": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductSort": {
+        "enum": [
+          "newest",
+          "oldest",
+          "cheapest",
+          "priciest"
+        ]
+      },
+      "ProductStatus": {
+        "enum": [
+          "active",
+          "archived",
+          "all"
+        ]
+      },
+      "PublicStoreSettingsResponse": {
+        "required": [
+          "storeName",
+          "supportEmail",
+          "shippingFlatRateCents",
+          "freeShippingThresholdCents",
+          "returnPolicy",
+          "returnWindowDays",
+          "returnPolicyNote",
+          "lowStockThreshold"
+        ],
+        "type": "object",
+        "properties": {
+          "storeName": {
+            "type": "string"
+          },
+          "supportEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "shippingFlatRateCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "freeShippingThresholdCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "returnPolicy": {
+            "$ref": "#/components/schemas/ReturnPolicy"
+          },
+          "returnWindowDays": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int16"
+          },
+          "returnPolicyNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lowStockThreshold": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 32,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9._-]+$",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "RemovedSubscribersResponse": {
+        "required": [
+          "removed"
+        ],
+        "type": "object",
+        "properties": {
+          "removed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RemoveSubscribersRequest": {
+        "required": [
+          "ids"
+        ],
+        "type": "object",
+        "properties": {
+          "ids": {
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "ReturnPolicy": {
+        "enum": [
+          "no_returns",
+          "exchanges",
+          "refunds"
+        ]
+      },
+      "SetQuantityRequest": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "maximum": 99,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StartCheckoutRequest": {
+        "type": "object",
+        "properties": {
+          "addressId": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StatusCount": {
+        "required": [
+          "status",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StoreSettingsResponse": {
+        "required": [
+          "storeName",
+          "supportEmail",
+          "shippingFlatRateCents",
+          "freeShippingThresholdCents",
+          "returnPolicy",
+          "returnWindowDays",
+          "returnPolicyNote",
+          "lowStockThreshold",
+          "emailCustomerOnStatusUpdateByDefault",
+          "timeZoneId",
+          "updatedAtUtc",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "storeName": {
+            "type": "string"
+          },
+          "supportEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "shippingFlatRateCents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "freeShippingThresholdCents": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "returnPolicy": {
+            "$ref": "#/components/schemas/ReturnPolicy"
+          },
+          "returnWindowDays": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int16"
+          },
+          "returnPolicyNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lowStockThreshold": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "emailCustomerOnStatusUpdateByDefault": {
+            "type": "boolean"
+          },
+          "timeZoneId": {
+            "type": "string"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "rowVersion": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "SubscribeRequest": {
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "SubscriberResponse": {
+        "required": [
+          "id",
+          "email",
+          "subscribedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "email": {
+            "type": "string"
+          },
+          "subscribedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TopProduct": {
+        "required": [
+          "productId",
+          "name",
+          "quantity",
+          "revenueCents"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "revenueCents": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateOrderRequest": {
+        "required": [
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "carrier": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Carrier"
+              }
+            ]
+          },
+          "trackingNumber": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "estimatedDeliveryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "note": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "emailCustomer": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "confirmRefund": {
+            "type": "boolean"
+          },
+          "rowVersion": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "UpdateProductRequest": {
+        "required": [
+          "rowVersion",
+          "name",
+          "description",
+          "imageKey"
+        ],
+        "type": "object",
+        "properties": {
+          "rowVersion": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "format": "byte"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 0,
+            "type": "string"
+          },
+          "categoryId": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "priceCents": {
+            "maximum": 10000000,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "stock": {
+            "maximum": 100000,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "imageKey": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "UpdateStoreSettingsRequest": {
+        "required": [
+          "storeName",
+          "timeZoneId",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "storeName": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string"
+          },
+          "supportEmail": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "shippingFlatRateCents": {
+            "maximum": 100000,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "freeShippingThresholdCents": {
+            "maximum": 10000000,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "returnPolicy": {
+            "$ref": "#/components/schemas/ReturnPolicy"
+          },
+          "returnWindowDays": {
+            "maximum": 365,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int16"
+          },
+          "returnPolicyNote": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lowStockThreshold": {
+            "maximum": 1000,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "emailCustomerOnStatusUpdateByDefault": {
+            "type": "boolean"
+          },
+          "timeZoneId": {
+            "maxLength": 64,
+            "minLength": 0,
+            "type": "string"
+          },
+          "rowVersion": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "UploadedImageResponse": {
+        "required": [
+          "key",
+          "url"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "AdminSettings"
+    },
+    {
+      "name": "Store"
+    },
+    {
+      "name": "AdminOrders"
+    },
+    {
+      "name": "Orders"
+    },
+    {
+      "name": "AdminNewsletter"
+    },
+    {
+      "name": "Newsletter"
+    },
+    {
+      "name": "AdminImages"
+    },
+    {
+      "name": "Images"
+    },
+    {
+      "name": "AdminDashboard"
+    },
+    {
+      "name": "AdminCustomers"
+    },
+    {
+      "name": "Contact"
+    },
+    {
+      "name": "Checkout"
+    },
+    {
+      "name": "StripeWebhook"
+    },
+    {
+      "name": "AdminCategories"
+    },
+    {
+      "name": "AdminProducts"
+    },
+    {
+      "name": "Catalog"
+    },
+    {
+      "name": "Cart"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "AdminActivity"
+    },
+    {
+      "name": "Addresses"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Hosting;
 using StoreOps.Api.Tests.Infrastructure;
 
@@ -54,5 +55,28 @@ public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"openapi\"", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+    }
+
+    // The web app's TypeScript types are generated from a copy of the contract in web/lib/api. This
+    // fails when the API changed and the copy wasn't regenerated, so a renamed field can't slip through.
+    [Fact]
+    public async Task The_web_apps_copy_of_the_contract_is_up_to_date()
+    {
+        await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+        var served = JsonNode.Parse(await development.CreateClient().GetStringAsync("/openapi/v1.json", TestContext.Current.CancellationToken));
+
+        var copyPath = Path.Combine(RepositoryRoot(), "web", "lib", "api", "openapi.json");
+        var copy = File.Exists(copyPath) ? JsonNode.Parse(await File.ReadAllTextAsync(copyPath, TestContext.Current.CancellationToken)) : null;
+
+        Assert.True(JsonNode.DeepEquals(served, copy),
+            "The API's contract changed. With the API running, run `npm run api:types` in web/ and commit web/lib/api.");
+    }
+
+    private static string RepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !Directory.Exists(Path.Combine(directory.FullName, "web")))
+            directory = directory.Parent;
+        return directory?.FullName ?? throw new DirectoryNotFoundException("Couldn't find the repository root (the folder with web/).");
     }
 }
