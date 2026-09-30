@@ -35,3 +35,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# private working notes stay local
+*.md
+!README.md
+/docs/audit/
