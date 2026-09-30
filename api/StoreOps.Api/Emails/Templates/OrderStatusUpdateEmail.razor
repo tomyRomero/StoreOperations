@@ -7,6 +7,13 @@
         <p style="text-align:center;color:#444444;">@Model.Note</p>
     }
 
+    @if (Model.RefundedCents is { } refunded)
+    {
+        <p style="text-align:center;color:#444444;">
+            We refunded <strong>@Money.Format(refunded)</strong> to your card. It usually shows within 5 to 10 business days.
+        </p>
+    }
+
     @if (Model.TrackingNumber is not null)
     {
         <div style="margin-top:16px;text-align:center;color:#444444;">

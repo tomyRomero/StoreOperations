@@ -39,4 +39,8 @@ public interface IPayments
 
     // Commits the tax calculation as a Stripe tax transaction, so the tax is on record. Returns its id.
     Task<string> RecordTaxAsync(string calculationId, string orderNumber, CancellationToken ct);
+
+    // Reverses a recorded tax transaction in full after a refund, so tax reports don't count the sale.
+    // Safe to repeat: a second call returns the first reversal.
+    Task ReverseTaxAsync(string taxTransactionId, string orderNumber, CancellationToken ct);
 }

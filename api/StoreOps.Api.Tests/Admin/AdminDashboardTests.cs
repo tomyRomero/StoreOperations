@@ -175,7 +175,7 @@ public class AdminDashboardTests(ApiFixture api) : IClassFixture<ApiFixture>
     {
         var opened = await admin.GetFromJsonAsync<JsonElement>($"/api/admin/orders/{number}", Ct);
         var response = await admin.PutAsJsonAsync($"/api/admin/orders/{number}",
-            new { status, rowVersion = opened.GetProperty("rowVersion").GetString() }, Ct);
+            new { status, confirmRefund = true, rowVersion = opened.GetProperty("rowVersion").GetString() }, Ct);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 

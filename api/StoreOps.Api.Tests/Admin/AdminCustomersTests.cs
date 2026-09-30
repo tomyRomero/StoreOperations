@@ -69,7 +69,7 @@ public class AdminCustomersTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(order.OrderNumber, Assert.Single(theirs.GetProperty("items").EnumerateArray()).GetProperty("orderNumber").GetString());
         var opened = await admin.GetFromJsonAsync<JsonElement>($"/api/admin/orders/{order.OrderNumber}", Ct);
         await admin.PutAsJsonAsync($"/api/admin/orders/{order.OrderNumber}",
-            new { status = "cancelled", rowVersion = opened.GetProperty("rowVersion").GetString() }, Ct);
+            new { status = "cancelled", confirmRefund = true, rowVersion = opened.GetProperty("rowVersion").GetString() }, Ct);
         Assert.Equal(0, (await GetAsync(admin, me.Id)).GetProperty("spentCents").GetInt32());
     }
 

@@ -41,8 +41,10 @@ public sealed class OrderPlacement(
         }
 
         // The order is safely stored. Now the Stripe calls that complete it; if one fails the webhook
-        // fails, and Stripe's retry lands here again with only the missing step left to do.
-        if (order.Status == OrderStatus.Refunded)
+        // fails, and Stripe's retry lands here again with only the missing step left to do. An order an
+        // admin cancelled or refunded before that retry was already refunded (repeating it is harmless),
+        // and no tax is ever recorded for money given back.
+        if (order.Status is OrderStatus.Refunded or OrderStatus.Cancelled)
         {
             await payments.RefundAsync(paymentIntentId, ct);
         }

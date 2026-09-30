@@ -74,12 +74,16 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             order.TrackingNumber,
             Tracking.UrlFor(order.Carrier, order.TrackingNumber),
             order.EstimatedDeliveryDate,
-            note);
+            note,
+            // Cancelling or refunding always refunds the payment in full
+            order.Status is OrderStatus.Cancelled or OrderStatus.Refunded ? order.TotalCents : null);
 
         var text = new StringBuilder()
             .AppendLine($"{model.Headline}: order {order.OrderNumber}.");
         if (note is not null)
             text.AppendLine(note);
+        if (model.RefundedCents is { } refunded)
+            text.AppendLine($"We refunded {Money.Format(refunded)} to your card. It usually shows within 5 to 10 business days.");
         if (model.TrackingNumber is not null)
             text.AppendLine($"{model.CarrierName ?? "Tracking"} number: {model.TrackingNumber} {model.TrackingUrl}");
         text.AppendLine().AppendLine($"See your order: {model.OrderUrl}");

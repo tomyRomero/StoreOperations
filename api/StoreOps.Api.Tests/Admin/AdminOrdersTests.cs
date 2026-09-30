@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using StoreOps.Api.Common;
 using StoreOps.Api.Domain;
 using StoreOps.Api.Tests.Infrastructure;
 
@@ -246,9 +247,101 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
         var admin = await api.CreateAdminClientAsync();
         var (sale, number) = await PlacedOrderAsync(quantity: 2, stock: 5);
 
-        await admin.PostAsJsonAsync("/api/admin/orders/bulk-status", new { orderNumbers = new[] { number }, status = "cancelled" }, Ct);
+        var unconfirmed = await BodyOf(await admin.PostAsJsonAsync("/api/admin/orders/bulk-status",
+            new { orderNumbers = new[] { number }, status = "cancelled" }, Ct));
+        await admin.PostAsJsonAsync("/api/admin/orders/bulk-status",
+            new { orderNumbers = new[] { number }, status = "cancelled", confirmRefund = true }, Ct);
 
+        Assert.Equal("REFUND_NOT_CONFIRMED", unconfirmed.GetProperty("failed")[0].GetProperty("code").GetString());
         Assert.Equal(5, await StockOfAsync(sale.ProductId));
+        Assert.Contains(sale.Intent.Id, api.Payments.Refunds);
+    }
+
+    [Fact]
+    public async Task Cancelling_refunds_the_payment_in_full_before_it_is_recorded()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (sale, number) = await PlacedOrderAsync();
+
+        var response = await UpdateAsync(admin, number, await GetAsync(admin, number), "cancelled");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(sale.Intent.Id, api.Payments.Refunds);
+        // The sale's tax record is reversed too, so tax reports don't count it
+        Assert.Contains(number, api.Payments.TaxReversedForOrders);
+        await using var db = api.CreateContext();
+        var order = await db.Orders.SingleAsync(o => o.OrderNumber == number, Ct);
+        var entry = await db.ActivityLog.SingleAsync(e => e.Action == ActivityAction.OrderStatusChanged && e.EntityId == order.Id, Ct);
+        Assert.Equal(order.TotalCents, JsonDocument.Parse(entry.DetailsJson!).RootElement.GetProperty("refundedCents").GetInt32());
+    }
+
+    [Fact]
+    public async Task Money_never_moves_without_the_admins_confirmation()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (sale, number) = await PlacedOrderAsync();
+
+        var response = await UpdateAsync(admin, number, await GetAsync(admin, number), "refunded", confirmRefund: false);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True((await BodyOf(response)).GetProperty("errors").TryGetProperty("confirmRefund", out _));
+        Assert.DoesNotContain(sale.Intent.Id, api.Payments.Refunds);
+        Assert.Equal("pending", (await GetAsync(admin, number)).GetProperty("status").GetString());
+    }
+
+    [Fact]
+    public async Task When_stripe_cannot_refund_nothing_changes_and_trying_again_works()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (sale, number) = await PlacedOrderAsync(quantity: 2, stock: 5);
+        api.Payments.FailNextRefund();
+
+        var failed = await UpdateAsync(admin, number, await GetAsync(admin, number), "cancelled");
+
+        Assert.Equal(HttpStatusCode.BadGateway, failed.StatusCode);
+        Assert.Equal("REFUND_FAILED", (await BodyOf(failed)).GetProperty("code").GetString());
+        Assert.Equal("pending", (await GetAsync(admin, number)).GetProperty("status").GetString());
+        Assert.Equal(3, await StockOfAsync(sale.ProductId));
+
+        var retried = await UpdateAsync(admin, number, await GetAsync(admin, number), "cancelled");
+
+        Assert.Equal(HttpStatusCode.OK, retried.StatusCode);
+        Assert.Contains(sale.Intent.Id, api.Payments.Refunds);
+        Assert.Equal(5, await StockOfAsync(sale.ProductId));
+    }
+
+    [Fact]
+    public async Task The_customer_is_told_their_money_is_on_its_way()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (sale, number) = await PlacedOrderAsync(priceCents: 2000);
+        var shipped = await BodyOf(await UpdateAsync(admin, number, await GetAsync(admin, number), "shipped"));
+
+        await UpdateAsync(admin, number, shipped, "refunded", emailCustomer: true);
+
+        var email = Assert.Single(await StatusEmailsToAsync(sale.Email));
+        Assert.Equal($"Your order was refunded ({number})", email.Subject);
+        Assert.Contains($"We refunded <strong>{Money.Format(shipped.GetProperty("totalCents").GetInt32())}</strong> to your card", email.HtmlBody);
+    }
+
+    [Fact]
+    public async Task A_webhook_retried_after_a_cancellation_records_no_tax()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var sale = await api.PaidCheckoutAsync();
+        var payload = StripeEvents.PaymentSucceeded(sale.Intent);
+        // The order is saved, but recording its tax fails, so Stripe will send the webhook again later
+        api.Payments.FailNextTaxRecording();
+        await StripeEvents.SendAsync(api.Factory.CreateClient(), payload);
+        await using var db = api.CreateContext();
+        var number = await db.Orders.Where(o => o.StripePaymentIntentId == sale.Intent.Id).Select(o => o.OrderNumber).SingleAsync(Ct);
+        await UpdateAsync(admin, number, await GetAsync(admin, number), "cancelled");
+
+        var retry = await StripeEvents.SendAsync(api.Factory.CreateClient(), payload);
+
+        Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
+        Assert.DoesNotContain(number, api.Payments.TaxRecordedForOrders);
+        Assert.Equal("cancelled", (await GetAsync(admin, number)).GetProperty("status").GetString());
     }
 
     [Fact]
@@ -280,10 +373,12 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
     private static Task<JsonElement> GetAsync(HttpClient admin, string number) =>
         admin.GetFromJsonAsync<JsonElement>($"/api/admin/orders/{number}", Ct);
 
-    // The side panel saved as the admin left it: the new status, the shipping details, and the version they opened
+    // The side panel saved as the admin left it: the new status, the shipping details, and the version
+    // they opened. The refund is confirmed, as the page's dialog does, unless a test says otherwise.
     private static Task<HttpResponseMessage> UpdateAsync(
         HttpClient admin, string number, JsonElement opened, string status, string? carrier = null,
-        string? trackingNumber = null, string? estimatedDeliveryDate = null, string? note = null, bool? emailCustomer = null) =>
+        string? trackingNumber = null, string? estimatedDeliveryDate = null, string? note = null, bool? emailCustomer = null,
+        bool confirmRefund = true) =>
         admin.PutAsJsonAsync($"/api/admin/orders/{number}", new
         {
             status,
@@ -292,6 +387,7 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
             estimatedDeliveryDate,
             note,
             emailCustomer,
+            confirmRefund,
             rowVersion = opened.GetProperty("rowVersion").GetString(),
         }, Ct);
 

@@ -4,9 +4,6 @@ namespace StoreOps.Api.Checkouts.Services;
 
 public static class CheckoutErrors
 {
-    public static readonly ApiError PaymentsNotConfigured = new(StatusCodes.Status503ServiceUnavailable, "PAYMENTS_NOT_CONFIGURED",
-        "Payments aren't set up on this store yet.");
-
     public static readonly ApiError UnknownAddress = new(StatusCodes.Status400BadRequest, "UNKNOWN_ADDRESS",
         "Choose one of your saved addresses.", Field: "addressId");
 

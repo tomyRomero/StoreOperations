@@ -32,7 +32,8 @@ public sealed record OrderStatusEmailModel(
     string? TrackingNumber,
     string? TrackingUrl,
     DateOnly? EstimatedDelivery,
-    string? Note)
+    string? Note,
+    int? RefundedCents)
 {
     public string Headline => Status switch
     {

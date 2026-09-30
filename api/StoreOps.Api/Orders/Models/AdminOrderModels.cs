@@ -58,6 +58,10 @@ public sealed record UpdateOrderRequest
     // Null follows the store's default in Store settings
     public bool? EmailCustomer { get; init; }
 
+    // Cancelling or refunding gives the customer's money back through Stripe, so the admin must say
+    // they mean it (the page asks in a dialog that shows the amount)
+    public bool ConfirmRefund { get; init; }
+
     [Required, MinLength(8), MaxLength(8)]
     public byte[] RowVersion { get; init; } = [];
 }
@@ -72,4 +76,7 @@ public sealed record BulkOrderStatusRequest
 
     // Null follows the store's default in Store settings
     public bool? EmailCustomer { get; init; }
+
+    // Required to cancel or refund: each order is refunded in full
+    public bool ConfirmRefund { get; init; }
 }

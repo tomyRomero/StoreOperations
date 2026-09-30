@@ -109,6 +109,16 @@ public sealed class StripePayments(IOptions<StripeOptions> options) : IPayments
         return transaction.Id;
     }
 
+    public async Task ReverseTaxAsync(string taxTransactionId, string orderNumber, CancellationToken ct) =>
+        await new TransactionService(Client).CreateReversalAsync(
+            new TransactionCreateReversalOptions
+            {
+                Mode = "full",
+                OriginalTransaction = taxTransactionId,
+                Reference = $"{orderNumber}-refund",
+            },
+            new RequestOptions { IdempotencyKey = $"tax-reversal-for-order-{orderNumber}" }, ct);
+
     private static PaymentIntentState State(PaymentIntent intent) => new(
         intent.Id, intent.ClientSecret, intent.Status, checked((int)intent.Amount), checked((int)intent.AmountReceived));
 

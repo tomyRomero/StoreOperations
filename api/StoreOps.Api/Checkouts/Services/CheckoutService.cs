@@ -19,7 +19,7 @@ public sealed class CheckoutService(
     public async Task<(CheckoutResponse? Checkout, ApiError? Error)> StartAsync(int userId, int addressId, CancellationToken ct)
     {
         if (!stripe.Value.IsConfigured)
-            return (null, CheckoutErrors.PaymentsNotConfigured);
+            return (null, PaymentErrors.NotConfigured);
 
         var address = await db.UserAddresses.AsNoTracking().SingleOrDefaultAsync(a => a.UserId == userId && a.Id == addressId, ct);
         if (address is null)

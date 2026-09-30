@@ -13,10 +13,12 @@ public sealed class FakePayments : IPayments
 
     private readonly ConcurrentDictionary<string, PaymentIntentState> _intents = new();
     private int _taxRecordingFailures;
+    private int _refundFailures;
 
     public ConcurrentBag<string> CustomersCreated { get; } = [];
     public ConcurrentBag<string> Refunds { get; } = [];
     public ConcurrentBag<string> TaxRecordedForOrders { get; } = [];
+    public ConcurrentBag<string> TaxReversedForOrders { get; } = [];
 
     public int PaymentIntentsCreated => _intents.Count;
 
@@ -31,6 +33,9 @@ public sealed class FakePayments : IPayments
 
     // The next attempt to record tax fails, as if Stripe were briefly down
     public void FailNextTaxRecording() => Interlocked.Increment(ref _taxRecordingFailures);
+
+    // The next refund fails, as if Stripe were briefly down
+    public void FailNextRefund() => Interlocked.Increment(ref _refundFailures);
 
     public Task<string> CreateCustomerAsync(int userId, string email, CancellationToken ct)
     {
@@ -68,6 +73,10 @@ public sealed class FakePayments : IPayments
 
     public Task RefundAsync(string paymentIntentId, CancellationToken ct)
     {
+        if (Interlocked.Decrement(ref _refundFailures) >= 0)
+            throw new HttpRequestException("Stripe is unavailable (simulated).");
+        Interlocked.Exchange(ref _refundFailures, 0);
+
         Refunds.Add(paymentIntentId);
         return Task.CompletedTask;
     }
@@ -80,5 +89,11 @@ public sealed class FakePayments : IPayments
 
         TaxRecordedForOrders.Add(orderNumber);
         return Task.FromResult($"taxtxn_test_{orderNumber}");
+    }
+
+    public Task ReverseTaxAsync(string taxTransactionId, string orderNumber, CancellationToken ct)
+    {
+        TaxReversedForOrders.Add(orderNumber);
+        return Task.CompletedTask;
     }
 }
