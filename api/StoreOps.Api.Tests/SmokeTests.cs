@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
 using StoreOps.Api.Tests.Infrastructure;
 
 namespace StoreOps.Api.Tests;
@@ -48,12 +48,16 @@ public class SmokeTests(ApiFixture api) : IClassFixture<ApiFixture>
 }
 
 // Runs in the Development environment, where the contract is published. Never touches a database.
-public class OpenApiTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
 {
     [Fact]
     public async Task OpenApi_contract_is_published_in_development()
     {
-        var response = await factory.CreateClient().GetAsync("/openapi/v1.json", TestContext.Current.CancellationToken);
+        // The test API switched to Development. Its test settings still win over the developer's
+        // user secrets, so this never reaches the development database.
+        await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+
+        var response = await development.CreateClient().GetAsync("/openapi/v1.json", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("\"openapi\"", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
