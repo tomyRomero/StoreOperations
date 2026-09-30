@@ -44,3 +44,25 @@ jobs:
 
       # No secrets are needed: settings are validated when the server first uses them, not at build time
       - run: npm run build
+
+  api:
+    name: "API: build and test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the newest .NET 10 SDK allowed by api/global.json and caches NuGet packages
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: api/global.json
+          cache: true
+          cache-dependency-path: api/**/packages.lock.json
+
+      # --locked-mode fails if packages.lock.json is out of date, so CI builds exactly what was committed
+      - run: dotnet restore --locked-mode
+      - run: dotnet build --no-restore --configuration Release
+      - run: dotnet test --no-build --configuration Release

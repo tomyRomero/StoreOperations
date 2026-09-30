@@ -40,3 +40,10 @@ next-env.d.ts
 *.md
 !README.md
 /docs/audit/
+
+# .NET build output
+/api/**/bin/
+/api/**/obj/
+/api/**/TestResults/
+*.user
+.vs/
