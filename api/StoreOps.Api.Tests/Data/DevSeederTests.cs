@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
+using StoreOps.Api.Images;
 using StoreOps.Api.Tests.Infrastructure;
 
 namespace StoreOps.Api.Tests.Data;
@@ -68,5 +69,12 @@ public class DevSeederTests(ApiFixture api) : IClassFixture<ApiFixture>
             [OrderStatus.Pending, OrderStatus.Shipped, OrderStatus.Delivered],
             delivered.StatusHistory.OrderBy(h => h.ChangedAtUtc).Select(h => h.Status));
         Assert.Equal(delivered.Lines.Sum(l => l.LineTotalCents) + 1000, delivered.TotalCents);
+
+        // Every product and category photo was uploaded to storage
+        var images = scope.ServiceProvider.GetRequiredService<ImageStorage>();
+        var imageKeys = await db.Products.Select(p => p.ImageKey).Concat(db.Categories.Select(c => c.ImageKey)).ToListAsync(Ct);
+        Assert.Equal(16, imageKeys.Count);
+        foreach (var key in imageKeys)
+            Assert.True(await images.ExistsAsync(key, Ct), $"{key} was not uploaded");
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Domain;
+using StoreOps.Api.Images;
 
 namespace StoreOps.Api.Data;
 
@@ -65,7 +66,7 @@ public static class DevSeeder
 
         var categories = Categories.ToDictionary(
             c => c.Name,
-            c => new Category { Name = c.Name, ImageKey = $"seed/categories/{c.ImageFile}" });
+            c => new Category { Name = c.Name, ImageKey = CategoryImageKey(c.ImageFile) });
 
         // Newest first in "sort by date", one minute apart
         var products = Products.Select((p, i) => new Product
@@ -108,6 +109,21 @@ public static class DevSeeder
             new ActivityLogEntry { Action = ActivityAction.OrderCreated, EntityType = ActivityEntity.Order, EntityId = newestOrder.Id, OccurredAtUtc = now.AddMinutes(-30) },
             new ActivityLogEntry { Action = ActivityAction.NewsletterSubscribed, EntityType = ActivityEntity.NewsletterSubscriber, OccurredAtUtc = now.AddMinutes(-10) });
         await db.SaveChangesAsync(cancellationToken);
+
+        await UploadImagesAsync(scope.ServiceProvider.GetRequiredService<ImageStorage>(), cancellationToken);
+    }
+
+    // The photos ship with the API in Data/SeedImages (resized to 1600 px). Uploading again just overwrites them.
+    private static async Task UploadImagesAsync(ImageStorage images, CancellationToken ct)
+    {
+        var keys = Categories.Select(c => CategoryImageKey(c.ImageFile))
+            .Concat(Products.Select(p => ProductImageKey(p.ImageFile)));
+
+        foreach (var key in keys)
+        {
+            var file = Path.Combine(AppContext.BaseDirectory, "Data", "SeedImages", key["seed/".Length..]);
+            await images.PutAsync(key, await File.ReadAllBytesAsync(file, ct), "image/jpeg", ct);
+        }
     }
 
     // Refuses anything but a Palettehub database on this machine
@@ -180,6 +196,8 @@ public static class DevSeeder
             StatusHistory = history,
         };
     }
+
+    private static string CategoryImageKey(string file) => $"seed/categories/{file}";
 
     private static string ProductImageKey(string file) => $"seed/products/{file}";
 

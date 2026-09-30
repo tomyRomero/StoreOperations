@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Auth;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
+using StoreOps.Api.Images;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
     .AddInterceptors(services.GetRequiredService<TimestampInterceptor>()));
 
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+
+builder.Services.AddImageStorage();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
