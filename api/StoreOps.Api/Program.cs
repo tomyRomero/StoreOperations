@@ -13,6 +13,7 @@ using StoreOps.Api.Customers.Services;
 using StoreOps.Api.Data;
 using StoreOps.Api.Emails;
 using StoreOps.Api.Images;
+using StoreOps.Api.Newsletter.Services;
 using StoreOps.Api.Orders.Services;
 using StoreOps.Api.Payments;
 using StoreOps.Api.Settings.Services;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<AdminOrderService>();
 builder.Services.AddScoped<AdminCustomerService>();
 builder.Services.AddScoped<ActivityFeedService>();
 builder.Services.AddScoped<StoreSettingsService>();
+builder.Services.AddScoped<NewsletterService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<OrderPlacement>();
 

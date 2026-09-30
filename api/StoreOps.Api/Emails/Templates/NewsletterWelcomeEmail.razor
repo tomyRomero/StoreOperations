@@ -1,0 +1,12 @@
+<EmailLayout StoreName="@Model.StoreName" SupportEmail="@Model.SupportEmail">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">You're subscribed</div>
+    <p style="text-align:center;color:#444444;">
+        Thanks for signing up for @Model.StoreName news: new paints, deals and tips, now and then.
+    </p>
+    <EmailButton Href="@Model.ShopUrl" Text="Visit the store" />
+    <UnsubscribeNote StoreName="@Model.StoreName" Url="@Model.UnsubscribeUrl" />
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public NewsletterWelcomeEmailModel Model { get; set; } = null!;
+}

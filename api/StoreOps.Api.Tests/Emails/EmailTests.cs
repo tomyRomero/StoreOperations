@@ -123,6 +123,23 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
         Assert.Equal(EmailStatus.Failed, (await QueuedToAsync(sale.Email)).Single(m => m.Id == waiting.Id).Status);
     }
 
+    [Fact]
+    public async Task Newsletter_emails_offer_one_click_unsubscribe()
+    {
+        var subscriber = $"{Guid.NewGuid():N}@example.test";
+        await api.Factory.CreateClient().PostAsJsonAsync("/api/newsletter", new { email = subscriber }, Ct);
+
+        await using var withMailpit = WithSmtp(mailpit.Host, mailpit.Port);
+        await SendDueAsync(withMailpit);
+
+        await using var db = api.CreateContext();
+        var token = await db.NewsletterSubscribers.Where(s => s.Email == subscriber).Select(s => s.UnsubscribeToken).SingleAsync(Ct);
+        var welcome = Assert.Single(await mailpit.MessagesToAsync(subscriber));
+        Assert.Equal($"<http://localhost:3200/api/newsletter/unsubscribe/{token}>", welcome.Headers.GetProperty("List-Unsubscribe")[0].GetString());
+        Assert.Equal("List-Unsubscribe=One-Click", welcome.Headers.GetProperty("List-Unsubscribe-Post")[0].GetString());
+        Assert.Contains($"http://localhost:3200/unsubscribe/{token}", welcome.Html);
+    }
+
     private WebApplicationFactory<Program> WithSmtp(string host, int port) =>
         api.Factory.WithWebHostBuilder(builder => builder
             .UseSetting("Email:Host", host)

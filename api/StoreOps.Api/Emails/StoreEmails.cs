@@ -88,6 +88,41 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             $"{model.Headline} ({order.OrderNumber})", model, text.ToString());
     }
 
+    // Tells a new subscriber they're on the list, with a link to leave in case someone else typed their address
+    public async Task AddNewsletterWelcomeAsync(string email, string unsubscribeToken, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        var model = new NewsletterWelcomeEmailModel(settings.StoreName, settings.SupportEmail, SiteUrl, UnsubscribePageUrl(unsubscribeToken));
+        await AddAsync<NewsletterWelcomeEmail>(EmailKind.NewsletterWelcome, email, $"You're subscribed to {settings.StoreName} news", model,
+            $"Thanks for signing up for {settings.StoreName} news.\n\nDidn't sign up? Unsubscribe: {model.UnsubscribeUrl}\n",
+            unsubscribeUrl: OneClickUnsubscribeUrl(unsubscribeToken));
+    }
+
+    // One email per subscriber, each with its own unsubscribe link. Returns how many were queued.
+    public async Task<int> AddNewsletterAsync(
+        string subject, string body, IReadOnlyList<(string Email, string UnsubscribeToken)> recipients, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        var paragraphs = body.ReplaceLineEndings("\n")
+            .Split("\n\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        foreach (var (email, token) in recipients)
+        {
+            var model = new NewsletterEmailModel(
+                settings.StoreName, settings.SupportEmail, subject, paragraphs, SiteUrl, UnsubscribePageUrl(token));
+            await AddAsync<NewsletterEmail>(EmailKind.Newsletter, email, subject, model,
+                $"{subject}\n\n{string.Join("\n\n", paragraphs)}\n\nVisit the store: {SiteUrl}\nUnsubscribe: {model.UnsubscribeUrl}\n",
+                unsubscribeUrl: OneClickUnsubscribeUrl(token));
+        }
+        return recipients.Count;
+    }
+
+    // The page that asks "Unsubscribe?" before doing it, so a link scanner opening the link changes nothing
+    private string UnsubscribePageUrl(string token) => $"{SiteUrl}/unsubscribe/{token}";
+
+    // Where a mail app's Unsubscribe button POSTs (through the web app's /api rewrite)
+    private string OneClickUnsubscribeUrl(string token) => $"{SiteUrl}/api/newsletter/unsubscribe/{token}";
+
     private async Task AddAsync<TTemplate>(
         EmailKind kind, string to, string subject, object model, string text, string? replyTo = null, string? unsubscribeUrl = null)
         where TTemplate : IComponent

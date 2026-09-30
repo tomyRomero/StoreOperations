@@ -131,6 +131,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
             // Every test request comes from the same in-memory address, so the per-address limit is
             // lifted here. RateLimitTests checks the limiter with a low one.
             builder.UseSetting("RateLimits:Credentials:PermitLimit", "100000");
+            builder.UseSetting("RateLimits:PublicForms:PermitLimit", "100000");
             // Only warnings and errors, so a failing test's output isn't buried under SQL
             builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
         }

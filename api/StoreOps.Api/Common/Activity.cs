@@ -13,9 +13,10 @@ public static class Activity
     };
 
     // An entry for the admin activity feed. The details are stored as they are now, so the feed
-    // still reads correctly after the product or category changes again.
+    // still reads correctly after the product or category changes again. EntityId is null for an
+    // action on many at once, such as removing subscribers.
     public static ActivityLogEntry Entry(
-        ActivityAction action, ActivityEntity entity, int entityId, int actorUserId, object details, TimeProvider clock) => new()
+        ActivityAction action, ActivityEntity entity, int? entityId, int actorUserId, object details, TimeProvider clock) => new()
     {
         Action = action,
         EntityType = entity,

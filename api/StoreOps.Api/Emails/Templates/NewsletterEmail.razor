@@ -1,0 +1,13 @@
+<EmailLayout StoreName="@Model.StoreName" SupportEmail="@Model.SupportEmail">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">@Model.Subject</div>
+    @foreach (var paragraph in Model.Paragraphs)
+    {
+        <p style="color:#444444;white-space:pre-line;">@paragraph</p>
+    }
+    <EmailButton Href="@Model.ShopUrl" Text="Visit the store" />
+    <UnsubscribeNote StoreName="@Model.StoreName" Url="@Model.UnsubscribeUrl" />
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public NewsletterEmailModel Model { get; set; } = null!;
+}

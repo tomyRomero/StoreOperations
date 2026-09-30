@@ -36,6 +36,7 @@ public enum EmailKind
     OrderRefunded,
     SupportRequest,
     Newsletter,
+    NewsletterWelcome,
 }
 
 public enum EmailStatus

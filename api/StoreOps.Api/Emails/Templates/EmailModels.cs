@@ -43,3 +43,9 @@ public sealed record OrderStatusEmailModel(
         _ => $"Your order is {Status.ToString().ToLowerInvariant()}",
     };
 }
+
+// The admin's plain-text newsletter. Each paragraph keeps its line breaks.
+public sealed record NewsletterEmailModel(
+    string StoreName, string? SupportEmail, string Subject, IReadOnlyList<string> Paragraphs, string ShopUrl, string UnsubscribeUrl);
+
+public sealed record NewsletterWelcomeEmailModel(string StoreName, string? SupportEmail, string ShopUrl, string UnsubscribeUrl);
