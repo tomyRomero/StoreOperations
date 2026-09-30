@@ -120,7 +120,7 @@ public sealed class AdminCustomerService(
         {
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTimeOffset.MaxValue;
-            Record(ActivityAction.CustomerDisabled, id, adminId);
+            db.ActivityLog.Add(Activity.Entry(ActivityAction.CustomerDisabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
 
             // A new security stamp is what ends the account's open sessions. Identity saves the user
             // through this same database context, so the lockout, the stamp and the activity entry
@@ -141,7 +141,7 @@ public sealed class AdminCustomerService(
         if (await users.IsLockedOutAsync(user))
         {
             user.LockoutEnd = null;
-            Record(ActivityAction.CustomerEnabled, id, adminId);
+            db.ActivityLog.Add(Activity.Entry(ActivityAction.CustomerEnabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
 
             // Saves the user and the activity entry together, as above
             if (!(await users.UpdateAsync(user)).Succeeded)
@@ -150,16 +150,6 @@ public sealed class AdminCustomerService(
 
         return (await GetAsync(id, ct), null);
     }
-
-    private void Record(ActivityAction action, int customerId, int adminId) =>
-        db.ActivityLog.Add(new ActivityLogEntry
-        {
-            Action = action,
-            EntityType = ActivityEntity.User,
-            EntityId = customerId,
-            ActorUserId = adminId,
-            OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
-        });
 
     // The ids of admin accounts, as a subquery EF folds into the query that uses it
     private IQueryable<int> AdminIds() =>

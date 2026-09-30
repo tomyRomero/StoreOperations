@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using StoreOps.Api.Common;
 using StoreOps.Api.Data;
@@ -22,8 +21,6 @@ public static class AdminOrderErrors
 // refunds an order issues the refund in the Stripe dashboard, and the app records the status.
 public sealed class AdminOrderService(AppDbContext db, StoreEmails emails, TimeProvider clock)
 {
-    private static readonly JsonSerializerOptions DetailsJson = new(JsonSerializerDefaults.Web);
-
     // Newest first. Search matches the order number, the customer's email or username, or the recipient.
     public async Task<Paged<AdminOrderSummaryResponse>> ListAsync(AdminOrderQuery query, CancellationToken ct)
     {
@@ -115,15 +112,8 @@ public sealed class AdminOrderService(AppDbContext db, StoreEmails emails, TimeP
             var now = clock.GetUtcNow().UtcDateTime;
             order.ChangeStatus(request.Status, now, adminId, note);
 
-            db.ActivityLog.Add(new ActivityLogEntry
-            {
-                Action = ActivityAction.OrderStatusChanged,
-                EntityType = ActivityEntity.Order,
-                EntityId = order.Id,
-                ActorUserId = adminId,
-                OccurredAtUtc = now,
-                DetailsJson = JsonSerializer.Serialize(new { order.OrderNumber, from, to = request.Status }, DetailsJson),
-            });
+            db.ActivityLog.Add(Activity.Entry(ActivityAction.OrderStatusChanged, ActivityEntity.Order, order.Id, adminId,
+                new { order.OrderNumber, from, to = request.Status }, clock));
 
             var emailCustomer = request.EmailCustomer
                 ?? await db.StoreSettings.Select(s => s.EmailCustomerOnStatusUpdateByDefault).SingleAsync(ct);

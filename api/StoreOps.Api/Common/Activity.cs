@@ -1,11 +1,16 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Common;
 
 public static class Activity
 {
-    private static readonly JsonSerializerOptions DetailsJson = new(JsonSerializerDefaults.Web);
+    // Enums as the API writes them ("shipped"), so the feed can show them as they are
+    private static readonly JsonSerializerOptions DetailsJson = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
+    };
 
     // An entry for the admin activity feed. The details are stored as they are now, so the feed
     // still reads correctly after the product or category changes again.
