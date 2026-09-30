@@ -9,6 +9,7 @@ import AdminDashboard from "@/components/nav/AdminDashboard";
 import MobileAdminDashboard from "@/components/nav/MobileAdminDashboard";
 import { Toaster } from "@/components/ui/toaster";
 import { authOptions } from "@/lib/auth";
+import { getSessionUser } from "@/lib/guards";
 import { redirect } from "next/navigation";
 
 const jost = Jost({
@@ -30,8 +31,9 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
 
-  if(!session || session?.user.admin === false || session === undefined)
-  {
+  // Fail closed: only a user the database confirms as admin gets in
+  const user = await getSessionUser();
+  if (!user?.admin) {
     redirect("/")
   }
 

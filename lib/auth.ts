@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDB } from "@/lib/mongoose";
 import User from "./models/user.model";
 import { compare } from "bcrypt";
-import GithubProvider from "next-auth/providers/github";
 
 
 export const authOptions: NextAuthOptions = {
@@ -15,10 +14,6 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt'
     },
     providers: [
-      GithubProvider({
-        clientId: process.env.GITHUB_ID ?? "",
-        clientSecret: process.env.GITHUB_SECRET ?? "",
-      }),
       CredentialsProvider({
         name: "Credentials",
         credentials: {
@@ -26,7 +21,7 @@ export const authOptions: NextAuthOptions = {
           password: { label: "Password", type: "password" }
         },
         async authorize(credentials) {
-          connectToDB();  
+          await connectToDB();
 
           if(!credentials?.email || !credentials?.password)
           {
