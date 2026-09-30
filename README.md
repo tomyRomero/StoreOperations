@@ -208,8 +208,8 @@ The project is currently in Stripe test mode, but all functionalities are fully 
 # Clone the repository
 git clone https://github.com/tomyRomero/storeOps
 
-# Navigate to the project directory
-cd storeOps
+# Navigate to the web app
+cd storeOps/web
 
 # Install dependencies
 npm install

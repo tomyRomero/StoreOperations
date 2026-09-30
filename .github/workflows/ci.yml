@@ -14,17 +14,21 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Lint, typecheck, test and build
+  web:
+    name: "Web: lint, typecheck, test and build"
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v5
         with:
-          node-version-file: .nvmrc
+          node-version-file: web/.nvmrc
           cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - run: npm ci
 
