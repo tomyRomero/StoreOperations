@@ -14,20 +14,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { signIn} from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
+import { api } from '@/lib/api/browser';
+import { problemMessage } from '@/lib/api/problems';
+import { safeReturnPath } from '@/lib/sign-in-path';
 
 const FormSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must have than 8 characters'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 const SignInForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
 
@@ -39,39 +39,23 @@ const SignInForm = () => {
     },
   });
 
+  // The API sets its session cookie on this site (through the /api pass-through), then the page
+  // re-renders as the signed-in user
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-   
-      const signInData = await signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
+    const { error, response } = await api.POST('/api/auth/login', { body: values });
 
-      if(signInData?.error)
-      {
-        toast({
-          title: "Failed to Login",
-          description: "Something went wrong! Wrong email or password.", 
-          variant: "destructive",
-        })
-      }else{
-        toast({
-          title: "Success!",
-          description: "Welcome back, redirecting!", 
-        })
+    if (!response.ok) {
+      toast({
+        title: "Couldn't sign you in",
+        description: problemMessage(error),
+        variant: "destructive",
+      })
+      return;
+    }
 
-        setTimeout(() => {
-          const url = sessionStorage.getItem('path');
-          if(url)
-          {
-            router.push(url)
-          }else{
-            router.push("/");
-          }
-        }, 1500);
-
-      }
-    
+    toast({ title: "Welcome back!" })
+    router.replace(safeReturnPath(searchParams.get('callbackUrl')));
+    router.refresh();
   };
 
   

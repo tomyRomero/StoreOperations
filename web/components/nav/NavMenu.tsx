@@ -1,7 +1,9 @@
 "use client"
 
 import { motion as m, AnimatePresence } from 'framer-motion';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useCurrentUser } from '../CurrentUserProvider';
+import { useSignOut } from '@/lib/use-sign-out';
+import { signInPath } from '@/lib/sign-in-path';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -15,12 +17,13 @@ interface Props {
 
 export default function NavMenu({ isActive, setIsActive }: Props) {
 
-const { data: session } = useSession();
+const user = useCurrentUser();
+const signOut = useSignOut();
 
 const router = useRouter(); 
 
 
-  const navLinks = session? loggedInNavLinks : loggedOutNavLinks;
+  const navLinks = user? loggedInNavLinks : loggedOutNavLinks;
 
   const pathname = usePathname();
 
@@ -28,15 +31,10 @@ const router = useRouter();
     setIsActive(false)
     if(link === "/login")
     {
-        // Set data in sessionStorage so user can navigate back to exact page after loggin in
-        sessionStorage.setItem('path', pathname);
-        signIn()
+        router.push(signInPath(pathname))
     }else if(link === "/logout")
     {
-        signOut({
-            redirect: true,
-            callbackUrl: `${pathname}`
-        })
+        signOut(pathname)
     }
     else{
         router.push(link)

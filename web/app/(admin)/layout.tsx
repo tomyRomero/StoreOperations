@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "../globals.css";
-import { getServerSession } from "next-auth/next";
-import SessionProvider from "../../components/SessionProvider"
 import { AppProvider } from "@/lib/AppContext";
 import AdminNav from "@/components/nav/AdminNav";
 import AdminDashboard from "@/components/nav/AdminDashboard";
 import MobileAdminDashboard from "@/components/nav/MobileAdminDashboard";
 import { Toaster } from "@/components/ui/toaster";
-import { authOptions } from "@/lib/auth";
-import { getSessionUser } from "@/lib/guards";
 import { redirect } from "next/navigation";
+import { CurrentUserProvider } from "@/components/CurrentUserProvider";
+import { getCurrentUser } from "@/lib/session";
 
 const jost = Jost({
   subsets: ['latin'],
@@ -29,11 +27,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-
-  // Fail closed: only a user the database confirms as admin gets in
-  const user = await getSessionUser();
-  if (!user?.admin) {
+  // Fail closed: only a user the API confirms as admin gets in. The API also refuses every admin
+  // request from anyone else, so this only spares them a broken page.
+  const user = await getCurrentUser();
+  if (!user?.isAdmin) {
     redirect("/")
   }
 
@@ -41,7 +38,7 @@ export default async function RootLayout({
 
     <html lang="en">
     <AppProvider>
-      <SessionProvider session={session}>
+      <CurrentUserProvider user={user}>
         <body className={`${jost.className} flex flex-col min-h-screen`}>
           <AdminNav/>
             <div className="max-xxs:pt-16 pt-20 md:pt-24 lg:pt-32 grid h-screen min-h-screen w-full lg:grid-cols-[280px_1fr]">
@@ -55,7 +52,7 @@ export default async function RootLayout({
             </div>
         <Toaster />
         </body>
-      </SessionProvider>
+      </CurrentUserProvider>
     </AppProvider>
   </html>
 

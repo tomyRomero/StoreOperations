@@ -6,7 +6,10 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import {useRouter, usePathname } from "next/navigation";
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+import { useCurrentUser } from '../CurrentUserProvider';
+import { useSignOut } from '@/lib/use-sign-out';
+import { signInPath } from '@/lib/sign-in-path';
 import { useAppContext } from '@/lib/AppContext';
 import { getCartItems } from '@/lib/actions/store.actions';
 import { syncLocalStorageWithServerCartClient } from '@/lib/utils';
@@ -24,7 +27,10 @@ const Nav = () => {
 
   const {productAdjusted, cart} = useAppContext();
   const router = useRouter();
+  // The cart count still reads the old session until the cart moves to the API
   const { data: session } = useSession();
+  const user = useCurrentUser();
+  const signOut = useSignOut();
   const currentPath =  usePathname();
 
  
@@ -61,7 +67,7 @@ const Nav = () => {
   }
 
   function AuthButton() {
-    if (session) {
+    if (user) {
       return (
         <>
           <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={goAccount}>
@@ -72,12 +78,9 @@ const Nav = () => {
             height={32}
             className="px-1 max-md:hidden"
           />
-          <span className="ml-2">{session.user.admin? "Admin" : "Account"}</span>
+          <span className="ml-2">{user.isAdmin? "Admin" : "Account"}</span>
         </Button>
-          <Button variant="destructive" className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut({
-            redirect: true,
-            callbackUrl: `${currentPath}`
-          })}>
+          <Button variant="destructive" className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut(currentPath)}>
             LOGOUT
             </Button>
         </>
@@ -86,11 +89,7 @@ const Nav = () => {
     return (
       <>
         <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" 
-          onClick={()=> {
-          // Set data in sessionStorage so user can navigate back to exact page after loggin in
-          sessionStorage.setItem('path', currentPath);
-          signIn()
-          }}>
+          onClick={()=> router.push(signInPath(currentPath))}>
             LOGIN
           </Button>
       </>

@@ -1,31 +1,16 @@
-import { withAuth } from "next-auth/middleware";
+import { NextResponse, type NextRequest } from "next/server";
+import { sessionCookie } from "./lib/api/config";
 
-// A first line of defense for page navigation. The real checks run on the server
-// in every action, data function and API route (lib/guards.ts), because Next.js
-// runs server actions before any layout, and this middleware reads the session
-// token, which can be up to 30 days old.
+// A smoother experience only: signed-out visitors go straight to sign-in instead of a page that
+// would fail. It only looks for the cookie. The API decides who is really signed in, and the admin
+// layout checks the role.
+export function middleware(request: NextRequest) {
+  if (request.cookies.has(sessionCookie)) return NextResponse.next();
 
-const adminPrefixes = [
-  "/adminactivity",
-  "/adminusers",
-  "/admincategories",
-  "/adminaddcategory",
-  "/adminproducts",
-  "/adminaddproduct",
-  "/adminorders",
-  "/adminnewsletter",
-];
-
-export default withAuth({
-  pages: { signIn: "/sign-in" },
-  callbacks: {
-    authorized: ({ req, token }) => {
-      if (!token) return false;
-      const isAdminPage = adminPrefixes.some((prefix) => req.nextUrl.pathname.startsWith(prefix));
-      return isAdminPage ? token.admin === true : true;
-    },
-  },
-});
+  const signIn = new URL("/sign-in", request.url);
+  signIn.searchParams.set("callbackUrl", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  return NextResponse.redirect(signIn);
+}
 
 export const config = {
   matcher: [

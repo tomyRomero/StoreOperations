@@ -15,39 +15,24 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { useToast } from '../ui/use-toast';
+import { api } from '@/lib/api/browser';
+import { fieldErrors, problemMessage } from '@/lib/api/problems';
+import { newPassword } from '@/lib/validation/password';
 import { useState } from 'react';
 import Image from 'next/image';
 
 const FormSchema = z
-//Added strict password params to ensure safety from brute force attacks
   .object({
-    password: z
-    .string()
-    .min(9, 'Password must be at least 9 characters long')
-    .regex(/[A-Z]/, 'Password must contain at least one capitalized letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
-    .refine((value) => !/\s/.test(value), 'Password cannot contain whitespace'),
-    newPassword: z
-      .string()
-      .min(9, 'Password must be at least 9 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one capitalized letter')
-      .regex(/[0-9]/, 'Password must contain at least one number')
-      .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character')
-      .refine((value) => !/\s/.test(value), 'Password cannot contain whitespace'),
+    password: z.string().min(1, 'Enter your current password'),
+    newPassword: newPassword,
     confirmNewPassword: z.string().min(1, 'Password confirmation is required'),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    path: ['confirmPassword'],
+    path: ['confirmNewPassword'],
     message: 'Passwords do not match',
   });
 
-// Function to encode HTML entities
-const encodeHTML = (str: string) => {
-  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-};
-
-const ChangePasswordForm = ({userId} : {userId: string}) => {
+const ChangePasswordForm = () => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -62,55 +47,28 @@ const ChangePasswordForm = ({userId} : {userId: string}) => {
     },
   });
 
+  // Changing it signs out every other session; this one stays signed in
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-  setLoading(true)
-  try{
-   const response = await fetch('/api/changepassword', {
-    method: 'POST', 
-    headers: {
-      'Content-Type' : 'application/json'
-    },
-    body: JSON.stringify({
-      // Encode the username before sending it to the server fro added security to prevent XSS attacks.
-      id: encodeHTML(userId).toString(),
-      password: encodeHTML(values.password), 
-      newPassword: encodeHTML(values.newPassword)
-    })
-   })
+    setLoading(true)
+    const { error, response } = await api.POST('/api/auth/change-password', {
+      body: { currentPassword: values.password, newPassword: values.newPassword },
+    });
 
-   const responseData = await response.json();
+    if (!response.ok) {
+      const errors = fieldErrors(error);
+      if (errors.currentPassword) form.setError('password', { message: errors.currentPassword });
+      if (errors.newPassword) form.setError('newPassword', { message: errors.newPassword });
+      toast({
+        title: "Couldn't change your password",
+        description: problemMessage(error),
+        variant: "destructive",
+      })
+      setLoading(false)
+      return;
+    }
 
-   if(response.ok) {
-    toast({
-      title: "Success! Password Changed",
-      description: "Redirecting to Account Page", 
-    })
-    
-    // Introduce a delay before redirecting so user has time to read message
-    setTimeout(() => {
-      router.push('/account');
-    }, 2000);
-      
-   }else{
-    toast({
-      title: "Error Changing Password",
-      description: `Something went wrong! ${responseData.message}`, 
-      variant: "destructive",
-    })
-    setLoading(false)
-   }
-  }catch(error)
-  {
-    console.error('Error during fetch:', error);
-    toast({
-      title: "Error Changing Password",
-      description: `Something went wrong! ${error}`, 
-      variant: "destructive",
-    })
-    setLoading(false)
-  }
-
-  
+    toast({ title: "Password changed", description: "You've been signed out everywhere else." })
+    router.push('/account');
   };
 
   return (

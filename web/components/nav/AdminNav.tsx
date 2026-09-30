@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {useRouter } from "next/navigation";
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useCurrentUser } from '../CurrentUserProvider';
+import { useSignOut } from '@/lib/use-sign-out';
 
 
 export default function Nav() {
@@ -13,8 +14,9 @@ export default function Nav() {
   const router = useRouter();
 
   function AuthButton() {
-    const { data: session } = useSession();
-    if (session) {
+    const user = useCurrentUser();
+    const signOut = useSignOut();
+    if (user) {
       return (
         <>
           <Button className="sm:px-2 xs:px-0.5 hidden lg:flex" variant="ghost">
@@ -27,10 +29,7 @@ export default function Nav() {
           />
           <span className="ml-2">Welcome Admin</span>
         </Button>
-          <Button variant="destructive" className="flex sm:px-6 px-1.5  xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut({
-            redirect: true,
-            callbackUrl: `/`
-          })}>
+          <Button variant="destructive" className="flex sm:px-6 px-1.5  xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut("/")}>
             LOGOUT
             </Button>
         </>
@@ -38,7 +37,7 @@ export default function Nav() {
     }
     return (
       <>
-        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" onClick={() => signIn()}>LOGIN</Button>
+        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" onClick={() => router.push("/sign-in")}>LOGIN</Button>
       </>
     );
   }
