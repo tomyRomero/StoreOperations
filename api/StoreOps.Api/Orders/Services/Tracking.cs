@@ -21,3 +21,15 @@ public static class Tracking
         };
     }
 }
+
+public static class CarrierNames
+{
+    public static string Of(Carrier carrier) => carrier switch
+    {
+        Carrier.Ups => "UPS",
+        Carrier.Usps => "USPS",
+        Carrier.FedEx => "FedEx",
+        Carrier.Dhl => "DHL",
+        _ => "Carrier",
+    };
+}

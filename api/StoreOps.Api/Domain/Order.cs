@@ -39,6 +39,28 @@ public class Order : IUpdatedAt
 
     public List<OrderLine> Lines { get; set; } = [];
     public List<OrderStatusChange> StatusHistory { get; set; } = [];
+
+    // Pending -> Shipped -> Delivered. Cancelled or Refunded from Pending or Shipped, and Refunded after
+    // delivery too, so a "refunds within N days" policy can be recorded. Cancelled and Refunded are final.
+    public static IReadOnlyList<OrderStatus> NextStatuses(OrderStatus from) => from switch
+    {
+        OrderStatus.Pending => [OrderStatus.Shipped, OrderStatus.Cancelled, OrderStatus.Refunded],
+        OrderStatus.Shipped => [OrderStatus.Delivered, OrderStatus.Cancelled, OrderStatus.Refunded],
+        OrderStatus.Delivered => [OrderStatus.Refunded],
+        _ => [],
+    };
+
+    public bool CanChangeTo(OrderStatus next) => NextStatuses(Status).Contains(next);
+
+    // Moves the order on and adds the step to its timeline. ChangedByUserId is null for the system.
+    public void ChangeStatus(OrderStatus next, DateTime atUtc, int? changedByUserId, string? note = null)
+    {
+        if (!CanChangeTo(next))
+            throw new InvalidOperationException($"An order that is {Status} can't become {next}.");
+
+        Status = next;
+        StatusHistory.Add(new OrderStatusChange { Status = next, ChangedAtUtc = atUtc, ChangedByUserId = changedByUserId, Note = note });
+    }
 }
 
 public class OrderLine

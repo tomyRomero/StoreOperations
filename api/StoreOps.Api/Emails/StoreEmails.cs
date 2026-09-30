@@ -6,6 +6,7 @@ using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
 using StoreOps.Api.Emails.Templates;
+using StoreOps.Api.Orders.Services;
 
 namespace StoreOps.Api.Emails;
 
@@ -56,6 +57,35 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             await AddAsync<AdminNewOrderEmail>(EmailKind.AdminNewOrder, storeInbox,
                 $"New order {order.OrderNumber}", forStore, OrderText("A new order came in.", forStore));
         }
+    }
+
+    // Only when the admin chose to email the customer about a status change
+    public async Task AddStatusUpdateAsync(Order order, string customerEmail, string? note, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        var model = new OrderStatusEmailModel(
+            settings.StoreName,
+            settings.SupportEmail,
+            order.OrderNumber,
+            $"{SiteUrl}/orders/{order.OrderNumber}",
+            order.Status,
+            order.ShipTo.RecipientName,
+            order.Carrier is { } carrier ? CarrierNames.Of(carrier) : null,
+            order.TrackingNumber,
+            Tracking.UrlFor(order.Carrier, order.TrackingNumber),
+            order.EstimatedDeliveryDate,
+            note);
+
+        var text = new StringBuilder()
+            .AppendLine($"{model.Headline}: order {order.OrderNumber}.");
+        if (note is not null)
+            text.AppendLine(note);
+        if (model.TrackingNumber is not null)
+            text.AppendLine($"{model.CarrierName ?? "Tracking"} number: {model.TrackingNumber} {model.TrackingUrl}");
+        text.AppendLine().AppendLine($"See your order: {model.OrderUrl}");
+
+        await AddAsync<OrderStatusUpdateEmail>(EmailKind.OrderStatusUpdate, customerEmail,
+            $"{model.Headline} ({order.OrderNumber})", model, text.ToString());
     }
 
     private async Task AddAsync<TTemplate>(EmailKind kind, string to, string subject, object model, string text)

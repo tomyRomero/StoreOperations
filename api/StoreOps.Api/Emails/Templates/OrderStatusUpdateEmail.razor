@@ -1,0 +1,35 @@
+<EmailLayout StoreName="@Model.StoreName" SupportEmail="@Model.SupportEmail">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">@Model.Headline</div>
+    <p style="text-align:center;color:#444444;">Hello @Model.RecipientName, here's an update on order <strong>@Model.OrderNumber</strong>.</p>
+
+    @if (Model.Note is not null)
+    {
+        <p style="text-align:center;color:#444444;">@Model.Note</p>
+    }
+
+    @if (Model.TrackingNumber is not null)
+    {
+        <div style="margin-top:16px;text-align:center;color:#444444;">
+            @(Model.CarrierName ?? "Tracking") number:
+            @if (Model.TrackingUrl is not null)
+            {
+                <a href="@Model.TrackingUrl" style="color:#222222;">@Model.TrackingNumber</a>
+            }
+            else
+            {
+                <span>@Model.TrackingNumber</span>
+            }
+        </div>
+    }
+
+    @if (Model.EstimatedDelivery is { } estimate)
+    {
+        <div style="margin-top:8px;text-align:center;color:#444444;">Expected by @estimate.ToString("dddd, MMMM d", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</div>
+    }
+
+    <EmailButton Href="@Model.OrderUrl" Text="See your order" />
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public OrderStatusEmailModel Model { get; set; } = null!;
+}

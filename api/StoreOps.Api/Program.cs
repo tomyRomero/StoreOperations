@@ -52,6 +52,7 @@ builder.Services.AddScoped<ProductAdminService>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<OrderHistoryService>();
+builder.Services.AddScoped<AdminOrderService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<OrderPlacement>();
 
