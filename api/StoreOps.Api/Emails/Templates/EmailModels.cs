@@ -49,3 +49,6 @@ public sealed record NewsletterEmailModel(
     string StoreName, string? SupportEmail, string Subject, IReadOnlyList<string> Paragraphs, string ShopUrl, string UnsubscribeUrl);
 
 public sealed record NewsletterWelcomeEmailModel(string StoreName, string? SupportEmail, string ShopUrl, string UnsubscribeUrl);
+
+// A message from the contact form, for the store's inbox
+public sealed record SupportRequestEmailModel(string StoreName, string Name, string Email, string Subject, string Message);

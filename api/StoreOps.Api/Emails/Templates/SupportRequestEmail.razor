@@ -1,0 +1,15 @@
+<EmailLayout StoreName="@Model.StoreName">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">New message from the contact form</div>
+    <p style="text-align:center;color:#444444;">
+        From @Model.Name (<a href="mailto:@Model.Email" style="color:#222222;">@Model.Email</a>).
+        Reply to this email to answer them.
+    </p>
+    <div style="margin-top:20px;border-top:1px solid #e6e6e6;padding-top:16px;">
+        <div style="font-weight:bold;">@Model.Subject</div>
+        <p style="color:#444444;white-space:pre-line;">@Model.Message</p>
+    </div>
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public SupportRequestEmailModel Model { get; set; } = null!;
+}

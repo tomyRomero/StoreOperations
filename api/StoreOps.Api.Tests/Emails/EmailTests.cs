@@ -124,6 +124,21 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
     }
 
     [Fact]
+    public async Task Replying_to_a_contact_form_message_answers_the_customer()
+    {
+        var customer = $"{Guid.NewGuid():N}@example.test";
+        var subject = $"Brush sizes {Guid.NewGuid():N}";
+        await api.Factory.CreateClient().PostAsJsonAsync("/api/contact",
+            new { name = "Ada", email = customer, subject, message = "Which brush suits gouache?" }, Ct);
+
+        await using var withMailpit = WithSmtp(mailpit.Host, mailpit.Port);
+        await SendDueAsync(withMailpit);
+
+        var delivered = Assert.Single(await mailpit.MessagesToAsync(StoreInbox), m => m.Subject == $"Contact form: {subject}");
+        Assert.Equal(customer, delivered.Headers.GetProperty("Reply-To")[0].GetString());
+    }
+
+    [Fact]
     public async Task Newsletter_emails_offer_one_click_unsubscribe()
     {
         var subscriber = $"{Guid.NewGuid():N}@example.test";

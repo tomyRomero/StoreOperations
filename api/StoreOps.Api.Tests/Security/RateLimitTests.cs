@@ -8,7 +8,7 @@ using StoreOps.Api.Tests.Infrastructure;
 
 namespace StoreOps.Api.Tests.Security;
 
-// Each test gets its own copy of the API with a limit of two attempts per address
+// Each test gets its own copy of the API with a limit of two attempts per address, per policy
 public class RateLimitTests(ApiFixture api) : IClassFixture<ApiFixture>
 {
     private const string NextServer = "127.0.0.1";
@@ -52,8 +52,27 @@ public class RateLimitTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(StatusCodes.Status429TooManyRequests, await SignInFromAsync(factory, "203.0.113.20", forwardedFor: "198.51.100.5"));
     }
 
+    [Fact]
+    public async Task The_public_forms_share_their_own_limit()
+    {
+        await using var factory = WithLimitOfTwo();
+        var client = factory.CreateClient();
+        await client.PostAsJsonAsync("/api/newsletter", new { email = $"{Guid.NewGuid():N}@example.test" }, Ct);
+        await client.PostAsJsonAsync("/api/newsletter", new { email = $"{Guid.NewGuid():N}@example.test" }, Ct);
+
+        var contact = await client.PostAsJsonAsync("/api/contact",
+            new { name = "Ada", email = "ada@example.test", subject = "Hello", message = "A question about brushes." }, Ct);
+        var signIn = await client.PostAsJsonAsync("/api/auth/login", NewSignIn(), Ct);
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, contact.StatusCode);
+        // Signing in is counted separately
+        Assert.Equal(HttpStatusCode.Unauthorized, signIn.StatusCode);
+    }
+
     private WebApplicationFactory<Program> WithLimitOfTwo() =>
-        api.Factory.WithWebHostBuilder(builder => builder.UseSetting("RateLimits:Credentials:PermitLimit", "2"));
+        api.Factory.WithWebHostBuilder(builder => builder
+            .UseSetting("RateLimits:Credentials:PermitLimit", "2")
+            .UseSetting("RateLimits:PublicForms:PermitLimit", "2"));
 
     // A failed sign-in for a new email each time, so the per-account lockout never gets involved
     private static object NewSignIn() => new { email = $"{Guid.NewGuid():N}@example.test", password = "Wrong-Password-1" };

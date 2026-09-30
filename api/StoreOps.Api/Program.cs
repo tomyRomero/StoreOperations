@@ -9,6 +9,7 @@ using StoreOps.Api.Cart.Services;
 using StoreOps.Api.Catalog.Services;
 using StoreOps.Api.Checkouts.Services;
 using StoreOps.Api.Common;
+using StoreOps.Api.Contact.Services;
 using StoreOps.Api.Customers.Services;
 using StoreOps.Api.Data;
 using StoreOps.Api.Emails;
@@ -61,6 +62,7 @@ builder.Services.AddScoped<AdminCustomerService>();
 builder.Services.AddScoped<ActivityFeedService>();
 builder.Services.AddScoped<StoreSettingsService>();
 builder.Services.AddScoped<NewsletterService>();
+builder.Services.AddScoped<ContactService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<OrderPlacement>();
 

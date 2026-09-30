@@ -117,6 +117,21 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
         return recipients.Count;
     }
 
+    // A contact form message for the store's inbox, with the customer as the reply address.
+    // Returns false when the store has no inbox set in Store settings.
+    public async Task<bool> AddSupportRequestAsync(string name, string email, string subject, string message, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        if (settings.SupportEmail is not { } storeInbox)
+            return false;
+
+        var model = new SupportRequestEmailModel(settings.StoreName, name, email, subject, message);
+        await AddAsync<SupportRequestEmail>(EmailKind.SupportRequest, storeInbox, $"Contact form: {subject}", model,
+            $"From {name} <{email}>. Reply to this email to answer them.\n\n{subject}\n\n{message}\n",
+            replyTo: email);
+        return true;
+    }
+
     // The page that asks "Unsubscribe?" before doing it, so a link scanner opening the link changes nothing
     private string UnsubscribePageUrl(string token) => $"{SiteUrl}/unsubscribe/{token}";
 
