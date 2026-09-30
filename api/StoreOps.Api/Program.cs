@@ -10,6 +10,7 @@ using StoreOps.Api.Common;
 using StoreOps.Api.Data;
 using StoreOps.Api.Images;
 using StoreOps.Api.Orders.Services;
+using StoreOps.Api.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
 builder.Services.AddImageStorage();
+builder.Services.AddPayments();
 builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<CategoryAdminService>();
 builder.Services.AddScoped<ProductAdminService>();
