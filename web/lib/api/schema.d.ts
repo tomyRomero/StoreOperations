@@ -2727,7 +2727,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfAdminCustomerSummaryResponse: {
             items: components["schemas"]["AdminCustomerSummaryResponse"][];
@@ -2738,7 +2738,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfAdminOrderSummaryResponse: {
             items: components["schemas"]["AdminOrderSummaryResponse"][];
@@ -2749,7 +2749,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfAdminProductResponse: {
             items: components["schemas"]["AdminProductResponse"][];
@@ -2760,7 +2760,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfOrderSummaryResponse: {
             items: components["schemas"]["OrderSummaryResponse"][];
@@ -2771,7 +2771,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfProductResponse: {
             items: components["schemas"]["ProductResponse"][];
@@ -2782,7 +2782,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PagedOfSubscriberResponse: {
             items: components["schemas"]["SubscriberResponse"][];
@@ -2793,7 +2793,7 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
             /** Format: int32 */
-            totalPages?: number;
+            totalPages: number;
         };
         PostalAddress: {
             recipientName: string;

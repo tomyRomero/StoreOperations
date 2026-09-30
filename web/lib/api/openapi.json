@@ -4243,7 +4243,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4276,7 +4277,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4309,7 +4311,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4342,7 +4345,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4375,7 +4379,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4408,7 +4413,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
@@ -4441,7 +4447,8 @@
           "items",
           "page",
           "pageSize",
-          "totalCount"
+          "totalCount",
+          "totalPages"
         ],
         "type": "object",
         "properties": {
