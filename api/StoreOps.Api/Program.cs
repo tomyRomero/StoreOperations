@@ -8,6 +8,7 @@ using StoreOps.Api.Cart.Services;
 using StoreOps.Api.Catalog.Services;
 using StoreOps.Api.Checkouts.Services;
 using StoreOps.Api.Common;
+using StoreOps.Api.Customers.Services;
 using StoreOps.Api.Data;
 using StoreOps.Api.Emails;
 using StoreOps.Api.Images;
@@ -53,6 +54,7 @@ builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<OrderHistoryService>();
 builder.Services.AddScoped<AdminOrderService>();
+builder.Services.AddScoped<AdminCustomerService>();
 builder.Services.AddScoped<CheckoutService>();
 builder.Services.AddScoped<OrderPlacement>();
 
@@ -69,6 +71,13 @@ if (args is ["seed"])
 
     await DevSeeder.RunAsync(app.Services);
     Console.WriteLine($"Seeded the demo store. Sign in as admin@example.test or customer@example.test, password {DevSeeder.DemoPassword}");
+    return;
+}
+
+// dotnet run --project StoreOps.Api -- make-admin someone@example.com (or remove-admin): change who is an admin, then exit
+if (args is [(AdminCommands.MakeAdmin or AdminCommands.RemoveAdmin) and var command, var email])
+{
+    Environment.ExitCode = await AdminCommands.RunAsync(app.Services, command, email, Console.Out);
     return;
 }
 

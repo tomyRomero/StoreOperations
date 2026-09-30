@@ -23,6 +23,10 @@ public class ActivityLogEntry
 public enum ActivityAction
 {
     UserRegistered,
+    CustomerDisabled,
+    CustomerEnabled,
+    AdminRoleGranted,
+    AdminRoleRemoved,
     NewsletterSubscribed,
     NewsletterUnsubscribed,
     SubscribersRemoved,

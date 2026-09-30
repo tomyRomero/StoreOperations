@@ -30,6 +30,8 @@ public sealed class AdminOrderService(AppDbContext db, StoreEmails emails, TimeP
         var orders = db.Orders.AsQueryable();
         if (query.Status is { } status)
             orders = orders.Where(o => o.Status == status);
+        if (query.CustomerId is { } customerId)
+            orders = orders.Where(o => o.UserId == customerId);
         if (query.Search?.Trim() is { Length: > 0 } search)
             orders = orders.Where(o => o.OrderNumber == search.ToUpper()
                 || o.User.Email!.Contains(search)

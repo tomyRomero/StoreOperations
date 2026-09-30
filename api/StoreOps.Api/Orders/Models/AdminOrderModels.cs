@@ -3,7 +3,7 @@ using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Orders.Models;
 
-public sealed record AdminOrderQuery(string? Search, OrderStatus? Status, int Page, int PageSize);
+public sealed record AdminOrderQuery(string? Search, OrderStatus? Status, int? CustomerId, int Page, int PageSize);
 
 public sealed record AdminOrderSummaryResponse(
     string OrderNumber,
