@@ -60,8 +60,10 @@ public static class AuthServiceCollectionExtensions
                     "You don't have access to this.");
         });
 
-        // Changing a password, removing the Admin role or disabling an account rotates the user's
-        // security stamp; every cookie is re-checked against it this often and dropped if it's stale.
+        // Every sign-in cookie is re-checked against the database this often. A changed security stamp
+        // (a new password) ends the session, and roles are re-read, so removing the Admin role takes
+        // effect too. Setting a lockout does not change the stamp: disabling an account must also
+        // call UpdateSecurityStampAsync to end its sessions.
         services.Configure<SecurityStampValidatorOptions>(options =>
             options.ValidationInterval = configuration.GetValue("Auth:SecurityStampValidationInterval", TimeSpan.FromMinutes(1)));
 
