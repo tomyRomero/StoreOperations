@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
+using StoreOps.Api.Account.Services;
 using StoreOps.Api.Auth;
 using StoreOps.Api.Cart.Services;
 using StoreOps.Api.Catalog.Services;
@@ -43,6 +44,7 @@ builder.Services.AddScoped<CatalogService>();
 builder.Services.AddScoped<CategoryAdminService>();
 builder.Services.AddScoped<ProductAdminService>();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<AddressService>();
 
 builder.Services.AddEdgeSecurity(builder.Configuration);
 builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
