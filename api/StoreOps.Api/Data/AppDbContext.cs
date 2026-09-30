@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using StoreOps.Api.Domain;
 namespace StoreOps.Api.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options)
-    : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>(options)
+    : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>(options), IDataProtectionKeyContext
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Product> Products => Set<Product>();
@@ -21,6 +22,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<ActivityLogEntry> ActivityLog => Set<ActivityLogEntry>();
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
     public DbSet<EmailOutboxMessage> EmailOutbox => Set<EmailOutboxMessage>();
+
+    // The keys that encrypt the sign-in cookie (ASP.NET Core Data Protection)
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

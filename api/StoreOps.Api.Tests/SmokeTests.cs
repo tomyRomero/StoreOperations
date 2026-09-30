@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using StoreOps.Api.Tests.Infrastructure;
 
@@ -19,9 +20,27 @@ public class SmokeTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task Unknown_routes_return_problem_details()
+    public async Task Anonymous_callers_learn_nothing_about_which_routes_exist()
     {
+        // Deny by default covers unknown paths too: signed out, everything but the public endpoints is a 401
         var response = await _client.GetAsync("/api/does-not-exist", TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task Unknown_routes_return_not_found_problem_details_when_signed_in()
+    {
+        var client = api.Factory.CreateClient();
+        await client.PostAsJsonAsync("/api/auth/register", new
+        {
+            username = $"smoke-{Guid.NewGuid():N}"[..20],
+            email = $"{Guid.NewGuid():N}@example.test",
+            password = "Paint-Brush-2026!",
+        }, TestContext.Current.CancellationToken);
+
+        var response = await client.GetAsync("/api/does-not-exist", TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);

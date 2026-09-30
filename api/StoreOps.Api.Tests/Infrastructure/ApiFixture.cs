@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
 
 namespace StoreOps.Api.Tests.Infrastructure;
 
@@ -23,6 +24,10 @@ public sealed class ApiFixture(SqlServerFixture sql) : DatabaseFixture(sql)
             // "Testing" never loads the developer's user secrets, so a test can't reach the dev database
             builder.UseEnvironment("Testing");
             builder.UseSetting("ConnectionStrings:Database", connectionString);
+            // Re-check sign-in cookies on every request, so signing out other sessions is visible at once
+            builder.UseSetting("Auth:SecurityStampValidationInterval", "00:00:00");
+            // Only warnings and errors, so a failing test's output isn't buried under SQL
+            builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
         }
     }
 }

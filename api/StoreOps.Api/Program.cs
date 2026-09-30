@@ -1,13 +1,23 @@
-using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
+using StoreOps.Api.Auth;
 using StoreOps.Api.Data;
-using StoreOps.Api.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Every error, expected or not, is returned as RFC 9457 problem details (application/problem+json)
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+
+builder.Services
+    .AddControllers(options =>
+        // Validation errors are keyed by the JSON names the client sent ("email", not "Email")
+        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
+    .AddJsonOptions(options =>
+        // Enums travel as readable strings ("no_returns"), the same convention as Clareion's API
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)));
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<TimestampInterceptor>();
@@ -24,10 +34,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) => options
 
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 
-// Accounts: Identity's user store and password hashing. Sign-in endpoints come with the login feature.
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.User.RequireUniqueEmail = true)
-    .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
@@ -45,12 +52,17 @@ if (args is ["seed"])
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
 if (app.Environment.IsDevelopment())
 {
     // The API contract. The web app generates its TypeScript types from it.
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();

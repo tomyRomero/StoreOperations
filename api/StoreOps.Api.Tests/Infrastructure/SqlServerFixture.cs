@@ -19,10 +19,11 @@ public sealed class SqlServerFixture : IAsyncLifetime
             parameters.HostConfig ??= new HostConfig();
             parameters.HostConfig.Memory = 2L * 1024 * 1024 * 1024;
         })
-        // Ready means "accepts a connection". The first start of this x64 image on an Apple Silicon Mac
-        // (or a cold CI runner) can take over a minute, longer than the default wait.
+        // Ready means "accepts a connection". On CI (x64) that takes seconds. On an Apple Silicon Mac the
+        // x64 image runs under Rosetta, and translating it can take minutes on a busy machine, so the
+        // limit is generous. It only decides how long a start that is truly broken takes to fail.
         .WithWaitStrategy(Wait.ForUnixContainer()
-            .UntilDatabaseIsAvailable(SqlClientFactory.Instance, wait => wait.WithTimeout(TimeSpan.FromMinutes(3))))
+            .UntilDatabaseIsAvailable(SqlClientFactory.Instance, wait => wait.WithTimeout(TimeSpan.FromMinutes(5))))
         .Build();
 
     public async ValueTask InitializeAsync() => await _container.StartAsync();
