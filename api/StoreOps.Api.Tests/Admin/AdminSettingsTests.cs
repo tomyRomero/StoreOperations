@@ -40,8 +40,9 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
         Assert.Equal(1000, store.GetProperty("shippingFlatRateCents").GetInt32());
         Assert.Equal("no_returns", store.GetProperty("returnPolicy").GetString());
         Assert.Equal(5, store.GetProperty("lowStockThreshold").GetInt32());
+        Assert.Equal("America/New_York", store.GetProperty("timeZoneId").GetString());
         // Nothing internal
-        Assert.False(store.TryGetProperty("timeZoneId", out _));
+        Assert.False(store.TryGetProperty("emailCustomerOnStatusUpdateByDefault", out _));
         Assert.False(store.TryGetProperty("rowVersion", out _));
     }
 

@@ -22,7 +22,7 @@ public class StoreSettings : IUpdatedAt
     public int LowStockThreshold { get; set; }
     public bool EmailCustomerOnStatusUpdateByDefault { get; set; }
 
-    // IANA time zone (e.g. America/New_York): decides what "a day" means on the dashboard
+    // IANA time zone (e.g. America/New_York): decides what "a day" means on the dashboard and order pages
     public required string TimeZoneId { get; set; }
 
     public DateTime UpdatedAtUtc { get; set; }

@@ -3,7 +3,8 @@ using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Settings.Models;
 
-// What the storefront shows: the footer, the cart's free-shipping note, the returns page and "Only 3 left"
+// What the storefront shows: the footer, the cart's free-shipping note, the returns page and "Only 3 left".
+// Order dates are shown in the store's time zone, the same calendar day the admin pages use.
 public sealed record PublicStoreSettingsResponse(
     string StoreName,
     string? SupportEmail,
@@ -12,7 +13,8 @@ public sealed record PublicStoreSettingsResponse(
     ReturnPolicy ReturnPolicy,
     short? ReturnWindowDays,
     string? ReturnPolicyNote,
-    int LowStockThreshold);
+    int LowStockThreshold,
+    string TimeZoneId);
 
 public sealed record StoreSettingsResponse(
     string StoreName,

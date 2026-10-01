@@ -3020,6 +3020,7 @@ export interface components {
             returnPolicyNote: null | string;
             /** Format: int32 */
             lowStockThreshold: number;
+            timeZoneId: string;
         };
         RegisterRequest: {
             username: string;

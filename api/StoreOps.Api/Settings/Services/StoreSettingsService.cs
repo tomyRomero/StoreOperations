@@ -26,7 +26,7 @@ public sealed class StoreSettingsService(AppDbContext db, TimeProvider clock)
         await db.StoreSettings
             .Select(s => new PublicStoreSettingsResponse(
                 s.StoreName, s.SupportEmail, s.ShippingFlatRateCents, s.FreeShippingThresholdCents,
-                s.ReturnPolicy, s.ReturnWindowDays, s.ReturnPolicyNote, s.LowStockThreshold))
+                s.ReturnPolicy, s.ReturnWindowDays, s.ReturnPolicyNote, s.LowStockThreshold, s.TimeZoneId))
             .SingleAsync(ct);
 
     public async Task<StoreSettingsResponse> GetAsync(CancellationToken ct) =>

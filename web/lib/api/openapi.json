@@ -5093,7 +5093,8 @@
           "returnPolicy",
           "returnWindowDays",
           "returnPolicyNote",
-          "lowStockThreshold"
+          "lowStockThreshold",
+          "timeZoneId"
         ],
         "type": "object",
         "properties": {
@@ -5136,6 +5137,9 @@
           "lowStockThreshold": {
             "type": "integer",
             "format": "int32"
+          },
+          "timeZoneId": {
+            "type": "string"
           }
         }
       },
