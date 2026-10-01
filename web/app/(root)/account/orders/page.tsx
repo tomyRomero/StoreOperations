@@ -21,10 +21,10 @@ export default async function OrdersPage(props: { searchParams: Promise<SearchPa
   return (
     <div className="grid gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <h1 className="text-h1">Orders</h1>
-        <Link href="/contact" className="text-sm font-semibold text-accent underline-offset-4 hover:underline">
-          Questions about an order?
-        </Link>
+        <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] sm:text-[56px]">Your orders</h1>
+        {orders && orders.totalCount > 0 && (
+          <p className="font-mono text-sm text-muted-foreground">{orders.totalCount === 1 ? "1 order" : `${orders.totalCount} orders`}</p>
+        )}
       </div>
 
       {!orders || !settings ? (
@@ -61,6 +61,13 @@ export default async function OrdersPage(props: { searchParams: Promise<SearchPa
             totalCount={orders.totalCount}
             pageSize={orders.pageSize}
           />
+          <p className="text-sm text-faint">
+            Something wrong with an order?{" "}
+            <Link href="/contact" className="text-ink-2 underline underline-offset-3 hover:text-foreground">
+              Ask us
+            </Link>{" "}
+            and we&apos;ll sort it out.
+          </p>
         </>
       )}
     </div>

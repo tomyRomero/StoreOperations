@@ -5,8 +5,8 @@ import { orderProgress } from "@/lib/order-progress";
 import { cn } from "@/lib/utils";
 
 // Placed ─ Shipped ─ Delivered: across the page on large screens, down it on phones. Done steps are
-// filled with ink, the current one has the accent's ring, the rest are hollow; a cancelled or refunded
-// order ends in sale red. Every step also says in words where the order is.
+// green with a tick, the current one is ink in a violet ring, the rest are hollow; a cancelled or
+// refunded order ends on a quiet grey cross. Every step also says in words where the order is.
 export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: string }) {
   const steps = orderProgress(order);
 
@@ -33,7 +33,7 @@ export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: str
                 aria-hidden
                 className={cn(
                   "absolute left-[11px] top-7 h-[calc(100%-1.75rem)] w-0.5 md:left-7 md:top-[11px] md:h-0.5 md:w-[calc(100%-1.75rem)]",
-                  steps[index + 1].state === "upcoming" ? "bg-border" : "bg-foreground"
+                  steps[index + 1].state === "upcoming" ? "bg-foreground/10" : steps[index + 1].state === "ended" ? "bg-foreground/25" : "bg-glow-green"
                 )}
               />
             )}
@@ -41,23 +41,23 @@ export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: str
               aria-hidden
               className={cn(
                 "relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full",
-                step.state === "ended" && "bg-destructive text-destructive-foreground",
-                filled && step.state !== "current" && "bg-primary text-primary-foreground",
-                step.state === "current" && "bg-accent ring-4 ring-accent-subtle",
-                step.state === "upcoming" && "border-2 border-input bg-card"
+                step.state === "ended" && "bg-foreground/15 text-foreground",
+                filled && step.state !== "current" && "bg-glow-green text-[#052e1f] shadow-[0_0_0_4px_rgb(52_211_153/0.18)]",
+                step.state === "current" && "bg-primary ring-4 ring-glow-violet/30",
+                step.state === "upcoming" && "border-[1.5px] border-input bg-card"
               )}
             >
-              {step.state === "done" && <Check className="size-3.5" />}
+              {step.state === "done" && <Check className="size-3.5" strokeWidth={3} />}
               {step.state === "ended" && <X className="size-3.5" />}
             </span>
             <div className="grid gap-0.5">
-              <span className={cn("text-sm font-semibold", step.state === "upcoming" && "text-muted-foreground", step.state === "ended" && "text-destructive")}>
+              <span className={cn("text-[15px] font-semibold", step.state === "upcoming" && "text-muted-foreground")}>
                 {step.label}
                 <span className="sr-only">
                   {step.state === "done" ? " (done)" : step.state === "current" ? " (current step)" : step.state === "upcoming" ? " (not yet)" : ""}
                 </span>
               </span>
-              {when && <span className="text-xs text-muted-foreground">{when}</span>}
+              {when && <span className="text-[13px] text-faint">{when}</span>}
             </div>
           </li>
         );

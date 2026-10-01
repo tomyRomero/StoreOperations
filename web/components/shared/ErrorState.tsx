@@ -17,7 +17,7 @@ type Props = {
 // Something failed: say so plainly and offer to try again. Details stay in the server's logs.
 export function ErrorState({ title = "Something went wrong", children, onRetry, action, className }: Props) {
   return (
-    <div role="alert" className={cn("flex flex-col items-center gap-3 rounded-md border px-6 py-12 text-center", className)}>
+    <div role="alert" className={cn("flex flex-col items-center gap-3 rounded-[24px] border bg-card px-6 py-12 text-center", className)}>
       <span className="flex size-12 items-center justify-center rounded-full bg-destructive-subtle">
         <TriangleAlert className="size-6 text-destructive" aria-hidden />
       </span>
