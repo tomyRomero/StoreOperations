@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm, useWatch } from "react-hook-form";
+import { Check } from "lucide-react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -31,6 +32,7 @@ const ChangePasswordForm = () => {
     defaultValues: { password: "", newPassword: "", confirmNewPassword: "" },
   });
   const typed = useWatch({ control: form.control, name: "newPassword" });
+  const again = useWatch({ control: form.control, name: "confirmNewPassword" });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     const { error, response } = await api.POST("/api/auth/change-password", {
@@ -51,7 +53,7 @@ const ChangePasswordForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-5" noValidate>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5.5" noValidate>
         <FormField
           control={form.control}
           name="password"
@@ -88,12 +90,21 @@ const ChangePasswordForm = () => {
               <FormControl>
                 <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
+              {/* Says so as soon as the two agree, so nobody has to submit to find out */}
+              <p role="status" className="text-[13px] text-success">
+                {again && again === typed && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Check className="size-3.5" strokeWidth={3} aria-hidden />
+                    Matches
+                  </span>
+                )}
+              </p>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" size="lg" className="justify-self-start" loading={form.formState.isSubmitting}>
-          Change password
+        <Button type="submit" size="pill" className="mt-1 w-full shadow-glow" loading={form.formState.isSubmitting}>
+          Update password
         </Button>
       </form>
     </Form>

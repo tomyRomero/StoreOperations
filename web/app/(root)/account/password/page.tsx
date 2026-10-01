@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
 import ChangePasswordForm from "@/components/forms/ChangePasswordForm";
 
-export const metadata: Metadata = { title: "Security" };
+export const metadata: Metadata = { title: "Password" };
 
-export default function SecurityPage() {
+export default function PasswordPage() {
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-1">
-        <h1 className="text-h1">Security</h1>
-        <p className="text-muted-foreground">Changing your password signs you out on every other device.</p>
+    <div className="grid max-w-[620px] gap-6">
+      <div className="grid gap-2">
+        <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] sm:text-[56px]">Password</h1>
+        <p className="text-muted-foreground">Changing it signs you out everywhere else.</p>
       </div>
-      <section aria-labelledby="password-heading" className="grid gap-5 rounded-md border p-5 sm:p-6">
-        <h2 id="password-heading" className="text-h3">
-          Change your password
-        </h2>
+      <section aria-label="Change your password" className="rounded-[28px] border bg-card p-6 sm:p-7">
         <ChangePasswordForm />
       </section>
     </div>
