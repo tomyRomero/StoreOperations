@@ -44,8 +44,12 @@ builder.Services.ConfigureHttpJsonOptions(options => UseStoreJson(options.Serial
 
 builder.Services
     .AddControllers(options =>
+    {
         // Validation errors are keyed by the JSON names the client sent ("email", not "Email")
-        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
+        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+        // Query-string enums by their JSON names ("store_settings"), the ones the contract publishes
+        options.ModelBinderProviders.Insert(0, new QueryEnumBinderProvider());
+    })
     .AddJsonOptions(options =>
     {
         UseStoreJson(options.JsonSerializerOptions);

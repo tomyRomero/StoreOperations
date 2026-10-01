@@ -112,3 +112,65 @@ public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
         return directory?.FullName ?? throw new DirectoryNotFoundException("Couldn't find the repository root (the folder with web/).");
     }
 }
+
+// Every value the contract offers for a query-string enum is one the API accepts. MVC's own binder only
+// knew the C# names, so two-word values the contract lists (entityType=store_settings) were refused.
+public class QueryEnumTests(ApiFixture api) : IClassFixture<ApiFixture>
+{
+    private static CancellationToken Ct => TestContext.Current.CancellationToken;
+
+    [Fact]
+    public async Task Every_enum_value_the_contract_offers_in_a_query_string_is_accepted()
+    {
+        await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+        var contract = JsonNode.Parse(await development.CreateClient().GetStringAsync("/openapi/v1.json", Ct))!;
+        var schemas = contract["components"]!["schemas"]!;
+        var admin = await api.CreateAdminClientAsync();
+
+        var tried = new List<string>();
+        var refused = new List<string>();
+        foreach (var (path, operations) in contract["paths"]!.AsObject())
+        {
+            if (path.Contains('{') || operations!["get"] is not { } get)
+                continue;
+
+            foreach (var parameter in get["parameters"]?.AsArray() ?? [])
+            {
+                if (parameter!["in"]!.GetValue<string>() != "query")
+                    continue;
+
+                foreach (var value in EnumValues(parameter["schema"]!, schemas))
+                {
+                    var url = $"{path}?{parameter["name"]}={value}";
+                    tried.Add(url);
+                    if ((await admin.GetAsync(url, Ct)).StatusCode == HttpStatusCode.BadRequest)
+                        refused.Add(url);
+                }
+            }
+        }
+
+        Assert.Contains("/api/admin/activity?entityType=store_settings", tried);
+        Assert.Empty(refused);
+    }
+
+    [Fact]
+    public async Task A_value_the_contract_does_not_offer_is_a_field_error()
+    {
+        var admin = await api.CreateAdminClientAsync();
+
+        var response = await admin.GetAsync("/api/admin/activity?entityType=StoreSettings2", Ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var errors = (await response.Content.ReadFromJsonAsync<JsonNode>(Ct))!["errors"]!;
+        Assert.NotNull(errors["entityType"]);
+    }
+
+    // The schema's enum, directly or through its $ref
+    private static IEnumerable<string> EnumValues(JsonNode schema, JsonNode schemas)
+    {
+        if (schema["$ref"]?.GetValue<string>() is { } reference)
+            schema = schemas[reference.Split('/')[^1]]!;
+
+        return schema["enum"]?.AsArray().OfType<JsonNode>().Select(v => v.GetValue<string>()) ?? [];
+    }
+}
