@@ -46,7 +46,14 @@ builder.Services
     .AddControllers(options =>
         // Validation errors are keyed by the JSON names the client sent ("email", not "Email")
         options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
-    .AddJsonOptions(options => UseStoreJson(options.JsonSerializerOptions));
+    .AddJsonOptions(options =>
+    {
+        UseStoreJson(options.JsonSerializerOptions);
+        // A body that doesn't fit the request (a missing required field, text where a number goes) is
+        // reported as "The input was not valid." under its JSON path, without the serializer's message,
+        // which names the API's own types
+        options.AllowInputFormatterExceptionMessages = false;
+    });
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<TimestampInterceptor>();

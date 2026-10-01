@@ -20,14 +20,14 @@ public record ProductRequest
     public string Description { get; init; } = "";
 
     [Range(1, int.MaxValue)]
-    public int CategoryId { get; init; }
+    public required int CategoryId { get; init; }
 
     // What the customer pays, in cents. During a deal this is the deal price.
     [Range(1, 10_000_000)]
-    public int PriceCents { get; init; }
+    public required int PriceCents { get; init; }
 
     [Range(0, 100_000)]
-    public int Stock { get; init; }
+    public required int Stock { get; init; }
 
     // From POST /api/admin/images
     [Required, StringLength(300)]
@@ -46,7 +46,7 @@ public sealed record DealRequest
 {
     // Must be below the regular price
     [Range(1, 10_000_000)]
-    public int DealPriceCents { get; init; }
+    public required int DealPriceCents { get; init; }
 
     [StringLength(200)]
     public string? Description { get; init; }
@@ -82,7 +82,7 @@ public sealed record ProductBulkRequest
     [Required, MinLength(1), MaxLength(100)]
     public int[] Ids { get; init; } = [];
 
-    public ProductBulkAction Action { get; init; }
+    public required ProductBulkAction Action { get; init; }
 
     // Where Move puts them
     public int? CategoryId { get; init; }

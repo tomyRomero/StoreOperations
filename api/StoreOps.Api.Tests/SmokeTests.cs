@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Hosting;
 using StoreOps.Api.Tests.Infrastructure;
@@ -27,6 +28,21 @@ public class SmokeTests(ApiFixture api) : IClassFixture<ApiFixture>
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    // The serializer's own messages name the API's types and where parsing stopped. Callers get the
+    // field and a plain message instead.
+    [Fact]
+    public async Task A_body_that_does_not_fit_is_reported_without_the_apis_internals()
+    {
+        var client = await api.CreateCustomerClientAsync();
+
+        var response = await client.PostAsJsonAsync("/api/cart/items", new { productId = "seven" }, TestContext.Current.CancellationToken);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Contains("\"$.productId\"", body);
+        Assert.DoesNotContain("StoreOps", body);
     }
 
     [Fact]

@@ -7,7 +7,7 @@ public sealed record StartCheckoutRequest
 {
     // One of the customer's saved addresses
     [Range(1, int.MaxValue)]
-    public int AddressId { get; init; }
+    public required int AddressId { get; init; }
 }
 
 public sealed record CheckoutLineResponse(int ProductId, string Name, int UnitPriceCents, int Quantity, int LineTotalCents, string ImageUrl);

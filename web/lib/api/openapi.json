@@ -3256,6 +3256,9 @@
         }
       },
       "AddToCartRequest": {
+        "required": [
+          "productId"
+        ],
         "type": "object",
         "properties": {
           "productId": {
@@ -3717,7 +3720,8 @@
       },
       "BulkOrderStatusRequest": {
         "required": [
-          "orderNumbers"
+          "orderNumbers",
+          "status"
         ],
         "type": "object",
         "properties": {
@@ -3805,6 +3809,10 @@
         ]
       },
       "CartLineRequest": {
+        "required": [
+          "productId",
+          "quantity"
+        ],
         "type": "object",
         "properties": {
           "productId": {
@@ -4262,6 +4270,9 @@
         }
       },
       "DealRequest": {
+        "required": [
+          "dealPriceCents"
+        ],
         "type": "object",
         "properties": {
           "dealPriceCents": {
@@ -4943,7 +4954,8 @@
       },
       "ProductBulkRequest": {
         "required": [
-          "ids"
+          "ids",
+          "action"
         ],
         "type": "object",
         "properties": {
@@ -4972,6 +4984,9 @@
         "required": [
           "name",
           "description",
+          "categoryId",
+          "priceCents",
+          "stock",
           "imageKey"
         ],
         "type": "object",
@@ -5206,6 +5221,9 @@
         ]
       },
       "SetQuantityRequest": {
+        "required": [
+          "quantity"
+        ],
         "type": "object",
         "properties": {
           "quantity": {
@@ -5217,6 +5235,9 @@
         }
       },
       "StartCheckoutRequest": {
+        "required": [
+          "addressId"
+        ],
         "type": "object",
         "properties": {
           "addressId": {
@@ -5378,6 +5399,7 @@
       },
       "UpdateOrderRequest": {
         "required": [
+          "status",
           "rowVersion"
         ],
         "type": "object",
@@ -5440,6 +5462,9 @@
           "rowVersion",
           "name",
           "description",
+          "categoryId",
+          "priceCents",
+          "stock",
           "imageKey"
         ],
         "type": "object",
@@ -5488,6 +5513,10 @@
       "UpdateStoreSettingsRequest": {
         "required": [
           "storeName",
+          "shippingFlatRateCents",
+          "returnPolicy",
+          "lowStockThreshold",
+          "emailCustomerOnStatusUpdateByDefault",
           "timeZoneId",
           "rowVersion"
         ],

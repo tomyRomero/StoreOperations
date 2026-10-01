@@ -5,7 +5,7 @@ namespace StoreOps.Api.Cart.Models;
 public sealed record AddToCartRequest
 {
     [Range(1, int.MaxValue)]
-    public int ProductId { get; init; }
+    public required int ProductId { get; init; }
 
     [Range(1, 99)]
     public int Quantity { get; init; } = 1;
@@ -14,16 +14,16 @@ public sealed record AddToCartRequest
 public sealed record SetQuantityRequest
 {
     [Range(1, 99)]
-    public int Quantity { get; init; }
+    public required int Quantity { get; init; }
 }
 
 public sealed record CartLineRequest
 {
     [Range(1, int.MaxValue)]
-    public int ProductId { get; init; }
+    public required int ProductId { get; init; }
 
     [Range(1, 99)]
-    public int Quantity { get; init; }
+    public required int Quantity { get; init; }
 }
 
 // A guest's cart from the browser, to merge after sign-in or to price before it

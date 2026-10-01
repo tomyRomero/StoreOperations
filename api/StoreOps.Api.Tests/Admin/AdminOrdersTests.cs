@@ -344,6 +344,24 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal("cancelled", (await GetAsync(admin, number)).GetProperty("status").GetString());
     }
 
+    // Left out, the status would otherwise read as "pending" and the rest would be saved as if unchanged
+    [Fact]
+    public async Task An_update_without_a_status_is_refused()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (_, number) = await PlacedOrderAsync();
+        var opened = await GetAsync(admin, number);
+
+        var response = await admin.PutAsJsonAsync($"/api/admin/orders/{number}", new
+        {
+            trackingNumber = "1Z999AA10123456784",
+            rowVersion = opened.GetProperty("rowVersion").GetString(),
+        }, Ct);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(JsonValueKind.Null, (await GetAsync(admin, number)).GetProperty("trackingNumber").ValueKind);
+    }
+
     [Fact]
     public async Task An_unknown_order_is_not_found()
     {

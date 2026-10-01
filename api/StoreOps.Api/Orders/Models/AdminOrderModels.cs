@@ -42,7 +42,7 @@ public sealed record AdminOrderResponse(
 // The order page's side panel: the status (unchanged, or one of NextStatuses) and the shipping details
 public sealed record UpdateOrderRequest
 {
-    public OrderStatus Status { get; init; }
+    public required OrderStatus Status { get; init; }
 
     public Carrier? Carrier { get; init; }
 
@@ -72,7 +72,7 @@ public sealed record BulkOrderStatusRequest
     [Required, MinLength(1), MaxLength(100)]
     public string[] OrderNumbers { get; init; } = [];
 
-    public OrderStatus Status { get; init; }
+    public required OrderStatus Status { get; init; }
 
     // Null follows the store's default in Store settings
     public bool? EmailCustomer { get; init; }

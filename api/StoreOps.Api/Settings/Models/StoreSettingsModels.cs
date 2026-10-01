@@ -41,13 +41,13 @@ public sealed record UpdateStoreSettingsRequest
     public string? SupportEmail { get; init; }
 
     [Range(0, 100_000)]
-    public int ShippingFlatRateCents { get; init; }
+    public required int ShippingFlatRateCents { get; init; }
 
     // Null turns free shipping off
     [Range(1, 10_000_000)]
     public int? FreeShippingThresholdCents { get; init; }
 
-    public ReturnPolicy ReturnPolicy { get; init; }
+    public required ReturnPolicy ReturnPolicy { get; init; }
 
     // Required for exchanges and refunds; ignored for no returns
     [Range(1, 365)]
@@ -57,9 +57,9 @@ public sealed record UpdateStoreSettingsRequest
     public string? ReturnPolicyNote { get; init; }
 
     [Range(0, 1000)]
-    public int LowStockThreshold { get; init; }
+    public required int LowStockThreshold { get; init; }
 
-    public bool EmailCustomerOnStatusUpdateByDefault { get; init; }
+    public required bool EmailCustomerOnStatusUpdateByDefault { get; init; }
 
     // An IANA time zone such as America/New_York
     [Required, StringLength(64)]

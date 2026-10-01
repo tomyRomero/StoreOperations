@@ -2507,7 +2507,7 @@ export interface components {
         };
         AddToCartRequest: {
             /** Format: int32 */
-            productId?: number;
+            productId: number;
             /** Format: int32 */
             quantity?: number;
         };
@@ -2637,7 +2637,7 @@ export interface components {
         };
         BulkOrderStatusRequest: {
             orderNumbers: string[];
-            status?: components["schemas"]["OrderStatus"];
+            status: components["schemas"]["OrderStatus"];
             emailCustomer?: null | boolean;
             confirmRefund?: boolean;
         };
@@ -2655,9 +2655,9 @@ export interface components {
         CartLineIssue: "unavailable" | "out_of_stock" | "not_enough_stock" | null;
         CartLineRequest: {
             /** Format: int32 */
-            productId?: number;
+            productId: number;
             /** Format: int32 */
-            quantity?: number;
+            quantity: number;
         };
         CartLineResponse: {
             /** Format: int32 */
@@ -2783,7 +2783,7 @@ export interface components {
         };
         DealRequest: {
             /** Format: int32 */
-            dealPriceCents?: number;
+            dealPriceCents: number;
             description?: null | string;
         };
         /** Format: binary */
@@ -2971,7 +2971,7 @@ export interface components {
         ProductBulkAction: "archive" | "end_deal" | "move";
         ProductBulkRequest: {
             ids: number[];
-            action?: components["schemas"]["ProductBulkAction"];
+            action: components["schemas"]["ProductBulkAction"];
             /** Format: int32 */
             categoryId?: null | number;
         };
@@ -2979,11 +2979,11 @@ export interface components {
             name: string;
             description: string;
             /** Format: int32 */
-            categoryId?: number;
+            categoryId: number;
             /** Format: int32 */
-            priceCents?: number;
+            priceCents: number;
             /** Format: int32 */
-            stock?: number;
+            stock: number;
             imageKey: string;
         };
         ProductResponse: {
@@ -3038,11 +3038,11 @@ export interface components {
         ReturnPolicy: "no_returns" | "exchanges" | "refunds";
         SetQuantityRequest: {
             /** Format: int32 */
-            quantity?: number;
+            quantity: number;
         };
         StartCheckoutRequest: {
             /** Format: int32 */
-            addressId?: number;
+            addressId: number;
         };
         StatusCount: {
             status: components["schemas"]["OrderStatus"];
@@ -3089,7 +3089,7 @@ export interface components {
             revenueCents: number;
         };
         UpdateOrderRequest: {
-            status?: components["schemas"]["OrderStatus"];
+            status: components["schemas"]["OrderStatus"];
             carrier?: null | components["schemas"]["Carrier"];
             trackingNumber?: null | string;
             /** Format: date */
@@ -3106,27 +3106,27 @@ export interface components {
             name: string;
             description: string;
             /** Format: int32 */
-            categoryId?: number;
+            categoryId: number;
             /** Format: int32 */
-            priceCents?: number;
+            priceCents: number;
             /** Format: int32 */
-            stock?: number;
+            stock: number;
             imageKey: string;
         };
         UpdateStoreSettingsRequest: {
             storeName: string;
             supportEmail?: null | string;
             /** Format: int32 */
-            shippingFlatRateCents?: number;
+            shippingFlatRateCents: number;
             /** Format: int32 */
             freeShippingThresholdCents?: null | number;
-            returnPolicy?: components["schemas"]["ReturnPolicy"];
+            returnPolicy: components["schemas"]["ReturnPolicy"];
             /** Format: int16 */
             returnWindowDays?: null | number;
             returnPolicyNote?: null | string;
             /** Format: int32 */
-            lowStockThreshold?: number;
-            emailCustomerOnStatusUpdateByDefault?: boolean;
+            lowStockThreshold: number;
+            emailCustomerOnStatusUpdateByDefault: boolean;
             timeZoneId: string;
             /** Format: byte */
             rowVersion: string;

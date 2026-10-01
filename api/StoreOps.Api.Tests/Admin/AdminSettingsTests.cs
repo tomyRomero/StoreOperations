@@ -132,6 +132,19 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
         Assert.Equal("America/Chicago", (await BodyOf(response)).GetProperty("timeZoneId").GetString());
     }
 
+    // Left out, a setting would otherwise be saved as zero: free shipping, or "no returns"
+    [Fact]
+    public async Task A_save_that_leaves_a_setting_out_is_refused()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var opened = await GetAsync(admin);
+
+        var response = await SaveAsync(admin, opened, s => s.Remove("shippingFlatRateCents"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(1000, (await GetAsync(admin)).GetProperty("shippingFlatRateCents").GetInt32());
+    }
+
     [Fact]
     public async Task A_save_from_an_older_copy_is_refused()
     {
