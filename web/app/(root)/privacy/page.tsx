@@ -16,6 +16,7 @@ export default async function PrivacyPage() {
 
   return (
     <ContentPage
+      eyebrow="Your data"
       title="Privacy"
       lead="We keep only what we need to take, ship and support your orders. We don't sell your details or share them for advertising."
     >

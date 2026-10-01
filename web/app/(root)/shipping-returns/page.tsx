@@ -4,7 +4,7 @@ import { ContentPage, ContentSection } from "@/components/content/ContentPage";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { getStoreSettings } from "@/lib/data/catalog";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, formatMoneyBrief } from "@/lib/money";
 import { returnsSummary, shippingSummary } from "@/lib/format";
 
 export const metadata: Metadata = {
@@ -35,8 +35,16 @@ export default async function ShippingReturnsPage() {
     </>
   );
 
+  const facts = [
+    flatRate === 0 ? { big: "Free", small: "shipping on every order" } : { big: formatMoneyBrief(flatRate), small: "flat shipping per order" },
+    ...(flatRate > 0 && freeOver !== null ? [{ big: formatMoneyBrief(freeOver), small: "and up ships free" }] : []),
+    returnPolicy === "no_returns"
+      ? { big: "Final", small: "all sales are final" }
+      : { big: days ? `${days} days` : returnPolicy === "refunds" ? "Refunds" : "Exchanges", small: returnPolicy === "refunds" ? "to send it back for a refund" : "to exchange it" },
+  ];
+
   return (
-    <ContentPage title="Shipping and returns" lead={`${shippingSummary(settings)}. ${returnsSummary(settings)}.`}>
+    <ContentPage eyebrow="Help" title="Shipping and returns" lead={`${shippingSummary(settings)}. ${returnsSummary(settings)}.`} facts={facts}>
       <ContentSection title="Shipping">
         <ul>
           {flatRate === 0 ? (
