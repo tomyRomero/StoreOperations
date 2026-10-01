@@ -53,6 +53,18 @@ export async function getProducts({ categoryIds, search, onDeal, inStock, minPri
   return data ?? null;
 }
 
+// How many products a category has and its lowest price, for the home page's category tiles
+export async function getCategorySummary(categoryId: number): Promise<{ count: number; fromCents: number | null }> {
+  const page = await getProducts({ categoryIds: [categoryId], sort: "cheapest", pageSize: 1 });
+  return { count: page?.totalCount ?? 0, fromCents: page?.items[0]?.priceCents ?? null };
+}
+
+// How many products can be bought right now, or null when the API can't say
+export async function countInStock(): Promise<number | null> {
+  const page = await getProducts({ inStock: true, pageSize: 1 });
+  return page?.totalCount ?? null;
+}
+
 // Null when there's no such product (or it's no longer sold)
 export async function getProduct(id: number): Promise<Product | null> {
   const { data } = await serverApi().GET("/api/products/{id}", { params: { path: { id } } });

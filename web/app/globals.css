@@ -218,6 +218,27 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
 
+  /* The hero's product drifts up and down; the in-stock dot sends out a ring */
+  --animate-float: float 8s ease-in-out infinite;
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -14px;
+    }
+  }
+  --animate-ring: ring 1.8s ease-out infinite;
+  @keyframes ring {
+    from {
+      box-shadow: 0 0 0 0 rgb(52 211 153 / 0.55);
+    }
+    to {
+      box-shadow: 0 0 0 10px rgb(52 211 153 / 0);
+    }
+  }
+
   /* A just-added cart line glows in the accent's tint, then settles */
   --animate-highlight: highlight 2.4s var(--ease-standard);
   @keyframes highlight {
@@ -241,6 +262,27 @@
     var(--glow-amber),
     var(--glow-pink)
   );
+}
+
+/* Display type swept through the glows. Light mode takes deeper stops so even the pink passes 4.4:1. */
+@utility text-brand-gradient {
+  background-image: linear-gradient(
+    90deg,
+    light-dark(#d4247a, var(--glow-pink)) 0%,
+    light-dark(#6d4df2, var(--glow-violet)) 45%,
+    light-dark(#2563eb, var(--glow-blue)) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+/* A faint 64px studio grid that fades out from the top middle, behind the home page's opening */
+@utility bg-studio-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(60% 55% at 50% 20%, #000, transparent 75%);
 }
 
 /* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */

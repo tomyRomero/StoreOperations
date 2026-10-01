@@ -5,6 +5,13 @@ export function formatMoney(cents: number): string {
   return dollars.format(cents / 100);
 }
 
+const wholeDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+// For an amount inside a sentence: whole dollars without the cents ("$75"), anything else in full ("$7.50")
+export function formatMoneyBrief(cents: number): string {
+  return cents % 100 === 0 ? wholeDollars.format(cents / 100) : formatMoney(cents);
+}
+
 const shortDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
 
 // Short amounts for chart axes, such as "$250" and "$2.5K"

@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
-import SubscribeForm from "@/components/forms/SubscribeForm";
 import type { Category } from "@/lib/api/types";
+import { FooterNewsletter } from "./FooterNewsletter";
 
 type Props = {
   categories: Category[];
@@ -24,7 +24,7 @@ export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Pr
       <div className="container grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-8">
         <div className="col-span-2 grid content-start gap-5 sm:col-span-3 lg:col-span-1 lg:max-w-sm">
           <Logo name={storeName} />
-          <SubscribeForm />
+          <FooterNewsletter />
         </div>
 
         <nav aria-label="Shop" className="grid content-start gap-3">

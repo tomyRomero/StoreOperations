@@ -1,5 +1,5 @@
 import type { Carrier, OrderStatus, PostalAddress, StoreSettings } from "./api/types";
-import { formatMoney } from "./money";
+import { formatMoney, formatMoneyBrief } from "./money";
 
 // How the API's values read on a page. Money has its own file (money.ts).
 
@@ -64,6 +64,15 @@ export function shippingSummary(settings: Pick<StoreSettings, "shippingFlatRateC
       : `Free shipping on orders over ${formatMoney(settings.freeShippingThresholdCents)}`;
   }
   return settings.shippingFlatRateCents === 0 ? "Free shipping on every order" : `${formatMoney(settings.shippingFlatRateCents)} flat-rate shipping`;
+}
+
+// The same promise as one sentence, for the home page: "Flat $10 shipping, and free over $75."
+export function shippingSentence(settings: Pick<StoreSettings, "shippingFlatRateCents" | "freeShippingThresholdCents">): string {
+  const flat = settings.shippingFlatRateCents;
+  const free = settings.freeShippingThresholdCents;
+  if (flat === 0 || free === 0) return "Free shipping on every order.";
+  if (free === null) return `Flat ${formatMoneyBrief(flat)} shipping on every order.`;
+  return `Flat ${formatMoneyBrief(flat)} shipping, and free over ${formatMoneyBrief(free)}.`;
 }
 
 export function returnsSummary(settings: Pick<StoreSettings, "returnPolicy" | "returnWindowDays">): string {

@@ -144,7 +144,6 @@ async function RelatedProducts({ product, lowStockThreshold }: { product: Produc
       id="related"
       title="You may also like"
       href={`/products?category=${product.categoryId}`}
-      linkLabel={`More ${product.categoryName.toLowerCase()}`}
       products={related}
       lowStockThreshold={lowStockThreshold}
     />

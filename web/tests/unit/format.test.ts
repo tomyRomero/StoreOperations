@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, returnsSummary, shippingSummary, stockLabel } from "@/lib/format";
+import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, returnsSummary, shippingSentence, shippingSummary, stockLabel } from "@/lib/format";
 import type { PostalAddress } from "@/lib/api/types";
 
 describe("formatDate", () => {
@@ -67,6 +67,18 @@ describe("shippingSummary", () => {
 
   it("says free when the flat rate is zero", () => {
     expect(shippingSummary({ shippingFlatRateCents: 0, freeShippingThresholdCents: null })).toBe("Free shipping on every order");
+  });
+});
+
+describe("shippingSentence", () => {
+  it.each([
+    [1000, 7500, "Flat $10 shipping, and free over $75."],
+    [750, 5000, "Flat $7.50 shipping, and free over $50."],
+    [1000, null, "Flat $10 shipping on every order."],
+    [0, null, "Free shipping on every order."],
+    [1000, 0, "Free shipping on every order."],
+  ])("says a $%i flat rate and a %s threshold as one sentence", (flat, free, sentence) => {
+    expect(shippingSentence({ shippingFlatRateCents: flat, freeShippingThresholdCents: free })).toBe(sentence);
   });
 });
 

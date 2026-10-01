@@ -7,7 +7,15 @@ import { cn } from "@/lib/utils";
 
 // The "+" on a product card: adds one, then opens the bag drawer with it highlighted. The cart checks
 // stock with the API and says why when it can't add.
-export function QuickAddButton({ productId, name, className }: { productId: number; name: string; className?: string }) {
+type Props = {
+  productId: number;
+  name: string;
+  className?: string;
+  // In place of the "+", such as the word Add
+  children?: React.ReactNode;
+};
+
+export function QuickAddButton({ productId, name, className, children }: Props) {
   const cart = useCart();
   const [busy, setBusy] = useState(false);
 
@@ -31,7 +39,7 @@ export function QuickAddButton({ productId, name, className }: { productId: numb
         className
       )}
     >
-      {busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : <Plus className="size-[18px]" strokeWidth={2.4} aria-hidden />}
+      {busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : (children ?? <Plus className="size-[18px]" strokeWidth={2.4} aria-hidden />)}
     </button>
   );
 }
