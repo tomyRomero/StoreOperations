@@ -3,7 +3,6 @@ import "server-only";
 import { Types } from "mongoose";
 import { requireAdmin } from "../guards";
 import User from "../models/user.model";
-import Orders from "../models/orders.model";
 import Category from "../models/category.model";
 import Product from "../models/product.model";
 import Activity from "../models/activity.model";
@@ -59,36 +58,6 @@ export const getAddressesForUser = async (userId: string): Promise<Address[]> =>
   if (!Types.ObjectId.isValid(userId)) return [];
   const userAddresses = await Addresses.findOne({ user: userId });
   return userAddresses ? userAddresses.addresses.map((item: any) => item.address) : [];
-};
-
-export const findAllOrdersForAdmin = async ({ searchString = "", pageNumber = 1, pageSize = 20, sortBy = "desc" }: ListParams) => {
-  await requireAdmin();
-  try {
-    const skipAmount = (pageNumber - 1) * pageSize;
-    const regex = new RegExp(searchString, "i");
-    const query: any = {
-      $or: [
-        { orderId: { $regex: regex } },
-        { user: Types.ObjectId.isValid(searchString) ? new Types.ObjectId(searchString) : null },
-        { status: { $regex: regex } },
-      ],
-    };
-    const sortOrder = sortBy === "asc" ? 1 : -1;
-
-    const orders = await Orders.find(query).sort({ createdAt: sortOrder }).skip(skipAmount).limit(pageSize);
-    const totalOrdersCount = await Orders.countDocuments(query);
-    const isNext = totalOrdersCount > skipAmount + orders.length;
-
-    return { orders, isNext };
-  } catch (error) {
-    console.error("Error finding all orders for admin:", error);
-    return { orders: [], isNext: false };
-  }
-};
-
-export const findOrderForAdmin = async (orderId: string) => {
-  await requireAdmin();
-  return Orders.findOne({ orderId: String(orderId) });
 };
 
 export const getAllCategoriesAdmin = async ({ searchString = "", pageNumber = 1, pageSize = 20, sortBy = "desc" }: ListParams) => {

@@ -41,7 +41,7 @@ export default async function RootLayout({
       <CurrentUserProvider user={user}>
         <body className={`${jost.className} flex flex-col min-h-screen`}>
           <AdminNav/>
-            <div className="max-xxs:pt-16 pt-20 md:pt-24 lg:pt-32 grid h-screen min-h-screen w-full lg:grid-cols-[280px_1fr]">
+            <div className="max-xxs:pt-16 pt-20 md:pt-24 lg:pt-32 grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
             <AdminDashboard />
               <div className="flex flex-col">
               <MobileAdminDashboard />

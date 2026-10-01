@@ -1,21 +1,25 @@
 import OrderForm from "@/components/forms/OrderForm"
 import ErrorMessage from "@/components/shared/Error"
-import { findOrderForAdmin } from "@/lib/data/admin"
+import { getAdminOrder } from "@/lib/data/admin-orders"
+import { getAdminSettings } from "@/lib/data/admin-store"
 
 const page = async ({ params }: { params: { id: string } }) => {
 
-  const order = await findOrderForAdmin(params.id)
+  const [order, settings] = await Promise.all([getAdminOrder(params.id), getAdminSettings()])
 
-  if(!order)
+  if (!order || !settings)
   {
-    <section className="md:pt-24 max-sm:pt-20 lg:pt-0 ">
-      <ErrorMessage />
-    </section>
+    return (
+      <section className="md:pt-24 max-sm:pt-20 lg:pt-0 ">
+        <ErrorMessage />
+      </section>
+    )
   }
-  
+
   return (
     <section className="md:pt-24 max-sm:pt-20 lg:pt-0 ">
-       <OrderForm orderId={params.id} status={order.status} estimatedDelivery={order.deliveryDate} trackingNumber={order.trackingNumber}/>
+      {/* A new version of the order (after a conflict, or a save) starts the form again from it */}
+      <OrderForm key={order.rowVersion} order={order} emailByDefault={settings.emailCustomerOnStatusUpdateByDefault} />
     </section>
   )
 }

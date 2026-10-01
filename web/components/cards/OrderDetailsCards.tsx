@@ -1,15 +1,25 @@
 import React from 'react'
+import Link from 'next/link'
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components/ui/table"
-import { Order } from '@/app/types/global'
-import OrderDetailsCardRow from '../tables/OrderDetailsCardRow'
-import UserDetailsCard from './CustomerDetailsCard'
+import OrderLineRow from '../tables/OrderLineRow'
+import OrderStatusBadge from '../shared/OrderStatusBadge'
+import type { AdminOrder } from '@/lib/api/types'
+import { addressLines, carrierName, formatDate, formatDay, orderStatusLabel } from '@/lib/format'
+import { formatMoney } from '@/lib/money'
 
-const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date, trackingNumber, deliveryDate}: Order) => {
+// An order as the store sees it: the customer, the payment, what to ship where, and who changed what
+const OrderDetailsCards = ({ order, timeZone }: { order: AdminOrder; timeZone: string }) => {
+  const amounts = [
+    ["Subtotal", order.subtotalCents],
+    ["Shipping", order.shippingCents],
+    ["Tax", order.taxCents],
+    ["Total", order.totalCents],
+  ] as const;
 
   return (
-        <div className='grid grid-cols-1'>
-        <Card>
+    <div className='grid grid-cols-1 gap-6'>
+      <Card>
         <CardHeader>
           <CardTitle>Items Ordered</CardTitle>
         </CardHeader>
@@ -17,90 +27,116 @@ const OrderDetailsCards = ({pricing, address, status, items, orderId, user, date
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[150px]">Image</TableHead>
-                <TableHead className="max-w-[150px]">Product ID</TableHead>
-                <TableHead className="max-w-[150px]">Name</TableHead>
+                <TableHead className="w-[110px]"><span className="sr-only">Image</span></TableHead>
+                <TableHead>Name</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Subtotal</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-            {items.map((item) => (
-                <OrderDetailsCardRow key={item._id.toString()} productId={item.productId} productName={item.productName} productImage={item.productImage} productPrice={item.productPrice} quantity={item.quantity}/>
+              {order.lines.map((line) => (
+                <OrderLineRow key={line.productId} line={line} />
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-      <br/>
-        <Card>
-            
+
+      <Card>
         <CardHeader>
           <CardTitle className='text-heading3-bold'>Order Summary</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-2">
-          <UserDetailsCard userId={user.toString()} />
-        </CardContent>
-        <CardContent className="grid gap-2 grid-cols-1">
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Order ID:</div>
-            <div className="ml-auto font-medium">#{orderId}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Date:</div>
-            <div className="ml-auto font-medium">{date}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Shipping:</div>
-            <div className="ml-auto font-medium">${pricing.shipping}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Subtotal:</div>
-            <div className="ml-auto font-medium">${pricing.subtotal}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Tax:</div>
-            <div className="ml-auto font-medium">${pricing.taxAmount}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Tax ID:</div>
-            <div className="ml-auto font-medium">{pricing.taxtId}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Total:</div>
-            <div className="ml-auto font-medium">{pricing.total}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="!font-bold text-black ">Status:</div>
-            <div className="ml-auto font-bold">{status === "pending" || status === "Pending" ? (<p className='text-red-500 font-extrabold'>Customer Awaiting Your Shipment</p>) : status}</div>
-          </div>
+        <CardContent>
+          <dl className="grid gap-2">
+            <div className="flex items-center">
+              <dt className="font-bold text-black">Customer:</dt>
+              <dd className="ml-auto text-right font-medium">
+                <Link className="underline hover:text-blue" href={`/adminusers/${order.customerId}`}>{order.customerName}</Link>
+                <div className="text-gray-500">{order.customerEmail}</div>
+              </dd>
+            </div>
+            <div className="flex items-center">
+              <dt className="font-bold text-black">Order number:</dt>
+              <dd className="ml-auto font-medium">#{order.orderNumber}</dd>
+            </div>
+            <div className="flex items-center">
+              <dt className="font-bold text-black">Placed:</dt>
+              <dd className="ml-auto font-medium">{formatDate(order.placedAtUtc, timeZone)}</dd>
+            </div>
+            {amounts.map(([label, cents]) => (
+              <div className="flex items-center" key={label}>
+                <dt className="font-bold text-black">{label}:</dt>
+                <dd className="ml-auto font-medium">{formatMoney(cents)}</dd>
+              </div>
+            ))}
+            <div className="flex items-center">
+              <dt className="font-bold text-black">Status:</dt>
+              <dd className="ml-auto"><OrderStatusBadge status={order.status} /></dd>
+            </div>
+            <div className="flex items-center gap-4">
+              <dt className="font-bold text-black">Payment:</dt>
+              <dd className="ml-auto min-w-0 truncate font-medium">
+                {/* Payments are test mode only, so the link opens Stripe's test dashboard */}
+                <a className="underline" href={`https://dashboard.stripe.com/test/payments/${order.stripePaymentIntentId}`} target="_blank" rel="noopener noreferrer">
+                  {order.stripePaymentIntentId}
+                </a>
+              </dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
-      <br></br>
+
       <Card>
         <CardHeader>
           <CardTitle>Shipping Information</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="flex items-center gap-14">
-            <div className="font-bold text-black dark:text-gray-400">Address:</div>
-            <div className="ml-auto font-medium flex flex-wrap">
-            {`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}
+        <CardContent>
+          <dl className="grid gap-4">
+            <div className="flex gap-14">
+              <dt className="font-bold text-black">Address:</dt>
+              <dd className="ml-auto text-right font-medium">
+                <div>{order.shipTo.recipientName}</div>
+                {addressLines(order.shipTo).map((line) => <div key={line}>{line}</div>)}
+              </dd>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="font-bold text-black dark:text-gray-400">Estimated delivery:</div>
-            <div className="ml-auto font-medium">{deliveryDate ? deliveryDate : "Click on Update to Change Once You Have Shipped"}</div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="font-bold text-black dark:text-gray-400">Tracking number:</div>
-            <div className="ml-auto font-medium">{trackingNumber ? trackingNumber : "Click on Update to Change Once You Have Shipped"}</div>
-          </div>
+            <div className="flex items-center gap-4">
+              <dt className="font-bold text-black">Estimated delivery:</dt>
+              <dd className="ml-auto font-medium">{order.estimatedDeliveryDate ? formatDay(order.estimatedDeliveryDate) : "Not set"}</dd>
+            </div>
+            <div className="flex items-center gap-4">
+              <dt className="font-bold text-black">Tracking:</dt>
+              <dd className="ml-auto font-medium">
+                {!order.trackingNumber
+                  ? "Not set"
+                  : order.trackingUrl
+                    ? <a className="underline" href={order.trackingUrl} target="_blank" rel="noopener noreferrer">
+                        {order.carrier ? `${carrierName(order.carrier)} ` : ""}{order.trackingNumber}
+                      </a>
+                    : `${order.carrier ? `${carrierName(order.carrier)} ` : ""}${order.trackingNumber}`}
+              </dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
-      <br></br>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ol className="grid gap-3">
+            {order.timeline.map((step) => (
+              <li key={`${step.status}-${step.changedAtUtc}`} className="flex flex-wrap gap-x-4">
+                <span className="font-bold">{orderStatusLabel(step.status)}</span>
+                <span className="text-gray-500">{formatDate(step.changedAtUtc, timeZone)}</span>
+                <span className="text-gray-500">{step.changedBy ? `by ${step.changedBy}` : "by the store"}</span>
+                {step.note && <p className="w-full">{step.note}</p>}
+              </li>
+            ))}
+          </ol>
+        </CardContent>
+      </Card>
     </div>
   )
 }

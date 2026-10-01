@@ -28,3 +28,7 @@ export type Carrier = NonNullable<Schemas["Carrier"]>;
 export type Checkout = Schemas["CheckoutResponse"];
 export type CheckoutLine = Schemas["CheckoutLineResponse"];
 export type PaymentResult = Schemas["PaymentResult"];
+
+export type AdminOrderSummary = Schemas["AdminOrderSummaryResponse"];
+export type AdminOrder = Schemas["AdminOrderResponse"];
+export type AdminSettings = Schemas["StoreSettingsResponse"];

@@ -1,54 +1,30 @@
-"use client"
-
-import { Address } from "@/app/types/global"
-import { Button } from "@/components/ui/button"
-import { DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
-import {  TableRow,  TableCell } from "@/components/ui/table"
-import { getUserForClient } from "@/lib/actions/admin.actions"
-import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { TableRow, TableCell } from "@/components/ui/table"
+import OrderStatusBadge from "@/components/shared/OrderStatusBadge"
+import type { AdminOrderSummary } from "@/lib/api/types"
+import { formatDate } from "@/lib/format"
+import { formatMoney } from "@/lib/money"
 
-interface Props {
-    orderId: string;
-    total: string;
-    address: Address;
-    status: string;
-    user: string;
-    date: string;
-}
-
-export const OrderRow = ({orderId, total, address, status, user, date}: Props) => {
-  const [customer, setCustomer] = useState("User")
-
-  useEffect(()=> {
-    const getCustomer = async ()=> {
-        const data = await getUserForClient(user)
-
-        if(data)
-        setCustomer(data.username)
-
-    }
-
-    getCustomer()
-
-  }, [])   
-
+export const OrderRow = ({ order, timeZone }: { order: AdminOrderSummary; timeZone: string }) => {
   return (
     <TableRow>
     <TableCell>
-        <Link href={`/adminorders/${orderId}`}>
-          <Button  className="bg-black text-white border border-black" variant="ghost">
-            View
-          </Button>
-          </Link>
+      <Button asChild className="bg-black text-white border border-black" variant="ghost">
+        <Link href={`/adminorders/${order.orderNumber}`}>
+          View<span className="sr-only"> order {order.orderNumber}</span>
+        </Link>
+      </Button>
     </TableCell>
-    <TableCell>#{orderId}</TableCell>
-    <TableCell>{status === "Pending" ? (<p className="font-extrabold">Waiting to be Shipped!</p>) : <p className="font-bold">{status}</p>}</TableCell>
-    <TableCell><p className="text-green-400">${total}</p></TableCell>
-    <TableCell>{`${address.name} - ${address.address.line1}, ${address.address.city}, ${address.address.country}`}</TableCell>
-    <TableCell>{customer}</TableCell>
-    <TableCell>{date}</TableCell>
+    <TableCell>#{order.orderNumber}</TableCell>
+    <TableCell><OrderStatusBadge status={order.status} /></TableCell>
+    <TableCell><p className="text-green-600">{formatMoney(order.totalCents)}</p></TableCell>
+    <TableCell className="text-center">{order.itemCount}</TableCell>
+    <TableCell>
+      <div>{order.customerName}</div>
+      <div className="text-gray-500">{order.customerEmail}</div>
+    </TableCell>
+    <TableCell>{formatDate(order.placedAtUtc, timeZone)}</TableCell>
   </TableRow>
   )
 }

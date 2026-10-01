@@ -17,8 +17,6 @@ const adminReads: [string, () => Promise<unknown>][] = [
   ["fetchUsers", () => admin.fetchUsers({})],
   ["getUserForAdmin", () => admin.getUserForAdmin("64b000000000000000000000")],
   ["getAddressesForUser", () => admin.getAddressesForUser("64b000000000000000000000")],
-  ["findAllOrdersForAdmin", () => admin.findAllOrdersForAdmin({})],
-  ["findOrderForAdmin", () => admin.findOrderForAdmin("any")],
   ["getAllCategoriesAdmin", () => admin.getAllCategoriesAdmin({})],
   ["findProductsAdmin", () => admin.findProductsAdmin({})],
   ["findProductForDeal", () => admin.findProductForDeal("any")],
