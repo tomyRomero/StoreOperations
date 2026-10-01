@@ -139,7 +139,7 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
         </DropdownMenu>
       </BulkBar>
 
-      <div className="overflow-hidden rounded-md border bg-card">
+      <div className="overflow-hidden rounded-xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow>

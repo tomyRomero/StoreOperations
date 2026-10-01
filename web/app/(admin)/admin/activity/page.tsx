@@ -63,7 +63,7 @@ export default async function ActivityPage(props: { searchParams: Promise<Search
       ) : (
         <div className="grid max-w-3xl gap-6">
           {groupByDay(activity.items, settings.timeZoneId, now).map((group) => (
-            <section key={group.label} aria-label={group.label} className="rounded-md border bg-card">
+            <section key={group.label} aria-label={group.label} className="rounded-xl border bg-card">
               <h2 className="border-b px-5 py-3 font-sans text-sm font-semibold text-muted-foreground">{group.label}</h2>
               <ul className="divide-y">
                 {group.entries.map((entry) => {

@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 const statuses: OrderStatus[] = ["pending", "shipped", "delivered", "cancelled", "refunded"];
 const count = (n: number) => n.toLocaleString("en-US");
-const cardClasses = "rounded-md border bg-card p-5 sm:p-6";
+const cardClasses = "rounded-xl border bg-card p-5 sm:p-6";
 
 // How the store is doing: sales over the chosen period against the one before, what needs doing now,
 // and where orders and sales come from. Days are the store's days, in its time zone.
@@ -93,7 +93,7 @@ export default async function DashboardPage(props: { searchParams: Promise<{ day
             <h2 id="attention-heading" className="text-h4">
               Needs attention
             </h2>
-            <Link href="/admin/orders?status=pending" className="group flex items-center gap-4 rounded-md border p-4 transition-colors hover:bg-muted">
+            <Link href="/admin/orders?status=pending" className="group flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-muted">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-subtle">
                 <Truck className="size-5 text-accent-ink" aria-hidden />
               </span>
@@ -103,7 +103,7 @@ export default async function DashboardPage(props: { searchParams: Promise<{ day
               </span>
               <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
-            <Link href="/admin/products?stock=low" className="group flex items-center gap-4 rounded-md border p-4 transition-colors hover:bg-muted">
+            <Link href="/admin/products?stock=low" className="group flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-muted">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warning-subtle">
                 <PackageOpen className="size-5 text-warning" aria-hidden />
               </span>

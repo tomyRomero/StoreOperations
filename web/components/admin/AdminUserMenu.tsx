@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOut, Store } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Ellipsis, LogOut, Store } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +13,7 @@ import {
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useSignOut } from "@/lib/use-sign-out";
 
-// Who is signed in, the way back to the store, and the way out
+// Who is signed in, at the foot of the sidebar, with the way back to the store and the way out
 export function AdminUserMenu() {
   const user = useCurrentUser();
   const signOut = useSignOut();
@@ -22,15 +21,18 @@ export function AdminUserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="gap-2 px-2">
-          <span aria-hidden className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground uppercase">
-            {user.username.slice(0, 1)}
-          </span>
-          <span className="max-w-32 truncate max-sm:sr-only">{user.username}</span>
-        </Button>
+      <DropdownMenuTrigger className="flex w-full items-center gap-2.5 rounded-lg px-1.5 py-1 text-left transition-colors hover:bg-foreground/5">
+        <span aria-hidden className="grid size-[30px] shrink-0 place-items-center rounded-full bg-linear-135 from-glow-amber to-glow-orange text-xs font-bold uppercase text-white">
+          {user.username.slice(0, 1)}
+        </span>
+        <span className="grid min-w-0 flex-1">
+          <span className="truncate text-[13px] font-semibold">{user.username}</span>
+          <span className="text-xs text-muted-foreground">Admin</span>
+        </span>
+        <Ellipsis className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+        <span className="sr-only">, account menu</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
+      <DropdownMenuContent side="top" align="start" className="w-60">
         <DropdownMenuLabel className="grid font-normal">
           <span className="truncate font-semibold">{user.username}</span>
           <span className="truncate text-muted-foreground">{user.email}</span>

@@ -1,57 +1,44 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/brand/Logo";
-import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
-import { AdminNav } from "@/components/admin/AdminNav";
-import { AdminUserMenu } from "@/components/admin/AdminUserMenu";
+import { ConsoleSidebar } from "@/components/admin/ConsoleSidebar";
+import { ConsoleTopbar } from "@/components/admin/ConsoleTopbar";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { countOrders } from "@/lib/data/admin-orders";
+import { getStoreSettings } from "@/lib/data/catalog";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s · Admin · Palettehub" },
+  title: { default: "StoreOps", template: "%s · StoreOps" },
   robots: { index: false },
 };
 
-// The admin area: the sections on the left (a drawer on phones), who is signed in at the top. The console
-// marker keeps it light whatever the storefront's mode (see globals.css).
+// Test keys take no real money; without a key checkout can't take payments at all
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const payments = !publishableKey ? "off" : publishableKey.startsWith("pk_test_") ? "test" : "live";
+
+// The StoreOps console: its sidebar on the left (a drawer on phones), a top bar, and the page. The console
+// marker gives it the StoreOps cobalt and compact controls (see globals.css); light or dark follows the
+// same switch as the storefront.
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Fail closed: only a user the API confirms as admin gets in. The API also refuses every admin
   // request from anyone else, so this only spares them a broken page.
   const user = await getCurrentUser();
   if (!user?.isAdmin) redirect("/");
 
-  const toShip = (await countOrders("pending")) ?? 0;
+  const [toShip, settings] = await Promise.all([countOrders("pending"), getStoreSettings()]);
+  const shell = { storeName: settings?.storeName ?? "Palettehub", payments, toShip: toShip ?? 0 } as const;
 
   return (
-    <div data-console className="min-h-screen bg-muted/50 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <div data-console className="min-h-screen bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <SkipLink />
-      <aside className="sticky top-0 flex h-screen flex-col border-r bg-card max-lg:hidden">
-        <div className="flex h-16 items-center gap-2 px-5">
-          <Link href="/admin" className="rounded-sm">
-            <Logo />
-            <span className="sr-only"> admin, dashboard</span>
-          </Link>
-        </div>
-        <div className="flex-1 overflow-y-auto px-3 py-2">
-          <AdminNav toShip={toShip} />
+      <aside className="border-r bg-surface-sunk max-lg:hidden">
+        <div className="sticky top-0 h-screen px-3 py-4">
+          <ConsoleSidebar {...shell} />
         </div>
       </aside>
-
       <div className="flex min-h-screen min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-card px-4 lg:px-8">
-          <AdminMobileNav toShip={toShip} />
-          <Link href="/admin" className="rounded-sm lg:hidden">
-            <Logo />
-            <span className="sr-only"> admin, dashboard</span>
-          </Link>
-          <span className="rounded-sm bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground max-sm:hidden lg:hidden">Admin</span>
-          <div className="ml-auto">
-            <AdminUserMenu />
-          </div>
-        </header>
-        <main id="main" tabIndex={-1} className="flex-1 px-4 py-6 outline-none sm:px-6 lg:px-8 lg:py-8">
+        <ConsoleTopbar {...shell} />
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-6 outline-none sm:px-6 lg:px-10 lg:py-8">
           {children}
         </main>
       </div>

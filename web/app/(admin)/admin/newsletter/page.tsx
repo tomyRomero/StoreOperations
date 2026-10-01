@@ -34,7 +34,7 @@ export default async function NewsletterPage(props: { searchParams: Promise<Sear
     <>
       <AdminPageHeader title="Newsletter" description={`${total} ${total === 1 ? "person is" : "people are"} subscribed.`} />
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <section aria-labelledby="write-heading" className="self-start rounded-md border bg-card p-5 sm:p-6">
+        <section aria-labelledby="write-heading" className="self-start rounded-xl border bg-card p-5 sm:p-6">
           <h2 id="write-heading" className="mb-5 text-h4">
             Write a newsletter
           </h2>

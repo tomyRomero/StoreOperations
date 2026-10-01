@@ -146,7 +146,7 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
     toast({ variant: "destructive", title: "Couldn't save the settings", description: problemMessage(error) });
   };
 
-  const section = "grid gap-5 rounded-md border bg-card p-5 sm:p-6";
+  const section = "grid gap-5 rounded-xl border bg-card p-5 sm:p-6";
   const heading = "text-h4";
   const preview = (text: string | null) =>
     text && (

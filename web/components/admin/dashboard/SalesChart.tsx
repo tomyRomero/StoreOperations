@@ -111,7 +111,7 @@ export function SalesChart({ days }: { days: DailyRevenue[] }) {
       {point && active !== null && (
         <div
           aria-hidden
-          className="pointer-events-none absolute top-0 z-10 grid gap-0.5 rounded-md border bg-card px-3 py-2 text-sm whitespace-nowrap shadow-md"
+          className="pointer-events-none absolute top-0 z-10 grid gap-0.5 rounded-xl border bg-card px-3 py-2 text-sm whitespace-nowrap shadow-md"
           style={{ left: x(active), transform: flip ? "translateX(calc(-100% - 12px))" : "translateX(12px)" }}
         >
           <span className="font-semibold">{formatMoney(point.revenueCents)}</span>

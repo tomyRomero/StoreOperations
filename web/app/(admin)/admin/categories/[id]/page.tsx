@@ -39,7 +39,7 @@ export default async function CategoryPage(props: Props) {
           </>
         }
       />
-      <section className="max-w-2xl rounded-md border bg-card p-5 sm:p-6">
+      <section className="max-w-2xl rounded-xl border bg-card p-5 sm:p-6">
         {/* A new version (after a save) starts the form again from it */}
         <CategoryForm key={`${category.name}-${category.imageKey}`} category={category} />
         {!category.canDelete && (

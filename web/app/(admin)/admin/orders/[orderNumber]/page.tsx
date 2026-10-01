@@ -18,7 +18,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return { title: `Order #${(await props.params).orderNumber}` };
 }
 
-const card = "rounded-md border bg-card p-5";
+const card = "rounded-xl border bg-card p-5";
 
 // One order as the store sees it: what was bought and what it cost, its history, and beside it the
 // panel that moves it on, with the customer, the address and the payment

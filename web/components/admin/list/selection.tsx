@@ -54,7 +54,7 @@ export function BulkBar({ count, noun, onClear, children }: { count: number; nou
         <div
           role="region"
           aria-label="Selected rows"
-          className="sticky top-18 z-20 flex flex-wrap items-center gap-2 rounded-md border border-primary bg-primary px-3 py-2 text-sm text-primary-foreground shadow-md"
+          className="sticky top-18 z-20 flex flex-wrap items-center gap-2 rounded-xl border border-primary bg-primary px-3 py-2 text-sm text-primary-foreground shadow-md"
         >
           <p className="mr-2 font-semibold">{summary}</p>
           <div className="flex flex-wrap gap-2">{children}</div>

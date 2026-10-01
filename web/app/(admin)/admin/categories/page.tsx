@@ -66,7 +66,7 @@ export default async function CategoriesPage(props: { searchParams: Promise<Sear
             <li key={category.id}>
               <Link
                 href={`/admin/categories/${category.id}`}
-                className="group flex items-center gap-4 rounded-md border bg-card p-3 transition-colors hover:border-foreground"
+                className="group flex items-center gap-4 rounded-xl border bg-card p-3 transition-colors hover:border-foreground"
               >
                 <Image src={category.imageUrl} alt="" width={72} height={72} className="aspect-square shrink-0 rounded-sm object-cover" />
                 <span className="grid min-w-0 gap-0.5">

@@ -22,7 +22,7 @@ export function AdminPageHeader({ title, description, back, actions }: Props) {
       )}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="grid min-w-0 gap-1">
-          <h1 className="text-h2">{title}</h1>
+          <h1 className="font-sans text-[28px] font-semibold leading-tight tracking-[-0.03em]">{title}</h1>
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

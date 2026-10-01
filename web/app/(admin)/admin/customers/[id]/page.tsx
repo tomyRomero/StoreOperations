@@ -23,7 +23,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return { title: (await customerFor(props))?.username ?? "Customer" };
 }
 
-const card = "rounded-md border bg-card p-5 sm:p-6";
+const card = "rounded-xl border bg-card p-5 sm:p-6";
 
 // One account: who it is, what it has bought, where it ships, and whether it can sign in
 export default async function CustomerPage(props: Props) {

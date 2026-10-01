@@ -14,7 +14,7 @@ export default async function NewProductPage() {
     <>
       <AdminPageHeader back={{ href: "/admin/products", label: "All products" }} title="Add a product" description="It goes into the store as soon as it's added." />
       {categories ? (
-        <section className="max-w-2xl rounded-md border bg-card p-5 sm:p-6">
+        <section className="max-w-2xl rounded-xl border bg-card p-5 sm:p-6">
           <ProductForm product={null} categories={categories} />
         </section>
       ) : (

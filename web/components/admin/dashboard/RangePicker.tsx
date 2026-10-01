@@ -16,7 +16,7 @@ export function RangePicker({ days, children }: { days: DashboardRange; children
 
   return (
     <div className="grid gap-6">
-      <nav aria-label="Period" className="flex w-fit rounded-md border bg-card p-1">
+      <nav aria-label="Period" className="flex w-fit rounded-xl border bg-card p-1">
         {dashboardRanges.map((range) => (
           <Link
             key={range}

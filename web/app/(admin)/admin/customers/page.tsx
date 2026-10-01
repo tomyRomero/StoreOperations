@@ -76,7 +76,7 @@ export default async function CustomersPage(props: { searchParams: Promise<Searc
         )
       ) : (
         <div className="grid gap-4">
-          <div className="overflow-hidden rounded-md border bg-card">
+          <div className="overflow-hidden rounded-xl border bg-card">
             <Table>
               <TableHeader>
                 <TableRow>

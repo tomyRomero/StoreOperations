@@ -107,13 +107,13 @@
   color-scheme: dark;
 }
 
-/* The admin console stays light until it has a dark design of its own, and keeps the StoreOps cobalt */
+/* The admin console: the StoreOps cobalt instead of the storefront's violet, light or dark like the
+   storefront (the same switch and cookie). Its accent text passes 4.5:1 on cards in both modes. */
 :root:has([data-console]) {
-  color-scheme: light;
-  --accent: #2f4be0;
-  --accent-subtle: #eef1ff;
-  --accent-ink: #2440b8;
-  --ring: #2f5bff;
+  --accent: light-dark(#2f4be0, #8fa4ff);
+  --accent-subtle: light-dark(#eef1ff, rgb(47 91 255 / 0.18));
+  --accent-ink: light-dark(#2440b8, #b4c2ff);
+  --ring: light-dark(#2f5bff, #7b93ff);
   --field-height: 2.5rem;
   --field-radius: 4px;
   --field-text: 0.875rem;
