@@ -1,28 +1,20 @@
-"use client"
-
+import Link from "next/link";
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 
 interface Props{
   username: string;
-  id: string;
   email: string;
-  date: string;
 }
 
-const CustomerUserCard = ({username, id, email, date }: Props) => {
-
-  const router = useRouter(); 
-
+const CustomerUserCard = ({ username, email }: Props) => {
   return (
-    <>
     <Card>
     <CardHeader>
-      <CardTitle>User details</CardTitle>
+      <CardTitle>Account details</CardTitle>
       <CardDescription>
-        Viewing user details for
+        Signed in as
         <span className="font-semibold"> {email}</span>
       </CardDescription>
     </CardHeader>
@@ -36,31 +28,13 @@ const CustomerUserCard = ({username, id, email, date }: Props) => {
           <div className="font-semibold">Email</div>
           <div>{email}</div>
         </div>
-        <div className="flex flex-col gap-1">
-          <div className="font-semibold">ID:</div>
-          <div>{id}</div>
-        </div>
       </div>
       <Separator />
-        <Button 
-        className="bg-black text-white border border-black" 
-        variant={"ghost"} 
-        onClick = {()=> {
-            router.push("/account/password")
-        }}
-        >
-            Change Password
-        </Button>
-      <Separator />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <div className="font-semibold">{"Member Since:"}</div>
-          <div>{date}</div>
-        </div>
-      </div>
+      <Button asChild className="bg-black text-white border border-black" variant={"ghost"}>
+        <Link href="/account/password">Change Password</Link>
+      </Button>
     </CardContent>
   </Card>
-  </>
   )
 }
 

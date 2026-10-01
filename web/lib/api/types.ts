@@ -15,3 +15,16 @@ export type CartLine = Schemas["CartLineResponse"];
 export type CartLineIssue = Schemas["CartLineIssue"];
 
 export type StoreSettings = Schemas["PublicStoreSettingsResponse"];
+
+export type PostalAddress = Schemas["PostalAddress"];
+export type Address = Schemas["AddressResponse"];
+export type NewAddress = Schemas["NewAddressRequest"];
+
+export type OrderSummary = Schemas["OrderSummaryResponse"];
+export type Order = Schemas["OrderResponse"];
+export type OrderLine = Schemas["OrderLineResponse"];
+export type Carrier = NonNullable<Schemas["Carrier"]>;
+
+export type Checkout = Schemas["CheckoutResponse"];
+export type CheckoutLine = Schemas["CheckoutLineResponse"];
+export type PaymentResult = Schemas["PaymentResult"];

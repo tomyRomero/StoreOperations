@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "../globals.css";
 import Nav from "@/components/nav/Nav";
-import SessionProvider from "../../components/SessionProvider"
 import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/lib/AppContext";
 import { redirect } from "next/navigation";
@@ -35,13 +34,11 @@ export default async function RootLayout({
     redirect("/adminactivity")
   }
 
-  // NextAuth's provider stays only until the cart and checkout pages move to the API
   return (
 
     <html lang="en">
     <CurrentUserProvider user={user}>
     <CartProvider>
-    <SessionProvider session={null}>
       <AppProvider>
       <body className={`${jost.className} flex flex-col`}>
         <Nav/>
@@ -55,7 +52,6 @@ export default async function RootLayout({
         <Toaster />
       </body>
       </AppProvider>
-    </SessionProvider>
     </CartProvider>
     </CurrentUserProvider>
   </html>

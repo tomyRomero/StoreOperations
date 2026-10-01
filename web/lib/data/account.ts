@@ -1,55 +1,23 @@
 import "server-only";
 
-import { connectToDB } from "../mongoose";
-import { getSessionUser, requireUser } from "../guards";
-import User from "../models/user.model";
-import Orders from "../models/orders.model";
-import Addresses from "../models/addresses.model";
-import Cart from "../models/cart.model";
-import { Address } from "@/app/types/global";
+import { serverApi } from "../api/server";
+import type { Address, Order } from "../api/types";
 
-// Reads scoped to the signed-in customer, for Server Components.
-// The user id always comes from the session, never from the caller.
+// The signed-in customer's own data, for Server Components. The API limits every call to the session's
+// account, so another customer's order simply isn't found.
 
-export const getCurrentUserProfile = async () => {
-  const { id } = await requireUser();
-  const user = await User.findById(id)
-    .select("username email date")
-    .lean<{ username: string; email: string; date: string }>();
-  if (!user) return null;
-  return { id, username: user.username, email: user.email, date: user.date };
-};
+export async function getAddresses(): Promise<Address[] | null> {
+  const { data } = await serverApi().GET("/api/account/addresses");
+  return data ?? null;
+}
 
-// The signed-in customer's orders, newest first
-export const findOrdersForCurrentUser = async (pageNumber = 1, pageSize = 10) => {
-  const { id } = await requireUser();
-  const skipAmount = (pageNumber - 1) * pageSize;
+// One page of orders, newest first, or null when the API can't answer
+export async function getOrders(page: number, pageSize = 10) {
+  const { data } = await serverApi().GET("/api/account/orders", { params: { query: { page, pageSize } } });
+  return data ?? null;
+}
 
-  const orders = await Orders.find({ user: id }).sort({ createdAt: -1 }).skip(skipAmount).limit(pageSize);
-  const totalOrdersCount = await Orders.countDocuments({ user: id });
-  const isNext = totalOrdersCount > skipAmount + orders.length;
-
-  return { orders, isNext };
-};
-
-// One order, only if it belongs to the signed-in customer
-export const findOrderForCurrentUser = async (orderId: string) => {
-  const { id } = await requireUser();
-  return Orders.findOne({ orderId: String(orderId), user: id });
-};
-
-export const getCurrentUserAddresses = async (): Promise<Address[]> => {
-  const { id } = await requireUser();
-  const userAddresses = await Addresses.findOne({ user: id });
-  return userAddresses ? userAddresses.addresses.map((item: any) => item.address) : [];
-};
-
-// Whether a product is already in the signed-in customer's cart; false for guests
-export const isInCurrentUserCart = async (productId: string) => {
-  const user = await getSessionUser();
-  if (!user) return false;
-
-  await connectToDB();
-  const cart = await Cart.findOne({ user: user.id });
-  return Boolean(cart?.products.some((item: any) => item.product.toString() === String(productId)));
-};
+export async function getOrder(orderNumber: string): Promise<Order | null> {
+  const { data } = await serverApi().GET("/api/account/orders/{orderNumber}", { params: { path: { orderNumber } } });
+  return data ?? null;
+}

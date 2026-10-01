@@ -1,19 +1,13 @@
 import AccountDashboard from "@/components/nav/AccountDashboard";
 import MobileAccountDashboard from "@/components/nav/MobileAccountDashboard";
-import { getCurrentUserProfile } from "@/lib/data/account";
-import { getSessionUser } from "@/lib/guards";
-import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/session";
 
 export default async function Layout ({ children }: { children: React.ReactNode }) {
-  
-    if (!(await getSessionUser())) {
-      redirect("/")
-    }
 
-    const user = (await getCurrentUserProfile()) ?? { username: "User", email: "Email" }
-  
+    const user = await requireUser("/account")
+
     return (
-      <div className="max-xxs:mt-16 mt-20 md:mt-24 lg:mt-32 grid h-screen min-h-screen w-full lg:grid-cols-[280px_1fr]">
+      <div className="max-xxs:mt-16 mt-20 md:mt-24 lg:mt-32 grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
       <AccountDashboard username={user.username} email={user.email}/>
         <div className="flex flex-col">
         <MobileAccountDashboard username={user.username}/>

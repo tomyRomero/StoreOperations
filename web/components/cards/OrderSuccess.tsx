@@ -1,20 +1,10 @@
-"use client"
-
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button } from '../ui/button'
 import Image from 'next/image'
-import { useAppContext } from '@/lib/AppContext'
-import { adminEmail, storeDetails } from '@/lib/constants'
+import { storeDetails } from '@/lib/constants'
 
-const OrderSuccess = () => {
-
-    const {productAdjusted, setProductAdjusted} = useAppContext()
-
-    useEffect(()=> {
-        setProductAdjusted(!productAdjusted);
-    }, [])
-
+const OrderSuccess = ({ orderNumber, supportEmail }: { orderNumber: string; supportEmail: string | null }) => {
   return (
     <>
     <div className="mx-auto max-w-2xl p-4 bg-white rounded-lg shadow-md">
@@ -28,7 +18,7 @@ const OrderSuccess = () => {
       <h1 className="text-2xl font-semibold">Purchase Successful!</h1>
     </div>
     <p className="mt-2 text-center text-gray-600">
-      Thank you for your purchase. You can now continue shopping or view your orders.
+      Thank you for your purchase. Your order number is <span className="font-semibold">#{orderNumber}</span>.
     </p>
   </div>
   <div className="mx-auto max-w-2xl mt-8 p-4 bg-white rounded-lg shadow-md">
@@ -44,8 +34,7 @@ const OrderSuccess = () => {
         <span className="text-gray-600">Contact Information:</span>
         <span className="font-medium">
           Phone: {storeDetails.contact}
-          <br />
-          Email: {adminEmail}
+          {supportEmail && (<><br />Email: {supportEmail}</>)}
         </span>
       </div>
       <div className="flex items-start justify-between">
@@ -69,9 +58,9 @@ const OrderSuccess = () => {
       Continue Shopping
     </Button>
     </Link>
-    <Link href="/account/orders">
+    <Link href={`/account/orders/${orderNumber}`}>
     <Button className="mt-8 max-w-md h-12 bg-black text-white border border-black" variant={"ghost"}>
-      View Orders
+      View Order
     </Button>
     </Link>
   </div>
