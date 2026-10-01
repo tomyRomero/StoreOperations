@@ -46,7 +46,7 @@ export function CartDrawer({ shipping, categories }: { shipping: ShippingSetting
         </div>
 
         {!cart ? (
-          <div className="grid gap-4 p-6" aria-busy="true" aria-label="Loading your bag">
+          <div className="grid gap-4 p-6" role="status" aria-busy="true" aria-label="Loading your bag">
             {[0, 1].map((n) => (
               <div key={n} className="flex gap-4">
                 <Skeleton className="size-21 rounded-[18px]" />

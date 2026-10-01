@@ -23,7 +23,7 @@ export function CheckoutBagSummary({ shipping }: { shipping: ShippingSettings })
         </Link>
       </div>
       {!cart ? (
-        <div className="grid gap-3" aria-busy="true" aria-label="Loading your order">
+        <div className="grid gap-3" role="status" aria-busy="true" aria-label="Loading your order">
           <Skeleton className="h-15" />
           <Skeleton className="h-15" />
         </div>

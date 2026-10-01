@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // The same grid and card shape as the real list, so nothing jumps when the products arrive
 export function ProductGridSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-3" aria-busy="true" aria-label="Loading products">
+    <div className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-3" role="status" aria-busy="true" aria-label="Loading products">
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="overflow-hidden rounded-[28px] border bg-card">
           <Skeleton className="aspect-[5/6] w-full rounded-none" />

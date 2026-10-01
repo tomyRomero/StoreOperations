@@ -38,7 +38,7 @@ export function CartPageContents({ shipping, categories, lowStockThreshold }: Pr
       </div>
 
       {!cart ? (
-        <div className="grid gap-3" aria-busy="true" aria-label="Loading your bag">
+        <div className="grid gap-3" role="status" aria-busy="true" aria-label="Loading your bag">
           <Skeleton className="h-44 w-full rounded-[24px]" />
           <Skeleton className="h-44 w-full rounded-[24px]" />
         </div>
