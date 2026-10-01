@@ -34,20 +34,6 @@ services:
       retries: 20
       start_period: 60s
 
-  # MongoDB for the Next.js app until the move to the API is finished
-  mongo:
-    image: mongo:7
-    ports:
-      - "127.0.0.1:27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
-
   # S3-compatible image storage for development (Adobe S3Mock).
   # Creates the private image bucket on start. API: http://localhost:9090
   s3:
@@ -70,5 +56,4 @@ services:
 
 volumes:
   sqlserver-data:
-  mongo-data:
   s3-data:

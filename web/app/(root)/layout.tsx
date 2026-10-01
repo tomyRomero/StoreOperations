@@ -3,7 +3,6 @@ import { Jost } from "next/font/google";
 import "../globals.css";
 import Nav from "@/components/nav/Nav";
 import Footer from "@/components/shared/Footer";
-import { AppProvider } from "@/lib/AppContext";
 import { redirect } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
@@ -39,7 +38,6 @@ export default async function RootLayout({
     <html lang="en">
     <CurrentUserProvider user={user}>
     <CartProvider>
-      <AppProvider>
       <body className={`${jost.className} flex flex-col`}>
         <Nav/>
         <main className="flex flex-col items-center">
@@ -51,7 +49,6 @@ export default async function RootLayout({
         <Footer />
         <Toaster />
       </body>
-      </AppProvider>
     </CartProvider>
     </CurrentUserProvider>
   </html>

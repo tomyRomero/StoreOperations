@@ -55,12 +55,6 @@ export const loggedOutNavLinks = [
   },
 ]
 
-//Later on it would be best practice to create a dedicated email that can be used to send all updates instead of the admin email emailing itself.
-
-//Email that is used to send email alerts and receive contact support messages, 
-//usually that of the admin, will also be used to recieve new order alerts and send newsletter messages
-export const adminEmail = "tomyfletcher99@hotmail.com"
-
 //used in navs folder, admin dashboard mobile admin dashboard
 export const navItems = [
     { title: 'Recent Activity', url: '/adminactivity', img: '/assets/bell.png' },

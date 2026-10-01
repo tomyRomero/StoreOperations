@@ -32,12 +32,6 @@ jobs:
 
       - run: npm ci
 
-      # The tests start an in-memory MongoDB; cache its binary between runs
-      - uses: actions/cache@v6
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: mongodb-binaries-${{ runner.os }}-7.0.14
-
       - run: npm run lint
 
       # The API's types must match the committed contract (the API job checks the contract itself)

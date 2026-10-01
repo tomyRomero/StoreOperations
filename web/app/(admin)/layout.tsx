@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "../globals.css";
-import { AppProvider } from "@/lib/AppContext";
 import AdminNav from "@/components/nav/AdminNav";
 import AdminDashboard from "@/components/nav/AdminDashboard";
 import MobileAdminDashboard from "@/components/nav/MobileAdminDashboard";
@@ -37,7 +36,6 @@ export default async function RootLayout({
   return (
 
     <html lang="en">
-    <AppProvider>
       <CurrentUserProvider user={user}>
         <body className={`${jost.className} flex flex-col min-h-screen`}>
           <AdminNav/>
@@ -53,7 +51,6 @@ export default async function RootLayout({
         <Toaster />
         </body>
       </CurrentUserProvider>
-    </AppProvider>
   </html>
 
   );
