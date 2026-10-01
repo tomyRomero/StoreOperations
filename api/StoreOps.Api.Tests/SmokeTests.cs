@@ -72,6 +72,22 @@ public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
             "The API's contract changed. With the API running, run `npm run api:types` in web/ and commit web/lib/api.");
     }
 
+    // An action that declares only its errors (say [ProducesResponseType(404)]) loses the success response
+    // ASP.NET Core would otherwise infer, and the web app's types then say the call never succeeds
+    [Fact]
+    public async Task Every_operation_says_what_it_answers_on_success()
+    {
+        await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+        var contract = JsonNode.Parse(await development.CreateClient().GetStringAsync("/openapi/v1.json", TestContext.Current.CancellationToken))!;
+
+        var missing = contract["paths"]!.AsObject()
+            .SelectMany(path => path.Value!.AsObject().Select(operation => (Path: path.Key, Method: operation.Key, Operation: operation.Value!)))
+            .Where(o => !o.Operation["responses"]!.AsObject().Any(response => response.Key.StartsWith('2')))
+            .Select(o => $"{o.Method.ToUpperInvariant()} {o.Path}");
+
+        Assert.Empty(missing);
+    }
+
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

@@ -23,6 +23,7 @@ public sealed class CheckoutController(CheckoutService checkout) : ControllerBas
 
     // For the confirmation page Stripe returns the customer to
     [HttpGet("result")]
+    [ProducesResponseType<CheckoutResultResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<CheckoutResultResponse>> Result(
         [FromQuery, Required, StringLength(255)] string paymentIntentId, CancellationToken ct) =>

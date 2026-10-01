@@ -31,11 +31,13 @@ public sealed class CatalogController(CatalogService catalog) : ControllerBase
         await catalog.GetProductsAsync(new ProductQuery(categoryId, search, onDeal, sort, page, pageSize), ct);
 
     [HttpGet("products/{id:int}")]
+    [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductResponse>> Product(int id, CancellationToken ct) =>
         await catalog.GetProductAsync(id, ct) is { } product ? product : NotFound();
 
     [HttpGet("products/{id:int}/related")]
+    [ProducesResponseType<IReadOnlyList<ProductResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyList<ProductResponse>>> Related(
         int id, [FromQuery, Range(1, 12)] int limit = 4, CancellationToken ct = default) =>

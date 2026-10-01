@@ -21,6 +21,7 @@ public sealed class OrdersController(OrderHistoryService orders) : ControllerBas
         await orders.ListAsync(User.GetUserId(), page, pageSize, ct);
 
     [HttpGet("{orderNumber}")]
+    [ProducesResponseType<OrderResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<OrderResponse>> Get([StringLength(20)] string orderNumber, CancellationToken ct) =>
         await orders.GetAsync(User.GetUserId(), orderNumber, ct) is { } order ? order : NotFound();

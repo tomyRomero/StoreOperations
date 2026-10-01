@@ -21,6 +21,7 @@ public sealed class AdminOrdersController(AdminOrderService orders) : AdminContr
         await orders.ListAsync(new AdminOrderQuery(search, status, customerId, page, pageSize), ct);
 
     [HttpGet("{orderNumber}")]
+    [ProducesResponseType<AdminOrderResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminOrderResponse>> Get([StringLength(20)] string orderNumber, CancellationToken ct) =>
         await orders.GetAsync(orderNumber, ct) is { } order ? order : NotFound();

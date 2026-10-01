@@ -19,6 +19,7 @@ public sealed class AdminCustomersController(AdminCustomerService customers) : A
         await customers.ListAsync(new AdminCustomerQuery(search, role, page, pageSize), ct);
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType<AdminCustomerResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminCustomerResponse>> Get(int id, CancellationToken ct) =>
         await customers.GetAsync(id, ct) is { } customer ? customer : NotFound();

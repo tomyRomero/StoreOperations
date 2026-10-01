@@ -163,6 +163,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminOrderResponse"];
+                        "application/json": components["schemas"]["AdminOrderResponse"];
+                        "text/json": components["schemas"]["AdminOrderResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -314,6 +325,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OrderResponse"];
+                        "application/json": components["schemas"]["OrderResponse"];
+                        "text/json": components["schemas"]["OrderResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -767,6 +789,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminCustomerResponse"];
+                        "application/json": components["schemas"]["AdminCustomerResponse"];
+                        "text/json": components["schemas"]["AdminCustomerResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -966,6 +999,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CheckoutResultResponse"];
+                        "application/json": components["schemas"]["CheckoutResultResponse"];
+                        "text/json": components["schemas"]["CheckoutResultResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -1113,6 +1157,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminCategoryResponse"];
+                        "application/json": components["schemas"]["AdminCategoryResponse"];
+                        "text/json": components["schemas"]["AdminCategoryResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -1269,6 +1324,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminProductResponse"];
+                        "application/json": components["schemas"]["AdminProductResponse"];
+                        "text/json": components["schemas"]["AdminProductResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -1607,6 +1673,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductResponse"];
+                        "application/json": components["schemas"]["ProductResponse"];
+                        "text/json": components["schemas"]["ProductResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -1648,6 +1725,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProductResponse"][];
+                        "application/json": components["schemas"]["ProductResponse"][];
+                        "text/json": components["schemas"]["ProductResponse"][];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -2222,6 +2310,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AddressResponse"];
+                        "application/json": components["schemas"]["AddressResponse"];
+                        "text/json": components["schemas"]["AddressResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -2252,6 +2351,17 @@ export interface paths {
                 };
             };
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AddressResponse"];
+                        "application/json": components["schemas"]["AddressResponse"];
+                        "text/json": components["schemas"]["AddressResponse"];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -2322,6 +2432,17 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AddressResponse"][];
+                        "application/json": components["schemas"]["AddressResponse"][];
+                        "text/json": components["schemas"]["AddressResponse"][];
+                    };
+                };
                 /** @description Not Found */
                 404: {
                     headers: {
@@ -2607,6 +2728,10 @@ export interface components {
             /** Format: int32 */
             totalCents: number;
         };
+        CheckoutResultResponse: {
+            result: components["schemas"]["PaymentResult"];
+            orderNumber: null | string;
+        };
         Comparison: {
             /** Format: int32 */
             value: number;
@@ -2705,8 +2830,36 @@ export interface components {
             lineTotalCents: number;
             imageUrl: string;
         };
+        OrderResponse: {
+            orderNumber: string;
+            status: components["schemas"]["OrderStatus"];
+            /** Format: date-time */
+            placedAtUtc: string;
+            lines: components["schemas"]["OrderLineResponse"][];
+            /** Format: int32 */
+            subtotalCents: number;
+            /** Format: int32 */
+            shippingCents: number;
+            /** Format: int32 */
+            taxCents: number;
+            /** Format: int32 */
+            totalCents: number;
+            shipTo: components["schemas"]["PostalAddress"];
+            carrier: null | components["schemas"]["Carrier"];
+            trackingNumber: null | string;
+            trackingUrl: null | string;
+            /** Format: date */
+            estimatedDeliveryDate: null | string;
+            timeline: components["schemas"]["OrderStepResponse"][];
+        };
         /** @enum {unknown} */
         OrderStatus: "pending" | "shipped" | "delivered" | "cancelled" | "refunded";
+        OrderStepResponse: {
+            status: components["schemas"]["OrderStatus"];
+            /** Format: date-time */
+            changedAtUtc: string;
+            note: null | string;
+        };
         OrderSummaryResponse: {
             orderNumber: string;
             status: components["schemas"]["OrderStatus"];
@@ -2795,6 +2948,8 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        /** @enum {unknown} */
+        PaymentResult: "processing" | "paid" | "refunded" | "failed";
         PostalAddress: {
             recipientName: string;
             line1: string;

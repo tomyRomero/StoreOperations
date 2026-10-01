@@ -13,6 +13,7 @@ public sealed class AdminCategoriesController(CategoryAdminService categories) :
         await categories.ListAsync(ct);
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType<AdminCategoryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminCategoryResponse>> Get(int id, CancellationToken ct) =>
         await categories.GetAsync(id, ct) is { } category ? category : NotFound();

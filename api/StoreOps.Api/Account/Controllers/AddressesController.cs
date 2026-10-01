@@ -16,6 +16,7 @@ public sealed class AddressesController(AddressService addresses) : ControllerBa
         await addresses.ListAsync(User.GetUserId(), ct);
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType<AddressResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AddressResponse>> Get(int id, CancellationToken ct) =>
         await addresses.GetAsync(User.GetUserId(), id, ct) is { } address ? address : NotFound();
@@ -31,12 +32,14 @@ public sealed class AddressesController(AddressService addresses) : ControllerBa
     }
 
     [HttpPut("{id:int}")]
+    [ProducesResponseType<AddressResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AddressResponse>> Update(int id, AddressRequest request, CancellationToken ct) =>
         await addresses.UpdateAsync(User.GetUserId(), id, request, ct) is { } address ? address : NotFound();
 
     // Answers with the whole book, because the old default changes too
     [HttpPost("{id:int}/default")]
+    [ProducesResponseType<IReadOnlyList<AddressResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IReadOnlyList<AddressResponse>>> MakeDefault(int id, CancellationToken ct) =>
         await addresses.SetDefaultAsync(User.GetUserId(), id, ct) is { } book ? Ok(book) : NotFound();

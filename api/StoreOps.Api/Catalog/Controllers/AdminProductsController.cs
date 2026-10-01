@@ -20,6 +20,7 @@ public sealed class AdminProductsController(ProductAdminService products) : Admi
         await products.ListAsync(new AdminProductQuery(search, status, page, pageSize), ct);
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType<AdminProductResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminProductResponse>> Get(int id, CancellationToken ct) =>
         await products.GetAsync(id, ct) is { } product ? product : NotFound();
