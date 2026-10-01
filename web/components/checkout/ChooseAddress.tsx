@@ -84,7 +84,7 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
           {adding ? (
             <div className="grid gap-4 rounded-[20px] border bg-card p-5 sm:p-6">
               <h2 className="font-sans text-base font-semibold">New address</h2>
-              <AddressForm submitLabel="Save and continue to payment" onSaved={(address) => continueWith(address.id)} />
+              <AddressForm submitLabel="Save and continue to payment" autoFocus={addresses.length > 0} onSaved={(address) => continueWith(address.id)} />
               {addresses.length > 0 && (
                 <Button variant="ghost" className="w-fit" onClick={() => setAdding(false)}>
                   Use a saved address instead

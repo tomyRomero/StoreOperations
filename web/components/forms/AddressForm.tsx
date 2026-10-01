@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,24 +30,44 @@ const FormSchema = z.object({
 type Values = z.infer<typeof FormSchema>;
 
 type Props = {
+  // The saved address to change; without one the form adds a new address
+  address?: Address;
   onSaved: (address: Address) => void;
+  // Shows a Cancel button beside Save
+  onCancel?: () => void;
   submitLabel?: string;
+  // Puts the cursor in the first field, for a form that opened because someone asked for it
+  autoFocus?: boolean;
 };
 
-// Adds an address to the customer's address book. The first one becomes the default on its own.
-const AddressForm = ({ onSaved, submitLabel = "Save address" }: Props) => {
+// Adds an address to the customer's address book (the first one becomes the default on its own), or
+// changes a saved one. Which address is the default is chosen in the address book, so editing leaves it.
+const AddressForm = ({ address, onSaved, onCancel, submitLabel = "Save address", autoFocus = false }: Props) => {
   const [saving, setSaving] = useState(false);
 
   const form = useForm<Values>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { recipientName: "", line1: "", line2: "", city: "", state: "", postalCode: "", isDefault: false },
+    defaultValues: {
+      recipientName: address?.recipientName ?? "",
+      line1: address?.line1 ?? "",
+      line2: address?.line2 ?? "",
+      city: address?.city ?? "",
+      state: address?.state ?? "",
+      postalCode: address?.postalCode ?? "",
+      isDefault: false,
+    },
   });
 
-  const onSubmit = async (values: Values) => {
+  useEffect(() => {
+    if (autoFocus) form.setFocus("recipientName");
+  }, [autoFocus, form]);
+
+  const onSubmit = async ({ isDefault, ...values }: Values) => {
     setSaving(true);
-    const { data, error } = await api.POST("/api/account/addresses", {
-      body: { ...values, line2: values.line2 || null, countryCode: "US" },
-    });
+    const body = { ...values, line2: values.line2 || null, countryCode: "US" };
+    const { data, error } = address
+      ? await api.PUT("/api/account/addresses/{id}", { params: { path: { id: address.id } }, body })
+      : await api.POST("/api/account/addresses", { body: { ...body, isDefault } });
     setSaving(false);
 
     if (!data) {
@@ -153,21 +173,30 @@ const AddressForm = ({ onSaved, submitLabel = "Save address" }: Props) => {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="isDefault"
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-3">
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-              <FormLabel>Make this my default address</FormLabel>
-            </FormItem>
+        {!address && (
+          <FormField
+            control={form.control}
+            name="isDefault"
+            render={({ field }) => (
+              <FormItem className="flex items-center gap-3">
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+                <FormLabel>Make this my default address</FormLabel>
+              </FormItem>
+            )}
+          />
+        )}
+        <div className="flex flex-wrap gap-2.5 max-sm:grid">
+          <Button type="submit" size="lg" loading={saving} className="rounded-full px-7">
+            {submitLabel}
+          </Button>
+          {onCancel && (
+            <Button type="button" size="lg" variant="ghost" className="rounded-full border border-foreground/16 px-6" onClick={onCancel}>
+              Cancel
+            </Button>
           )}
-        />
-        <Button type="submit" size="lg" loading={saving} className="max-sm:w-full sm:w-fit">
-          {submitLabel}
-        </Button>
+        </div>
       </form>
     </Form>
   );
