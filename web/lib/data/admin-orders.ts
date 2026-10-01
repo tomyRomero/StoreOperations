@@ -1,16 +1,18 @@
 import "server-only";
 
 import { serverApi } from "../api/server";
-import type { AdminOrder, OrderStatus } from "../api/types";
+import type { AdminOrder, AdminOrderSort, OrderStatus } from "../api/types";
 
 // Admin reads for Server Components. The API refuses them to anyone who isn't an admin.
 
-export type AdminOrderFilter = { search?: string; status?: OrderStatus; customerId?: number; page?: number };
+export type AdminOrderFilter = { search?: string; status?: OrderStatus; customerId?: number; sort?: AdminOrderSort; page?: number };
 
-// One page of orders, newest first, or null when the API can't answer
-export async function getAdminOrders({ search, status, customerId, page = 1 }: AdminOrderFilter) {
+export const adminOrdersPageSize = 20;
+
+// One page of orders (newest first unless sorted otherwise), or null when the API can't answer
+export async function getAdminOrders({ search, status, customerId, sort, page = 1 }: AdminOrderFilter) {
   const { data } = await serverApi().GET("/api/admin/orders", {
-    params: { query: { search: search || undefined, status, customerId, page, pageSize: 20 } },
+    params: { query: { search: search || undefined, status, customerId, sort, page, pageSize: adminOrdersPageSize } },
   });
   return data ?? null;
 }

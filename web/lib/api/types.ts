@@ -31,6 +31,7 @@ export type PaymentResult = Schemas["PaymentResult"];
 
 export type AdminOrderSummary = Schemas["AdminOrderSummaryResponse"];
 export type AdminOrder = Schemas["AdminOrderResponse"];
+export type AdminOrderSort = Schemas["AdminOrderSort"];
 export type AdminSettings = Schemas["StoreSettingsResponse"];
 export type AdminProduct = Schemas["AdminProductResponse"];
 export type AdminCategory = Schemas["AdminCategoryResponse"];
