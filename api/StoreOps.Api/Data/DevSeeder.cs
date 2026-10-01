@@ -60,6 +60,12 @@ public static class DevSeeder
         await db.Database.EnsureDeletedAsync(cancellationToken);
         await db.Database.MigrateAsync(cancellationToken);
 
+        // The demo store's own policies over the defaults a new store starts with: free shipping over $75,
+        // so the bag has progress toward it to show, and an address for questions
+        var settings = await db.StoreSettings.SingleAsync(cancellationToken);
+        settings.FreeShippingThresholdCents = 7500;
+        settings.SupportEmail = "support@palettehub.test";
+
         var now = DateTime.UtcNow;
 
         var admin = await CreateUserAsync(users, "demo-admin", "admin@example.test", now.AddDays(-30));
