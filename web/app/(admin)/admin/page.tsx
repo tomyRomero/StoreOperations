@@ -10,27 +10,29 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { Badge } from "@/components/ui/badge";
 import type { OrderStatus } from "@/lib/api/types";
-import { parseRange } from "@/lib/dashboard";
+import { greeting, parseRange } from "@/lib/dashboard";
 import { getDashboard } from "@/lib/data/admin-store";
+import { getStoreSettings } from "@/lib/data/catalog";
+import { getCurrentUser } from "@/lib/session";
 import { formatDay, orderStatusLabel } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Home" };
 
 const statuses: OrderStatus[] = ["pending", "shipped", "delivered", "cancelled", "refunded"];
 const count = (n: number) => n.toLocaleString("en-US");
 const cardClasses = "rounded-xl border bg-card p-5 sm:p-6";
 
-// How the store is doing: sales over the chosen period against the one before, what needs doing now,
+// The console's home: a greeting, then how the store is doing: sales over the chosen period against the one before, what needs doing now,
 // and where orders and sales come from. Days are the store's days, in its time zone.
 export default async function DashboardPage(props: { searchParams: Promise<{ days?: string | string[] }> }) {
   const days = parseRange((await props.searchParams).days);
-  const dashboard = await getDashboard(days);
+  const [dashboard, settings, user] = await Promise.all([getDashboard(days), getStoreSettings(), getCurrentUser()]);
 
   if (!dashboard) {
     return (
       <>
-        <AdminPageHeader title="Dashboard" />
+        <AdminPageHeader title="Home" />
         <ErrorState title="We couldn't load the dashboard" action={<RetryButton />} />
       </>
     );
@@ -43,8 +45,8 @@ export default async function DashboardPage(props: { searchParams: Promise<{ day
   return (
     <>
       <AdminPageHeader
-        title="Dashboard"
-        description={`${formatDay(dashboard.first)} to ${formatDay(dashboard.last)}, in the store's time zone (${dashboard.timeZoneId.replace("_", " ")})`}
+        title={`${greeting(new Date(), dashboard.timeZoneId)}${user ? `, ${user.username}` : ""}`}
+        description={`Here's how ${settings?.storeName ?? "the store"} did from ${formatDay(dashboard.first)} to ${formatDay(dashboard.last)}, in its time zone (${dashboard.timeZoneId.replace("_", " ")}).`}
       />
       <RangePicker days={days}>
         <div className="grid gap-6 xl:grid-cols-3">

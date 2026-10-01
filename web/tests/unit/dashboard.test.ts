@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { change, labelIndexes, niceTicks, parseRange } from "@/lib/dashboard";
+import { change, greeting, labelIndexes, niceTicks, parseRange } from "@/lib/dashboard";
 import { formatMoneyShort } from "@/lib/money";
 
 describe("dashboard range", () => {
@@ -56,5 +56,20 @@ describe("short money", () => {
     expect(formatMoneyShort(25_000)).toBe("$250");
     expect(formatMoneyShort(250_000)).toBe("$2.5K");
     expect(formatMoneyShort(0)).toBe("$0");
+  });
+});
+
+describe("greeting", () => {
+  it("follows the store's clock, not the server's", () => {
+    // 15:30 UTC is 10:30 in Chicago and 16:30 in London
+    const now = new Date("2026-10-01T15:30:00Z");
+    expect(greeting(now, "America/Chicago")).toBe("Good morning");
+    expect(greeting(now, "Europe/London")).toBe("Good afternoon");
+  });
+
+  it("turns to evening at six", () => {
+    expect(greeting(new Date("2026-10-01T17:59:00Z"), "UTC")).toBe("Good afternoon");
+    expect(greeting(new Date("2026-10-01T18:00:00Z"), "UTC")).toBe("Good evening");
+    expect(greeting(new Date("2026-10-01T00:30:00Z"), "UTC")).toBe("Good morning");
   });
 });

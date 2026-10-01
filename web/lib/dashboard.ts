@@ -39,3 +39,9 @@ export function labelIndexes(n: number, fit: number): number[] {
   const picked = Array.from({ length: slots }, (_, i) => Math.round((i * (n - 1)) / (slots - 1)));
   return [...new Set(picked)];
 }
+
+// "Good morning" before noon, "Good afternoon" until six, then "Good evening", by the store's clock
+export function greeting(now: Date, timeZone: string): string {
+  const hour = Number(new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone }).format(now));
+  return hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+}
