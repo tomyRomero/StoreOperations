@@ -69,7 +69,7 @@ const page = async (
           ) : orders.totalCount === 0 ? (
             <p>No orders match.</p>
           ) : (
-          <div className="border shadow-sm rounded-lg p-2">
+          <div className="border shadow-xs rounded-lg p-2">
             <Table >
               <TableHeader>
                 <TableRow>

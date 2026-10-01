@@ -58,7 +58,7 @@ export default async function Page(
           </Link>
         ))}
       </nav>
-      <div className="border shadow-sm rounded-lg">
+      <div className="border shadow-xs rounded-lg">
         {!products || !settings ? (
           <p className="p-10 text-center text-red-600">Failed to load products. Please try again later.</p>
         ) : products.totalCount === 0 ? (

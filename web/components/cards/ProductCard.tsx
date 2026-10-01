@@ -12,7 +12,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
       <Image
             alt={`Product ${product.name} Image`}
-            className="rounded-lg object-cover w-full aspect-square group-hover:opacity-80 transition-opacity max-sm:aspect-[4/3] px-6 py-2"
+            className="rounded-lg object-cover w-full aspect-square group-hover:opacity-80 transition-opacity max-sm:aspect-4/3 px-6 py-2"
             height={150}
             src={product.imageUrl}
             width={300}

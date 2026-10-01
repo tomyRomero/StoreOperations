@@ -19,7 +19,7 @@ const AccountDashboard = ({username, email} : {username: string, email:string}) 
     return(
     <div className="hidden w-full border-r lg:block">
 
-    <div className="w-[17rem] fixed flex h-full min-h-screen flex-col gap-5 p-3">
+    <div className="w-68 fixed flex h-full min-h-screen flex-col gap-5 p-3">
         <Link href="/account">
             <div className="flex items-center mb-4 p-2">
                 <div className="ml-4">

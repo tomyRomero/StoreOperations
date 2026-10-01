@@ -41,7 +41,7 @@ export default async function RootLayout({
       <body className={`${jost.className} flex flex-col`}>
         <Nav/>
         <main className="flex flex-col items-center">
-          <section className="main-container w-full mt-0.5 !z-10 overflow-auto">
+          <section className="main-container w-full mt-0.5 z-10! overflow-auto">
             {children}
             </section>
             <br/>

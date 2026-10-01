@@ -77,7 +77,7 @@ const router = useRouter();
                         />
                         <h2
                         className={`hover:text-gray-500 transition-all 
-                        duration-[500ms] md:text-[82px] text-[42px] tracking-[2.52px] font-bold uppercase md:tracking-[5.8px]
+                        duration-500 md:text-[82px] text-[42px] tracking-[2.52px] font-bold uppercase md:tracking-[5.8px]
                         ${link.path === pathname ? "text-gray-500" : ""}
                         `}
                       >

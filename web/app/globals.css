@@ -1,22 +1,167 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer components {
+@import 'tw-animate-css';
 
+@custom-variant dark (&:is(.dark *));
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-xxs)) {
+    max-width: none;
+  }
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
 }
 
-  /* main */
+@theme {
+  --text-*: initial;
+  --text-heading0-bold: 56px;
+  --text-heading0-bold--line-height: 140%;
+  --text-heading0-bold--font-weight: 800;
+  --text-heading1-bold: 36px;
+  --text-heading1-bold--line-height: 140%;
+  --text-heading1-bold--font-weight: 700;
+  --text-heading1-semibold: 36px;
+  --text-heading1-semibold--line-height: 140%;
+  --text-heading1-semibold--font-weight: 600;
+  --text-heading2-bold: 30px;
+  --text-heading2-bold--line-height: 140%;
+  --text-heading2-bold--font-weight: 700;
+  --text-heading2-semibold: 30px;
+  --text-heading2-semibold--line-height: 140%;
+  --text-heading2-semibold--font-weight: 600;
+  --text-heading3-bold: 28px;
+  --text-heading3-bold--line-height: 140%;
+  --text-heading3-bold--font-weight: 700;
+  --text-heading4-bold: 20px;
+  --text-heading4-bold--line-height: 140%;
+  --text-heading4-bold--font-weight: 700;
+  --text-body-bold: 18px;
+  --text-body-bold--line-height: 140%;
+  --text-body-bold--font-weight: 700;
+  --text-body-semibold: 18px;
+  --text-body-semibold--line-height: 140%;
+  --text-body-semibold--font-weight: 100;
+  --text-body-big: 22px;
+  --text-body-big--line-height: 140%;
+  --text-body-big--font-weight: 100;
+  --text-body-medium: 18px;
+  --text-body-medium--line-height: 140%;
+  --text-body-medium--font-weight: 500;
+  --text-body-normal: 18px;
+  --text-body-normal--line-height: 140%;
+  --text-body-normal--font-weight: 400;
+  --text-body1-bold: 18px;
+  --text-body1-bold--line-height: 140%;
+  --text-body1-bold--font-weight: 700;
+  --text-base-regular: 16px;
+  --text-base-regular--line-height: 140%;
+  --text-base-regular--font-weight: 400;
+  --text-base-medium: 16px;
+  --text-base-medium--line-height: 140%;
+  --text-base-medium--font-weight: 500;
+  --text-base-semibold: 16px;
+  --text-base-semibold--line-height: 140%;
+  --text-base-semibold--font-weight: 600;
+  --text-base1-semibold: 16px;
+  --text-base1-semibold--line-height: 140%;
+  --text-base1-semibold--font-weight: 600;
+  --text-small-regular: 14px;
+  --text-small-regular--line-height: 140%;
+  --text-small-regular--font-weight: 400;
+  --text-small-medium: 14px;
+  --text-small-medium--line-height: 140%;
+  --text-small-medium--font-weight: 500;
+  --text-small-semibold: 14px;
+  --text-small-semibold--line-height: 140%;
+  --text-small-semibold--font-weight: 600;
+  --text-subtle-medium: 12px;
+  --text-subtle-medium--line-height: 16px;
+  --text-subtle-medium--font-weight: 500;
+  --text-subtle-semibold: 12px;
+  --text-subtle-semibold--line-height: 16px;
+  --text-subtle-semibold--font-weight: 600;
+  --text-tiny-medium: 10px;
+  --text-tiny-medium--line-height: 140%;
+  --text-tiny-medium--font-weight: 500;
+  --text-x-small-semibold: 7px;
+  --text-x-small-semibold--line-height: 9.318px;
+  --text-x-small-semibold--font-weight: 600;
+
+  --color-primary-500: #0060d4;
+  --color-secondary-500: #ffb620;
+  --color-blue: #0060d4;
+  --color-logout-btn: #ff5a5a;
+  --color-navbar-menu: rgba(16, 16, 18, 0.6);
+  --color-dark-1: #000000;
+  --color-dark-2: #121417;
+  --color-dark-3: #101012;
+  --color-dark-4: #1f1f22;
+  --color-light-1: #ffffff;
+  --color-light-2: #efefef;
+  --color-light-3: #7878a3;
+  --color-light-4: #5c5c7b;
+  --color-gray-1: #697c89;
+  --color-glassmorphism: rgba(16, 16, 18, 0.6);
+
+  --shadow-count-badge: 0px 0px 6px 2px rgba(219, 188, 159, 0.3);
+  --shadow-groups-sidebar: -30px 0px 60px 0px rgba(28, 28, 31, 0.5);
+
+  --breakpoint-xs: 360px;
+  --breakpoint-xxs: 285px;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* main */
   .main-container {
     @apply min-h-screen flex flex-col items-center;
   }
 
   .account-form_image-input {
-    @apply cursor-pointer border-black hover:border-gray-400 bg-transparent outline-none file:text-black !important;
+    @apply cursor-pointer! border-black! hover:border-gray-400! bg-transparent! outline-hidden! file:text-black!;
   }
 
   .account-form_image-input {
-    @apply cursor-pointer border-black hover:border-gray-400 bg-transparent outline-none file:text-black !important;
+    @apply cursor-pointer! border-black! hover:border-gray-400! bg-transparent! outline-hidden! file:text-black!;
   }
 
   /* Pagination */
@@ -29,6 +174,6 @@
     @apply flex gap-2 rounded-lg bg-black px-4 py-2;
   }
   .searchbar_input {
-    @apply border-none bg-white text-base-regular text-black outline-none !important;
+    @apply border-none! bg-white! text-base-regular! text-black! outline-hidden!;
   }
 

@@ -13,7 +13,7 @@ const Hero = () => {
           {storeDetails.heroSubTitle}
         </p>
         <Link
-          className="text-body-bold mr-auto inline-flex h-12 items-center justify-center rounded-md bg-black px-8 text-lg font-medium text-white shadow transition-colors hover:bg-gray-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="text-body-bold mr-auto inline-flex h-12 items-center justify-center rounded-md bg-black px-8 text-lg font-medium text-white shadow-sm transition-colors hover:bg-gray-100 hover:text-black focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white"
           href="/products"
         >
           Shop Now

@@ -49,7 +49,7 @@ export default async function Page(
               </Link>
             ))}
           </nav>
-          <div className="grid grid-cols-1 border shadow-sm rounded-lg overflow-x-auto">
+          <div className="grid grid-cols-1 border shadow-xs rounded-lg overflow-x-auto">
             {!users || !settings ? (
               <p className="p-10 text-center text-red-600">Failed to load users. Please try again later.</p>
             ) : users.totalCount === 0 ? (

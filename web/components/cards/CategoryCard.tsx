@@ -9,7 +9,7 @@ const CategoryCard = ({ category }: { category: Category }) => {
     <div className="flex flex-col items-center">
           <Image
             alt={category.name}
-            className="object-cover w-full h-60 rounded-lg max-sm:aspect-[4/3]"
+            className="object-cover w-full h-60 rounded-lg max-sm:aspect-4/3"
             height={300}
             src={category.imageUrl}
             style={{

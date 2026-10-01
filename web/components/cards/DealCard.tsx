@@ -26,7 +26,7 @@ const DealCard = ({ product }: { product: Product }) => {
       <p className="text-gray-500">{product.dealDescription}</p>
       <Link
         className={`inline-flex h-9 items-center justify-center rounded-md bg-gray-900 px-4 py-2 font-medium text-gray-50 
-        shadow transition-colors hover:bg-white  hover:text-black focus-visible:outline-none 
+        shadow transition-colors hover:bg-white  hover:text-black focus-visible:outline-hidden 
          mt-4`}
         href={`/products/${product.id}`}
       >

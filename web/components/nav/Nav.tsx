@@ -112,8 +112,8 @@ const Nav = () => {
               height={24}
               className='pl-1'
             />
-          <span className="ml-2 font-bold max-xxs:!text-small-regular">Cart</span>  
-          <Badge className={`ml-2 h-3 w-4 hidden items-center justify-center rounded-full p-3 max-xxs:p-2 ${cartNum > 0 ? "flex max-xxs:!text-small-regular" : ""}`}>{cartNum}</Badge>
+          <span className="ml-2 font-bold max-xxs:text-small-regular!">Cart</span>  
+          <Badge className={`ml-2 h-3 w-4 hidden items-center justify-center rounded-full p-3 max-xxs:p-2 ${cartNum > 0 ? "flex max-xxs:text-small-regular!" : ""}`}>{cartNum}</Badge>
         </Button>
         <MenuToggle isActive={isActive} setIsActive={setIsActive} />
         <NavMenu
@@ -131,7 +131,7 @@ const Nav = () => {
     exit={{ scaleY: 0 }}
     transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
     onClick={() => setIsActive(false)}
-    className="bg-white fixed top-0 left-0 right-0 bottom-0 !z-20 border-b-2 border-black "
+    className="bg-white fixed top-0 left-0 right-0 bottom-0 z-20! border-b-2 border-black "
   ></m.div>
 )}
 </AnimatePresence>

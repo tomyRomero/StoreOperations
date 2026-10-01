@@ -50,7 +50,7 @@ const Promotion = ({ deals }: { deals: Product[] }) => {
 
   return (
     <section className="max-xs:px-4 max-sm:px-8 px-20 lg:px-40 mt-10 mx-auto grid grid-cols-1 gap-6 md:gap-0 mb-6 md:mb-0">
-    <div className="flex flex-col justify-center gap-6 p-6 bg-gradient-to-r from-green-400 to-blue rounded-lg shadow-lg text-white">
+    <div className="flex flex-col justify-center gap-6 p-6 bg-linear-to-r from-green-400 to-blue rounded-lg shadow-lg text-white">
       <div>
         <h3 className="text-heading3-bold">Deals of the Month</h3>
         <p className='text-body-semibold'>

@@ -26,7 +26,7 @@ export default async function Page(
         </Button>
       </div>
       <SearchBar routeType="admincategories" placeholder="Search categories by name" />
-      <div className="border shadow-sm rounded-lg">
+      <div className="border shadow-xs rounded-lg">
         {categories === null ? (
           <p className="p-10 text-red-600">Failed to load categories. Please try again later.</p>
         ) : shown.length === 0 ? (
