@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import { Bricolage_Grotesque, Figtree } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { getCurrentUser } from "@/lib/session";
 
-const jost = Jost({
+// Bricolage Grotesque for display and headings (its optical-size axis keeps small headings readable),
+// Figtree for text, UI and numbers. Both are variable fonts served from this site, not from Google.
+const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-jost",
+  axes: ["opsz"],
+  variable: "--font-bricolage",
+});
+
+const sans = Figtree({
+  subsets: ["latin"],
+  variable: "--font-figtree",
 });
 
 export const metadata: Metadata = {
@@ -22,8 +29,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const user = await getCurrentUser();
 
   return (
-    <html lang="en">
-      <body className={`${jost.className} flex flex-col`}>
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
+      <body className="flex min-h-screen flex-col">
         <CurrentUserProvider user={user}>
           {children}
           <Toaster />

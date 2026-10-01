@@ -1,22 +1,126 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import "tw-animate-css";
 
-@import 'tw-animate-css';
-
+/* Dark mode is out of scope; the dark: classes some components carry only apply under a .dark class
+   that is never set, rather than following the visitor's system setting. */
 @custom-variant dark (&:is(.dark *));
 
-@utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= --theme(--breakpoint-xxs)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
+/*
+  Swatch design tokens (DESIGN.md section 2). Components use the semantic names (bg-card,
+  text-muted-foreground, border-input), never raw hex, so a later dark mode is a matter of redefining them.
+  Contrast on white: foreground 18.6:1, muted-foreground 6.8:1, accent 5.9:1, input borders 3.4:1.
+*/
+:root {
+  --background: #ffffff;
+  --foreground: #111318;
+  --card: #ffffff;
+  --card-foreground: #111318;
+  --popover: #ffffff;
+  --popover-foreground: #111318;
+  --muted: #f3f4f6;
+  --muted-foreground: #555b66;
+  --border: #e4e6ea;
+  --input: #868c97;
+  --primary: #111318;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #111318;
+
+  /* The one interface accent: links, focus, selected states, the chart line */
+  --accent: #b8168f;
+  --accent-foreground: #ffffff;
+  --accent-subtle: #fce8f6;
+  --accent-ink: #8a0f6b;
+  --ring: #b8168f;
+
+  /* Status colors, always with a label or an icon */
+  --sale: #c42b1c;
+  --sale-subtle: #fdecea;
+  --success: #0b7a52;
+  --success-subtle: #e5f4ed;
+  --warning: #8c5a00;
+  --warning-subtle: #fff2d3;
+
+  /* The brand pigments: the logo mark, the stripe across the top and category markers. Decorative
+     only, never text or meaning. */
+  --pigment-magenta: #b8168f;
+  --pigment-cobalt: #1f4fe0;
+  --pigment-yellow: #f5c400;
+  --pigment-green: #00866e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-ink: var(--accent-ink);
+  --color-ring: var(--ring);
+  --color-sale: var(--sale);
+  --color-sale-subtle: var(--sale-subtle);
+  --color-destructive: var(--sale);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-pigment-magenta: var(--pigment-magenta);
+  --color-pigment-cobalt: var(--pigment-cobalt);
+  --color-pigment-yellow: var(--pigment-yellow);
+  --color-pigment-green: var(--pigment-green);
+
+  /* Set by next/font in app/layout.tsx */
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme {
-  --text-*: initial;
+  /* Type scale: Bricolage Grotesque for display and h1-h3 (set on the elements below), Figtree for the rest */
+  --text-display: clamp(2.5rem, 5vw, 4.25rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 800;
+  --text-h1: clamp(2rem, 3.5vw, 2.75rem);
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.025em;
+  --text-h1--font-weight: 800;
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 700;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.25;
+  --text-h3--font-weight: 700;
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+
+  /* Crisp shapes: 4px for badges, inputs and chips, 6px for buttons and cards, 10px for drawers and dialogs */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Quick motion: 120ms hover, 200ms menus and toasts, 320ms drawers */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Legacy tokens from before the redesign. Each page moves to the scale above, then these are deleted. */
+@theme {
   --text-heading0-bold: 56px;
   --text-heading0-bold--line-height: 140%;
   --text-heading0-bold--font-weight: 800;
@@ -111,69 +215,85 @@
 
   --breakpoint-xs: 360px;
   --breakpoint-xxs: 285px;
+}
 
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-
-  @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--radix-accordion-content-height);
-    }
+/* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */
+@utility container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
   }
-  @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height);
-    }
-    to {
-      height: 0;
-    }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
   }
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* One visible focus ring for everything focusable: 2px accent with a 2px gap */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-accent-ink);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
-/* main */
-  .main-container {
-    @apply min-h-screen flex flex-col items-center;
+/* Nothing moves for people who ask their system for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
 
-  .account-form_image-input {
-    @apply cursor-pointer! border-black! hover:border-gray-400! bg-transparent! outline-hidden! file:text-black!;
-  }
+/* Legacy component classes, removed with the pages that use them */
+.main-container {
+  @apply min-h-screen flex flex-col items-center;
+}
 
-  .account-form_image-input {
-    @apply cursor-pointer! border-black! hover:border-gray-400! bg-transparent! outline-hidden! file:text-black!;
-  }
+.pagination {
+  @apply mt-6 flex w-full items-center justify-center gap-5;
+}
 
-  /* Pagination */
-  .pagination {
-    @apply mt-6 flex w-full items-center justify-center gap-5;
-  }
-
-  /* Search Bar */
-  .searchbar {
-    @apply flex gap-2 rounded-lg bg-black px-4 py-2;
-  }
-  .searchbar_input {
-    @apply border-none! bg-white! text-base-regular! text-black! outline-hidden!;
-  }
-
+.searchbar {
+  @apply flex gap-2 rounded-lg bg-black px-4 py-2;
+}
+.searchbar_input {
+  @apply border-none! bg-white! text-base-regular! text-black! outline-hidden!;
+}
