@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { PriceTag } from "@/components/shared/PriceTag";
@@ -31,11 +32,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
+// No loading.tsx here on purpose: the page waits for the product, so an old link gets a real 404 status
+// instead of a streamed 200. Related products stream in below, so they never hold the page up.
 export default async function ProductPage(props: Props) {
-  const product = await productFor(props);
+  const [product, settings] = await Promise.all([productFor(props), getStoreSettings()]);
   if (!product) notFound();
 
-  const [related, settings] = await Promise.all([getRelatedProducts(product.id), getStoreSettings()]);
   const lowStockThreshold = settings?.lowStockThreshold ?? 5;
   const productUrl = new URL(`/products/${product.id}`, siteUrl).href;
 
@@ -119,16 +121,25 @@ export default async function ProductPage(props: Props) {
         </div>
       </div>
 
-      <ProductRow
-        id="related"
-        title="You may also like"
-        href={`/products?category=${product.categoryId}`}
-        linkLabel={`More ${product.categoryName.toLowerCase()}`}
-        products={related}
-        lowStockThreshold={lowStockThreshold}
-      />
+      <Suspense>
+        <RelatedProducts product={product} lowStockThreshold={lowStockThreshold} />
+      </Suspense>
       {/* Room for the phone's add-to-cart bar, so it never covers the end of the page */}
       <div aria-hidden className="h-20 lg:hidden" />
     </>
+  );
+}
+
+async function RelatedProducts({ product, lowStockThreshold }: { product: Product; lowStockThreshold: number }) {
+  const related = await getRelatedProducts(product.id);
+  return (
+    <ProductRow
+      id="related"
+      title="You may also like"
+      href={`/products?category=${product.categoryId}`}
+      linkLabel={`More ${product.categoryName.toLowerCase()}`}
+      products={related}
+      lowStockThreshold={lowStockThreshold}
+    />
   );
 }

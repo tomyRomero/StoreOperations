@@ -7,6 +7,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { ActiveFilters } from "@/components/products/ActiveFilters";
 import { MobileFilters } from "@/components/products/MobileFilters";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -88,11 +89,7 @@ async function ProductResults({ filters, searchParams, lowStockThreshold }: { fi
     return (
       <ErrorState
         title="We couldn't load the products"
-        action={
-          <Button asChild>
-            <a href={productFiltersHref(filters)}>Try again</a>
-          </Button>
-        }
+        action={<RetryButton />}
       />
     );
   }

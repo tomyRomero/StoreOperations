@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import Checkout from "@/components/checkout/Checkout";
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps";
 import { ErrorState } from "@/components/shared/ErrorState";
-import { Button } from "@/components/ui/button";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { getAddresses } from "@/lib/data/account";
 import { requireUser } from "@/lib/session";
 
@@ -39,11 +39,7 @@ const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
       ) : (
         <ErrorState
           title="We couldn't load checkout"
-          action={
-            <Button asChild>
-              <a href="/checkout">Try again</a>
-            </Button>
-          }
+          action={<RetryButton />}
         />
       )}
     </div>
