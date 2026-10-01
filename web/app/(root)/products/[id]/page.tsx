@@ -130,7 +130,7 @@ export default async function ProductPage(props: Props) {
 
             <ProductPurchase product={product} />
 
-            {settings && <FreeShippingMeter flatCents={settings.shippingFlatRateCents} freeOverCents={settings.freeShippingThresholdCents} />}
+            <FreeShippingMeter settings={settings} />
 
             {facts.length > 0 && (
               <div className="grid gap-3">

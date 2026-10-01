@@ -19,7 +19,7 @@ const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
     <div className="container max-w-3xl py-8 lg:py-12">
       <Link href="/cart" className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" aria-hidden />
-        Back to cart
+        Back to bag
       </Link>
       <h1 className="mt-4 text-h1">Checkout</h1>
       <div className="mt-6 mb-10">

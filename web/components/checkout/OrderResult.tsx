@@ -83,9 +83,9 @@ const OrderResult = ({ paymentIntentId, supportEmail }: { paymentIntentId: strin
   if (outcome === "refunded") {
     return (
       <Message icon={RotateCcw} tone="warning" title="We couldn't complete your order">
-        Something in your cart sold out or changed while you were paying, so your payment has been refunded in full.
+        Something in your bag sold out or changed while you were paying, so your payment has been refunded in full.
         Refunds usually reach your card within 5 to 10 business days.
-        <Actions primary={{ href: "/cart", label: "Back to cart" }} />
+        <Actions primary={{ href: "/cart", label: "Back to bag" }} />
       </Message>
     );
   }

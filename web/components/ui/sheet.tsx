@@ -64,7 +64,7 @@ function SheetContent({
         onCloseAutoFocus={handleCloseAutoFocus}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+        <SheetPrimitive.Close className="absolute right-4 top-4 inline-flex size-10 items-center justify-center rounded-full border border-foreground/12 text-ink-2 transition-colors hover:bg-foreground/6 hover:text-foreground">
           <X className="size-5" aria-hidden />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>

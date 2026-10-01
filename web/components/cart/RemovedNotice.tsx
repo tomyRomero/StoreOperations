@@ -2,7 +2,7 @@
 
 import { useCart } from "./CartProvider";
 
-// "Removed Fine Brush. Undo", in the cart itself rather than a toast: a toast sits outside the cart
+// "Removed Fine Brush. Undo", in the bag itself rather than a toast: a toast sits outside the bag
 // drawer, where nothing can be reached while the drawer is open
 export function RemovedNotice() {
   const { lastRemoved, undoRemove } = useCart();
@@ -10,7 +10,7 @@ export function RemovedNotice() {
   return (
     <div role="status" aria-live="polite">
       {lastRemoved && (
-        <p className="flex items-center justify-between gap-3 rounded-md bg-muted px-3 py-2 text-sm">
+        <p className="flex items-center justify-between gap-3 rounded-[14px] border border-foreground/8 bg-foreground/5 px-3.5 py-3 text-sm">
           <span className="min-w-0 truncate">
             Removed <span className="font-semibold">{lastRemoved.name}</span>
           </span>

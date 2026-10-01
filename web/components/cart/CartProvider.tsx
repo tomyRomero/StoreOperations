@@ -91,7 +91,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // A refused change puts back the cart the API last confirmed and says why
   const refused = useCallback((description: string) => {
     if (confirmed.current) setCart(confirmed.current);
-    toast({ title: "Couldn't update your cart", description, variant: "destructive" });
+    toast({ title: "Couldn't update your bag", description, variant: "destructive" });
     return false;
   }, []);
 

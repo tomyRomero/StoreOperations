@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { TriangleAlert } from "lucide-react";
+import { ProductThumb } from "@/components/products/ProductThumb";
 import { QuantityStepper } from "@/components/shared/QuantityStepper";
 import type { CartLine } from "@/lib/api/types";
 import { formatMoney } from "@/lib/money";
@@ -12,16 +12,22 @@ import { issueMessage, useCart } from "./CartProvider";
 
 type Props = {
   line: CartLine;
+  // The drawer's compact row, or the bag page's card
+  variant?: "drawer" | "page";
   // A line just added glows for a moment
   highlighted?: boolean;
   // Following the product link from the drawer closes it
   onNavigate?: () => void;
 };
 
-// One line of the cart. A line the store can't sell as it is says why, with a one-tap fix.
-export function CartLineItem({ line, highlighted = false, onNavigate }: Props) {
+// One line of the bag: the product in its glow, its price, a stepper and Remove, and the line's total
+// with the regular price struck through while it's on sale. A line the store can't sell as it is says
+// why, with a one-tap fix.
+export function CartLineItem({ line, variant = "drawer", highlighted = false, onNavigate }: Props) {
   const cart = useCart();
   const [busy, setBusy] = useState(false);
+  const page = variant === "page";
+  const regular = line.compareAtPriceCents !== null && line.compareAtPriceCents > line.priceCents ? line.compareAtPriceCents : null;
 
   const change = async (quantity: number) => {
     setBusy(true);
@@ -29,7 +35,7 @@ export function CartLineItem({ line, highlighted = false, onNavigate }: Props) {
     setBusy(false);
   };
 
-  // The cart then offers Undo where the line was (RemovedNotice)
+  // The bag then offers Undo where the line was (RemovedNotice)
   const remove = async () => {
     setBusy(true);
     await cart.remove(line.productId);
@@ -44,20 +50,35 @@ export function CartLineItem({ line, highlighted = false, onNavigate }: Props) {
         : null;
 
   return (
-    <li className={cn("flex gap-4 rounded-md p-2", highlighted && "animate-highlight")}>
-      <Link href={`/products/${line.productId}`} onClick={onNavigate} className="relative aspect-[4/5] w-20 shrink-0 overflow-hidden rounded-sm bg-muted" tabIndex={-1} aria-hidden>
-        <Image src={line.imageUrl} alt="" fill sizes="80px" className="object-cover" />
+    <li
+      className={cn(
+        "grid items-start gap-3.5",
+        page
+          ? "grid-cols-[96px_minmax(0,1fr)_auto] rounded-[24px] border bg-card p-3.5 sm:grid-cols-[148px_minmax(0,1fr)_auto] sm:items-center sm:gap-6 sm:p-4"
+          : "grid-cols-[84px_minmax(0,1fr)_auto] border-t border-foreground/7 py-4 first:border-t-0",
+        highlighted && "animate-highlight rounded-2xl",
+      )}
+    >
+      <Link href={`/products/${line.productId}`} onClick={onNavigate} tabIndex={-1} aria-hidden>
+        <ProductThumb
+          productId={line.productId}
+          imageUrl={line.imageUrl}
+          sizes={page ? "148px" : "84px"}
+          className={page ? "size-24 rounded-[18px] sm:size-37" : "size-21 rounded-[18px]"}
+        />
       </Link>
-      <div className="grid min-w-0 flex-1 content-start gap-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="grid min-w-0 gap-0.5">
-            <Link href={`/products/${line.productId}`} onClick={onNavigate} className="truncate font-semibold hover:underline">
-              {line.name}
-            </Link>
-            <span className="text-sm tabular-nums text-muted-foreground">{formatMoney(line.priceCents)} each</span>
-          </div>
-          <span className="font-semibold tabular-nums">{formatMoney(line.lineTotalCents)}</span>
-        </div>
+
+      <div className={cn("grid min-w-0 content-start", page ? "gap-1.5" : "gap-1")}>
+        <Link
+          href={`/products/${line.productId}`}
+          onClick={onNavigate}
+          className={cn("truncate font-semibold hover:underline", page ? "text-lg tracking-[-0.02em] sm:text-xl" : "text-[15px]")}
+        >
+          {line.name}
+        </Link>
+        <span className={cn("tabular-nums text-muted-foreground", page ? "text-sm" : "text-[13px]")}>
+          {formatMoney(line.priceCents)} each{regular !== null && <span className="text-sale"> · sale price</span>}
+        </span>
 
         {line.issue && (
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold text-warning">
@@ -71,10 +92,8 @@ export function CartLineItem({ line, highlighted = false, onNavigate }: Props) {
           </p>
         )}
 
-        <div className="flex items-center justify-between gap-3">
-          {line.issue === "unavailable" || line.issue === "out_of_stock" ? (
-            <span />
-          ) : (
+        <div className={cn("flex items-center gap-3", page ? "mt-2.5 sm:gap-4" : "mt-1.5")}>
+          {line.issue !== "unavailable" && line.issue !== "out_of_stock" && (
             <QuantityStepper
               value={line.quantity}
               onChange={change}
@@ -84,10 +103,25 @@ export function CartLineItem({ line, highlighted = false, onNavigate }: Props) {
               label={`Quantity of ${line.name}`}
             />
           )}
-          <button type="button" onClick={remove} disabled={busy} className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+          <button
+            type="button"
+            onClick={remove}
+            disabled={busy}
+            className={cn("text-muted-foreground underline underline-offset-3 hover:text-foreground", page ? "text-sm" : "text-[13px]")}
+          >
             Remove<span className="sr-only"> {line.name}</span>
           </button>
         </div>
+      </div>
+
+      <div className="grid justify-items-end gap-0.5 font-mono tabular-nums">
+        {regular !== null && <span className="sr-only">Was {formatMoney(regular * line.quantity)}, now </span>}
+        <span className={cn("font-medium", page ? "text-base sm:text-lg" : "text-[15px]")}>{formatMoney(line.lineTotalCents)}</span>
+        {regular !== null && (
+          <s aria-hidden className={cn("text-faint", page ? "text-[13px]" : "text-xs")}>
+            {formatMoney(regular * line.quantity)}
+          </s>
+        )}
       </div>
     </li>
   );

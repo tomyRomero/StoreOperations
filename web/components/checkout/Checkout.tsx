@@ -77,7 +77,7 @@ const Checkout = ({ address }: { address: Address }) => {
         action={
           <>
             <Button asChild>
-              <Link href="/cart">Back to cart</Link>
+              <Link href="/cart">Back to bag</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href={changeAddress}>Choose another address</Link>
@@ -85,7 +85,7 @@ const Checkout = ({ address }: { address: Address }) => {
           </>
         }
       >
-        {problem ?? "This store hasn't connected its payment provider yet, so orders can't be paid for. Your cart is saved."}
+        {problem ?? "This store hasn't connected its payment provider yet, so orders can't be paid for. Your bag is saved."}
       </ErrorState>
     );
   }

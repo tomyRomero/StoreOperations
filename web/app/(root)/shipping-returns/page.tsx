@@ -48,7 +48,7 @@ export default async function ShippingReturnsPage() {
             </li>
           )}
           <li>We ship to addresses in the United States.</li>
-          <li>Your cart shows the shipping cost before you check out.</li>
+          <li>Your bag shows the shipping cost before you check out.</li>
           <li>
             You can follow each order from placed to delivered under <Link href="/account/orders">Your orders</Link>.
           </li>

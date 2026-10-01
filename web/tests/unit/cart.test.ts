@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Cart } from "@/lib/api/types";
-import { shippingFor, withQuantity } from "@/lib/cart";
+import { cartSavings, shippingFor, toFreeShipping, withQuantity } from "@/lib/cart";
 
 const line = (productId: number, priceCents: number, quantity: number) => ({
   productId,
@@ -48,5 +48,33 @@ describe("shippingFor", () => {
 
   it("can't say without the settings", () => {
     expect(shippingFor(3248, null)).toBeNull();
+  });
+});
+
+describe("toFreeShipping", () => {
+  const store = { shippingFlatRateCents: 1000, freeShippingThresholdCents: 7500 };
+
+  it("says how much more ships the cart free, and 0 once it does", () => {
+    expect(toFreeShipping(6797, store)).toBe(703);
+    expect(toFreeShipping(7500, store)).toBe(0);
+    expect(toFreeShipping(9000, store)).toBe(0);
+  });
+
+  it("has nothing to say without a threshold or when shipping is free anyway", () => {
+    expect(toFreeShipping(1000, { shippingFlatRateCents: 1000, freeShippingThresholdCents: null })).toBeNull();
+    expect(toFreeShipping(1000, { shippingFlatRateCents: 0, freeShippingThresholdCents: 7500 })).toBeNull();
+    expect(toFreeShipping(1000, null)).toBeNull();
+  });
+});
+
+describe("cartSavings", () => {
+  it("adds up what the sale prices take off, times the quantities", () => {
+    const cart: Cart = {
+      lines: [{ ...line(1, 3499, 2), compareAtPriceCents: 4499 }, line(2, 699, 3)],
+      itemCount: 5,
+      subtotalCents: 3499 * 2 + 699 * 3,
+      canCheckout: true,
+    };
+    expect(cartSavings(cart)).toBe(2000);
   });
 });

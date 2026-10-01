@@ -43,7 +43,7 @@ export default async function PrivacyPage() {
       <ContentSection title="Cookies and your browser">
         <ul>
           <li>One cookie keeps you signed in. It lasts 7 days, renews while you use the site, and is removed when you sign out.</li>
-          <li>Before you sign in, your cart is kept in your browser. When you sign in, it moves into your account.</li>
+          <li>Before you sign in, your bag is kept in your browser. When you sign in, it moves into your account.</li>
           <li>At checkout, Stripe sets its own cookies to help prevent fraud.</li>
           <li>There are no analytics or advertising trackers.</li>
         </ul>
