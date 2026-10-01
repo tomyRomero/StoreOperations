@@ -2,17 +2,18 @@ import { Badge } from "@/components/ui/badge"
 import type { OrderStatus } from "@/lib/api/types"
 import { orderStatusLabel } from "@/lib/format"
 
-// Orders waiting on the store stand out; finished ones step back
-const variants: Record<OrderStatus, "default" | "secondary" | "outline" | "destructive"> = {
-  pending: "default",
-  shipped: "secondary",
-  delivered: "outline",
-  cancelled: "destructive",
-  refunded: "destructive",
+// Waiting on the store is amber, on its way is the accent, done is green, and the two endings that
+// return the money are sale red. The label always says which.
+const variants: Record<OrderStatus, "warning" | "accent" | "success" | "sale"> = {
+  pending: "warning",
+  shipped: "accent",
+  delivered: "success",
+  cancelled: "sale",
+  refunded: "sale",
 }
 
 const OrderStatusBadge = ({ status }: { status: OrderStatus }) => (
-  <Badge variant={variants[status]} className="whitespace-nowrap">{orderStatusLabel(status)}</Badge>
+  <Badge variant={variants[status]}>{orderStatusLabel(status)}</Badge>
 )
 
 export default OrderStatusBadge

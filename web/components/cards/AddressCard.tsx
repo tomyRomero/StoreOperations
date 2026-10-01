@@ -46,7 +46,7 @@ const AddressCard = ({ addresses }: { addresses: Address[] }) => {
             <div className="flex flex-col">
               <div className="flex items-center gap-2 font-medium">
                 {address.recipientName}
-                {address.isDefault && <Badge variant="secondary">Default</Badge>}
+                {address.isDefault && <Badge variant="accent">Default</Badge>}
               </div>
               {addressLines(address).map((line) => <div key={line}>{line}</div>)}
             </div>

@@ -17,3 +17,8 @@ export function parseDollars(text: string): number | null {
 export function dollarsText(cents: number): string {
   return (cents / 100).toFixed(2);
 }
+
+// How much a deal takes off the regular price, rounded to a whole percent: 3499 against 4499 is 22
+export function percentOff(priceCents: number, regularCents: number): number {
+  return regularCents > 0 ? Math.round((1 - priceCents / regularCents) * 100) : 0;
+}

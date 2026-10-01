@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel } from "@/lib/format";
+import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, stockLabel } from "@/lib/format";
 import type { PostalAddress } from "@/lib/api/types";
 
 describe("formatDate", () => {
@@ -44,5 +44,17 @@ describe("orderStatusLabel", () => {
   it("says what a pending order is waiting for", () => {
     expect(orderStatusLabel("pending")).toBe("Preparing to ship");
     expect(orderStatusLabel("refunded")).toBe("Refunded");
+  });
+});
+
+describe("stockLabel", () => {
+  it("says how many are left at or under the low-stock threshold", () => {
+    expect(stockLabel(3, 5)).toBe("Only 3 left");
+    expect(stockLabel(5, 5)).toBe("Only 5 left");
+  });
+
+  it("says in stock above it, and sold out at zero", () => {
+    expect(stockLabel(6, 5)).toBe("In stock");
+    expect(stockLabel(0, 5)).toBe("Sold out");
   });
 });

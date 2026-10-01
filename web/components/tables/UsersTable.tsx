@@ -33,7 +33,7 @@ const UsersTable = ({ users, timeZone }: { users: AdminCustomerSummary[]; timeZo
         <TableCell>
           <div className="flex flex-wrap gap-1">
             {user.isAdmin ? "Admin" : "Customer"}
-            {user.isDisabled && <Badge variant="destructive">Disabled</Badge>}
+            {user.isDisabled && <Badge variant="sale">Disabled</Badge>}
           </div>
         </TableCell>
         <TableCell className="text-center">{user.orderCount}</TableCell>

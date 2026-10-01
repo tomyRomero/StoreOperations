@@ -45,3 +45,10 @@ const carrierNames: Record<Carrier, string> = {
 export function carrierName(carrier: Carrier): string {
   return carrierNames[carrier];
 }
+
+// In stock / Only 3 left / Sold out. The threshold is the Store setting for low stock.
+export function stockLabel(stock: number, lowStockThreshold: number): string {
+  if (stock <= 0) return "Sold out";
+  if (stock <= lowStockThreshold) return `Only ${stock} left`;
+  return "In stock";
+}

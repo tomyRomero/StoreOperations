@@ -25,8 +25,8 @@ const AdminUserCard = ({ customer, timeZone }: { customer: AdminCustomer; timeZo
       <div className="grid gap-1.5">
         <CardTitle className="flex flex-wrap items-center gap-2">
           {customer.username}
-          {customer.isAdmin && <Badge variant="secondary">Admin</Badge>}
-          {customer.isDisabled && <Badge variant="destructive">Disabled</Badge>}
+          {customer.isAdmin && <Badge variant="accent">Admin</Badge>}
+          {customer.isDisabled && <Badge variant="sale">Disabled</Badge>}
         </CardTitle>
         <CardDescription>{customer.email}</CardDescription>
       </div>

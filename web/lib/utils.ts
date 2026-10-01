@@ -1,6 +1,11 @@
-
 import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
+
+// tailwind-merge has to know the type scale's names (globals.css), or it takes text-h2 for a color and
+// drops text-sale when both are given
+const twMerge = extendTailwindMerge({
+  extend: { theme: { text: ["display", "h1", "h2", "h3", "h4", "body-lg"] } },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
