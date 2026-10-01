@@ -1,16 +1,18 @@
 import "server-only";
 
 import { serverApi } from "../api/server";
-import type { AccountRole, AdminCustomer } from "../api/types";
+import type { AccountRole, AdminCustomer, AdminCustomerSort } from "../api/types";
 
 // Accounts as admins see them. The API refuses these to anyone who isn't an admin.
 
-export type AdminCustomerFilter = { search?: string; role?: AccountRole; page?: number };
+export type AdminCustomerFilter = { search?: string; role?: AccountRole; sort?: AdminCustomerSort; page?: number };
 
-// One page of accounts, newest first, or null when the API can't answer
-export async function getAdminCustomers({ search, role, page = 1 }: AdminCustomerFilter) {
+export const adminCustomersPageSize = 20;
+
+// One page of accounts (newest first unless sorted otherwise), or null when the API can't answer
+export async function getAdminCustomers({ search, role, sort, page = 1 }: AdminCustomerFilter) {
   const { data } = await serverApi().GET("/api/admin/customers", {
-    params: { query: { search: search || undefined, role, page, pageSize: 20 } },
+    params: { query: { search: search || undefined, role, sort, page, pageSize: adminCustomersPageSize } },
   });
   return data ?? null;
 }

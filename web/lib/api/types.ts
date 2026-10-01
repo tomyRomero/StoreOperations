@@ -41,6 +41,7 @@ export type StockLevel = NonNullable<Schemas["StockLevel"]>;
 export type ProductBulkAction = Schemas["ProductBulkAction"];
 export type AdminCustomerSummary = Schemas["AdminCustomerSummaryResponse"];
 export type AdminCustomer = Schemas["AdminCustomerResponse"];
+export type AdminCustomerSort = Schemas["AdminCustomerSort"];
 export type AccountRole = NonNullable<Schemas["AccountRole"]>;
 export type ActivityEntry = Schemas["ActivityEntryResponse"];
 export type ActivityEntity = NonNullable<Schemas["ActivityEntity"]>;
