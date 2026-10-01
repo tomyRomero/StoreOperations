@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, Package, RotateCcw } from "lucide-react";
+import { ArrowRight, Mail, Package, RotateCcw } from "lucide-react";
 import ContactForm from "@/components/forms/ContactForm";
-import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { getStoreSettings } from "@/lib/data/catalog";
 
 export const metadata: Metadata = {
@@ -16,54 +15,60 @@ export default async function ContactPage() {
   const settings = await getStoreSettings();
 
   const shortcuts = [
-    { icon: Package, title: "Where's my order?", text: "Each order's progress is in your account.", href: "/account/orders", label: "See your orders" },
-    { icon: RotateCcw, title: "Returns", text: "What we accept back, and how to start.", href: "/shipping-returns", label: "Shipping and returns" },
+    ...(settings?.supportEmail ? [{ icon: Mail, small: "Email us", big: settings.supportEmail, href: `mailto:${settings.supportEmail}` }] : []),
+    { icon: Package, small: "Where's my order?", big: "See your orders", href: "/account/orders" },
+    { icon: RotateCcw, small: "Returns", big: "Shipping and returns", href: "/shipping-returns" },
   ];
 
   return (
-    <div className="container py-8 lg:py-12">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Contact us" }]} />
-      <div className="mt-4 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-16">
-        <div className="grid content-start gap-8">
-          <div className="grid gap-3">
-            <h1 className="text-h1">Contact us</h1>
-            <p className="text-body-lg text-muted-foreground">Questions about a supply or an order? Write to us and a real person will reply by email.</p>
+    <div className="relative isolate overflow-x-clip">
+      <div aria-hidden className="absolute -left-40 -top-40 -z-10 h-[560px] w-[900px] max-w-full bg-[radial-gradient(50%_50%_at_40%_45%,rgb(139_108_255/0.2),transparent_70%)] opacity-(--glow-strength)" />
+      <div className="container grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 lg:py-20">
+        <div className="grid content-start gap-9">
+          <div className="grid gap-5">
+            <p className="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent">Contact</p>
+            <h1 className="text-[52px] font-semibold leading-[0.95] tracking-[-0.055em] sm:text-[72px] lg:text-[88px]">
+              Talk to
+              <br />a person.
+            </h1>
+            <p className="max-w-[460px] text-lg leading-normal text-muted-foreground">
+              Questions about a supply, an order or a delivery? Send a message and we&apos;ll reply by email.
+            </p>
           </div>
-          <ul className="grid gap-5">
-            {settings?.supportEmail && (
-              <li className="flex gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted">
-                  <Mail className="size-5" aria-hidden />
-                </span>
-                <div className="grid gap-0.5">
-                  <h2 className="font-sans text-base font-semibold">Email</h2>
-                  <a href={`mailto:${settings.supportEmail}`} className="text-sm font-semibold text-accent underline-offset-4 hover:underline">
-                    {settings.supportEmail}
-                  </a>
-                </div>
-              </li>
-            )}
-            {shortcuts.map(({ icon: Icon, title, text, href, label }) => (
-              <li key={href} className="flex gap-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted">
-                  <Icon className="size-5" aria-hidden />
-                </span>
-                <div className="grid gap-0.5">
-                  <h2 className="font-sans text-base font-semibold">{title}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {text}{" "}
-                    <Link href={href} className="font-semibold text-accent underline-offset-4 hover:underline">
-                      {label}
+          <ul className="grid gap-3">
+            {shortcuts.map(({ icon: Icon, small, big, href }) => {
+              const body = (
+                <>
+                  <span className="grid size-12 shrink-0 place-items-center rounded-[14px] bg-foreground/6">
+                    <Icon className="size-5" strokeWidth={1.8} aria-hidden />
+                  </span>
+                  <span className="grid min-w-0 flex-1 gap-0.5">
+                    <span className="text-[13px] text-faint">{small}</span>
+                    <span className="truncate font-semibold">{big}</span>
+                  </span>
+                  <ArrowRight className="size-4 shrink-0 text-faint" aria-hidden />
+                </>
+              );
+              const look = "flex items-center gap-4 rounded-[20px] border bg-card px-5 py-4 transition-colors hover:border-foreground/22";
+              return (
+                <li key={href}>
+                  {href.startsWith("mailto:") ? (
+                    <a href={href} className={look}>
+                      {body}
+                    </a>
+                  ) : (
+                    <Link href={href} className={look}>
+                      {body}
                     </Link>
-                  </p>
-                </div>
-              </li>
-            ))}
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
 
-        <section aria-labelledby="contact-form-heading" className="rounded-md border p-6 sm:p-8">
-          <h2 id="contact-form-heading" className="mb-6 text-h3">
+        <section aria-labelledby="contact-form-heading" className="grid content-start gap-6 rounded-[28px] border bg-card p-6 sm:p-8">
+          <h2 id="contact-form-heading" className="font-sans text-[22px] font-semibold tracking-[-0.02em]">
             Send a message
           </h2>
           {/* Messages go to the support email, so without one the form would only fail */}

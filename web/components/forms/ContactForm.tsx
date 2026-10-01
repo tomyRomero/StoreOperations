@@ -62,7 +62,7 @@ const ContactForm = () => {
         <p className="text-muted-foreground">Thanks for writing. We&apos;ll reply to {sentTo}.</p>
         <Button
           variant="outline"
-          className="mt-2"
+          className="mt-2 border px-5"
           onClick={() => {
             form.reset({ ...form.getValues(), subject: "", message: "" });
             setSentTo(null);
@@ -133,9 +133,10 @@ const ContactForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" size="lg" className="justify-self-start" loading={form.formState.isSubmitting}>
+          <Button type="submit" size="pill" className="mt-1 w-full shadow-glow" loading={form.formState.isSubmitting}>
             Send message
           </Button>
+          <p className="text-[13px] text-faint">We reply to the email above. No account needed.</p>
         </form>
       </Form>
     </div>
