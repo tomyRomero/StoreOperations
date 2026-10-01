@@ -1,18 +1,14 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
-import { Layout } from "@stripe/stripe-js";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { LockKeyhole } from "lucide-react";
 import { Button } from "../ui/button";
-import Image from "next/image";
+import { formatMoney } from "@/lib/money";
 
 // Stripe's Payment Element for the quote's PaymentIntent. Card details go straight to Stripe and never
 // touch this site or the API. After paying, Stripe sends the customer to the confirmation page.
-const CheckoutForm = ()=> {
+const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -43,33 +39,25 @@ const CheckoutForm = ()=> {
     setIsLoading(false);
   };
 
-  const paymentElementOptions = {
-    layout: "tabs" as Layout,
-  };
-
   return (
-    <div>
-        <form id="payment-form" onSubmit={handleSubmit}>
-        <PaymentElement id="payment-element" options={paymentElementOptions} />
+    <form id="payment-form" onSubmit={handleSubmit} className="grid gap-4">
+      <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
 
-        {message && <div id="payment-message" className="text-center py-2" role="alert">{message}</div>}
-          <div className="mt-4 flex justify-center">
-          <Button disabled={isLoading || !stripe || !elements} id="submit" className={`max-sm:w-full sm:w-3/4 xl:w-2/5 ${isLoading ? "bg-white border border-black" : "bg-black"}`}>
-            <span id="button-text">
-              {isLoading ? <Image
-             src={"/assets/lineloader.svg"}
-             alt="Paying"
-             width={100}
-             height={100}
-             className="mx-auto"
-           /> : "Pay now"}
-            </span>
-          </Button>
-        </div>
+      {message && (
+        <p id="payment-message" role="alert" className="text-sm font-semibold text-sale">
+          {message}
+        </p>
+      )}
 
-      </form>
-    </div>
+      <Button id="submit" size="lg" className="w-full" disabled={!stripe || !elements} loading={isLoading}>
+        Pay {formatMoney(totalCents)}
+      </Button>
+      <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+        <LockKeyhole className="size-3.5" aria-hidden />
+        Secured by Stripe. Your card details never reach our servers.
+      </p>
+    </form>
   );
-}
+};
 
 export default CheckoutForm;

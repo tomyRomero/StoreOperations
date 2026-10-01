@@ -157,7 +157,7 @@ const AddressForm = ({ onSaved, submitLabel = "Save address" }: Props) => {
           control={form.control}
           name="isDefault"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-2 space-y-0">
+            <FormItem className="flex items-center gap-3">
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
@@ -165,8 +165,8 @@ const AddressForm = ({ onSaved, submitLabel = "Save address" }: Props) => {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={saving} className="max-sm:w-full sm:w-fit">
-          {saving ? "Saving..." : submitLabel}
+        <Button type="submit" size="lg" loading={saving} className="max-sm:w-full sm:w-fit">
+          {submitLabel}
         </Button>
       </form>
     </Form>

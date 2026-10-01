@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import OrderResult from "@/components/checkout/OrderResult";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { requireUser } from "@/lib/session";
+
+export const metadata: Metadata = { title: "Order confirmation" };
 
 // Where Stripe sends the customer after paying, with the PaymentIntent's id in the address
 const page = async (props: { searchParams: Promise<{ payment_intent?: string }> }) => {
@@ -10,9 +13,9 @@ const page = async (props: { searchParams: Promise<{ payment_intent?: string }> 
   const settings = await getStoreSettings();
 
   return (
-    <section className="w-full max-md:pt-36 md:pt-36 px-16 lg:px-40 max-sm:px-8 max-xs:px-4 max-xs:pt-40">
+    <div className="container py-12 lg:py-20">
       <OrderResult paymentIntentId={paymentIntentId} supportEmail={settings?.supportEmail ?? null} />
-    </section>
+    </div>
   );
 };
 
