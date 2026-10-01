@@ -1,57 +1,62 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Logo, PaletteStripe } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import type { Category } from "@/lib/api/types";
 import { AccountMenu } from "./AccountMenu";
 import { CartButton } from "./CartButton";
+import { HeaderNav } from "./HeaderNav";
 import { HeaderSearch } from "./HeaderSearch";
 import { MobileNav } from "./MobileNav";
 import { MobileSearch } from "./MobileSearch";
 import { ThemeToggle } from "./ThemeToggle";
 
-// The storefront header: the palette stripe, the logo, the categories (from the store), search, the
-// account menu, the light and dark switch (in the menu on phones) and the cart. It stays at the top while the page scrolls.
-export function SiteHeader({ categories, storeName }: { categories: Category[]; storeName: string }) {
+type Props = {
+  categories: Category[];
+  storeName: string;
+  hasDeals: boolean;
+};
+
+// The storefront header, frosted over the page as it scrolls. Large screens: the logo, the shop pill in
+// the middle, then search, light and dark, the account and the bag. Phones: the menu (which holds the
+// account and the theme switch), the logo in the middle, search and the bag.
+export function SiteHeader({ categories, storeName, hasDeals }: Props) {
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-      <PaletteStripe />
-      <div className="container relative flex h-16 items-center gap-2 lg:h-[72px] lg:gap-6">
-        {/* The parts that read the address (to come back after signing in) */}
-        <Suspense>
-          <MobileNav categories={categories} storeName={storeName} />
-        </Suspense>
-        <Link href="/" className="shrink-0 rounded-sm">
-          <Logo name={storeName} />
-          <span className="sr-only">, home</span>
-        </Link>
-
-        <nav aria-label="Categories" className="max-lg:hidden">
-          <ul className="flex items-center gap-1">
-            <li>
-              <Link href="/products" className="rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted">
-                Shop all
-              </Link>
-            </li>
-            {categories.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/products?category=${category.id}`}
-                  className="rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted"
-                >
-                  {category.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+    <header className="sticky top-0 z-40 border-b bg-background/75 backdrop-blur-xl">
+      <div className="container relative grid h-15 grid-cols-[1fr_auto_1fr] items-center gap-3 lg:h-19">
+        <div className="flex items-center justify-self-start">
+          {/* The parts that read the address (to come back after signing in, to mark the current list) */}
           <Suspense>
-            <HeaderSearch className="w-64 max-md:hidden xl:w-80" />
-            <MobileSearch />
-            <AccountMenu />
+            <MobileNav categories={categories} storeName={storeName} hasDeals={hasDeals} />
           </Suspense>
-          <ThemeToggle className="size-10 justify-center rounded-md hover:bg-muted max-lg:hidden" />
+          <Link href="/" className="rounded-lg max-lg:hidden">
+            <Logo name={storeName} />
+            <span className="sr-only">, home</span>
+          </Link>
+        </div>
+
+        <div className="justify-self-center">
+          <Link href="/" className="rounded-lg lg:hidden">
+            <Logo name={storeName} compact />
+            <span className="sr-only">, home</span>
+          </Link>
+          <Suspense>
+            <div className="max-lg:hidden">
+              <HeaderNav categories={categories} hasDeals={hasDeals} />
+            </div>
+          </Suspense>
+        </div>
+
+        <div className="flex items-center gap-1 justify-self-end lg:gap-2">
+          <Suspense>
+            <HeaderSearch className="w-44 max-lg:hidden xl:w-56" />
+            <MobileSearch />
+          </Suspense>
+          <ThemeToggle className="size-10 justify-center rounded-full border text-ink-2 hover:bg-foreground/5 hover:text-foreground max-lg:hidden" />
+          <Suspense>
+            <div className="max-lg:hidden">
+              <AccountMenu />
+            </div>
+          </Suspense>
           <CartButton />
         </div>
       </div>

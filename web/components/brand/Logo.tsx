@@ -1,36 +1,23 @@
 import { cn } from "@/lib/utils";
 
-// Four of the brand glows, in the order they appear in the mark and the stripe
-const pigments = ["bg-glow-pink", "bg-glow-blue", "bg-glow-amber", "bg-glow-green"];
-
-// The mark: four paint chips, one per pigment. Decorative, so screen readers skip it.
-export function PaletteMark({ className }: { className?: string }) {
-  return (
-    <span aria-hidden className={cn("grid size-6 shrink-0 grid-cols-2 gap-0.5", className)}>
-      {pigments.map((pigment) => (
-        <span key={pigment} className={cn("rounded-[2px]", pigment)} />
-      ))}
-    </span>
-  );
+// The mark: a tile swept through the brand glows. Decorative, so screen readers skip it.
+export function LogoMark({ className }: { className?: string }) {
+  return <span aria-hidden className={cn("size-7 shrink-0 rounded-[9px] bg-brand-sweep", className)} />;
 }
 
-// The mark and the wordmark. The wordmark is real text, so it reads as the store's name.
-export function Logo({ name = "Palettehub", className }: { name?: string; className?: string }) {
-  return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
-      <PaletteMark />
-      <span className="font-display text-xl font-extrabold tracking-tight">{name}</span>
-    </span>
-  );
-}
+type LogoProps = {
+  name?: string;
+  // The smaller size for phone headers
+  compact?: boolean;
+  className?: string;
+};
 
-// The thin four-pigment stripe across the very top of every page
-export function PaletteStripe({ className }: { className?: string }) {
+// The mark and the store's name. The name is real text, so it reads as the store's name.
+export function Logo({ name = "Palettehub", compact = false, className }: LogoProps) {
   return (
-    <div aria-hidden className={cn("grid h-1 grid-cols-4", className)}>
-      {pigments.map((pigment) => (
-        <span key={pigment} className={pigment} />
-      ))}
-    </div>
+    <span className={cn("inline-flex items-center", compact ? "gap-2" : "gap-2.5", className)}>
+      <LogoMark className={cn(compact && "size-6 rounded-lg")} />
+      <span className={cn("font-semibold tracking-[-0.02em]", compact ? "text-[17px]" : "text-[19px]")}>{name}</span>
+    </span>
   );
 }

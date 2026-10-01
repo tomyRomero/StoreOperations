@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/brand/Logo";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
@@ -14,11 +12,12 @@ import { useSignOut } from "@/lib/use-sign-out";
 import { HeaderSearch } from "./HeaderSearch";
 import { ThemeToggle } from "./ThemeToggle";
 
-const linkClasses = "flex min-h-11 items-center rounded-md px-3 font-semibold transition-colors hover:bg-muted";
+const linkClasses = "flex min-h-11 items-center rounded-xl px-3 font-medium transition-colors hover:bg-foreground/5";
+const groupLabel = "px-3 pb-1 font-mono text-xs uppercase tracking-[0.08em] text-faint";
 
 // The phone menu: search, the categories, the account pages and the light and dark switch, in a drawer
 // from the left. Following a link closes it.
-export function MobileNav({ categories, storeName }: { categories: Category[]; storeName: string }) {
+export function MobileNav({ categories, storeName, hasDeals }: { categories: Category[]; storeName: string; hasDeals: boolean }) {
   const [open, setOpen] = useState(false);
   const user = useCurrentUser();
   const here = currentPath(usePathname(), useSearchParams());
@@ -28,15 +27,18 @@ export function MobileNav({ categories, storeName }: { categories: Category[]; s
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Menu">
-          <Menu className="size-5!" aria-hidden />
-        </Button>
+        <button type="button" aria-label="Menu" className="-ml-2 inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-foreground/5 lg:hidden">
+          {/* Two strokes, the lower one shorter */}
+          <svg aria-hidden viewBox="0 0 24 24" className="size-[22px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M4 8h16M4 16h10" />
+          </svg>
+        </button>
       </SheetTrigger>
       <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle asChild>
             <div>
-              <Logo name={storeName} />
+              <Logo name={storeName} compact />
             </div>
           </SheetTitle>
           <SheetDescription className="sr-only">Search, shop by category and your account</SheetDescription>
@@ -45,7 +47,7 @@ export function MobileNav({ categories, storeName }: { categories: Category[]; s
           <HeaderSearch className="px-2" onSearch={close} />
 
           <nav aria-label="Shop">
-            <p className="px-3 pb-1 text-xs font-semibold text-muted-foreground">Shop</p>
+            <p className={groupLabel}>Shop</p>
             <ul>
               <li>
                 <Link href="/products" onClick={close} className={linkClasses}>
@@ -59,11 +61,18 @@ export function MobileNav({ categories, storeName }: { categories: Category[]; s
                   </Link>
                 </li>
               ))}
+              {hasDeals && (
+                <li>
+                  <Link href="/products?sale=1" onClick={close} className={`${linkClasses} text-sale`}>
+                    Sale
+                  </Link>
+                </li>
+              )}
             </ul>
           </nav>
 
           <nav aria-label="Your account">
-            <p className="px-3 pb-1 text-xs font-semibold text-muted-foreground">Account</p>
+            <p className={groupLabel}>Account</p>
             <ul>
               {user ? (
                 <>

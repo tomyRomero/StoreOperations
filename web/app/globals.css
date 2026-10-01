@@ -230,6 +230,19 @@
   }
 }
 
+/* The brand's sweep through every glow: the logo mark, avatars, the hero's light */
+@utility bg-brand-sweep {
+  background-image: conic-gradient(
+    from 200deg,
+    var(--glow-pink),
+    var(--glow-violet),
+    var(--glow-blue),
+    var(--glow-green),
+    var(--glow-amber),
+    var(--glow-pink)
+  );
+}
+
 /* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */
 @utility container {
   margin-inline: auto;

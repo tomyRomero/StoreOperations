@@ -15,6 +15,12 @@ export async function getDeals(): Promise<Product[]> {
   return data?.items ?? [];
 }
 
+// Whether anything is on a deal right now, so the store only offers a Sale link that leads somewhere
+export async function hasDeals(): Promise<boolean> {
+  const { data } = await serverApi().GET("/api/products", { params: { query: { onDeal: true, pageSize: 1 } } });
+  return (data?.items.length ?? 0) > 0;
+}
+
 export type ProductQuery = {
   categoryIds?: number[];
   search?: string;

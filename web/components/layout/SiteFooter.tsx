@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import SubscribeForm from "@/components/forms/SubscribeForm";
@@ -8,88 +9,96 @@ type Props = {
   storeName: string;
   // From Store settings; shown when the store has set one
   supportEmail: string | null;
+  // Offered only while something is on a deal
+  hasDeals: boolean;
 };
 
-const linkClasses = "text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground hover:underline underline-offset-4";
+const linkClasses = "text-[15px] text-ink-2 transition-colors duration-[120ms] hover:text-foreground";
+const headingClasses = "mb-1 font-mono text-xs font-medium uppercase tracking-[0.08em] text-faint";
 
-// Shop, help, the store, and the newsletter
-export function SiteFooter({ categories, storeName, supportEmail }: Props) {
+// The store's name and newsletter, then shop, help and the store's own pages, and the name again in large
+// fading type to close the page
+export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Props) {
   return (
-    <footer className="mt-auto bg-primary text-primary-foreground">
-      <div className="container grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.5fr] lg:py-16">
-        <nav aria-label="Shop">
-          <h2 className="mb-4 font-sans text-sm font-semibold">Shop</h2>
-          <ul className="grid gap-2.5">
-            <li>
-              <Link href="/products" className={linkClasses}>
-                All supplies
-              </Link>
-            </li>
-            {categories.map((category) => (
-              <li key={category.id}>
-                <Link href={`/products?category=${category.id}`} className={linkClasses}>
-                  {category.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+    <footer className="mt-auto overflow-hidden border-t pt-14 lg:pt-16">
+      <div className="container grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-8">
+        <div className="col-span-2 grid content-start gap-5 sm:col-span-3 lg:col-span-1 lg:max-w-sm">
+          <Logo name={storeName} />
+          <SubscribeForm />
+        </div>
+
+        <nav aria-label="Shop" className="grid content-start gap-3">
+          <h2 className={headingClasses}>Shop</h2>
+          <Link href="/products" className={linkClasses}>
+            All supplies
+          </Link>
+          {categories.map((category) => (
+            <Link key={category.id} href={`/products?category=${category.id}`} className={linkClasses}>
+              {category.name}
+            </Link>
+          ))}
+          {hasDeals && (
+            <Link href="/products?sale=1" className={linkClasses}>
+              Sale
+            </Link>
+          )}
         </nav>
 
-        <nav aria-label="Help">
-          <h2 className="mb-4 font-sans text-sm font-semibold">Help</h2>
-          <ul className="grid gap-2.5">
-            <li>
-              <Link href="/contact" className={linkClasses}>
-                Contact us
-              </Link>
-            </li>
-            <li>
-              <Link href="/shipping-returns" className={linkClasses}>
-                Shipping and returns
-              </Link>
-            </li>
-            <li>
-              <Link href="/account/orders" className={linkClasses}>
-                Track an order
-              </Link>
-            </li>
-            {supportEmail && (
-              <li>
-                <a href={`mailto:${supportEmail}`} className={linkClasses}>
-                  {supportEmail}
-                </a>
-              </li>
-            )}
-          </ul>
+        <nav aria-label="Help" className="grid content-start gap-3">
+          <h2 className={headingClasses}>Help</h2>
+          <Link href="/shipping-returns" className={linkClasses}>
+            Shipping and returns
+          </Link>
+          <Link href="/contact" className={linkClasses}>
+            Contact us
+          </Link>
+          <Link href="/account/orders" className={linkClasses}>
+            Track an order
+          </Link>
+          {supportEmail && (
+            // A narrow column wraps the address after the @, never inside a word
+            <a href={`mailto:${supportEmail}`} className={`${linkClasses} break-words`}>
+              {supportEmail.split("@").map((part, i) => (
+                <Fragment key={i}>
+                  {i > 0 && (
+                    <>
+                      @<wbr />
+                    </>
+                  )}
+                  {part}
+                </Fragment>
+              ))}
+            </a>
+          )}
         </nav>
 
-        <nav aria-label={storeName}>
-          <h2 className="mb-4 font-sans text-sm font-semibold">{storeName}</h2>
-          <ul className="grid gap-2.5">
-            <li>
-              <Link href="/about" className={linkClasses}>
-                About us
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className={linkClasses}>
-                Privacy
-              </Link>
-            </li>
-          </ul>
+        <nav aria-label={storeName} className="grid content-start gap-3">
+          <h2 className={headingClasses}>{storeName}</h2>
+          <Link href="/about" className={linkClasses}>
+            About us
+          </Link>
+          <Link href="/privacy" className={linkClasses}>
+            Privacy
+          </Link>
         </nav>
-
-        <SubscribeForm />
       </div>
 
-      <div className="border-t border-primary-foreground/15">
-        <div className="container flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-primary-foreground/75">
-          <Logo name={storeName} className="text-primary-foreground" />
+      <div className="container mt-14">
+        <div className="flex flex-wrap justify-between gap-x-6 gap-y-2 border-t py-5 font-mono text-[13px] text-faint">
           <p>
-            © {new Date().getFullYear()} {storeName}. Art supplies, shipped across the US.
+            © {new Date().getFullYear()} {storeName}
           </p>
+          <p>Runs on StoreOps</p>
         </div>
       </div>
+
+      {/* The name again, large and fading into the page. The words are already above, so it's hidden from screen readers. */}
+      <p
+        aria-hidden
+        className="h-[0.74em] select-none overflow-hidden whitespace-nowrap bg-linear-to-b from-foreground/14 to-foreground/0 bg-clip-text text-center text-[clamp(3rem,18vw,14.5rem)] font-bold leading-[0.95] tracking-[-0.07em] text-transparent"
+      >
+        {storeName}
+      </p>
     </footer>
   );
 }

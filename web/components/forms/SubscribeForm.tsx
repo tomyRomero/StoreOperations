@@ -41,12 +41,12 @@ const SubscribeForm = () => {
 
   return (
     <section aria-labelledby="newsletter-heading">
-      <h2 id="newsletter-heading" className="mb-2 font-sans text-sm font-semibold">
+      <h2 id="newsletter-heading" className="mb-1.5 font-sans text-[15px] font-semibold">
         Newsletter
       </h2>
-      <p className="mb-4 text-sm text-primary-foreground/75">New supplies and deals, about once a month. Leave any time.</p>
+      <p className="mb-4 text-[15px] text-muted-foreground">New supplies and deals, about once a month. Leave any time.</p>
       {subscribed ? (
-        <p role="status" className="flex items-center gap-2 text-sm font-semibold">
+        <p role="status" className="flex items-center gap-2 text-sm font-semibold text-success">
           <CircleCheck className="size-4" aria-hidden />
           You&apos;re subscribed. Check your inbox.
         </p>
@@ -60,13 +60,13 @@ const SubscribeForm = () => {
                 <FormItem className="flex-1">
                   <FormLabel className="sr-only">Email</FormLabel>
                   <FormControl>
-                    <Input type="email" autoComplete="email" placeholder="you@example.com" {...field} />
+                    <Input type="email" autoComplete="email" placeholder="you@example.com" className="h-11 rounded-full px-4" {...field} />
                   </FormControl>
-                  <FormMessage className="text-primary-foreground" />
+                  <FormMessage className="px-4" />
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="secondary" loading={form.formState.isSubmitting} className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+            <Button type="submit" loading={form.formState.isSubmitting} className="h-11 rounded-full px-5">
               Subscribe
             </Button>
           </form>

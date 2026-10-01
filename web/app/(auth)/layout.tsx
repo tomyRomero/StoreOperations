@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Logo, PaletteStripe } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { getCurrentUser } from "@/lib/session";
 import authImage from "@/public/assets/auth.jpg";
@@ -18,10 +18,8 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       <SkipLink />
       <div className="relative max-lg:hidden">
         <Image src={authImage} alt="" fill priority placeholder="blur" sizes="50vw" className="object-cover" />
-        <PaletteStripe className="absolute inset-x-0 top-0" />
       </div>
       <div className="flex flex-col">
-        <PaletteStripe className="lg:hidden" />
         <header className="px-6 py-5 sm:px-10">
           <Link href="/" className="inline-flex rounded-sm">
             <Logo />

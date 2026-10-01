@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Logo, PaletteStripe } from "@/components/brand/Logo";
+import { Logo } from "@/components/brand/Logo";
 import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { AdminUserMenu } from "@/components/admin/AdminUserMenu";
@@ -28,7 +28,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div data-console className="min-h-screen bg-muted/50 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
       <SkipLink />
       <aside className="sticky top-0 flex h-screen flex-col border-r bg-card max-lg:hidden">
-        <PaletteStripe />
         <div className="flex h-16 items-center gap-2 px-5">
           <Link href="/admin" className="rounded-sm">
             <Logo />
@@ -41,7 +40,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       <div className="flex min-h-screen min-w-0 flex-col">
-        <PaletteStripe className="lg:hidden" />
         <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b bg-card px-4 lg:px-8">
           <AdminMobileNav toShip={toShip} />
           <Link href="/admin" className="rounded-sm lg:hidden">
