@@ -1,3 +1,4 @@
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { AdminBar } from "@/components/layout/AdminBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -20,6 +21,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         {children}
       </main>
       <SiteFooter categories={categories} storeName={storeName} supportEmail={settings?.supportEmail ?? null} />
+      <CartDrawer shipping={settings} categories={categories} />
     </CartProvider>
   );
 }

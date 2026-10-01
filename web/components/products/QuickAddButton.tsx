@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { LoaderCircle, Plus } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
-import { ToastAction } from "@/components/ui/toast";
-import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
-// The "+" on a product card: adds one to the cart without leaving the list. The cart checks stock
-// with the API and says why when it can't add.
+// The "+" on a product card: adds one, then opens the cart drawer with it highlighted. The cart checks
+// stock with the API and says why when it can't add.
 export function QuickAddButton({ productId, name, className }: { productId: number; name: string; className?: string }) {
   const cart = useCart();
   const [busy, setBusy] = useState(false);
@@ -18,18 +15,7 @@ export function QuickAddButton({ productId, name, className }: { productId: numb
     setBusy(true);
     const added = await cart.add(productId);
     setBusy(false);
-    if (added) {
-      toast({
-        variant: "success",
-        title: "Added to cart",
-        description: name,
-        action: (
-          <ToastAction altText="View your cart" asChild>
-            <Link href="/cart">View cart</Link>
-          </ToastAction>
-        ),
-      });
-    }
+    if (added) cart.openCart(productId);
   };
 
   return (

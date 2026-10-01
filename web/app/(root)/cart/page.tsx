@@ -1,19 +1,17 @@
-import Cart from '@/components/checkout/Cart'
-import { getStoreSettings } from '@/lib/data/catalog'
-import React from 'react'
+import type { Metadata } from "next";
+import { CartPageContents } from "@/components/cart/CartPageContents";
+import { getCategories, getStoreSettings } from "@/lib/data/catalog";
 
-const page = async () => {
+export const metadata: Metadata = { title: "Your cart" };
+
+export default async function CartPage() {
   // Shipping comes from Store settings, so the cart shows what checkout will charge
-  const settings = await getStoreSettings()
+  const [settings, categories] = await Promise.all([getStoreSettings(), getCategories()]);
 
   return (
-    <section className="w-full max-md:pt-36 md:pt-36 px-16 lg:px-40 max-sm:px-8 max-xs:px-4 max-xs:pt-40">
-        <Cart
-          shippingFlatRateCents={settings?.shippingFlatRateCents ?? null}
-          freeShippingThresholdCents={settings?.freeShippingThresholdCents ?? null}
-        />
-    </section>
-  )
+    <div className="container py-8 lg:py-12">
+      <h1 className="mb-8 text-h1">Your cart</h1>
+      <CartPageContents shipping={settings} categories={categories} />
+    </div>
+  );
 }
-
-export default page

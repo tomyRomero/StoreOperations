@@ -117,6 +117,17 @@
   /* Quick motion: 120ms hover, 200ms menus and toasts, 320ms drawers */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* A just-added cart line glows in the accent's tint, then settles */
+  --animate-highlight: highlight 2.4s var(--ease-standard);
+  @keyframes highlight {
+    from {
+      background-color: var(--color-accent-subtle);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
 }
 
 /* Legacy tokens from before the redesign. Each page moves to the scale above, then these are deleted. */
