@@ -18,10 +18,12 @@ const page = async ({
 
   const search = searchParams.q ?? ""
   const status = statuses.find((s) => s === searchParams.status)
+  // From a customer's page: only their orders
+  const customerId = Number.parseInt(searchParams.customer ?? "", 10) || undefined
   const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1)
 
   const [orders, settings] = await Promise.all([
-    getAdminOrders({ search, status, page: pageNumber }),
+    getAdminOrders({ search, status, customerId, page: pageNumber }),
     getStoreSettings(),
   ])
 
@@ -29,6 +31,7 @@ const page = async ({
   const pathWith = (next: { status?: OrderStatus }) => {
     const params = new URLSearchParams()
     if (search) params.set("q", search)
+    if (customerId) params.set("customer", String(customerId))
     if (next.status) params.set("status", next.status)
     return `/adminorders?${params.toString()}`
   }
@@ -43,6 +46,11 @@ const page = async ({
             <h1 className="text-heading3-bold">Orders</h1>
           </div>
           <SearchBar routeType="adminorders" placeholder={"Search by order number, customer name or email"}/>
+          {customerId && (
+            <p className="text-sm">
+              Showing one customer&apos;s orders. <Link className="underline" href="/adminorders">Show everyone&apos;s</Link>
+            </p>
+          )}
           <nav aria-label="Filter by status" className="flex flex-wrap gap-2">
             {[undefined, ...statuses].map((s) => (
               <Link

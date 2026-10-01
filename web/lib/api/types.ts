@@ -35,3 +35,6 @@ export type AdminSettings = Schemas["StoreSettingsResponse"];
 export type AdminProduct = Schemas["AdminProductResponse"];
 export type AdminCategory = Schemas["AdminCategoryResponse"];
 export type ProductStatus = Schemas["ProductStatus"];
+export type AdminCustomerSummary = Schemas["AdminCustomerSummaryResponse"];
+export type AdminCustomer = Schemas["AdminCustomerResponse"];
+export type AccountRole = NonNullable<Schemas["AccountRole"]>;

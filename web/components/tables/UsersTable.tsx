@@ -1,49 +1,45 @@
-import React from 'react';;
-import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import React from 'react';
 import Link from 'next/link';
+import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@/components/ui/table";
+import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
+import type { AdminCustomerSummary } from '@/lib/api/types';
+import { formatDate } from '@/lib/format';
 
-interface User {
-  id: string,
-  username: string,
-  email: string,
-  admin: boolean,
-  date: string
-}
-
-
-const UsersTable = ({users} : any) => {
+const UsersTable = ({ users, timeZone }: { users: AdminCustomerSummary[]; timeZone: string }) => {
 
   return (
     <Table>
     <TableHeader>
       <TableRow>
-        <TableHead className='font-bold text-black'>Details</TableHead>
-        <TableHead className="font-bold text-black w-[100px]">ID</TableHead>
+        <TableHead className='font-bold text-black'><span className="sr-only">Details</span></TableHead>
         <TableHead className='font-bold text-black'>Username</TableHead>
-        <TableHead className='font-bold text-black text-center'>Email</TableHead>
+        <TableHead className='font-bold text-black'>Email</TableHead>
         <TableHead className='font-bold text-black'>Role</TableHead>
-        <TableHead className='font-bold text-black'>Registration Date</TableHead>
+        <TableHead className='font-bold text-black text-center'>Orders</TableHead>
+        <TableHead className='font-bold text-black'>Joined</TableHead>
       </TableRow>
     </TableHeader>
     <TableBody>
-    {users?.map((user: User, index: any) => (
-           <TableRow key={index}>
-             <TableCell>
-            <Link href={`/adminusers/${user.id}`}>
-            <Button className='bg-black text-white border border-black' variant={"ghost"}>
-              View
-            </Button>
-            </Link>
-            </TableCell>
-           <TableCell className='text-black'>{user.id}</TableCell>
-           <TableCell className="font-medium">{user.username}</TableCell>
-           <TableCell>{user.email}</TableCell>
-           <TableCell>{user.admin? "Admin" : "User"}</TableCell>
-           <TableCell>{user.date}</TableCell>
-          
-         </TableRow>
-        ))}
+    {users.map((user) => (
+      <TableRow key={user.id}>
+        <TableCell>
+          <Button asChild className='bg-black text-white border border-black' variant={"ghost"}>
+            <Link href={`/adminusers/${user.id}`}>View<span className="sr-only"> {user.username}</span></Link>
+          </Button>
+        </TableCell>
+        <TableCell className="font-medium">{user.username}</TableCell>
+        <TableCell>{user.email}</TableCell>
+        <TableCell>
+          <div className="flex flex-wrap gap-1">
+            {user.isAdmin ? "Admin" : "Customer"}
+            {user.isDisabled && <Badge variant="destructive">Disabled</Badge>}
+          </div>
+        </TableCell>
+        <TableCell className="text-center">{user.orderCount}</TableCell>
+        <TableCell>{formatDate(user.joinedAtUtc, timeZone)}</TableCell>
+      </TableRow>
+    ))}
     </TableBody>
   </Table>
   )

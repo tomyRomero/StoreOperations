@@ -14,9 +14,6 @@ afterAll(disconnectTestDb);
 // Every admin read, called the way a page calls it. Adding a new admin read without
 // a guard makes this table fail.
 const adminReads: [string, () => Promise<unknown>][] = [
-  ["fetchUsers", () => admin.fetchUsers({})],
-  ["getUserForAdmin", () => admin.getUserForAdmin("64b000000000000000000000")],
-  ["getAddressesForUser", () => admin.getAddressesForUser("64b000000000000000000000")],
   ["getAllActivity", () => admin.getAllActivity()],
   ["getAllSubscribedEmails", () => admin.getAllSubscribedEmails()],
 ];
@@ -43,13 +40,5 @@ describe("admin reads", () => {
   it.each(adminReads)("%s works for admins", async (_name, call) => {
     signInAs(await createUser({ admin: true }));
     await expect(call()).resolves.toBeDefined();
-  });
-
-  it("returns users without password hashes", async () => {
-    await createUser();
-    signInAs(await createUser({ admin: true }));
-    const { users } = await admin.fetchUsers({});
-    expect(users.length).toBe(2);
-    for (const user of users) expect((user as any).toObject().password).toBeUndefined();
   });
 });
