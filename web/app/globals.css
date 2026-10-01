@@ -294,6 +294,13 @@
   mask-image: radial-gradient(60% 55% at 50% 20%, #000, transparent 75%);
 }
 
+/* Under a main action: a faint halo and the violet studio glow */
+@utility shadow-glow {
+  box-shadow:
+    0 0 0 6px color-mix(in oklab, var(--foreground) 5%, transparent),
+    0 20px 50px rgb(139 108 255 / 0.3);
+}
+
 /* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */
 @utility container {
   margin-inline: auto;

@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import SignUpForm from "@/components/forms/SignUpForm";
+import { getStoreSettings } from "@/lib/data/catalog";
 
 export const metadata: Metadata = { title: "Create an account" };
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
+  const settings = await getStoreSettings();
+
   return (
     <div className="grid gap-8">
-      <div className="grid gap-2">
-        <h1 className="text-h1">Create an account</h1>
-        <p className="text-muted-foreground">Save your addresses, check out faster and follow every order.</p>
+      <div className="grid gap-2.5">
+        <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] sm:text-5xl">Create your account</h1>
+        <p className="text-muted-foreground">Takes a minute. You can check out as soon as you&apos;re in.</p>
       </div>
       {/* The form reads where to go back to from the address */}
       <Suspense>
-        <SignUpForm />
+        <SignUpForm storeName={settings?.storeName ?? "Palettehub"} />
       </Suspense>
     </div>
   );

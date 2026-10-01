@@ -28,7 +28,7 @@ const FormSchema = z.object({
   password: newPassword,
 });
 
-const SignUpForm = () => {
+const SignUpForm = ({ storeName }: { storeName: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -54,7 +54,7 @@ const SignUpForm = () => {
       return;
     }
 
-    toast({ variant: "success", title: "Welcome to Palettehub!", description: "Your account is ready." });
+    toast({ variant: "success", title: `Welcome to ${storeName}!`, description: "Your account is ready." });
     router.replace(safeReturnPath(callbackUrl));
     router.refresh();
   };
@@ -63,7 +63,7 @@ const SignUpForm = () => {
     <div className="grid gap-6">
       {refusal && <FormAlert>{refusal}</FormAlert>}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5.5" noValidate>
           <FormField
             control={form.control}
             name="username"
@@ -105,17 +105,14 @@ const SignUpForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" size="lg" className="w-full" loading={form.formState.isSubmitting}>
+          <Button type="submit" size="pill" className="mt-1 w-full shadow-glow" loading={form.formState.isSubmitting}>
             Create account
           </Button>
         </form>
       </Form>
-      <p className="text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          href={callbackUrl ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/sign-in"}
-          className="font-semibold text-accent underline-offset-4 hover:underline"
-        >
+      <p className="border-t border-foreground/8 pt-5 text-center text-[15px] text-muted-foreground">
+        Already have one?{" "}
+        <Link href={callbackUrl ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/sign-in"} className="font-semibold text-foreground underline-offset-4 hover:underline">
           Sign in
         </Link>
       </p>

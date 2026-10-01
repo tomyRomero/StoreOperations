@@ -21,7 +21,7 @@ const FormSchema = z.object({
   password: z.string().min(1, "Enter your password"),
 });
 
-const SignInForm = () => {
+const SignInForm = ({ storeName }: { storeName: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -54,7 +54,7 @@ const SignInForm = () => {
     <div className="grid gap-6">
       {refusal && <FormAlert>{refusal}</FormAlert>}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5.5" noValidate>
           <FormField
             control={form.control}
             name="email"
@@ -81,20 +81,27 @@ const SignInForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" size="lg" className="w-full" loading={form.formState.isSubmitting}>
+          <Button type="submit" size="pill" className="mt-1 w-full shadow-glow" loading={form.formState.isSubmitting}>
             Sign in
           </Button>
         </form>
       </Form>
-      <p className="text-center text-sm text-muted-foreground">
-        New here?{" "}
-        <Link
-          href={callbackUrl ? `/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/sign-up"}
-          className="font-semibold text-accent underline-offset-4 hover:underline"
-        >
-          Create an account
-        </Link>
-      </p>
+      <div className="grid gap-4 border-t border-foreground/8 pt-5 text-center">
+        <p className="text-[15px] text-muted-foreground">
+          New to {storeName}?{" "}
+          <Link href={callbackUrl ? `/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/sign-up"} className="font-semibold text-foreground underline-offset-4 hover:underline">
+            Create an account
+          </Link>
+        </p>
+        {/* The bag merges into the account on signing in (CartProvider), so nothing in it is lost */}
+        <p className="text-[13px] text-faint">
+          Or{" "}
+          <Link href="/products" className="text-ink-2 underline underline-offset-3 hover:text-foreground">
+            keep browsing
+          </Link>
+          , your bag stays put.
+        </p>
+      </div>
     </div>
   );
 };

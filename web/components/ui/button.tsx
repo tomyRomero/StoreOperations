@@ -22,6 +22,8 @@ const buttonVariants = cva(
         default: "h-10 px-4",
         sm: "h-9 px-3",
         lg: "h-12 px-6 text-base",
+        // The storefront's main actions
+        pill: "h-14 rounded-full px-7 text-base",
         icon: "size-10",
         "icon-sm": "size-9",
       },
