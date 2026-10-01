@@ -1,15 +1,25 @@
-import React from 'react'
-import AddProductForm from '@/components/forms/AddProductForm';
-import ErrorMessage from '@/components/shared/Error';
-import { getAdminCategories } from '@/lib/data/admin-catalog';
+import type { Metadata } from "next";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { ProductForm } from "@/components/admin/products/ProductForm";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
+import { getAdminCategories } from "@/lib/data/admin-catalog";
 
-export default async function page() {
+export const metadata: Metadata = { title: "Add a product" };
 
-  const categories = await getAdminCategories()
+export default async function NewProductPage() {
+  const categories = await getAdminCategories();
 
   return (
-    <section className="">
-      {categories ? <AddProductForm product={null} categories={categories} /> : <ErrorMessage />}
-    </section>
-  )
+    <>
+      <AdminPageHeader back={{ href: "/admin/products", label: "All products" }} title="Add a product" description="It goes into the store as soon as it's added." />
+      {categories ? (
+        <section className="max-w-2xl rounded-md border bg-card p-5 sm:p-6">
+          <ProductForm product={null} categories={categories} />
+        </section>
+      ) : (
+        <ErrorState title="We couldn't load the categories" action={<RetryButton />} />
+      )}
+    </>
+  );
 }

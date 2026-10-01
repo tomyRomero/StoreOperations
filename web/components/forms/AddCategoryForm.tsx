@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "../ui/use-toast";
-import ImageUpload from "./ImageUpload";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { api } from "@/lib/api/browser";
 import { fieldErrors, problemMessage } from "@/lib/api/problems";
 import type { AdminCategory } from "@/lib/api/types";

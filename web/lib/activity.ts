@@ -65,7 +65,7 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
       return { text: `${who} put ${name} back in the store`, href: id ? `/admin/products/${id}` : undefined }
     case "deal_started": {
       const price = detail(entry, "dealPriceCents")
-      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/admin/products/${id}/deal` : undefined }
+      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/admin/products/${id}` : undefined }
     }
     case "deal_ended":
       return { text: `${who} ended the deal on ${name}`, href: id ? `/admin/products/${id}` : undefined }
