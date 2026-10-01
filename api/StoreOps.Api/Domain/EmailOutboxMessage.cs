@@ -37,6 +37,7 @@ public enum EmailKind
     SupportRequest,
     Newsletter,
     NewsletterWelcome,
+    PasswordReset,
 }
 
 public enum EmailStatus

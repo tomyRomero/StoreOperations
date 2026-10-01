@@ -33,7 +33,13 @@ public static class AuthServiceCollectionExtensions
             })
             .AddRoles<IdentityRole<int>>()
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddSignInManager();
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+
+        // Password reset links work for an hour. Their tokens are tied to the security stamp, so a link
+        // also stops working once the password changes (including by using that link).
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = configuration.GetValue("Auth:PasswordResetLinkLifespan", TimeSpan.FromHours(1)));
 
         services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 

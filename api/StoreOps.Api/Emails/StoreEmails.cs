@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StoreOps.Api.Common;
@@ -22,6 +23,20 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
         var model = new WelcomeEmailModel(settings.StoreName, settings.SupportEmail, username, SiteUrl);
         await AddAsync<WelcomeEmail>(EmailKind.Welcome, email, $"Welcome to {settings.StoreName}!", model,
             $"Welcome to {settings.StoreName}, {username}!\n\nYour account is ready. Start browsing: {SiteUrl}\n");
+    }
+
+    // A link to choose a new password. The token proves the email reached its owner; it lasts as long as
+    // Identity's token lifespan and stops working once the password changes.
+    public async Task AddPasswordResetAsync(ApplicationUser user, string token, TimeSpan validFor, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        var url = $"{SiteUrl}/reset-password?user={user.Id}&token={WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token))}";
+        var minutes = (int)validFor.TotalMinutes;
+        var model = new PasswordResetEmailModel(settings.StoreName, settings.SupportEmail, user.UserName!, url, minutes);
+        await AddAsync<PasswordResetEmail>(EmailKind.PasswordReset, user.Email!, $"Reset your {settings.StoreName} password", model,
+            $"Hi {user.UserName},\n\nSomeone asked to reset the password for your {settings.StoreName} account. " +
+            $"To choose a new one, open this link within {minutes} minutes:\n{url}\n\n" +
+            "If it wasn't you, ignore this email. Your password stays as it is.\n");
     }
 
     // The customer's confirmation and a note for the store, or, for a refunded order, the refund email

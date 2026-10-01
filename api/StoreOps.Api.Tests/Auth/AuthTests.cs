@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -286,7 +288,124 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.True(me.GetProperty("isAdmin").GetBoolean());
     }
 
+    [Fact]
+    public async Task Asking_for_a_reset_gets_the_same_answer_for_an_unknown_email()
+    {
+        var known = await RegisterNewAccountAsync();
+        var unknown = NewEmail();
+
+        var forKnown = await ForgotPasswordAsync(api.Factory.CreateClient(), known);
+        var forUnknown = await ForgotPasswordAsync(api.Factory.CreateClient(), unknown);
+
+        Assert.Equal(HttpStatusCode.Accepted, forKnown.StatusCode);
+        Assert.Equal(HttpStatusCode.Accepted, forUnknown.StatusCode);
+        Assert.Equal(await forKnown.Content.ReadAsStringAsync(Ct), await forUnknown.Content.ReadAsStringAsync(Ct));
+        await using var db = api.CreateContext();
+        Assert.False(await db.EmailOutbox.AnyAsync(m => m.ToAddress == unknown, Ct));
+    }
+
+    [Fact]
+    public async Task The_emailed_link_sets_a_new_password_and_signs_out_every_session()
+    {
+        var email = NewEmail();
+        var signedIn = api.Factory.CreateClient();
+        await RegisterAsync(signedIn, email);
+        await ForgotPasswordAsync(api.Factory.CreateClient(), email);
+        var (userId, token) = await ResetLinkSentToAsync(email);
+
+        var response = await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "New-Easel-2026!");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await signedIn.GetAsync("/api/auth/me", Ct)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await LoginAsync(api.Factory.CreateClient(), email, Password)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, "New-Easel-2026!")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_reset_link_works_only_once()
+    {
+        var email = await RegisterNewAccountAsync();
+        await ForgotPasswordAsync(api.Factory.CreateClient(), email);
+        var (userId, token) = await ResetLinkSentToAsync(email);
+        await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "New-Easel-2026!");
+
+        var again = await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "Other-Easel-2026!");
+
+        Assert.Equal(HttpStatusCode.BadRequest, again.StatusCode);
+        Assert.Equal("INVALID_RESET_LINK", await CodeOf(again));
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, "New-Easel-2026!")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("not base64 at all!")]
+    [InlineData("bWFkZS11cC10b2tlbg")]   // "made-up-token", well formed but never issued
+    public async Task A_made_up_reset_link_is_refused(string token)
+    {
+        var email = await RegisterNewAccountAsync();
+        var userId = await UserIdOfAsync(email);
+
+        var response = await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "New-Easel-2026!");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("INVALID_RESET_LINK", await CodeOf(response));
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, Password)).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_weak_new_password_is_a_field_error_and_keeps_the_link_usable()
+    {
+        var email = await RegisterNewAccountAsync();
+        await ForgotPasswordAsync(api.Factory.CreateClient(), email);
+        var (userId, token) = await ResetLinkSentToAsync(email);
+
+        var weak = await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "short");
+        var strong = await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "New-Easel-2026!");
+
+        Assert.Equal(HttpStatusCode.BadRequest, weak.StatusCode);
+        Assert.True((await ErrorsOf(weak)).TryGetProperty("newPassword", out _));
+        Assert.Equal(HttpStatusCode.NoContent, strong.StatusCode);
+    }
+
+    [Fact]
+    public async Task A_reset_ends_a_lockout_from_wrong_passwords()
+    {
+        var email = await RegisterNewAccountAsync();
+        for (var i = 0; i < 5; i++)
+            await LoginAsync(api.Factory.CreateClient(), email, "Wrong-Password-1");
+        await ForgotPasswordAsync(api.Factory.CreateClient(), email);
+        var (userId, token) = await ResetLinkSentToAsync(email);
+
+        await ResetPasswordAsync(api.Factory.CreateClient(), userId, token, "New-Easel-2026!");
+
+        Assert.Equal(HttpStatusCode.OK, (await LoginAsync(api.Factory.CreateClient(), email, "New-Easel-2026!")).StatusCode);
+    }
+
     private static string NewEmail() => $"{Guid.NewGuid():N}@example.test";
+
+    private static Task<HttpResponseMessage> ForgotPasswordAsync(HttpClient client, string email) =>
+        client.PostAsJsonAsync("/api/auth/forgot-password", new { email }, Ct);
+
+    private static Task<HttpResponseMessage> ResetPasswordAsync(HttpClient client, int userId, string token, string newPassword) =>
+        client.PostAsJsonAsync("/api/auth/reset-password", new { userId, token, newPassword }, Ct);
+
+    // The user and token from the link in the newest reset email to this address
+    private async Task<(int UserId, string Token)> ResetLinkSentToAsync(string email)
+    {
+        await using var db = api.CreateContext();
+        var message = await db.EmailOutbox
+            .Where(m => m.ToAddress == email && m.Kind == EmailKind.PasswordReset)
+            .OrderByDescending(m => m.Id)
+            .FirstAsync(Ct);
+        var link = Regex.Match(message.TextBody, @"/reset-password\?user=(\d+)&token=([A-Za-z0-9_-]+)");
+        Assert.True(link.Success, "The reset email has no reset link");
+        return (int.Parse(link.Groups[1].Value, CultureInfo.InvariantCulture), link.Groups[2].Value);
+    }
+
+    private async Task<int> UserIdOfAsync(string email)
+    {
+        await using var db = api.CreateContext();
+        return await db.Users.Where(u => u.Email == email).Select(u => u.Id).SingleAsync(Ct);
+    }
 
     private async Task<string> RegisterNewAccountAsync()
     {

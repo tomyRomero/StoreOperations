@@ -4,6 +4,8 @@ namespace StoreOps.Api.Emails.Templates;
 
 public sealed record WelcomeEmailModel(string StoreName, string? SupportEmail, string Username, string ShopUrl);
 
+public sealed record PasswordResetEmailModel(string StoreName, string? SupportEmail, string Username, string ResetUrl, int ValidForMinutes);
+
 public sealed record OrderEmailLine(string Name, int Quantity, int LineTotalCents);
 
 // Note explains a refund

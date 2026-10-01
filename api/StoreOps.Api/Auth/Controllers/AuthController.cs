@@ -10,7 +10,7 @@ using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Auth.Controllers;
 
-// Sign-up, sign-in, password changes and the session cookie. Responses are never cached anywhere.
+// Sign-up, sign-in, password changes and resets, and the session cookie. Responses are never cached anywhere.
 [ApiController]
 [Route("api/auth")]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
@@ -113,6 +113,42 @@ public sealed class AuthController(
             case ChangePasswordOutcome.WrongPassword:
                 ModelState.AddModelError("currentPassword", "Your current password is incorrect.");
                 return ValidationProblem(ModelState);
+
+            default:
+                foreach (var (field, messages) in result.Errors!)
+                    foreach (var message in messages)
+                        ModelState.AddModelError(field, message);
+                return ValidationProblem(ModelState);
+        }
+    }
+
+    // Always 202, whether or not the email has an account: the answer can't be used to find accounts
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting(RateLimitPolicies.PublicForms)]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request, CancellationToken ct)
+    {
+        await auth.RequestPasswordResetAsync(request.Email.Trim(), ct);
+        return Accepted();
+    }
+
+    [HttpPost("reset-password")]
+    [EnableRateLimiting(RateLimitPolicies.Credentials)]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest request, CancellationToken ct)
+    {
+        var result = await auth.ResetPasswordAsync(request, ct);
+
+        switch (result.Outcome)
+        {
+            case ResetPasswordOutcome.Reset:
+                return NoContent();
+
+            case ResetPasswordOutcome.InvalidLink:
+                return this.CodedProblem(StatusCodes.Status400BadRequest, ErrorCodes.InvalidResetLink,
+                    "This reset link has expired or was already used. Ask for a new one.");
 
             default:
                 foreach (var (field, messages) in result.Errors!)

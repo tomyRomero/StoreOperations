@@ -34,4 +34,23 @@ public sealed record ChangePasswordRequest
     public string NewPassword { get; init; } = "";
 }
 
+public sealed record ForgotPasswordRequest
+{
+    [Required, EmailAddress, StringLength(256)]
+    public string Email { get; init; } = "";
+}
+
+// From the link in the reset email: whose password, and the proof that the email reached them
+public sealed record ResetPasswordRequest
+{
+    [Range(1, int.MaxValue)]
+    public int UserId { get; init; }
+
+    [Required, StringLength(2000)]
+    public string Token { get; init; } = "";
+
+    [Required, StringLength(128)]
+    public string NewPassword { get; init; } = "";
+}
+
 public sealed record CurrentUserResponse(int Id, string Username, string Email, bool IsAdmin);

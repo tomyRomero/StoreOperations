@@ -1,7 +1,11 @@
+using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using StoreOps.Api.Auth.Models;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
@@ -30,6 +34,15 @@ public enum ChangePasswordOutcome
 public sealed record ChangePasswordResult(
     ChangePasswordOutcome Outcome, DateTimeOffset? LockedUntil = null, IReadOnlyDictionary<string, string[]>? Errors = null);
 
+public enum ResetPasswordOutcome
+{
+    Reset,
+    InvalidLink,
+    Invalid,
+}
+
+public sealed record ResetPasswordResult(ResetPasswordOutcome Outcome, IReadOnlyDictionary<string, string[]>? Errors = null);
+
 public sealed record RegisterResult(ApplicationUser? User, bool AccountExists, IReadOnlyDictionary<string, string[]> Errors)
 {
     public static RegisterResult Created(ApplicationUser user) => new(user, false, new Dictionary<string, string[]>());
@@ -45,6 +58,7 @@ public sealed class AuthService(
     LoginThrottle throttle,
     AppDbContext db,
     StoreEmails emails,
+    IOptions<DataProtectionTokenProviderOptions> tokenOptions,
     TimeProvider clock,
     ILogger<AuthService> logger)
 {
@@ -173,6 +187,57 @@ public sealed class AuthService(
         await signIn.RefreshSignInAsync(user);
         logger.LogInformation("User {UserId} changed their password", user.Id);
         return new ChangePasswordResult(ChangePasswordOutcome.Changed);
+    }
+
+    // Queues a reset link when the email belongs to an account. The caller answers the same either way,
+    // so the form can't be used to find out who has an account here.
+    public async Task RequestPasswordResetAsync(string email, CancellationToken ct)
+    {
+        var user = await users.FindByEmailAsync(email);
+        if (user is null)
+        {
+            logger.LogInformation("Password reset asked for an email with no account");
+            return;
+        }
+
+        var token = await users.GeneratePasswordResetTokenAsync(user);
+        await emails.AddPasswordResetAsync(user, token, tokenOptions.Value.TokenLifespan, ct);
+        await db.SaveChangesAsync(ct);
+        logger.LogInformation("Password reset link sent to user {UserId}", user.Id);
+    }
+
+    // Sets the new password from the emailed link. The token is checked before the password, so a link that
+    // is wrong, expired or already used says so; a weak password keeps the link usable for another try.
+    // Success replaces the security stamp, which ends every session, and clears any lockout from wrong
+    // passwords so the owner can sign in straight away.
+    public async Task<ResetPasswordResult> ResetPasswordAsync(ResetPasswordRequest request, CancellationToken ct)
+    {
+        string token;
+        try
+        {
+            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+        }
+        catch (FormatException)
+        {
+            return new ResetPasswordResult(ResetPasswordOutcome.InvalidLink);
+        }
+
+        var user = await users.FindByIdAsync(request.UserId.ToString(CultureInfo.InvariantCulture));
+        if (user is null)
+            return new ResetPasswordResult(ResetPasswordOutcome.InvalidLink);
+
+        var reset = await users.ResetPasswordAsync(user, token, request.NewPassword);
+        if (reset.Errors.Any(e => e.Code == nameof(IdentityErrorDescriber.InvalidToken)))
+            return new ResetPasswordResult(ResetPasswordOutcome.InvalidLink);
+        if (!reset.Succeeded)
+            return new ResetPasswordResult(ResetPasswordOutcome.Invalid, new Dictionary<string, string[]>
+            {
+                ["newPassword"] = reset.Errors.Select(e => e.Description).ToArray(),
+            });
+
+        await throttle.ClearAsync(user.Email!, ct);
+        logger.LogInformation("User {UserId} reset their password", user.Id);
+        return new ResetPasswordResult(ResetPasswordOutcome.Reset);
     }
 
     private bool VerifyAgainstNobody(string password)
