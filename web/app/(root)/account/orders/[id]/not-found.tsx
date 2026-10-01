@@ -8,6 +8,7 @@ export default function OrderNotFound() {
     <EmptyState
       icon={SearchX}
       title="We couldn't find that order"
+      heading="h1"
       action={
         <Button asChild>
           <Link href="/account/orders">See your orders</Link>

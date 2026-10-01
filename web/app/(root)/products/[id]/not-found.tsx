@@ -10,6 +10,7 @@ export default function ProductNotFound() {
       <EmptyState
         icon={PackageX}
         title="We couldn't find that product"
+        heading="h1"
         action={
           <Button asChild>
             <Link href="/products">Browse all supplies</Link>

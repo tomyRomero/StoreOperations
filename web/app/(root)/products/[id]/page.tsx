@@ -92,6 +92,7 @@ export default async function ProductPage(props: Props) {
 
           <ProductPurchase product={product} />
 
+          <h2 className="sr-only">More about this product</h2>
           <Accordion type="multiple" defaultValue={["details"]} className="border-t">
             <AccordionItem value="details">
               <AccordionTrigger>Details</AccordionTrigger>

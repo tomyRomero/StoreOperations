@@ -6,8 +6,15 @@ import type { OrderSummary } from "@/lib/api/types";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
 
+type Props = {
+  order: OrderSummary;
+  timeZone: string;
+  // h2 when the cards sit right under the page's title, h3 under a section heading
+  heading?: "h2" | "h3";
+};
+
 // One order in the history: picture, number, date, status, total. The whole card opens the order.
-export function OrderCard({ order, timeZone }: { order: OrderSummary; timeZone: string }) {
+export function OrderCard({ order, timeZone, heading: Heading = "h3" }: Props) {
   return (
     <article className="relative flex items-center gap-4 rounded-md border p-4 transition-colors hover:bg-muted/40 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ring">
       <span className="relative flex aspect-square w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted">
@@ -19,11 +26,11 @@ export function OrderCard({ order, timeZone }: { order: OrderSummary; timeZone: 
       </span>
       <div className="grid min-w-0 flex-1 gap-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h3 className="font-sans text-base font-semibold">
+          <Heading className="font-sans text-base font-semibold">
             <Link href={`/account/orders/${order.orderNumber}`} className="outline-none after:absolute after:inset-0">
               Order #{order.orderNumber}
             </Link>
-          </h3>
+          </Heading>
           <OrderStatusBadge status={order.status} />
         </div>
         <p className="text-sm text-muted-foreground">

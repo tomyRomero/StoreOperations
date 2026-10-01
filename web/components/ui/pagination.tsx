@@ -38,7 +38,7 @@ export function Pagination({ pathname, searchParams, page, totalPages, totalCoun
               <span className="max-sm:sr-only">Previous</span>
             </Link>
           ) : (
-            <span aria-hidden className={cn(item, "text-muted-foreground opacity-50")}>
+            <span aria-hidden className={cn(item, "cursor-default text-muted-foreground")}>
               <ChevronLeft className="size-4" />
               <span className="max-sm:hidden">Previous</span>
             </span>
@@ -69,7 +69,7 @@ export function Pagination({ pathname, searchParams, page, totalPages, totalCoun
               <ChevronRight className="size-4" aria-hidden />
             </Link>
           ) : (
-            <span aria-hidden className={cn(item, "text-muted-foreground opacity-50")}>
+            <span aria-hidden className={cn(item, "cursor-default text-muted-foreground")}>
               <span className="max-sm:hidden">Next</span>
               <ChevronRight className="size-4" />
             </span>

@@ -49,7 +49,7 @@ export default async function OrdersPage(props: { searchParams: Promise<SearchPa
           <ul className="grid gap-3">
             {orders.items.map((order) => (
               <li key={order.orderNumber}>
-                <OrderCard order={order} timeZone={settings.timeZoneId} />
+                <OrderCard order={order} timeZone={settings.timeZoneId} heading="h2" />
               </li>
             ))}
           </ul>

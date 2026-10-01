@@ -14,7 +14,7 @@ export default function NotFound() {
         <h1 className="text-h1">We couldn&apos;t find that page</h1>
         <p className="mx-auto max-w-md text-muted-foreground">The link may be old or mistyped. Search for what you were after, or head into the shop.</p>
       </div>
-      <form action="/products" role="search" className="flex w-full max-w-md gap-2">
+      <form action="/products" role="search" aria-label="Search for what you were after" className="flex w-full max-w-md gap-2">
         <label htmlFor="not-found-search" className="sr-only">
           Search supplies
         </label>

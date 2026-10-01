@@ -9,6 +9,7 @@ export default function AdminNotFound() {
     <EmptyState
       icon={SearchX}
       title="We couldn't find that"
+      heading="h1"
       className="mt-10 bg-card"
       action={
         <Button asChild>
