@@ -1,218 +1,183 @@
-# StoreOps - E-Commerce Portfolio Project
+# StoreOps
 
-## 📋 Table of Contents
+StoreOps is an online store platform: a storefront for customers and a console for the people who run the store. Each store runs its own copy, with its own name, settings, catalog and payments. **Palettehub**, a small art-supply shop, is the demo store you see in the screenshots.
 
-1. [Overview](#overview) 🌐
-2. [Technologies Used](#technologies) ⚙️
-3. [Features](#features) 🚀
-4. [Live Site](#live) 📦
-5. [Contact](#contact) 📫
-6. [Database Schema](#database-schema) 📊
-7. [Screenshots](#screenshots) 📸
-8. [Admin Panel Screenshots](#admin-panel) 🔧
-9. [Acknowledgments](#acknowledgments) 🙌
-10. [Future Updates](#updates)  🚀 
-11. [Project Status](#status) 📊
-12. [Setup](#setup) ⚙️
+It is built as a production-style system rather than a template: a Next.js storefront and console, a .NET API with SQL Server, real Stripe payments (in test mode), transactional email, and tests that run in CI.
 
+| Storefront, dark | Storefront, light |
+| --- | --- |
+| ![Palettehub home page in dark mode](docs/screenshots/home-dark.jpg) | ![Palettehub home page in light mode](docs/screenshots/home-light.jpg) |
 
-## <a name="overview">🌐 Overview </a>
+## What it does
 
-StoreOps is a full-stack E-Commerce Platform designed to provide a seamless online shopping experience for users. With robust features that you would expect in an E-Commerce platform, StoreOps comes with a customer experience and an admin experience.
+**For shoppers**
 
-## <a name="technologies">⚙️ Technologies Used </a>
+- Browse by category, filter by price and stock, sort, and search from anywhere with ⌘K.
+- Product pages with sale prices, stock levels and the shipping and returns rules of the store.
+- A bag that remembers itself before you sign in and tells you how far you are from free shipping.
+- Checkout in two steps: choose or add an address, then pay with Stripe. Sales tax is worked out for the address by Stripe Tax before you pay.
+- An account with every order and where it is (placed, shipped with tracking, delivered), saved addresses, and password changes. A forgotten password can be reset by email.
+- Light and dark mode, following the device until the shopper picks one.
 
-- Frontend: [React](https://reactjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React Hook Forms](https://react-hook-form.com/), [Zod](https://zod.dev/), [Stripe](https://stripe.com/), [Shadcn](https://ui.shadcn.com/)
-  ![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=white)
-  ![Tailwind CSS](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
-  ![React Hook Forms](https://img.shields.io/badge/-React%20Hook%20Forms-0088CC?style=flat)
-  ![Zod](https://img.shields.io/badge/-Zod-FF3E00?style=flat)
-  ![Stripe](https://img.shields.io/badge/-Stripe-008CDD?style=flat&logo=stripe&logoColor=white)
-  ![Shadcn](https://img.shields.io/badge/-Shadcn-2D3748?style=flat)
+**For the store (the StoreOps console)**
 
-- Backend: [Next.js](https://nextjs.org/), [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), [AWS S3](https://aws.amazon.com/s3/), [Nodemailer](https://nodemailer.com/), [NextAuth.js](https://next-auth.js.org/), [bcrypt](https://www.npmjs.com/package/bcrypt)
-  ![Next.js](https://img.shields.io/badge/-Next.js-000000?style=flat&logo=next.js&logoColor=white)
-  ![MongoDB Atlas](https://img.shields.io/badge/-MongoDB%20Atlas-47A248?style=flat&logo=mongodb&logoColor=white)
-  ![AWS S3](https://img.shields.io/badge/-AWS%20S3-232F3E?style=flat&logo=amazon-aws&logoColor=white)
-  ![Nodemailer](https://img.shields.io/badge/-Nodemailer-339933?style=flat)
-  ![NextAuth.js](https://img.shields.io/badge/-NextAuth.js-000000?style=flat)
-  ![bcrypt](https://img.shields.io/badge/-bcrypt-00599C?style=flat)
+- Home: sales over 7, 30 or 90 days against the period before, orders to ship, products running low, best sellers.
+- Orders: search and filter, update status with a carrier and tracking number (the customer is emailed), cancel or refund in full through Stripe.
+- Products and categories: prices, stock, deals, photos, archiving.
+- Customers: their orders and addresses, disabling an account, granting the admin role.
+- Newsletter, an activity feed of everything that changed, and store settings: name, support email, flat shipping, free-shipping threshold, returns policy and time zone. The storefront reads all of it, so a change in the console shows up on the site without a release.
 
+## Screenshots
 
-- Payment Processing: [Stripe](https://stripe.com/)
-  ![Stripe](https://img.shields.io/badge/-Stripe-008CDD?style=flat&logo=stripe&logoColor=white)
+### Shopping
 
-## <a name="features">🚀 Features</a>
+| Shop | Product | Search |
+| --- | --- | --- |
+| ![The shop with filters](docs/screenshots/shop-dark.jpg) | ![A product page](docs/screenshots/product-dark.jpg) | ![The search palette](docs/screenshots/search-dark.jpg) |
 
-## Project Features
+### Bag, checkout and confirmation
 
-- **Product Management**: Browse, search, filter and purchase products with ease. Administrators have full control to edit, add, or delete products based on business needs. Products come with stock management capabilities, ensuring seamless reflection of stock changes in the store. Admins can also create deals for products and more.
-
-- **Category Management**: Easily browse, filter, and associate products to categories. Admins have the authority to manage categories by editing, adding, or deleting them as needed, deleting a category would delete all products associated.
-
-- **Cart**: Seamlessly add items to your cart, and resume your shopping experience right where you left off. The cart functionality is powered by local storage and a cart database schema, ensuring synchronization once a user creates or logs into an account. Real-time dynamic calculations ensure accurate subtotals, and users are promptly notified if a product is out of stock or if the desired quantity exceeds availability.
-
-- **User Authentication**: Secure login and registration built through NextAuth.js and MongoDB database integration. The sign-up form, is backed with bcrypt encryption, ensures password security. Users can securely change their passwords at any time.
-
-- **Payment Processing**: Integration with Stripe, using my very own custom payment flow. Products are registered through Stripe, including archiving of deleted products. The checkout and address pages leverage Stripe's security features, while tax calculations are dynamically adjusted based on user addresses. If products are out of stock or have been deleted users are thrown back to cart page, ensuring site integrity.  
-
- - For testing Stripe purchases, you can use the following test card details:
-    - Card number: 4242 4242 4242 4242
-    - Expiration date: Any future date
-    - CVC: Any
-
-- **Webhooks**: Utilization of Stripe webhooks enables automated order recording, email notifications to customers and admins, real-time stock updates, cart clearance, and more.
-
-- **Order Management**: Users can view order history and track order status, while admins can update order statuses to keep customers informed of order progress.
-
-- **Responsive Design**: The platform is optimized for all devices and screen sizes, ensuring a consistent user experience across platforms.
-
-- **Image Storage System**: AWS S3 is employed for storing and serving product images, enabling administrators to upload and edit products and categories from anywhere, without the need to manage image storage locally.
-
-- **Database Management**: MongoDB Atlas is utilized to store and manage data, including carts, addresses, users, products, categories, activity logs, orders, and newsletter subscribers.
-
-- **Admin Panel**: Administrators can manage products, orders, and user accounts with ease. Dedicated sections for recent activity and newsletter updates ensure administrators stay informed and connected with users.
-
-- **Search Functionality and Pagination For All Pages**: Robust search functionality and pagination facilitate quick access to desired products and other data such as orders, users and addresses. ensuring fast performance and efficient navigation.
-
-- **Security**: Multiple security measures are implemented, including encoded HTML to prevent XSS attacks, server-side data validation, strict password parameters to thwart brute force attacks, and HTML sanitization to prevent potential injection attacks.
-
-- **Email System**: A comprehensive email system is in place for sending alerts to admins and customers, including notifications for account creation, order placement, and customer support requests. Newsletter functionality enables visitors to subscribe and receive updates on store activities.
-
-- **Input Validation**: Utilizes Zod resolver and React Hook Forms for input validation, ensuring data integrity and preventing invalid data submission.
-
-## <a name="live"> 📦 Live Deployment </a>
-The StoreOps platform is live and accessible at [palettehub.vercel.app](https://palettehub.vercel.app/). StoreOps was created with the default theme of an art supply store to demonstrate the functionalities but can be fully customized to reflect any type of supply business. For those interested in exploring the admin panel, kindly reach out to me, specifying your purpose, and I'll gladly provide the necessary login credentials.
-
-## <a name="contact" > 📫 Contact </a>
-For inquiries or further information, please contact me at tomyflecther99@hotmail.com, or reach out to me at [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomy-romero-902476145/)
-
-## <a name="database-schema"> 📊 Data Base Schema </a>
-<img src="public/assets/readMe/database.png" alt="Screenshot of database">
-
-###  📊 Database Relationships
-- **User and Order Relationship**: One-to-Many relationship.
-- **Cart and User Relationship**: One-to-One relationship.
-- **User and Address Relationship**: Many-to-Many relationship.
-
-
-## <a name="screenshots"> 📸 Screenshots Customer Side</a>
-
-User interface and different functionalities of StoreOps.
-
-### Home
-<img src="public/assets/readMe/home.png" alt="Screenshot of home">
-<img src="public/assets/readMe/mobliehome.png" alt="Screenshot of mobile home">
-
-### Promotion
-<img src="public/assets/readMe/promotions.png" alt="Screenshot of promotions">
-
-### Footer
-<img src="public/assets/readMe/footer.png" alt="Screenshot of footer">
-
-### Products 
-<img src="public/assets/readMe/products.png" alt="Screenshot of products">
-<img src="public/assets/readMe/mobileproducts.png" alt="Screenshot of mobile products">
-
-### Product Details
-<img src="public/assets/readMe/productdetails.png" alt="Screenshot of product details">
-
-### Cart
-<img src="public/assets/readMe/cart.png" alt="Screenshot of cart">
-
-### Checkout
-<img src="public/assets/readMe/checkout.png" alt="Screenshot of checkout">
-
-### Sign Up 
-<img src="public/assets/readMe/signup.png" alt="Screenshot of signup">
-
-### Login
-<img src="public/assets/readMe/login.png" alt="Screenshot of login">
-
-### Address 
-<img src="public/assets/readMe/address.png" alt="Screenshot of address">
-
-### Order Success
-<img src="public/assets/readMe/ordersuccess.png" alt="Screenshot of order success">
-
-### Search
-<img src="public/assets/readMe/search.png" alt="Screenshot of search">
+| Bag | Payment | Confirmation |
+| --- | --- | --- |
+| ![The bag with a free-shipping meter](docs/screenshots/bag-light.jpg) | ![The payment step with Stripe's Payment Element](docs/screenshots/checkout-light.jpg) | ![The order confirmation](docs/screenshots/confirmation-light.jpg) |
 
 ### Account
-<img src="public/assets/readMe/accountdetails.png" alt="Screenshot of account details">
 
-### Orders
-<img src="public/assets/readMe/accountorders.png" alt="Screenshot of account order">
-<img src="public/assets/readMe/accountorderdetails.png" alt="Screenshot of order details">
+| Overview | Order tracking |
+| --- | --- |
+| ![The account overview with the latest order](docs/screenshots/account-dark.jpg) | ![An order's tracking page](docs/screenshots/order-tracking-dark.jpg) |
 
-### Email
-<img src="public/assets/readMe/email.png"  alt="Screenshot of email">
+### On a phone
 
-### Addresses
-<img src="public/assets/readMe/accountaddresses.png" alt="Screenshot of account addresses">
+| Home | Product | Bag |
+| --- | --- | --- |
+| ![Home on a phone](docs/screenshots/phone-home-dark.jpg) | ![A product on a phone](docs/screenshots/phone-product-dark.jpg) | ![The bag on a phone](docs/screenshots/phone-bag-light.jpg) |
 
-### Policy 
-<img src="public/assets/readMe/privacyPolicy.png" alt="Screenshot of policy">
+### The StoreOps console
 
-## <a name="admin-panel"> 🔧 Screenshots Admin Panel </a>
+| Home, light | Home, dark |
+| --- | --- |
+| ![The console home in light mode](docs/screenshots/console-home-light.jpg) | ![The console home in dark mode](docs/screenshots/console-home-dark.jpg) |
 
-The Admin Panel provides administrators with functionalities for managing products, orders, and user accounts.
+| Orders | Editing a product |
+| --- | --- |
+| ![The console's orders](docs/screenshots/console-orders-light.jpg) | ![Editing a product with its deal](docs/screenshots/console-product-light.jpg) |
 
-### Activity
-<img src="public/assets/readMe/activity.png" alt="Screenshot of activity page">
+## How it's built
 
-### Users
-<img src="public/assets/readMe/adminusers.png" alt="Screenshot of admin users">
-<img src="public/assets/readMe/adminuserdetails.png" alt="Screenshot of admin user details">
+```mermaid
+flowchart LR
+    Browser -->|pages| Web["Next.js 16<br/>storefront and console"]
+    Browser -->|"/api/* (same origin)"| Web
+    Web -->|"rewrites /api/*,<br/>server components call it too"| API[".NET 10 API"]
+    API --> SQL[("SQL Server")]
+    API --> Images[("S3-compatible storage<br/>(Cloudflare R2)")]
+    API -->|"PaymentIntents, Stripe Tax, refunds"| Stripe
+    Stripe -->|webhooks| API
+    API -->|"email outbox → SMTP"| Mail[Email]
+```
 
-### Categories
-<img src="public/assets/readMe/admincategories.png" alt="Screenshot of categories">
-<img src="public/assets/readMe/editcategory.png" alt="Screenshot of edit category">
+| Layer | Technology |
+| --- | --- |
+| Web | Next.js 16 (App Router, React 19, Server Components), TypeScript, Tailwind CSS 4, Radix UI, react-hook-form with Zod, openapi-fetch with types generated from the API's OpenAPI contract |
+| API | ASP.NET Core 10 controllers, EF Core 10 with SQL Server, ASP.NET Core Identity (cookie sessions), Stripe.net, MailKit with Razor email templates, S3 SDK for images |
+| Tests | xUnit with Testcontainers (a real SQL Server and an S3 mock per run), Vitest |
+| Local stack | Docker Compose: SQL Server 2025, S3Mock, Mailpit |
+| CI | GitHub Actions: web lint, typecheck, unit tests and build; API build and tests |
 
-### Products 
-<img src="public/assets/readMe/adminproducts.png" alt="Screenshot of products">
-<img src="public/assets/readMe/editproduct.png" alt="Screenshot of edit product">
-<img src="public/assets/readMe/adminmakedeal.png" alt="Screenshot of make deal">
-<img src="public/assets/readMe/admindeal.png"  alt="Screenshot of deal">
+### Decisions worth knowing
 
-### Orders
-<img src="public/assets/readMe/adminorders.png"  alt="Screenshot of orders">
-<img src="public/assets/readMe/adminorderdetails.png"  alt="Screenshot of order details">
-<img src="public/assets/readMe/updateorder.png"  alt="Screenshot of order update">
+- **One origin, no tokens in JavaScript.** The browser only talks to the Next.js site, which forwards `/api/*` to the API. The API's session cookie is HttpOnly and SameSite=Lax, so it never touches client code and needs no cross-site setup.
+- **The server owns every amount.** At checkout the API prices the bag, adds shipping and asks Stripe Tax for the tax, then creates one PaymentIntent for that quote. The order is created only when Stripe's webhook confirms the payment. If anything changed in between (a product sold out), the payment is refunded automatically and the customer is told why. Stock can never go negative.
+- **Emails are never lost or sent by mistake.** An email is written to an outbox table in the same database transaction as the change that caused it, then sent and retried by a background worker.
+- **Security by default.** Every endpoint needs a signed-in user unless marked otherwise, and admin endpoints need the admin role. Sign-in, sign-up and the public forms are rate limited. Repeated wrong passwords lock the account for a while. Sign-in answers a wrong password and an unknown email the same way and in the same time, and password reset answers the same whether or not the email has an account. Password reset links are single-use, expire in an hour and sign out every session. The API refuses to start with live Stripe keys.
+- **Money in whole cents, history kept.** Prices and totals are integers in cents. Orders keep their status history, and an activity log records who changed what in the console.
+- **A design system in tokens.** Colors, field sizes and button shapes are CSS variables with light and dark values. The storefront (the violet "Night Studio" look) and the console (StoreOps cobalt, compact controls) share the same components and differ only by tokens.
+- **Accessible on purpose.** The target is WCAG 2.2 AA. During the redesign each page was checked with axe in light and dark mode on desktop and phone, contrast was measured rather than eyeballed, and search, menus and forms work by keyboard and screen reader.
 
-### Newsletter
-<img src="public/assets/readMe/newsletter.png"  alt="Screenshot of newsletter">
+### Data model
 
-## <a name="updates">🚀 Future Updates</a>
-Looking ahead, there are some cool ideas brewing to make StoreOps better:
+```mermaid
+erDiagram
+    USER ||--o{ USER_ADDRESS : saves
+    USER ||--o{ CART_ITEM : "has in bag"
+    USER ||--o{ CHECKOUT : starts
+    USER ||--o{ ORDER : places
+    CATEGORY ||--o{ PRODUCT : groups
+    PRODUCT ||--o{ CART_ITEM : ""
+    CHECKOUT ||--|{ CHECKOUT_LINE : quotes
+    ORDER ||--|{ ORDER_LINE : contains
+    ORDER ||--|{ ORDER_STATUS_CHANGE : "moves through"
+    PRODUCT ||--o{ ORDER_LINE : ""
+```
 
-- **Saved Payments**: Give users the option to save their payment methods for faster checkouts. This would require more security. 
+A checkout is the priced quote behind one Stripe PaymentIntent; the webhook turns it into an order, matched by that PaymentIntent (unique, so a retried webhook can't create a second order). Alongside these: store settings (one row), the activity log, newsletter subscribers, the email outbox, and the keys that encrypt session cookies. The schema is created and changed by EF Core migrations.
 
-- **Enhanced Store Design**: Explore additional options to allow store owners to further personalize the online storefront. From custom themes to advanced branding options, giving businesses more control over their digital presence..
+## Running it locally
 
-- **Business Protocol Integration**: Ensure everything is under policy and suitable for an actual thriving business.
+You need Docker, the .NET 10 SDK and Node.js 24. For payments, a Stripe account in test mode (with Stripe Tax turned on) and the Stripe CLI.
 
-## <a name="acknowledgments"> 🙌 Acknowledgments</a>
-Special thanks to [Stripe](https://stripe.com/) for providing a reliable payment processing solution, 
-Shout out to https://unsplash.com/ for all the pictures that were not user submitted.
-Shout out to https://icons8.com/ for all provided icons. 
+1. **Start the database, image storage and mail catcher.**
 
-## <a name="status">📊 Project Status</a>
-The project is currently in Stripe test mode, but all functionalities are fully operational. The business logic is the only aspect that requires adjustments. 
+   ```bash
+   cp .env.example .env   # then set STOREOPS_SQL_PASSWORD
+   docker compose up -d   # SQL Server on 14330, S3Mock on 9090, Mailpit on http://localhost:8025
+   ```
 
-## Setup
+2. **Configure and seed the API.** Secrets stay out of the repository, in .NET user secrets:
 
-### .env.example is provided to follow on what keys the project needs
+   ```bash
+   cd api
+   dotnet user-secrets set "ConnectionStrings:Database" \
+     "Server=localhost,14330;Database=Palettehub;User Id=sa;Password=<your password>;TrustServerCertificate=True" \
+     --project StoreOps.Api
+   dotnet user-secrets set "Stripe:SecretKey" "sk_test_..." --project StoreOps.Api
+   dotnet user-secrets set "Stripe:WebhookSecret" "whsec_..." --project StoreOps.Api
+
+   dotnet run --project StoreOps.Api -- seed                 # creates the demo store
+   dotnet run --project StoreOps.Api --launch-profile http   # http://localhost:5200
+   ```
+
+   In another terminal, forward Stripe's webhooks to it:
+
+   ```bash
+   stripe listen --forward-to localhost:5200/api/stripe/webhook
+   ```
+
+3. **Start the web app.**
+
+   ```bash
+   cd web
+   cp .env.example .env.local   # then set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+   npm ci
+   npm run dev                  # http://localhost:3200
+   ```
+
+The seed creates two accounts, `customer@example.test` and `admin@example.test`, both with the password `Demo-Pass-123!` (local demo data only). Pay with Stripe's test card `4242 4242 4242 4242`, any future date and any three digits. Every email the store sends shows up in Mailpit.
+
+## Tests
 
 ```bash
-# Clone the repository
-git clone https://github.com/tomyRomero/storeOps
+cd api && dotnet test                                          # integration tests against a real SQL Server in a container
+cd web && npm run lint && npm run typecheck && npm test        # ESLint, TypeScript and Vitest
+```
 
-# Navigate to the web app
-cd storeOps/web
+The API tests run each feature through HTTP against a real database: checkout and webhooks (with a fake Stripe), refunds, the email outbox, rate limits and lockouts, admin permissions, and a check that the web app's copy of the API contract is up to date. CI runs both suites on every push.
 
-# Install dependencies
-npm install
+## Project layout
 
-# Start the development server
-npm run dev
+```text
+api/
+  StoreOps.Api/         the API, one folder per feature (Auth, Catalog, Cart, Checkouts, Orders, Emails, ...)
+  StoreOps.Api.Tests/   integration tests
+web/
+  app/                  routes: (root) storefront, (checkout), (auth) sign-in, (admin) the console
+  components/           UI by feature, plus the shared ui/ primitives
+  lib/                  API client and types, data loading, formatting and other small tested helpers
+docs/screenshots/       the images above
+docker-compose.yml      the local stack
+```
+
+## Contact
+
+For inquiries or further information, please contact me at tomyflecther99@hotmail.com, or reach out to me at [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomy-romero-902476145/)
