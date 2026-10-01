@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { CurrentUserProvider } from "@/components/CurrentUserProvider";
 import { getCurrentUser } from "@/lib/session";
+import { siteUrl } from "@/lib/site";
 
 // Bricolage Grotesque for display and headings (its optical-size axis keeps small headings readable),
 // Figtree for text, UI and numbers. Both are variable fonts served from this site, not from Google.
@@ -18,9 +19,11 @@ const sans = Figtree({
   variable: "--font-figtree",
 });
 
+// Each page sets its own title, shown as "Oil Paint Set · Palettehub"
 export const metadata: Metadata = {
-  title: "PaletteHub",
-  description: "Online Store Operations Manager App with Admin Dashboard",
+  metadataBase: siteUrl,
+  title: { default: "Palettehub · Art supplies", template: "%s · Palettehub" },
+  description: "Artist-grade paint, brushes and canvas, shipped across the US.",
 };
 
 // The one document every page shares: the storefront, the account pages, sign-in and the admin. Each
