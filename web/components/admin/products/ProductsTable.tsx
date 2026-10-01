@@ -113,20 +113,28 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
               <ChevronDown aria-hidden />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuContent align="start" className="w-64">
             <DropdownMenuLabel>Move to category</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {categories.map((category) => (
-              <DropdownMenuItem
-                key={category.id}
-                onSelect={() => {
-                  fromMenu.current = true;
-                  setPending({ action: "move", category });
-                }}
-              >
-                {category.name}
-              </DropdownMenuItem>
-            ))}
+            {categories.map((category) => {
+              // Products already in this category stay put, so it's offered only if something would move
+              const n = eligibleFor({ action: "move", category }).length;
+              return (
+                <DropdownMenuItem
+                  key={category.id}
+                  disabled={n === 0}
+                  onSelect={() => {
+                    fromMenu.current = true;
+                    setPending({ action: "move", category });
+                  }}
+                >
+                  <span className="flex-1">{category.name}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {n} of {chosen.length}
+                  </span>
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
       </BulkBar>
