@@ -45,8 +45,9 @@ public static class DevSeeder
         new("Canvas Sign", "Canvas", 1500, 3, "canvassign.jpg", "A small canvas panel with a hanging cord, made for lettering and gifts."),
     ];
 
+    // A real Springfield, IL ZIP: Stripe Tax places an address by its ZIP when the street doesn't match
     private static readonly PostalAddress CustomerAddress =
-        new("Demo Customer", "1 Demo Street", null, "Springfield", "IL", "12345", "US");
+        new("Demo Customer", "1 Demo Street", null, "Springfield", "IL", "62701", "US");
 
     public static async Task RunAsync(IServiceProvider services, CancellationToken cancellationToken = default)
     {
