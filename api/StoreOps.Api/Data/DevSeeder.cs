@@ -1,5 +1,6 @@
 using System.Buffers.Text;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -97,17 +98,31 @@ public static class DevSeeder
             SeedOrder("SEED0003", 3, customer, admin, products, now, OrderStatus.Pending, null,
                 ("Oil Paint Set", 1), ("Fine Brush", 3)));
 
+        var newestSubscriber = new NewsletterSubscriber { Email = "customer@example.test", UnsubscribeToken = NewToken(), SubscribedAtUtc = now.AddDays(-5) };
         db.NewsletterSubscribers.AddRange(
             new NewsletterSubscriber { Email = "reader@example.test", UnsubscribeToken = NewToken(), SubscribedAtUtc = now.AddDays(-10) },
-            new NewsletterSubscriber { Email = "customer@example.test", UnsubscribeToken = NewToken(), SubscribedAtUtc = now.AddDays(-5) });
+            newestSubscriber);
 
         await db.SaveChangesAsync(cancellationToken);
 
         var newestOrder = await db.Orders.SingleAsync(o => o.OrderNumber == "SEED0003", cancellationToken);
+        // With the same details the real events record, so the activity feed reads the same
         db.ActivityLog.AddRange(
-            new ActivityLogEntry { Action = ActivityAction.UserRegistered, EntityType = ActivityEntity.User, EntityId = customer.Id, OccurredAtUtc = now.AddHours(-1) },
-            new ActivityLogEntry { Action = ActivityAction.OrderCreated, EntityType = ActivityEntity.Order, EntityId = newestOrder.Id, OccurredAtUtc = now.AddMinutes(-30) },
-            new ActivityLogEntry { Action = ActivityAction.NewsletterSubscribed, EntityType = ActivityEntity.NewsletterSubscriber, OccurredAtUtc = now.AddMinutes(-10) });
+            new ActivityLogEntry
+            {
+                Action = ActivityAction.UserRegistered, EntityType = ActivityEntity.User, EntityId = customer.Id, OccurredAtUtc = now.AddHours(-1),
+                DetailsJson = JsonSerializer.Serialize(new { username = customer.UserName }),
+            },
+            new ActivityLogEntry
+            {
+                Action = ActivityAction.OrderCreated, EntityType = ActivityEntity.Order, EntityId = newestOrder.Id, OccurredAtUtc = now.AddMinutes(-30),
+                DetailsJson = JsonSerializer.Serialize(new { orderNumber = newestOrder.OrderNumber, totalCents = newestOrder.TotalCents, refunded = false }),
+            },
+            new ActivityLogEntry
+            {
+                Action = ActivityAction.NewsletterSubscribed, EntityType = ActivityEntity.NewsletterSubscriber, EntityId = newestSubscriber.Id,
+                OccurredAtUtc = now.AddMinutes(-10),
+            });
         await db.SaveChangesAsync(cancellationToken);
 
         await UploadImagesAsync(scope.ServiceProvider.GetRequiredService<ImageStorage>(), cancellationToken);
