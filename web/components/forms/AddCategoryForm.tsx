@@ -1,213 +1,112 @@
 "use client"
 
-import { ChangeEvent, useEffect, useState } from "react";
-import { useForm} from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
-import { getRes} from "@/lib/s3";
 import { toast } from "../ui/use-toast";
-import { useRouter, usePathname } from "next/navigation";
-import { revalidate } from "@/lib/actions/admin.actions";
-import { CategoryType } from "@/app/types/global";
+import ImageUpload from "./ImageUpload";
+import { api } from "@/lib/api/browser";
+import { fieldErrors, problemMessage } from "@/lib/api/problems";
+import type { AdminCategory } from "@/lib/api/types";
 
+const FormSchema = z.object({
+  name: z.string().trim().min(1, 'Enter a name').max(50, 'Use at most 50 characters'),
+  imageKey: z.string().min(1, 'Upload an image'),
+});
 
-export default function AddCategoryForm({title, photo, id }: CategoryType) {
-  const [files, setFiles] = useState<File[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [img, setImg] = useState("/assets/image.png");
-  const [imgChanged, setImgChanged] = useState(false);
+type Values = z.infer<typeof FormSchema>;
 
-  const path = usePathname();
+// Adds a category, or renames one and changes its picture
+export default function AddCategoryForm({ category }: { category: AdminCategory | null }) {
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
 
-  useEffect(()=> {
-    const fetchData = async () => {
-      if(photo.length > 0)
-      {
-      const fetched = await getRes(photo)
-      if(fetched)
-      {
-        setImg(fetched)
-      }
-    }
-    }
-    revalidate(path)
-    fetchData();
-  }, [])
-
-  const FormSchema = z.object({
-    photo: z.string()
-    .min(1, 'Photo is required'),
-    title: z
-      .string()
-      .min(1, 'Category Title is required')
-      .min(3, 'Gategory Title must have than more 3 characters'),
-  });
-
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<Values>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      title: title.length > 0? title : "",
-      photo: photo.length > 0? photo : ""
-    },
+    defaultValues: { name: category?.name ?? "", imageKey: category?.imageKey ?? "" },
   });
 
+  const onSubmit = async (values: Values) => {
+    setSaving(true);
+    const { error, response } = category
+      ? await api.PUT("/api/admin/categories/{id}", { params: { path: { id: category.id } }, body: values })
+      : await api.POST("/api/admin/categories", { body: values });
+    setSaving(false);
 
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    setLoading(true);
-
-    const response = await fetch('/api/category', {
-      method: 'POST', 
-      headers: {
-        'Content-Type' : 'application/json'
-      },
-      body: JSON.stringify({
-        id: id,
-        title: values.title,
-        photo: values.photo,
-        imgChanged: imgChanged
-      })
-     })
-
-    if(response.ok)
-    {
-      toast({
-        title: "Success!",
-        description: "Added New/Edited Category", 
-      })
-
-      revalidate(path)
-      setTimeout(() => {
-        router.push('/admincategories');
-      }, 1500);
-
-    }else{
-      setLoading(false)
-       toast({
-        title: "Failed to Add/Edit Category",
-        description: "Something went wrong!", 
-        variant: "destructive",
-      })
-      }
-    } 
-  
-
-  const handleImage = (
-    e: ChangeEvent<HTMLInputElement>,
-    fieldChange: (value: string) => void
-  ) => {
-    e.preventDefault();
-
-    const fileReader = new FileReader();
-
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setFiles(Array.from(e.target.files));
-
-      if (!file.type.includes("image")) return;
-
-      fileReader.onload = async (event) => {
-        const imageDataUrl = event.target?.result?.toString() || "";
-        fieldChange(imageDataUrl);
-        setImg(imageDataUrl);
-        setImgChanged(true)
-      };
-
-      fileReader.readAsDataURL(file);
+    if (response.ok) {
+      toast({ title: category ? "Category saved" : "Category added" });
+      router.push('/admincategories');
+      router.refresh();
+      return;
     }
+
+    for (const [field, message] of Object.entries(fieldErrors(error))) {
+      if (field in values) form.setError(field as keyof Values, { message });
+    }
+    toast({ title: "Couldn't save the category", description: problemMessage(error), variant: "destructive" });
   };
 
   return (
     <div className="flex flex-col max-w-md mx-auto">
-      <Link href={'/admincategories'} className="w-0">
-        <Button className="flex px-6 border border-black" variant="ghost">
-          <Image
-            src="/assets/back.png"
-            alt="go back icon"
-            width={32}
-            height={32}
-            className="px-1"
-          />
+      <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
+        <Link href={'/admincategories'}>
+          <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
           <span className="ml-2">Go Back</span>
-        </Button>
-      </Link>
-      <br />
-      <h1 className="text-heading4-bold font-bold text-center mb-6">{id ? "Edit Category" : "Add New Category"}</h1>
+        </Link>
+      </Button>
+      <h1 className="text-heading4-bold font-bold text-center my-6">{category ? "Edit Category" : "Add New Category"}</h1>
         <Form {...form}>
-          <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}
-           encType="multipart/form-data"
-          >
-          <FormField
+          <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
               control={form.control}
-              name='title'
+              name='name'
               render={({ field }) => (
-            <FormItem className="space-y-2">
-              <FormLabel>Category Title</FormLabel>
+            <FormItem>
+              <FormLabel>Category Name</FormLabel>
               <FormControl>
-              <Input
-                type="text"
-                placeholder="Enter Category Title"
-                {...field}
-              />
+              <Input type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
             )}
             />
-            <div className="py-4">
-              <FormField
+            <FormField
               control={form.control}
-              name='photo'
+              name='imageKey'
               render={({ field }) => (
-            <FormItem className="space-y-2 flex items-center gap-2">
-              <FormLabel className='account-form_image-label'>
-              <Image
-                      src={img}
-                      alt='category image'
-                      width={96}
-                      height={96}
-                      className='object-contain rounded-lg'
-                    />
-              </FormLabel>
-              <FormControl className='flex-1 text-base-semibold text-black'>
-              <Input
-                      type='file'
-                      accept='image/*'
-                      placeholder='Add category photo'
-                      className='account-form_image-input'
-                      onChange={(e) => handleImage(e, field.onChange)}
-                    />
-              </FormControl>
+            <FormItem>
+              <ImageUpload
+                label="Category picture"
+                imageUrl={category?.imageUrl ?? null}
+                onUploaded={(key) => {
+                  field.onChange(key);
+                  form.clearErrors("imageKey");
+                }}
+                onError={(message) => form.setError("imageKey", { message })}
+              />
               <FormMessage />
             </FormItem>
-            )}
+              )}
             />
-            </div>
-            <Button className="w-full" type="submit">
-              {id.length > 0 ? "Edit Category" : "Add Category"}
+            <Button className="w-full" type="submit" disabled={saving}>
+              {saving ? "Saving..." : category ? "Save Category" : "Add Category"}
             </Button>
-            <Image
-              src={"/assets/spinner.svg"}
-              alt={"loader"}
-              width={100}
-              height={100}
-              className={`${loading? "" : "hidden"} mx-auto`}
-            />
           </form>
         </Form>
     </div>
   );
 }
-

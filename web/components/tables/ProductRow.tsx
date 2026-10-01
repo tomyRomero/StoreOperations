@@ -1,102 +1,88 @@
 "use client"
 
-import { ProductType } from "@/app/types/global"
-import { Button } from "@/components/ui/button"
-import { TableRow, TableCell} from "@/components/ui/table"
-import { getRes } from "@/lib/s3"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { toast } from "../ui/use-toast"
-import { revalidate } from "@/lib/actions/admin.actions"
-import {deleteProductById} from "@/lib/actions/store.actions"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { TableRow, TableCell } from "@/components/ui/table"
+import { toast } from "../ui/use-toast"
+import { api } from "@/lib/api/browser"
+import { problemMessage } from "@/lib/api/problems"
+import type { AdminProduct } from "@/lib/api/types"
+import { formatDate } from "@/lib/format"
+import { formatMoney } from "@/lib/money"
 
+type Props = { product: AdminProduct; lowStockThreshold: number; timeZone: string };
 
-const ProductRow = ({stripeProductId, name, description, stock, price, category, photo, date, deal}: ProductType) => {
-  const [img, setImg] = useState("/assets/spinner.svg")
-  const router = useRouter();
+// Products are archived rather than deleted, so past orders keep their links. Archiving takes the
+// product out of the store; restoring puts it back.
+const ProductRow = ({ product, lowStockThreshold, timeZone }: Props) => {
+  const [busy, setBusy] = useState(false)
+  const router = useRouter()
+  const archived = product.archivedAtUtc !== null
 
-  useEffect(() => { 
-    const loadProductImage = async () => {
-    
-    setImg(await getRes(photo))
+  const toggleArchive = async () => {
+    if (!archived && !window.confirm(`Archive ${product.name}? It leaves the store and customers' carts, and can be restored later.`)) return
+
+    setBusy(true)
+    const path = { params: { path: { id: product.id } } }
+    const { error, response } = archived
+      ? await api.POST("/api/admin/products/{id}/restore", path)
+      : await api.POST("/api/admin/products/{id}/archive", path)
+    setBusy(false)
+
+    if (!response.ok) {
+      toast({ title: archived ? "Couldn't restore the product" : "Couldn't archive the product", description: problemMessage(error), variant: "destructive" })
+      return
+    }
+    toast({ title: archived ? `${product.name} is back in the store` : `${product.name} archived` })
+    router.refresh()
   }
-
-  loadProductImage()
-
-}, [])
-
-const redirect = () => {
-  router.push(`/adminaddproduct/${stripeProductId}`)
-}
-
-const redirectDeal  = ()=> {
-  router.push(`/adminaddproduct/deal/${stripeProductId}`)
-}
-
-const deleteProduct = async () => {
-
-  const userConfirmed = window.confirm(`Are you sure you want to delete this product?`);
-  if(userConfirmed)
-  {
-    const deleted = await deleteProductById(stripeProductId)
-
-    if(deleted)
-      {
-        toast({
-          title: "Success!",
-          description: "Product Deleted", 
-        })
-        
-      }else{
-         toast({
-          title: "Failed to Delete Product",
-          description: "Something went wrong!", 
-          variant: "destructive",
-        })
-      }
-  }
-}
 
   return (
-      <TableRow>
+      <TableRow className={archived ? "opacity-60" : ""}>
         <TableCell>
-        <Link href={`/adminaddproduct/${stripeProductId}`}>
-          <Image
-            alt="Product image"
-            className="aspect-square rounded-md object-cover"
-            height="64"
-            src={img}
-            width="64"
-            priority
-          />
+          <Link href={`/adminaddproduct/${product.id}`}>
+            <Image
+              alt=""
+              className="aspect-square rounded-md object-cover"
+              height="64"
+              src={product.imageUrl}
+              width="64"
+            />
           </Link>
         </TableCell>
-        
-       
-        <TableCell className="font-bold hover:underline"> <Link href={`/adminaddproduct/${stripeProductId}`}>{name}</Link></TableCell>
-        
+        <TableCell className="font-bold hover:underline">
+          <Link href={`/adminaddproduct/${product.id}`}>{product.name}</Link>
+          {archived && <span className="ml-2 font-normal text-gray-500">(archived)</span>}
+        </TableCell>
         <TableCell>
-            <div className='flex'>
-             <Button size="sm" variant="outline" onClick={redirect}>
-               Edit
-             </Button>
-             {deal === true ? ( <Button className="ml-2"  size="sm" variant="outline" onClick={redirectDeal}>
-               View Deal
-             </Button>) : (<Button className="ml-2"  size="sm" variant="outline" onClick={redirectDeal}>
-               Make Deal
-             </Button>)}
-             <Button className="ml-2" size="sm" variant="outline" onClick={deleteProduct}>
-               Delete
-             </Button>
-             </div>
-           </TableCell>
-        <TableCell className={`text-center font-bold ${stock === "0" ? "text-red-400" : ""}`}>{stock}</TableCell>
-        <TableCell className="text-center font-bold text-green-600">{`$${price}`}</TableCell>
-        <TableCell>{stripeProductId}</TableCell>
-        <TableCell className="font-semibold">{category}</TableCell>
-        <TableCell>{date}</TableCell>
+          <div className='flex flex-wrap gap-2'>
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/adminaddproduct/${product.id}`}>Edit</Link>
+            </Button>
+            {!archived && (
+              <Button asChild size="sm" variant="outline">
+                <Link href={`/adminaddproduct/deal/${product.id}`}>{product.compareAtPriceCents !== null ? "View Deal" : "Make Deal"}</Link>
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={toggleArchive} disabled={busy}>
+              {archived ? "Restore" : "Archive"}
+            </Button>
+          </div>
+        </TableCell>
+        <TableCell className={`text-center font-bold ${product.stock === 0 ? "text-red-500" : product.stock <= lowStockThreshold ? "text-amber-600" : ""}`}>
+          {product.stock}
+        </TableCell>
+        <TableCell className="text-center font-bold">
+          {product.compareAtPriceCents !== null && (
+            <span className="mr-1 font-normal text-gray-500 line-through">{formatMoney(product.compareAtPriceCents)}</span>
+          )}
+          <span className="text-green-600">{formatMoney(product.priceCents)}</span>
+        </TableCell>
+        <TableCell className="font-semibold">{product.categoryName}</TableCell>
+        <TableCell>{formatDate(product.createdAtUtc, timeZone)}</TableCell>
       </TableRow>
   )
 }

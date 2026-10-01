@@ -1,55 +1,17 @@
-import DeleteDeal from '@/components/cards/DealDetails';
+import React from 'react'
 import MakeDealForm from '@/components/forms/MakeDealForm';
 import ErrorMessage from '@/components/shared/Error';
-import { findProductForDeal } from '@/lib/data/admin';
-import { redirect } from 'next/navigation';
-import React from 'react'
+import { getAdminProduct } from '@/lib/data/admin-catalog';
 
 const page = async ({ params }: { params: { id: string } }) => {
 
-    const product = await findProductForDeal(params.id);
-
-    if(!product)
-    {
-      return(
-        <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
-            <ErrorMessage />
-        </section>
-      )
-    }
-
-if(product){
-
-  if(product.deal === true)
-  {
-    return(
-    <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
-      <DeleteDeal
-       stripeProductId={product.stripeProductId}
-       name={product.name} 
-       price={product.price} 
-       photo={product.photo} 
-       stock={product.stock} 
-       oldPrice={product.oldPrice}
-       dealDescription={product.dealDescription}
-       description={product.description}
-       />  
-    </section>
-    )
-  }
+  const product = await getAdminProduct(Number(params.id));
 
   return (
     <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
-        <MakeDealForm 
-        stripeProductId={product.stripeProductId} 
-        name={product.name} 
-        price={product.price} 
-        photo={product.photo} 
-        stock={product.stock}
-        description={product.description} />
+      {product && !product.archivedAtUtc ? <MakeDealForm product={product} /> : <ErrorMessage />}
     </section>
   )
-}
 }
 
 export default page

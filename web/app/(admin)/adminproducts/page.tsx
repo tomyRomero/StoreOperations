@@ -1,120 +1,96 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components/ui/table";
-import Link from "next/link";
 import ProductRow from "@/components/tables/ProductRow";
 import Pagination from "@/components/shared/Pagination";
-import { findProductsAdmin } from "@/lib/data/admin";
 import SearchBar from "@/components/forms/SearchBar";
+import type { ProductStatus } from "@/lib/api/types";
+import { getAdminProducts } from "@/lib/data/admin-catalog";
+import { getStoreSettings } from "@/lib/data/catalog";
+
+const tabs: { status: ProductStatus; label: string }[] = [
+  { status: "active", label: "In the store" },
+  { status: "archived", label: "Archived" },
+  { status: "all", label: "All" },
+];
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) {
-  try {
-    const searchString = searchParams?.q || ""; // Fallback to empty string
-    const pageNumber = searchParams?.page ? +searchParams.page : 1; // Fallback to page 1
-    const pageSize = 5;
-    const sortBy = "desc";
+  const search = searchParams.q ?? "";
+  const status = tabs.find((t) => t.status === searchParams.status)?.status ?? "active";
+  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
 
-    const { products, isNext } = await findProductsAdmin({
-      searchString,
-      pageNumber,
-      pageSize,
-      sortBy,
-    });
+  const [products, settings] = await Promise.all([
+    getAdminProducts({ search, status, page: pageNumber }),
+    getStoreSettings(),
+  ]);
 
-    const createPaginationPath = () => {
-      const params = new URLSearchParams();
+  // Keeps the search and the tab while paging or switching tabs
+  const pathWith = (next: ProductStatus) => {
+    const params = new URLSearchParams();
+    if (search) params.set("q", search);
+    if (next !== "active") params.set("status", next);
+    return `/adminproducts?${params.toString()}`;
+  };
 
-      if (searchParams.q) {
-        params.append("q", searchParams.q);
-      }
-
-      return `/adminproducts?${params.toString()}&`;
-    };
-
-    return (
-      <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
-        <div className="flex items-center">
-          <h1 className="font-semibold text-heading4-bold">Products</h1>
-          <Link href="/adminaddproduct" className="ml-auto">
-            <Button className="ml-auto" size="sm">
-              Add product
-            </Button>
+  return (
+    <section className="grid grid-cols-1 gap-4 md:pt-24 max-sm:pt-20 lg:pt-0">
+      <div className="flex items-center">
+        <h1 className="font-semibold text-heading4-bold">Products</h1>
+        <Button asChild className="ml-auto" size="sm">
+          <Link href="/adminaddproduct">Add product</Link>
+        </Button>
+      </div>
+      <SearchBar routeType="adminproducts" placeholder="Search products by name or category" />
+      <nav aria-label="Filter products" className="flex flex-wrap gap-2">
+        {tabs.map((tab) => (
+          <Link
+            key={tab.status}
+            href={pathWith(tab.status)}
+            aria-current={tab.status === status ? "page" : undefined}
+            className={`rounded-full border px-3 py-1 text-sm ${tab.status === status ? "bg-black text-white border-black" : "hover:bg-gray-100"}`}
+          >
+            {tab.label}
           </Link>
-        </div>
-        <br />
-        <SearchBar
-          routeType="adminproducts"
-          placeholder="Search for Products by Name, Stripe ID, Category or Price (Full Price)"
-        />
-        <div className="mt-4 border shadow-sm rounded-lg">
-          {products.length === 0 ? (
-            <h1 className="p-10">
-              No products have been added, click on add product to get started.
-            </h1>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-bold text-black w-[80px]">Image</TableHead>
-                  <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
-                  <TableHead className="font-bold text-black text-center">Action</TableHead>
-                  <TableHead className="font-bold text-black">Inventory</TableHead>
-                  <TableHead className="font-bold text-black">Price</TableHead>
-                  <TableHead className="font-bold text-black max-w-[150px]">Stripe ID</TableHead>
-                  <TableHead className="font-bold text-black">Category</TableHead>
-                  <TableHead className="font-bold text-black">Creation Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {products.map((product) => (
-                  <ProductRow
-                    key={product.stripeProductId}
-                    stripeProductId={product.stripeProductId}
-                    name={product.name}
-                    description={product.description}
-                    stock={product.stock}
-                    price={product.price}
-                    category={product.category}
-                    photo={product.photo}
-                    date={product.date}
-                    deal={product.deal}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </div>
-
-        {products.length > 0 && (
-          <Pagination
-            path={createPaginationPath()}
-            pageNumber={searchParams?.page ? +searchParams.page : 1}
-            isNext={isNext}
-          />
+        ))}
+      </nav>
+      <div className="border shadow-sm rounded-lg">
+        {!products || !settings ? (
+          <p className="p-10 text-center text-red-600">Failed to load products. Please try again later.</p>
+        ) : products.totalCount === 0 ? (
+          <p className="p-10">{search || status !== "active" ? "No products match." : "No products yet. Click Add product to get started."}</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-bold text-black w-[80px]"><span className="sr-only">Image</span></TableHead>
+                <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
+                <TableHead className="font-bold text-black">Actions</TableHead>
+                <TableHead className="font-bold text-black text-center">Stock</TableHead>
+                <TableHead className="font-bold text-black text-center">Price</TableHead>
+                <TableHead className="font-bold text-black">Category</TableHead>
+                <TableHead className="font-bold text-black">Added</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.items.map((product) => (
+                <ProductRow key={product.id} product={product} lowStockThreshold={settings.lowStockThreshold} timeZone={settings.timeZoneId} />
+              ))}
+            </TableBody>
+          </Table>
         )}
-      </section>
-    );
-  } catch (error) {
-    return (
-      <section className="grid grid-cols-1 md:pt-24 max-sm:pt-20 lg:pt-0">
-        <div className="flex items-center">
-          <h1 className="font-semibold text-heading4-bold">Products</h1>
-          <Link href="/adminaddproduct" className="ml-auto">
-            <Button className="ml-auto" size="sm">
-              Add product
-            </Button>
-          </Link>
-        </div>
-        <br />
-        <div className="mt-4 border shadow-sm rounded-lg">
-          <h1 className="p-10 text-center text-red-600">
-            Failed to load products. Please try again later.
-          </h1>
-        </div>
-      </section>
-    );
-  }
+      </div>
+
+      {products && (
+        <Pagination
+          path={`${pathWith(status)}&`}
+          pageNumber={products.page}
+          isNext={products.page < products.totalPages}
+        />
+      )}
+    </section>
+  );
 }

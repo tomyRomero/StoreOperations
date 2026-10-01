@@ -3,8 +3,6 @@ import "server-only";
 import { Types } from "mongoose";
 import { requireAdmin } from "../guards";
 import User from "../models/user.model";
-import Category from "../models/category.model";
-import Product from "../models/product.model";
 import Activity from "../models/activity.model";
 import Addresses from "../models/addresses.model";
 import Store from "../models/store.model";
@@ -58,67 +56,6 @@ export const getAddressesForUser = async (userId: string): Promise<Address[]> =>
   if (!Types.ObjectId.isValid(userId)) return [];
   const userAddresses = await Addresses.findOne({ user: userId });
   return userAddresses ? userAddresses.addresses.map((item: any) => item.address) : [];
-};
-
-export const getAllCategoriesAdmin = async ({ searchString = "", pageNumber = 1, pageSize = 20, sortBy = "desc" }: ListParams) => {
-  await requireAdmin();
-  try {
-    const skipAmount = (pageNumber - 1) * pageSize;
-    const regex = new RegExp(searchString, "i");
-    const query = {
-      $or: [
-        { title: { $regex: regex } },
-        { _id: Types.ObjectId.isValid(searchString) ? new Types.ObjectId(searchString) : null },
-      ],
-    };
-
-    const categories = await Category.find(query).skip(skipAmount).limit(pageSize).sort({ date: sortBy });
-    const totalCategoriesCount = await Category.countDocuments(query);
-    const isNext = totalCategoriesCount > skipAmount + categories.length;
-
-    return { categories, isNext };
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    return { categories: [], isNext: false };
-  }
-};
-
-export const findProductsAdmin = async ({ searchString = "", pageNumber = 1, pageSize = 20 }: ListParams) => {
-  await requireAdmin();
-  try {
-    const skipAmount = (pageNumber - 1) * pageSize;
-    const regex = new RegExp(searchString, "i");
-    const query: { $or: any[] } = {
-      $or: [{ name: { $regex: regex } }, { stripeProductId: { $regex: regex } }, { category: { $regex: regex } }],
-    };
-    // Match on price only when the search is a number
-    if (searchString.trim() !== "" && !isNaN(Number(searchString))) {
-      query.$or.push({ price: Number(searchString) });
-    }
-
-    const products = await Product.find(query).skip(skipAmount).limit(pageSize);
-    const totalProductsCount = await Product.countDocuments(query);
-    const isNext = totalProductsCount > skipAmount + products.length;
-
-    return { products, isNext };
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return { products: [], isNext: false };
-  }
-};
-
-// A product with its deal fields, for the deal form
-export const findProductForDeal = async (id: string) => {
-  await requireAdmin();
-  try {
-    const product = await Product.findOne({ stripeProductId: String(id) });
-    if (!product) return null;
-    const { stripeProductId, name, description, stock, price, category, photo, deal, oldPrice, dealDescription } = product;
-    return { name, description, stock, price, category, photo, stripeProductId, deal, oldPrice, dealDescription };
-  } catch (error) {
-    console.error("Error fetching product:", error);
-    return null;
-  }
 };
 
 // Activity log, newest first

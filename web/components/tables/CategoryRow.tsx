@@ -1,87 +1,64 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
+import React, { useState } from 'react'
 import Image from 'next/image'
-import { TableRow, TableCell} from "@/components/ui/table"
-import { getRes } from '@/lib/s3'
-import { deleteCategoryById } from '@/lib/actions/store.actions'
-import { toast } from '../ui/use-toast'
-import { useRouter } from 'next/navigation'
-import { CategoryType } from '@/app/types/global'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
+import { TableRow, TableCell } from "@/components/ui/table"
+import { toast } from '../ui/use-toast'
+import { api } from '@/lib/api/browser'
+import { problemMessage } from '@/lib/api/problems'
+import type { AdminCategory } from '@/lib/api/types'
 
+// Only an empty category can be deleted: products, archived ones too, keep their category
+const CategoryRow = ({ category }: { category: AdminCategory }) => {
+  const [busy, setBusy] = useState(false)
+  const router = useRouter()
 
-const CategoryRow = ({id, photo, date, title}: CategoryType) => {
-  const [img, setImg] = useState("/assets/spinner.svg")
-  const router = useRouter();
-  
-  useEffect(() => { 
-    const loadCategoryImage = async () => {
-    
-    setImg(await getRes(photo))
-  }
+  const deleteCategory = async () => {
+    if (!window.confirm(`Delete the ${category.name} category?`)) return
 
-  loadCategoryImage()
+    setBusy(true)
+    const { error, response } = await api.DELETE("/api/admin/categories/{id}", { params: { path: { id: category.id } } })
+    setBusy(false)
 
-}, [])
-
-const deleteCategory = async () => {
-
-  const userConfirmed = window.confirm(`WARNING: All products in this category will be deleted!!! Are you sure you want to delete this category?`);
-  if(userConfirmed)
-  {
-    const deleted = await deleteCategoryById(id)
-
-    if(deleted)
-      {
-        toast({
-          title: "Success!",
-          description: "Category Delete", 
-        })
-  
-      }else{
-         toast({
-          title: "Failed to Delete Category",
-          description: "Something went wrong!", 
-          variant: "destructive",
-        })
+    if (!response.ok) {
+      toast({ title: "Couldn't delete the category", description: problemMessage(error), variant: "destructive" })
+      return
     }
+    toast({ title: `${category.name} deleted` })
+    router.refresh()
   }
-}
-    
-const redirect = () => {
-  router.push(`/adminaddcategory/${id}`)
-}
 
   return (
     <TableRow>
       <TableCell>
-        <Link href={`/adminaddcategory/${id}`}>
-        <Image
-          alt="Category image"
-          className="aspect-square rounded-md object-cover"
-          height="64"
-          src={img}
-          width="64"
-          priority
-        />
+        <Link href={`/adminaddcategory/${category.id}`}>
+          <Image
+            alt=""
+            className="aspect-square rounded-md object-cover"
+            height="64"
+            src={category.imageUrl}
+            width="64"
+          />
         </Link>
       </TableCell>
       <TableCell>
-      <div className='flex'>
-        <Button size="sm" variant="outline" onClick={redirect}>
-        Edit
-       </Button>
-        <Button className="ml-2" size="sm" variant="outline" onClick={deleteCategory}>
-        Delete
-      </Button>
-      </div>
-    </TableCell>
-    <TableCell className="font-bold hover:underline"> <Link href={`/adminaddcategory/${id}`}>{title}</Link></TableCell>
-        <TableCell className="font-medium">{id}</TableCell>
-        <TableCell className="">{date}</TableCell>
-  </TableRow>
+        <div className='flex flex-wrap gap-2'>
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/adminaddcategory/${category.id}`}>Edit</Link>
+          </Button>
+          {category.canDelete && (
+            <Button size="sm" variant="outline" onClick={deleteCategory} disabled={busy}>
+              Delete
+            </Button>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="font-bold hover:underline"><Link href={`/adminaddcategory/${category.id}`}>{category.name}</Link></TableCell>
+      <TableCell className="text-center">{category.productCount}</TableCell>
+    </TableRow>
   )
 }
 
