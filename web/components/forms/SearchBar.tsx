@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAppContext } from "@/lib/AppContext";
 
 import { Input } from "../ui/input";
 
@@ -12,34 +11,41 @@ interface Props {
   placeholder: string;
 }
 
+// Searches 0.3s after typing stops. It starts from the search in the address, so a shared or reloaded
+// link keeps its results, and a new search keeps the page's other filters but goes back to page 1.
 function SearchBar({ routeType, placeholder }: Props) {
   const router = useRouter();
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const current = searchParams.get("q") ?? "";
+  const [search, setSearch] = useState(current);
 
-  // query after 0.3s of no input
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (search) {
-        router.push(`/${routeType}?q=` + search);
-      } else {
-        router.push(`/${routeType}`);
-      }
+    if (search === current) return;
+
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (search) params.set("q", search);
+      else params.delete("q");
+      params.delete("page");
+      const query = params.toString();
+      router.push(query ? `/${routeType}?${query}` : `/${routeType}`);
     }, 300);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [search, routeType]);
+    return () => clearTimeout(timer);
+  }, [search, current, routeType, router, searchParams]);
 
   return (
     <div className='searchbar'>
       <Image
         src='/assets/search.png'
-        alt='search'
+        alt=''
         width={24}
         height={24}
         className='object-contain'
       />
       <Input
-        id='text'
+        type='search'
+        aria-label={placeholder}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder={placeholder}
