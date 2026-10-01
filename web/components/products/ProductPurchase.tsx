@@ -28,12 +28,13 @@ export function ProductPurchase({ product }: { product: Product }) {
     return () => observer.disconnect();
   }, []);
 
-  const add = async () => {
+  const add = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
     setAdding(true);
     const added = await cart.add(product.id, quantity);
     setAdding(false);
     if (added) {
-      cart.openCart(product.id);
+      cart.openCart(product.id, button);
       setQuantity(1);
     }
   };

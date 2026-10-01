@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,6 +49,10 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
   const selection = useSelection(products.map((p) => p.id));
   const [pending, setPending] = useState<Pending | null>(null);
   const [working, setWorking] = useState(false);
+  // "Move to" opens the dialog from a menu item that's gone by the time it closes, so focus goes back to the
+  // menu's button. Archive and End deal are buttons, which the dialog returns focus to by itself.
+  const moveButton = useRef<HTMLButtonElement>(null);
+  const fromMenu = useRef(false);
 
   const chosen = products.filter((p) => selection.isSelected(p.id));
   const eligibleFor = (p: Pending | null) => {
@@ -103,7 +107,7 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="secondary">
+            <Button ref={moveButton} size="sm" variant="secondary">
               <FolderInput aria-hidden />
               Move to
               <ChevronDown aria-hidden />
@@ -113,7 +117,13 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
             <DropdownMenuLabel>Move to category</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {categories.map((category) => (
-              <DropdownMenuItem key={category.id} onSelect={() => setPending({ action: "move", category })}>
+              <DropdownMenuItem
+                key={category.id}
+                onSelect={() => {
+                  fromMenu.current = true;
+                  setPending({ action: "move", category });
+                }}
+              >
                 {category.name}
               </DropdownMenuItem>
             ))}
@@ -188,7 +198,15 @@ export function ProductsTable({ products, categories, lowStockThreshold, timeZon
       </div>
 
       <AlertDialog open={pending !== null} onOpenChange={(open) => !open && !working && setPending(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            const opened = fromMenu.current;
+            fromMenu.current = false;
+            if (!opened || !moveButton.current?.isConnected) return;
+            event.preventDefault();
+            moveButton.current.focus();
+          }}
+        >
           {pending && (
             <>
               <AlertDialogHeader>

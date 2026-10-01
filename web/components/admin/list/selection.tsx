@@ -41,22 +41,29 @@ export function SelectBox({ label, checked, indeterminate = false, onChange }: C
 
 // Shown while rows are ticked: how many, what can be done to them, and a way to untick them all
 export function BulkBar({ count, noun, onClear, children }: { count: number; noun: [string, string]; onClear: () => void; children: React.ReactNode }) {
-  if (count === 0) return null;
+  const summary = `${count} ${count === 1 ? noun[0] : noun[1]} selected`;
 
   return (
-    <div
-      role="region"
-      aria-label="Selected rows"
-      className="sticky top-18 z-20 flex flex-wrap items-center gap-2 rounded-md border border-primary bg-primary px-3 py-2 text-sm text-primary-foreground shadow-md"
-    >
-      <p className="mr-2 font-semibold" aria-live="polite">
-        {count} {count === 1 ? noun[0] : noun[1]} selected
+    <>
+      {/* Always on the page: screen readers miss a live region that appears together with its text,
+          so the first tick would go unannounced if this lived inside the bar */}
+      <p className="sr-only" aria-live="polite">
+        {count === 0 ? "" : count === 1 ? `${summary}. Actions are above the table.` : summary}
       </p>
-      <div className="flex flex-wrap gap-2">{children}</div>
-      <Button size="sm" variant="ghost" onClick={onClear} className="ml-auto text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
-        <X aria-hidden />
-        Clear
-      </Button>
-    </div>
+      {count > 0 && (
+        <div
+          role="region"
+          aria-label="Selected rows"
+          className="sticky top-18 z-20 flex flex-wrap items-center gap-2 rounded-md border border-primary bg-primary px-3 py-2 text-sm text-primary-foreground shadow-md"
+        >
+          <p className="mr-2 font-semibold">{summary}</p>
+          <div className="flex flex-wrap gap-2">{children}</div>
+          <Button size="sm" variant="ghost" onClick={onClear} className="ml-auto text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
+            <X aria-hidden />
+            Clear
+          </Button>
+        </div>
+      )}
+    </>
   );
 }

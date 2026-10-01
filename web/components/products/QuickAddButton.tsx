@@ -11,11 +11,12 @@ export function QuickAddButton({ productId, name, className }: { productId: numb
   const cart = useCart();
   const [busy, setBusy] = useState(false);
 
-  const add = async () => {
+  const add = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const button = event.currentTarget;
     setBusy(true);
     const added = await cart.add(productId);
     setBusy(false);
-    if (added) cart.openCart(productId);
+    if (added) cart.openCart(productId, button);
   };
 
   return (

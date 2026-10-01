@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
@@ -51,6 +51,8 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
   const [target, setTarget] = useState<OrderStatus | null>(null);
   const [emailCustomers, setEmailCustomers] = useState(emailByDefault);
   const [working, setWorking] = useState(false);
+  // The dialog opens from a menu item that no longer exists when it closes, so focus goes back to the menu's button
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   const chosen = orders.filter((o) => selection.isSelected(o.orderNumber));
   const eligibleFor = (status: OrderStatus) => chosen.filter((o) => o.nextStatuses.includes(status));
@@ -101,7 +103,7 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
       <BulkBar count={selection.selected.length} noun={["order", "orders"]} onClear={selection.clear}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" variant="secondary">
+            <Button ref={menuButton} size="sm" variant="secondary">
               Change status
               <ChevronDown aria-hidden />
             </Button>
@@ -178,7 +180,13 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
       </div>
 
       <AlertDialog open={target !== null} onOpenChange={(open) => !open && !working && setTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (!menuButton.current?.isConnected) return;
+            event.preventDefault();
+            menuButton.current.focus();
+          }}
+        >
           {target && (
             <>
               <AlertDialogHeader>

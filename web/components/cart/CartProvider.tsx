@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { api } from "@/lib/api/browser";
 import { problemMessage } from "@/lib/api/problems";
 import type { Cart, CartLine } from "@/lib/api/types";
@@ -30,7 +30,10 @@ type CartContextValue = {
   // The cart drawer, opened by the cart button and after adding something (which it highlights)
   isOpen: boolean;
   justAdded: number | null;
-  openCart: (justAdded?: number) => void;
+  // `opener` is the button to give focus back to on close. An add button passes itself, because it's
+  // disabled while adding and the drawer can't tell what had focus.
+  openCart: (justAdded?: number, opener?: HTMLElement | null) => void;
+  openedFrom: RefObject<HTMLElement | null>;
   closeCart: () => void;
 };
 
@@ -168,7 +171,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return add(lastRemoved.productId, lastRemoved.quantity);
   }, [lastRemoved, add]);
 
-  const openCart = useCallback((added?: number) => {
+  const openedFrom = useRef<HTMLElement | null>(null);
+  const openCart = useCallback((added?: number, opener?: HTMLElement | null) => {
+    openedFrom.current = opener ?? null;
     setJustAdded(added ?? null);
     setIsOpen(true);
   }, []);
@@ -191,6 +196,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     isOpen,
     justAdded,
     openCart,
+    openedFrom,
     closeCart,
   }), [cart, add, setQuantity, remove, lastRemoved, undoRemove, refresh, isOpen, justAdded, openCart, closeCart]);
 

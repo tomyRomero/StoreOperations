@@ -5,9 +5,10 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useReturnFocus } from "@/components/ui/use-return-focus"
 
 // Confirms an action that can't be undone, naming the consequence. Radix traps focus, closes on Esc
-// and returns focus to the button that opened it.
+// and returns focus to whatever opened it (see useReturnFocus).
 const AlertDialog = AlertDialogPrimitive.Root
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 const AlertDialogPortal = AlertDialogPrimitive.Portal
@@ -24,7 +25,8 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
   )
 }
 
-function AlertDialogContent({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+function AlertDialogContent({ className, onCloseAutoFocus, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus)
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
@@ -34,6 +36,8 @@ function AlertDialogContent({ className, ...props }: React.ComponentProps<typeof
           className
         )}
         {...props}
+        ref={noteOpener}
+        onCloseAutoFocus={handleCloseAutoFocus}
       />
     </AlertDialogPortal>
   )

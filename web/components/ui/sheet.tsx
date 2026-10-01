@@ -6,6 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useReturnFocus } from "@/components/ui/use-return-focus"
 
 // A drawer from the side of the screen (the cart, the mobile menu, mobile filters), built on Radix Dialog:
 // focus stays inside while it's open, Esc closes it, the page behind is inert, and focus goes back to
@@ -49,12 +50,19 @@ function SheetContent({
   side = "right",
   className,
   children,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>) {
+  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus)
   return (
     <SheetPortal>
       <SheetOverlay />
-      <SheetPrimitive.Content className={cn(sheetVariants({ side }), className)} {...props}>
+      <SheetPrimitive.Content
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+        ref={noteOpener}
+        onCloseAutoFocus={handleCloseAutoFocus}
+      >
         {children}
         <SheetPrimitive.Close className="absolute right-3 top-3 inline-flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
           <X className="size-5" aria-hidden />

@@ -11,13 +11,21 @@ import { EmptyCart } from "./EmptyCart";
 import { RemovedNotice } from "./RemovedNotice";
 
 // The cart in a drawer from the right, full width on phones. Radix keeps focus inside, Esc closes it,
-// and focus goes back to the button that opened it.
+// and focus goes back to the button that opened it (an add button says which, see openCart).
 export function CartDrawer({ shipping, categories }: { shipping: ShippingSettings; categories: Category[] }) {
-  const { cart, itemCount, isOpen, justAdded, closeCart, openCart } = useCart();
+  const { cart, itemCount, isOpen, justAdded, closeCart, openCart, openedFrom } = useCart();
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => (open ? openCart() : closeCart())}>
-      <SheetContent side="right">
+      <SheetContent
+        side="right"
+        onCloseAutoFocus={(event) => {
+          const opener = openedFrom.current;
+          if (!opener?.isConnected) return;
+          event.preventDefault();
+          opener.focus({ preventScroll: true });
+        }}
+      >
         <SheetHeader>
           <SheetTitle>Your cart{itemCount > 0 && ` (${itemCount})`}</SheetTitle>
           <SheetDescription className="sr-only">The items in your cart, their quantities and the way to checkout.</SheetDescription>
