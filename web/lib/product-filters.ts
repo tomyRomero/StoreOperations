@@ -73,6 +73,11 @@ function dollars(cents: number): string {
 }
 
 // How many filters narrow the list (search and sort don't count)
+// The same search and sort with every filter taken off, back on page 1
+export function clearedFilters(filters: ProductFilters): ProductFilters {
+  return { ...filters, categoryIds: [], onSale: false, inStock: false, minCents: null, maxCents: null, page: 1 };
+}
+
 export function activeFilterCount(filters: ProductFilters): number {
   return filters.categoryIds.length + (filters.onSale ? 1 : 0) + (filters.inStock ? 1 : 0) + (filters.minCents !== null || filters.maxCents !== null ? 1 : 0);
 }

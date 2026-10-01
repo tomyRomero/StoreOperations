@@ -16,7 +16,7 @@ type Props = {
 // "Nothing here yet", always with a way forward
 export function EmptyState({ icon: Icon, title, children, action, heading: Heading = "h2", className }: Props) {
   return (
-    <div className={cn("flex flex-col items-center gap-3 rounded-md border border-dashed px-6 py-12 text-center", className)}>
+    <div className={cn("flex flex-col items-center gap-3 rounded-[24px] border border-dashed border-foreground/12 px-6 py-12 text-center", className)}>
       <span className="flex size-12 items-center justify-center rounded-full bg-muted">
         <Icon className="size-6 text-muted-foreground" aria-hidden />
       </span>

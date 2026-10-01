@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeFilterCount, parseProductFilters, productFiltersHref } from "@/lib/product-filters";
+import { activeFilterCount, clearedFilters, parseProductFilters, productFiltersHref } from "@/lib/product-filters";
 
 describe("parseProductFilters", () => {
   it("reads every filter from the address", () => {
@@ -39,5 +39,12 @@ describe("activeFilterCount", () => {
   it("counts categories, deals, availability and the price range, not search or sort", () => {
     expect(activeFilterCount(parseProductFilters({ q: "brush", sort: "price-asc" }))).toBe(0);
     expect(activeFilterCount(parseProductFilters({ category: ["1", "2"], sale: "1", inStock: "1", min: "5", max: "10" }))).toBe(5);
+  });
+});
+
+describe("clearedFilters", () => {
+  it("takes every filter off but keeps the search and sort", () => {
+    const filters = parseProductFilters({ q: "brush", category: ["1", "2"], sale: "1", inStock: "1", min: "5", max: "30", sort: "price-asc", page: "3" });
+    expect(productFiltersHref(clearedFilters(filters))).toBe("/products?q=brush&sort=price-asc");
   });
 });

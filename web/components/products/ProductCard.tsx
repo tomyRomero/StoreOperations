@@ -42,14 +42,14 @@ export function ProductCard({ product, lowStockThreshold, priority = false }: Pr
         )}
       </ProductStage>
 
-      <div className="flex items-center justify-between gap-3 border-t border-foreground/6 px-5 pb-5 pt-4">
+      <div className="flex items-center justify-between gap-2 border-t border-foreground/6 px-3.5 pb-3.5 pt-3 sm:gap-3 sm:px-5 sm:pb-5 sm:pt-4">
         <div className="grid min-w-0 gap-1">
-          <h3 className="line-clamp-2 font-sans text-base font-semibold leading-snug">
+          <h3 className="line-clamp-2 font-sans text-[15px] font-semibold leading-snug sm:text-base">
             <Link href={`/products/${product.id}`} className="outline-none after:absolute after:inset-0">
               {product.name}
             </Link>
           </h3>
-          <p className="text-sm tabular-nums text-muted-foreground">
+          <p className="text-[13px] tabular-nums text-muted-foreground sm:text-sm">
             {regular !== null && saving > 0 ? (
               <>
                 <span className="sr-only">Was {formatMoney(regular)}, now </span>
@@ -62,11 +62,11 @@ export function ProductCard({ product, lowStockThreshold, priority = false }: Pr
           </p>
         </div>
         {soldOut ? (
-          <span className="inline-flex h-8 shrink-0 items-center rounded-full border border-foreground/12 px-3 font-mono text-xs font-medium text-muted-foreground">
+          <span className="inline-flex h-7 shrink-0 items-center rounded-full border border-foreground/12 px-2.5 font-mono text-[11px] font-medium text-muted-foreground sm:h-8 sm:px-3 sm:text-xs">
             Sold out
           </span>
         ) : (
-          <QuickAddButton productId={product.id} name={product.name} />
+          <QuickAddButton productId={product.id} name={product.name} className="max-sm:size-9" />
         )}
       </div>
     </article>

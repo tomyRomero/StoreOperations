@@ -15,7 +15,7 @@ type Props = {
 };
 
 const item =
-  "inline-flex h-9 min-w-9 items-center justify-center gap-1 rounded-md px-2 text-sm font-semibold tabular-nums transition-colors";
+  "inline-flex h-9 min-w-9 items-center justify-center gap-1 rounded-full px-2.5 text-sm font-semibold tabular-nums transition-colors";
 
 // Real links, so pages can be opened in a new tab, shared, crawled and used without JavaScript
 export function Pagination({ pathname, searchParams, page, totalPages, totalCount, pageSize, className }: Props) {
@@ -33,7 +33,7 @@ export function Pagination({ pathname, searchParams, page, totalPages, totalCoun
       <ul className="flex items-center gap-1">
         <li>
           {page > 1 ? (
-            <Link href={href(page - 1)} className={cn(item, "hover:bg-muted")} rel="prev">
+            <Link href={href(page - 1)} className={cn(item, "hover:bg-foreground/6")} rel="prev">
               <ChevronLeft className="size-4" aria-hidden />
               <span className="max-sm:sr-only">Previous</span>
             </Link>
@@ -55,7 +55,7 @@ export function Pagination({ pathname, searchParams, page, totalPages, totalCoun
                 href={href(n)}
                 aria-current={n === page ? "page" : undefined}
                 aria-label={`Page ${n}`}
-                className={cn(item, n === page ? "bg-primary text-primary-foreground" : "hover:bg-muted")}
+                className={cn(item, n === page ? "bg-primary text-primary-foreground" : "hover:bg-foreground/6")}
               >
                 {n}
               </Link>
@@ -64,7 +64,7 @@ export function Pagination({ pathname, searchParams, page, totalPages, totalCoun
         )}
         <li>
           {page < totalPages ? (
-            <Link href={href(page + 1)} className={cn(item, "hover:bg-muted")} rel="next">
+            <Link href={href(page + 1)} className={cn(item, "hover:bg-foreground/6")} rel="next">
               <span className="max-sm:sr-only">Next</span>
               <ChevronRight className="size-4" aria-hidden />
             </Link>
