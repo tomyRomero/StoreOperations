@@ -1,11 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
-import ActivityCard from "@/components/cards/ActivityCard";
-import Pagination from "@/components/shared/Pagination";
+import { Activity, LayoutGrid, Mail, Package, Settings, ShoppingBag, User, type LucideIcon } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { FilterTabs } from "@/components/admin/list/FilterTabs";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
+import { Pagination } from "@/components/ui/pagination";
 import type { ActivityEntity } from "@/lib/api/types";
-import { getStoreSettings } from "@/lib/data/catalog";
-import { getActivity } from "@/lib/data/admin-store";
+import { describeActivity, groupByDay } from "@/lib/activity";
+import { listHref, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
+import { activityPageSize, getActivity, getAdminSettings } from "@/lib/data/admin-store";
+import { formatDate } from "@/lib/format";
+import type { SearchParams } from "@/lib/paging";
+import { calculateTimeAgo } from "@/lib/utils";
 
+export const metadata: Metadata = { title: "Activity" };
+
+const path = "/admin/activity";
 const tabs: { entity?: ActivityEntity; label: string }[] = [
   { label: "Everything" },
   { entity: "order", label: "Orders" },
@@ -15,64 +27,81 @@ const tabs: { entity?: ActivityEntity; label: string }[] = [
   { entity: "newsletter_subscriber", label: "Newsletter" },
   { entity: "store_settings", label: "Settings" },
 ];
-
-const Page = async (
-  props: {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-  }
-) => {
-  const searchParams = await props.searchParams;
-  const entity = tabs.find((t) => t.entity !== undefined && t.entity === searchParams.type)?.entity;
-  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
-  const [activity, settings] = await Promise.all([getActivity({ entityType: entity, page: pageNumber }), getStoreSettings()]);
-  const now = new Date();
-
-  const pathFor = (next?: ActivityEntity) => (next ? `/admin/activity?type=${next}` : "/admin/activity?");
-
-  return (
-      <section className="">
-        <div className="grid grid-cols-1 max-w-3xl mx-auto gap-4">
-          <Card>
-            <CardHeader className="gap-4">
-              <CardTitle className="text-heading4-bold">Recent Activity</CardTitle>
-              <nav aria-label="Filter activity" className="flex flex-wrap gap-2">
-                {tabs.map((tab) => (
-                  <Link
-                    key={tab.label}
-                    href={pathFor(tab.entity)}
-                    aria-current={tab.entity === entity ? "page" : undefined}
-                    className={`rounded-full border px-3 py-1 text-sm ${tab.entity === entity ? "bg-black text-white border-black" : "hover:bg-gray-100"}`}
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </nav>
-            </CardHeader>
-            <CardContent>
-              {!activity || !settings ? (
-                <p className="text-center py-4 text-red-600">Failed to load recent activity. Please try again later.</p>
-              ) : activity.totalCount === 0 ? (
-                <p className="text-center py-4">Nothing here yet.</p>
-              ) : (
-                <ul className="divide-y">
-                  {activity.items.map((entry) => (
-                    <ActivityCard key={entry.id} entry={entry} timeZone={settings.timeZoneId} now={now} />
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {activity && (
-          <Pagination
-            path={entity ? `${pathFor(entity)}&` : pathFor()}
-            pageNumber={activity.page}
-            isNext={activity.page < activity.totalPages}
-          />
-        )}
-      </section>
-  );
+const icons: Record<ActivityEntity, LucideIcon> = {
+  order: ShoppingBag,
+  product: Package,
+  category: LayoutGrid,
+  user: User,
+  newsletter_subscriber: Mail,
+  store_settings: Settings,
 };
 
-export default Page;
+// Everything customers and admins did, newest first, by the store's day
+export default async function ActivityPage(props: { searchParams: Promise<SearchParams> }) {
+  const params = await props.searchParams;
+  const entity = oneOf(params.type, tabs.flatMap((t) => (t.entity ? [t.entity] : [])));
+  const page = pageNumber(params.page);
+  const [activity, settings] = await Promise.all([getActivity({ entityType: entity, page }), getAdminSettings()]);
+  const now = new Date();
+
+  return (
+    <>
+      <AdminPageHeader title="Activity" description="Everything customers and admins did in the store, newest first." />
+      <div className="mb-4">
+        <FilterTabs
+          label="Filter activity"
+          tabs={tabs.map((tab) => ({ label: tab.label, href: listHref(path, withParams(params, { type: tab.entity })), current: tab.entity === entity }))}
+        />
+      </div>
+
+      {!activity || !settings ? (
+        <ErrorState title="We couldn't load the activity" action={<RetryButton />} />
+      ) : activity.items.length === 0 ? (
+        <EmptyState icon={Activity} title="Nothing here yet" className="bg-card">
+          Orders, sign-ups and admin changes show up here as they happen.
+        </EmptyState>
+      ) : (
+        <div className="grid max-w-3xl gap-6">
+          {groupByDay(activity.items, settings.timeZoneId, now).map((group) => (
+            <section key={group.label} aria-label={group.label} className="rounded-md border bg-card">
+              <h2 className="border-b px-5 py-3 font-sans text-sm font-semibold text-muted-foreground">{group.label}</h2>
+              <ul className="divide-y">
+                {group.entries.map((entry) => {
+                  const { text, href } = describeActivity(entry);
+                  const Icon = entry.entityType ? icons[entry.entityType] : Activity;
+                  return (
+                    <li key={entry.id} className="flex items-start gap-3 px-5 py-3">
+                      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-muted">
+                        <Icon className="size-4 text-muted-foreground" aria-hidden />
+                      </span>
+                      <p className="min-w-0 flex-1 pt-1.5 text-sm">
+                        {href ? (
+                          <Link href={href} className="underline-offset-4 hover:underline">
+                            {text}
+                          </Link>
+                        ) : (
+                          text
+                        )}
+                      </p>
+                      <time dateTime={entry.occurredAtUtc} title={formatDate(entry.occurredAtUtc, settings.timeZoneId)} className="shrink-0 pt-1.5 text-sm text-muted-foreground">
+                        {calculateTimeAgo(now, entry.occurredAtUtc)}
+                      </time>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+          <Pagination
+            pathname={path}
+            searchParams={params}
+            page={activity.page}
+            totalPages={activity.totalPages}
+            totalCount={activity.totalCount}
+            pageSize={activityPageSize}
+          />
+        </div>
+      )}
+    </>
+  );
+}

@@ -1,5 +1,5 @@
 import type { ActivityEntry, OrderStatus } from "./api/types";
-import { orderStatusLabel } from "./format";
+import { formatDay, orderStatusLabel } from "./format";
 import { formatMoney } from "./money";
 
 // One value from the entry's details, which differ by action (see the API's activity entries)
@@ -85,4 +85,27 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
     case "settings_changed":
       return { text: `${who} changed the store settings`, href: "/admin/settings" }
   }
+}
+
+// The store's calendar day of a moment, as "2026-09-30", so entries group by the store's days
+function storeDay(utc: string | Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(utc));
+}
+
+// Entries (newest first) in groups by the store's day: "Today", "Yesterday", then the date
+export function groupByDay<T extends { occurredAtUtc: string }>(entries: T[], timeZone: string, now: Date): { label: string; entries: T[] }[] {
+  const today = storeDay(now, timeZone);
+  const yesterday = storeDay(new Date(now.getTime() - 24 * 60 * 60 * 1000), timeZone);
+  const groups: { day: string; label: string; entries: T[] }[] = [];
+
+  for (const entry of entries) {
+    const day = storeDay(entry.occurredAtUtc, timeZone);
+    const group = groups.at(-1);
+    if (group?.day === day) group.entries.push(entry);
+    else {
+      const label = day === today ? "Today" : day === yesterday ? "Yesterday" : formatDay(day);
+      groups.push({ day, label, entries: [entry] });
+    }
+  }
+  return groups.map(({ label, entries }) => ({ label, entries }));
 }

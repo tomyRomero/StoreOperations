@@ -1,53 +1,76 @@
-import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card";
-import NewsletterSubscribers from "@/components/cards/NewsletterSubscribers";
-import NewsletterForm from "@/components/forms/NewsletterForm";
-import SearchBar from "@/components/forms/SearchBar";
-import Pagination from "@/components/shared/Pagination";
-import { getStoreSettings } from "@/lib/data/catalog";
-import { getSubscribers } from "@/lib/data/admin-store";
+import type { Metadata } from "next";
+import { MailX, SearchX } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { ListSearch } from "@/components/admin/list/ListSearch";
+import { NewsletterForm } from "@/components/admin/newsletter/NewsletterForm";
+import { SubscribersTable } from "@/components/admin/newsletter/SubscribersTable";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
+import { Pagination } from "@/components/ui/pagination";
+import { firstValue, pageNumber } from "@/lib/admin-lists";
+import { getAdminSettings, getSubscribers, subscribersPageSize } from "@/lib/data/admin-store";
+import type { SearchParams } from "@/lib/paging";
 
-const page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
-  const searchParams = await props.searchParams;
-  const search = searchParams.q ?? "";
-  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
+export const metadata: Metadata = { title: "Newsletter" };
 
-  // The total for the send button counts everyone, whatever the search shows
+const path = "/admin/newsletter";
+
+// Write and send the newsletter, and look after the list it goes to
+export default async function NewsletterPage(props: { searchParams: Promise<SearchParams> }) {
+  const params = await props.searchParams;
+  const search = firstValue(params.q)?.trim() ?? "";
+  const page = pageNumber(params.page);
+
+  // The send button counts everyone, whatever the search shows
   const [subscribers, everyone, settings] = await Promise.all([
-    getSubscribers({ search, page: pageNumber }),
+    getSubscribers({ search, page }),
     search ? getSubscribers({}) : null,
-    getStoreSettings(),
+    getAdminSettings(),
   ]);
   const total = (search ? everyone : subscribers)?.totalCount ?? 0;
 
   return (
-    <section className="flex flex-col gap-6 h-full">
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-heading3-bold">Subscribers</CardTitle>
-          <CardDescription>{total} subscribed to the newsletter.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <SearchBar placeholder="Search subscribers by email" />
+    <>
+      <AdminPageHeader title="Newsletter" description={`${total} ${total === 1 ? "person is" : "people are"} subscribed.`} />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <section aria-labelledby="write-heading" className="self-start rounded-md border bg-card p-5 sm:p-6">
+          <h2 id="write-heading" className="mb-5 text-h4">
+            Write a newsletter
+          </h2>
+          <NewsletterForm subscriberCount={total} />
+        </section>
+
+        <section aria-labelledby="subscribers-heading" className="grid content-start gap-3">
+          <h2 id="subscribers-heading" className="text-h4">
+            Subscribers
+          </h2>
+          <ListSearch label="Search subscribers by email" className="sm:max-w-none" />
           {!subscribers || !settings ? (
-            <p className="text-red-600">Couldn&apos;t load subscribers. Please try again.</p>
-          ) : subscribers.totalCount === 0 ? (
-            <p>{search ? "No subscribers match." : "No subscribers yet."}</p>
+            <ErrorState title="We couldn't load the subscribers" action={<RetryButton />} />
+          ) : subscribers.items.length === 0 ? (
+            search ? (
+              <EmptyState icon={SearchX} title="No subscribers match" className="bg-card" />
+            ) : (
+              <EmptyState icon={MailX} title="No subscribers yet" className="bg-card">
+                People join from the sign-up box in the store&apos;s footer.
+              </EmptyState>
+            )
           ) : (
-            <NewsletterSubscribers subscribers={subscribers.items} timeZone={settings.timeZoneId} />
+            <>
+              <SubscribersTable subscribers={subscribers.items} timeZone={settings.timeZoneId} />
+              <Pagination
+                pathname={path}
+                searchParams={params}
+                page={subscribers.page}
+                totalPages={subscribers.totalPages}
+                totalCount={subscribers.totalCount}
+                pageSize={subscribersPageSize}
+              />
+            </>
           )}
-          {subscribers && (
-            <Pagination
-              path={`/admin/newsletter?${search ? `q=${encodeURIComponent(search)}&` : ""}`}
-              pageNumber={subscribers.page}
-              isNext={subscribers.page < subscribers.totalPages}
-            />
-          )}
-        </CardContent>
-      </Card>
-
-      <NewsletterForm subscriberCount={total} />
-    </section>
-  )
+        </section>
+      </div>
+    </>
+  );
 }
-
-export default page;
