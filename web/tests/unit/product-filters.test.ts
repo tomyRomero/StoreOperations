@@ -4,14 +4,15 @@ import { activeFilterCount, parseProductFilters, productFiltersHref } from "@/li
 describe("parseProductFilters", () => {
   it("reads every filter from the address", () => {
     expect(
-      parseProductFilters({ q: " brush ", category: ["2", "3"], inStock: "1", min: "5", max: "30.5", sort: "price-asc", page: "2" }),
-    ).toEqual({ q: "brush", categoryIds: [2, 3], inStock: true, minCents: 500, maxCents: 3050, sort: "price-asc", page: 2 });
+      parseProductFilters({ q: " brush ", category: ["2", "3"], sale: "1", inStock: "1", min: "5", max: "30.5", sort: "price-asc", page: "2" }),
+    ).toEqual({ q: "brush", categoryIds: [2, 3], onSale: true, inStock: true, minCents: 500, maxCents: 3050, sort: "price-asc", page: 2 });
   });
 
   it("falls back to the defaults for anything it can't read", () => {
     expect(parseProductFilters({ category: ["two", "2", "2"], min: "cheap", sort: "random", page: "-1" })).toEqual({
       q: "",
       categoryIds: [2],
+      onSale: false,
       inStock: false,
       minCents: null,
       maxCents: null,
@@ -28,15 +29,15 @@ describe("productFiltersHref", () => {
   });
 
   it("round-trips the filters", () => {
-    const href = productFiltersHref(parseProductFilters({ q: "oil paint", category: "1", inStock: "1", min: "7.5", max: "40", sort: "price-desc" }));
+    const href = productFiltersHref(parseProductFilters({ q: "oil paint", category: "1", sale: "1", inStock: "1", min: "7.5", max: "40", sort: "price-desc" }));
 
-    expect(href).toBe("/products?q=oil+paint&category=1&inStock=1&min=7.50&max=40&sort=price-desc");
+    expect(href).toBe("/products?q=oil+paint&category=1&sale=1&inStock=1&min=7.50&max=40&sort=price-desc");
   });
 });
 
 describe("activeFilterCount", () => {
-  it("counts categories, availability and the price range, not search or sort", () => {
+  it("counts categories, deals, availability and the price range, not search or sort", () => {
     expect(activeFilterCount(parseProductFilters({ q: "brush", sort: "price-asc" }))).toBe(0);
-    expect(activeFilterCount(parseProductFilters({ category: ["1", "2"], inStock: "1", min: "5", max: "10" }))).toBe(4);
+    expect(activeFilterCount(parseProductFilters({ category: ["1", "2"], sale: "1", inStock: "1", min: "5", max: "10" }))).toBe(5);
   });
 });

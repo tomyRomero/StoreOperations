@@ -1,4 +1,5 @@
-import type { Carrier, OrderStatus, PostalAddress } from "./api/types";
+import type { Carrier, OrderStatus, PostalAddress, StoreSettings } from "./api/types";
+import { formatMoney } from "./money";
 
 // How the API's values read on a page. Money has its own file (money.ts).
 
@@ -51,4 +52,28 @@ export function stockLabel(stock: number, lowStockThreshold: number): string {
   if (stock <= 0) return "Sold out";
   if (stock <= lowStockThreshold) return `Only ${stock} left`;
   return "In stock";
+}
+
+// The store's policies in one line each, from Store settings, so no page promises more than checkout
+// and the returns desk deliver
+
+export function shippingSummary(settings: Pick<StoreSettings, "shippingFlatRateCents" | "freeShippingThresholdCents">): string {
+  if (settings.freeShippingThresholdCents !== null) {
+    return settings.shippingFlatRateCents === 0
+      ? "Free shipping on every order"
+      : `Free shipping on orders over ${formatMoney(settings.freeShippingThresholdCents)}`;
+  }
+  return settings.shippingFlatRateCents === 0 ? "Free shipping on every order" : `${formatMoney(settings.shippingFlatRateCents)} flat-rate shipping`;
+}
+
+export function returnsSummary(settings: Pick<StoreSettings, "returnPolicy" | "returnWindowDays">): string {
+  const days = settings.returnWindowDays;
+  switch (settings.returnPolicy) {
+    case "exchanges":
+      return days ? `Exchanges within ${days} days` : "Exchanges accepted";
+    case "refunds":
+      return days ? `Refunds within ${days} days` : "Refunds accepted";
+    default:
+      return "All sales are final";
+  }
 }

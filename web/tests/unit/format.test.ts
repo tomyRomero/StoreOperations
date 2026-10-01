@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, stockLabel } from "@/lib/format";
+import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, returnsSummary, shippingSummary, stockLabel } from "@/lib/format";
 import type { PostalAddress } from "@/lib/api/types";
 
 describe("formatDate", () => {
@@ -56,5 +56,26 @@ describe("stockLabel", () => {
   it("says in stock above it, and sold out at zero", () => {
     expect(stockLabel(6, 5)).toBe("In stock");
     expect(stockLabel(0, 5)).toBe("Sold out");
+  });
+});
+
+describe("shippingSummary", () => {
+  it("promises free shipping only when the store has a threshold", () => {
+    expect(shippingSummary({ shippingFlatRateCents: 1000, freeShippingThresholdCents: null })).toBe("$10.00 flat-rate shipping");
+    expect(shippingSummary({ shippingFlatRateCents: 1000, freeShippingThresholdCents: 15000 })).toBe("Free shipping on orders over $150.00");
+  });
+
+  it("says free when the flat rate is zero", () => {
+    expect(shippingSummary({ shippingFlatRateCents: 0, freeShippingThresholdCents: null })).toBe("Free shipping on every order");
+  });
+});
+
+describe("returnsSummary", () => {
+  it.each([
+    ["no_returns", null, "All sales are final"],
+    ["exchanges", 30, "Exchanges within 30 days"],
+    ["refunds", 14, "Refunds within 14 days"],
+  ] as const)("%s with %s days reads %j", (returnPolicy, returnWindowDays, text) => {
+    expect(returnsSummary({ returnPolicy, returnWindowDays })).toBe(text);
   });
 });

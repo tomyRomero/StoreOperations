@@ -2,12 +2,13 @@ import type { ProductSort } from "./api/types";
 import { parseDollars } from "./money";
 import type { SearchParams } from "./paging";
 
-// The product list's state, read from its address: /products?q=brush&category=2&inStock=1&min=5&max=30&sort=price-asc&page=2
+// The product list's state, read from its address: /products?q=brush&category=2&sale=1&inStock=1&min=5&max=30&sort=price-asc&page=2
 // Links are shareable, back and forward work, and a refresh keeps the view.
 
 export type ProductFilters = {
   q: string;
   categoryIds: number[];
+  onSale: boolean;
   inStock: boolean;
   // Typed in dollars, sent to the API in cents
   minCents: number | null;
@@ -42,6 +43,7 @@ export function parseProductFilters(params: SearchParams): ProductFilters {
   return {
     q: (first(params.q) ?? "").trim().slice(0, 100),
     categoryIds: [...new Set(ids)],
+    onSale: first(params.sale) === "1",
     inStock: first(params.inStock) === "1",
     minCents: parseDollars(first(params.min) ?? ""),
     maxCents: parseDollars(first(params.max) ?? ""),
@@ -55,6 +57,7 @@ export function productFiltersHref(filters: ProductFilters): string {
   const query = new URLSearchParams();
   if (filters.q) query.set("q", filters.q);
   for (const id of filters.categoryIds) query.append("category", String(id));
+  if (filters.onSale) query.set("sale", "1");
   if (filters.inStock) query.set("inStock", "1");
   if (filters.minCents !== null) query.set("min", dollars(filters.minCents));
   if (filters.maxCents !== null) query.set("max", dollars(filters.maxCents));
@@ -71,5 +74,5 @@ function dollars(cents: number): string {
 
 // How many filters narrow the list (search and sort don't count)
 export function activeFilterCount(filters: ProductFilters): number {
-  return filters.categoryIds.length + (filters.inStock ? 1 : 0) + (filters.minCents !== null || filters.maxCents !== null ? 1 : 0);
+  return filters.categoryIds.length + (filters.onSale ? 1 : 0) + (filters.inStock ? 1 : 0) + (filters.minCents !== null || filters.maxCents !== null ? 1 : 0);
 }

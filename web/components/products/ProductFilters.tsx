@@ -62,6 +62,10 @@ export function ProductFilters({ categories, filters, idPrefix, autoApply = fals
       <fieldset className="grid gap-3">
         <legend className="mb-3 text-sm font-semibold">Availability</legend>
         <label className="flex min-h-6 cursor-pointer items-center gap-3 text-sm">
+          <input type="checkbox" name="sale" value="1" defaultChecked={filters.onSale} onChange={applyNow} className="size-4 accent-primary" />
+          On sale
+        </label>
+        <label className="flex min-h-6 cursor-pointer items-center gap-3 text-sm">
           <input type="checkbox" name="inStock" value="1" defaultChecked={filters.inStock} onChange={applyNow} className="size-4 accent-primary" />
           In stock only
         </label>

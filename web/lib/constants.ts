@@ -1,4 +1,3 @@
-import hero from "@/public/assets/art.jpg"
 import auth from "@/public/assets/auth.jpg"
 import icon from "@/public/assets/icon.png"
 
@@ -13,12 +12,9 @@ export const navItems = [
     { title: 'Store Settings', url: '/adminsettings', img: '/assets/store.png' },
   ];
 
-  //Used in hero, sign up and login in page, nav, route.ts for nodemailer and also in contact us and order success
+  //Used in sign up and login in page, nav, route.ts for nodemailer and also in contact us and order success
   export const storeDetails = {
     title: "Palettehub.",
-    heroImg: hero,
-    heroSubTitle: "Browse and Discover an Array of Tools For Your Creative Needs",
-    heroTitle: "Enjoy an Explosion of Creative Freedom",
     authImg: auth,
     icon: icon,
     contact: "123-456-7890",
@@ -30,30 +26,6 @@ export const navItems = [
     },
 
   }
-
-//Used in promotions
-export const promotionInclusions = [
-        {   
-            title: "Free Shipping",
-            icon: "/assets/box.png",
-            description: "Free shipping for order above $150"
-        },
-        {
-            title: "Money Guarantee",
-            icon: "/assets/dollar.png",
-            description: "Within 30 days for an exchange"
-        },
-        {
-            title: "Online Support",
-            icon: "/assets/support.png",
-            description: "24 hours a day, 7 days a week"
-        },
-        {
-            title: "Flexible Payment",
-            icon: "/assets/card.png",
-            description: "Pay with multiple credit cards"
-        }
-];
 
 //Used in about page
 export const accordionItems = [

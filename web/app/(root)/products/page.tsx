@@ -25,6 +25,7 @@ type Props = { searchParams: Promise<SearchParams> };
 function pageTitle(filters: Filters, categories: Category[]): string {
   if (filters.q) return `Results for “${filters.q}”`;
   if (filters.categoryIds.length === 1) return categories.find((c) => c.id === filters.categoryIds[0])?.name ?? "Shop";
+  if (filters.onSale) return "On sale";
   return "Shop all supplies";
 }
 
@@ -74,6 +75,7 @@ async function ProductResults({ filters, searchParams, lowStockThreshold }: { fi
   const products = await getProducts({
     categoryIds: filters.categoryIds,
     search: filters.q,
+    onDeal: filters.onSale,
     inStock: filters.inStock,
     minPriceCents: filters.minCents,
     maxPriceCents: filters.maxCents,

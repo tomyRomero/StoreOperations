@@ -23,7 +23,7 @@ export function MobileFilters({ categories, filters, activeCount }: { categories
       <SheetContent side="bottom" className="overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Filters</SheetTitle>
-          <SheetDescription className="sr-only">Narrow the list by category, availability and price.</SheetDescription>
+          <SheetDescription className="sr-only">Narrow the list by category, deals, availability and price.</SheetDescription>
         </SheetHeader>
         <div className="px-5 py-6">
           <ProductFilters

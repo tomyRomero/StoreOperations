@@ -18,6 +18,7 @@ export async function getDeals(): Promise<Product[]> {
 export type ProductQuery = {
   categoryIds?: number[];
   search?: string;
+  onDeal?: boolean;
   inStock?: boolean;
   minPriceCents?: number | null;
   maxPriceCents?: number | null;
@@ -27,12 +28,13 @@ export type ProductQuery = {
 };
 
 // One page of products, or null when the API can't answer, so the page can say so
-export async function getProducts({ categoryIds, search, inStock, minPriceCents, maxPriceCents, sort, page = 1, pageSize = 20 }: ProductQuery) {
+export async function getProducts({ categoryIds, search, onDeal, inStock, minPriceCents, maxPriceCents, sort, page = 1, pageSize = 20 }: ProductQuery) {
   const { data } = await serverApi().GET("/api/products", {
     params: {
       query: {
         categoryId: categoryIds,
         search: search || undefined,
+        onDeal: onDeal || undefined,
         inStock: inStock || undefined,
         minPriceCents: minPriceCents ?? undefined,
         maxPriceCents: maxPriceCents ?? undefined,

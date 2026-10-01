@@ -6,7 +6,7 @@ import { productFiltersHref, type ProductFilters } from "@/lib/product-filters";
 
 type Chip = { label: string; href: string };
 
-// "Paint ×" "In stock ×" "$5.00 – $30.00 ×" and "Clear all": each is a link to the same list without that filter
+// "Paint ×" "On sale ×" "In stock ×" "$5.00 – $30.00 ×" and "Clear all": each is a link to the same list without that filter
 export function ActiveFilters({ filters, categories }: { filters: ProductFilters; categories: Category[] }) {
   const base = { ...filters, page: 1 };
   const chips: Chip[] = [
@@ -14,6 +14,7 @@ export function ActiveFilters({ filters, categories }: { filters: ProductFilters
       label: categories.find((c) => c.id === id)?.name ?? "Category",
       href: productFiltersHref({ ...base, categoryIds: filters.categoryIds.filter((other) => other !== id) }),
     })),
+    ...(filters.onSale ? [{ label: "On sale", href: productFiltersHref({ ...base, onSale: false }) }] : []),
     ...(filters.inStock ? [{ label: "In stock", href: productFiltersHref({ ...base, inStock: false }) }] : []),
     ...(filters.minCents !== null || filters.maxCents !== null
       ? [{ label: priceLabel(filters.minCents, filters.maxCents), href: productFiltersHref({ ...base, minCents: null, maxCents: null }) }]
@@ -22,7 +23,7 @@ export function ActiveFilters({ filters, categories }: { filters: ProductFilters
 
   if (chips.length === 0) return null;
 
-  const clearAll = productFiltersHref({ ...base, categoryIds: [], inStock: false, minCents: null, maxCents: null });
+  const clearAll = productFiltersHref({ ...base, categoryIds: [], onSale: false, inStock: false, minCents: null, maxCents: null });
 
   return (
     <ul className="flex flex-wrap items-center gap-2" aria-label="Filters in use">
