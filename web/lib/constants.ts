@@ -69,6 +69,7 @@ export const navItems = [
     { title: 'Products', url: '/adminproducts', img: '/assets/products.png' },
     { title: 'Orders', url: '/adminorders', img: '/assets/orders.png' },
     { title: 'Newsletter', url: '/adminnewsletter', img: '/assets/speaker.png' },
+    { title: 'Store Settings', url: '/adminsettings', img: '/assets/store.png' },
   ];
 
   //Used in hero, sign up and login in page, nav, route.ts for nodemailer and also in contact us and order success

@@ -86,7 +86,7 @@ export function describe(entry: ActivityEntry): { text: string; href?: string } 
     case "category_deleted":
       return { text: `${who} deleted the ${detail(entry, "name") ?? ""} category` }
     case "settings_changed":
-      return { text: `${who} changed the store settings` }
+      return { text: `${who} changed the store settings`, href: "/adminsettings" }
   }
 }
 

@@ -26,5 +26,6 @@ export const config = {
     "/adminaddproduct/:path*",
     "/adminorders/:path*",
     "/adminnewsletter",
+    "/adminsettings",
   ],
 };
