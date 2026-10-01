@@ -19,9 +19,9 @@ public static class DevSeeder
 
     private static readonly (string Name, string ImageFile)[] Categories =
     [
-        ("Paint", "paint.jpg"),
-        ("Brushes", "brushes.jpg"),
-        ("Canvas", "canvas.jpg"),
+        ("Paint", "paint.png"),
+        ("Brushes", "brushes.png"),
+        ("Canvas", "canvas.png"),
     ];
 
     private sealed record SeedProduct(
@@ -30,19 +30,19 @@ public static class DevSeeder
 
     private static readonly SeedProduct[] Products =
     [
-        new("Oil Paint Set", "Paint", 3499, 12, "oilpaint.jpg", "Twelve artist-grade oil colors with rich pigment and a buttery consistency, ready for canvas or panel.", 4499, "Spring sale on oils"),
-        new("Chalk Paint", "Paint", 1850, 0, "chalkpaint.jpg", "A matte, fast-drying chalk finish for furniture, frames and decor. No sanding or priming needed."),
+        new("Oil Paint Set", "Paint", 3499, 12, "oilpaint.png", "Twelve artist-grade oil colors with rich pigment and a buttery consistency, ready for canvas or panel.", 4499, "Spring sale on oils"),
+        new("Chalk Paint", "Paint", 1850, 0, "chalkpaint.png", "A matte, fast-drying chalk finish for furniture, frames and decor. No sanding or priming needed."),
         new("Watercolor Set", "Paint", 2200, 30, "watercolorset.jpg", "Twenty-four half pans of vivid, easy-to-blend watercolors in a travel tin with a mixing lid."),
-        new("Bucket Paint", "Paint", 4500, 8, "bucketpaint.jpg", "One gallon of low-odor acrylic paint for murals and large studio projects."),
-        new("Fine Brush", "Brushes", 699, 40, "finebrush.jpg", "A round synthetic brush with a sharp point for detail work and clean lines."),
-        new("Super Fine Brush", "Brushes", 849, 4, "superfine.jpg", "An extra-fine liner brush for lettering, whiskers and the smallest details."),
-        new("Wide Brush", "Brushes", 950, 25, "widebrush.jpg", "A two-inch flat brush for washes, backgrounds and smooth, even coats."),
-        new("Brush Set", "Brushes", 2499, 15, "brushset.jpg", "Ten brushes in rounds, flats and filberts, for oils, acrylics and watercolor.", 2999, "Save on the starter set"),
-        new("Paint Roller", "Brushes", 1200, 9, "paintroller.jpg", "A nine-inch roller with a comfortable grip for walls and large surfaces."),
-        new("Landscape Canvas", "Canvas", 2900, 6, "landscapecanvas.jpg", "A wide, triple-primed cotton canvas stretched over a solid pine frame."),
-        new("Rectangle Canvas", "Canvas", 1900, 14, "rectanglecanvas.jpg", "A classic 16 by 20 inch primed canvas, ready for any medium."),
-        new("Canvas Booklet", "Canvas", 1125, 22, "canvasbooklet.jpg", "Ten primed canvas sheets bound in a pad, ideal for studies and practice."),
-        new("Canvas Sign", "Canvas", 1500, 3, "canvassign.jpg", "A small canvas panel with a hanging cord, made for lettering and gifts."),
+        new("Bucket Paint", "Paint", 4500, 8, "bucketpaint.png", "One gallon of low-odor acrylic paint for murals and large studio projects."),
+        new("Fine Brush", "Brushes", 699, 40, "finebrush.png", "A round synthetic brush with a sharp point for detail work and clean lines."),
+        new("Super Fine Brush", "Brushes", 849, 4, "superfine.png", "An extra-fine liner brush for lettering, whiskers and the smallest details."),
+        new("Wide Brush", "Brushes", 950, 25, "widebrush.png", "A two-inch flat brush for washes, backgrounds and smooth, even coats."),
+        new("Brush Set", "Brushes", 2499, 15, "brushset.png", "Ten brushes in rounds, flats and filberts, for oils, acrylics and watercolor.", 2999, "Save on the starter set"),
+        new("Paint Roller", "Brushes", 1200, 9, "paintroller.png", "A nine-inch roller with a comfortable grip for walls and large surfaces."),
+        new("Landscape Canvas", "Canvas", 2900, 6, "landscapecanvas.png", "A wide, triple-primed cotton canvas stretched over a solid pine frame."),
+        new("Rectangle Canvas", "Canvas", 1900, 14, "rectanglecanvas.png", "A classic 16 by 20 inch primed canvas, ready for any medium."),
+        new("Canvas Booklet", "Canvas", 1125, 22, "canvasbooklet.png", "Ten primed canvas sheets bound in a pad, ideal for studies and practice."),
+        new("Canvas Sign", "Canvas", 1500, 3, "canvassign.png", "A small canvas panel with a hanging cord, made for lettering and gifts."),
     ];
 
     // A real Springfield, IL ZIP: Stripe Tax places an address by its ZIP when the street doesn't match
@@ -129,7 +129,8 @@ public static class DevSeeder
         await UploadImagesAsync(scope.ServiceProvider.GetRequiredService<ImageStorage>(), cancellationToken);
     }
 
-    // The photos ship with the API in Data/SeedImages (resized to 1600 px). Uploading again just overwrites them.
+    // The pictures ship with the API in Data/SeedImages: products cut out of their photos as transparent
+    // PNGs, so the storefront can light them on any background. Uploading again just overwrites them.
     private static async Task UploadImagesAsync(ImageStorage images, CancellationToken ct)
     {
         var keys = Categories.Select(c => CategoryImageKey(c.ImageFile))
@@ -138,7 +139,9 @@ public static class DevSeeder
         foreach (var key in keys)
         {
             var file = Path.Combine(AppContext.BaseDirectory, "Data", "SeedImages", key["seed/".Length..]);
-            await images.PutAsync(key, await File.ReadAllBytesAsync(file, ct), "image/jpeg", ct);
+            var bytes = await File.ReadAllBytesAsync(file, ct);
+            var format = ImageFormats.Detect(bytes) ?? throw new InvalidOperationException($"{file} is not a JPEG, PNG or WebP image.");
+            await images.PutAsync(key, bytes, format.ContentType, ct);
         }
     }
 
