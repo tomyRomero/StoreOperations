@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
-import { PriceTag } from "@/components/shared/PriceTag";
-import { StockIndicator } from "@/components/shared/StockIndicator";
 import { ProductRow } from "@/components/home/ProductRow";
+import { FreeShippingMeter } from "@/components/cart/FreeShippingMeter";
 import { ProductPurchase } from "@/components/products/ProductPurchase";
-import type { Product } from "@/lib/api/types";
+import { ProductShowcase } from "@/components/products/ProductShowcase";
+import type { Product, StoreSettings } from "@/lib/api/types";
 import { getProduct, getRelatedProducts, getStoreSettings } from "@/lib/data/catalog";
-import { returnsSummary, shippingSummary } from "@/lib/format";
+import { glowFor } from "@/lib/glow";
+import { formatMoney, formatMoneyBrief } from "@/lib/money";
 import { siteUrl } from "@/lib/site";
+import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -59,6 +59,11 @@ export default async function ProductPage(props: Props) {
     },
   };
 
+  const regular = product.compareAtPriceCents;
+  const onSale = regular !== null && regular > product.priceCents;
+  const lowStock = product.stock > 0 && product.stock <= lowStockThreshold;
+  const facts = settings ? storeFacts(settings) : [];
+
   return (
     <>
       <script
@@ -67,74 +72,108 @@ export default async function ProductPage(props: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
       />
 
-      <div className="container grid gap-8 py-8 lg:grid-cols-2 lg:gap-14 lg:py-12">
-        <div className="relative aspect-square overflow-hidden rounded-md bg-muted sm:aspect-[4/5] lg:sticky lg:top-28 lg:self-start">
-          <Image src={product.imageUrl} alt={product.name} fill priority sizes="(min-width: 1024px) 600px, 100vw" className="object-cover" />
-        </div>
+      <div style={{ "--glow": glowFor(product.id) } as React.CSSProperties}>
+        <Breadcrumbs
+          className="container py-5.5"
+          items={[
+            { label: "Shop", href: "/products" },
+            { label: product.categoryName, href: `/products?category=${product.categoryId}` },
+            { label: product.name },
+          ]}
+        />
 
-        <div className="grid content-start gap-6">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: product.categoryName, href: `/products?category=${product.categoryId}` },
-              { label: product.name },
-            ]}
-          />
+        <div className="container grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10">
+          <ProductShowcase productId={product.id} name={product.name} imageUrl={product.imageUrl} />
 
-          <div className="grid gap-3">
-            <h1 className="text-h1">{product.name}</h1>
-            <PriceTag priceCents={product.priceCents} compareAtPriceCents={product.compareAtPriceCents} size="lg" />
-            {product.dealDescription && <p className="text-sm font-semibold text-sale">{product.dealDescription}</p>}
-            <StockIndicator stock={product.stock} lowStockThreshold={lowStockThreshold} />
-          </div>
+          <div className="grid gap-6.5 lg:sticky lg:top-[100px] lg:rounded-[32px] lg:border lg:bg-linear-to-b lg:from-foreground/4 lg:to-foreground/[0.015] lg:p-10">
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/products?category=${product.categoryId}`}
+                className="inline-flex h-[30px] items-center rounded-full border border-foreground/12 px-3 font-mono text-xs font-medium text-ink-2 transition-colors hover:border-foreground/30"
+              >
+                {product.categoryName}
+              </Link>
+              {product.dealDescription && (
+                <span className="inline-flex h-[30px] items-center rounded-full border border-glow-pink/40 bg-linear-to-r from-glow-pink/25 to-glow-violet/25 px-3 font-mono text-xs font-medium text-sale">
+                  {product.dealDescription}
+                </span>
+              )}
+            </div>
 
-          <p className="text-body-lg text-muted-foreground">{product.description}</p>
+            <div className="grid gap-3.5">
+              <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] lg:text-[64px]">{product.name}</h1>
+              <p className="flex flex-wrap items-baseline gap-3">
+                {onSale && <span className="sr-only">Was {formatMoney(regular)}, now </span>}
+                <span className="text-[32px] font-semibold tabular-nums tracking-[-0.03em]">{formatMoney(product.priceCents)}</span>
+                {onSale && (
+                  <>
+                    <s aria-hidden className="text-lg tabular-nums text-faint">
+                      {formatMoney(regular)}
+                    </s>
+                    <span className="inline-flex h-[26px] items-center self-center rounded-full bg-success-subtle px-2.5 font-mono text-xs font-medium text-success">
+                      Save {formatMoney(regular - product.priceCents)}
+                    </span>
+                  </>
+                )}
+              </p>
+            </div>
 
-          <ProductPurchase product={product} />
+            <p className="text-[17px] leading-relaxed text-muted-foreground">{product.description}</p>
 
-          <h2 className="sr-only">More about this product</h2>
-          <Accordion type="multiple" defaultValue={["details"]} className="border-t">
-            <AccordionItem value="details">
-              <AccordionTrigger>Details</AccordionTrigger>
-              <AccordionContent>
-                <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
-                  <dt className="font-semibold text-foreground">Category</dt>
-                  <dd>{product.categoryName}</dd>
-                  <dt className="font-semibold text-foreground">Item number</dt>
-                  <dd className="tabular-nums">{String(product.id).padStart(5, "0")}</dd>
+            <p className="flex items-center gap-2.5 font-mono text-[13px] font-medium text-ink-2">
+              <span
+                aria-hidden
+                className={cn("size-2 rounded-full", product.stock <= 0 ? "bg-destructive" : lowStock ? "bg-glow-amber" : "bg-glow-green animate-ring")}
+              />
+              {product.stock <= 0 ? "Sold out for now" : lowStock ? `Only ${product.stock} left` : `${product.stock} in stock · ready to ship`}
+            </p>
+
+            <ProductPurchase product={product} />
+
+            {settings && <FreeShippingMeter flatCents={settings.shippingFlatRateCents} freeOverCents={settings.freeShippingThresholdCents} />}
+
+            {facts.length > 0 && (
+              <div className="grid gap-3">
+                <dl className={cn("grid gap-2.5", facts.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
+                  {facts.map(([term, value]) => (
+                    <div key={term} className="flex flex-col-reverse gap-1.5 rounded-2xl border border-foreground/7 bg-foreground/3 p-4">
+                      <dt className="font-mono text-xs text-faint">{term}</dt>
+                      <dd className="text-[15px] font-semibold">{value}</dd>
+                    </div>
+                  ))}
                 </dl>
-              </AccordionContent>
-            </AccordionItem>
-            {settings && (
-              <AccordionItem value="shipping">
-                <AccordionTrigger>Shipping and returns</AccordionTrigger>
-                <AccordionContent>
-                  <ul className="grid gap-2">
-                    <li>{shippingSummary(settings)}, anywhere in the United States.</li>
-                    <li>
-                      {returnsSummary(settings)}.{settings.returnPolicyNote ? ` ${settings.returnPolicyNote}` : ""}
-                    </li>
-                    <li>Tax is added at checkout, once we know where it&apos;s going.</li>
-                    <li>
-                      <Link href="/shipping-returns" className="font-semibold text-accent underline-offset-4 hover:underline">
-                        Shipping and returns in full
-                      </Link>
-                    </li>
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
+                <p className="text-[13px] text-muted-foreground">
+                  Tax is added at checkout.{" "}
+                  <Link href="/shipping-returns" className="text-foreground underline underline-offset-3">
+                    Shipping and returns in full
+                  </Link>
+                </p>
+              </div>
             )}
-          </Accordion>
+          </div>
         </div>
-      </div>
 
-      <Suspense>
-        <RelatedProducts product={product} lowStockThreshold={lowStockThreshold} />
-      </Suspense>
-      {/* Room for the phone's add-to-cart bar, so it never covers the end of the page */}
-      <div aria-hidden className="h-20 lg:hidden" />
+        <Suspense>
+          <RelatedProducts product={product} lowStockThreshold={lowStockThreshold} />
+        </Suspense>
+      </div>
+      {/* Room for the phone's add-to-bag bar, so it never covers the end of the page */}
+      <div aria-hidden className="h-24 lg:hidden" />
     </>
   );
+}
+
+// Shipping, the free-shipping threshold and returns, in a word or two each, from Store settings
+function storeFacts(settings: StoreSettings): [string, string][] {
+  const flat = settings.shippingFlatRateCents;
+  const free = settings.freeShippingThresholdCents;
+  const days = settings.returnWindowDays;
+  const returns = { no_returns: "Final sale", exchanges: days ? `${days}-day exchanges` : "Exchanges", refunds: days ? `${days}-day refunds` : "Refunds" }[settings.returnPolicy];
+  return [
+    ["Shipping", flat === 0 || free === 0 ? "Free" : `${formatMoneyBrief(flat)} flat`],
+    ...(free !== null && free > 0 && flat > 0 ? [["Free over", formatMoney(free)] as [string, string]] : []),
+    ["Returns", returns],
+  ];
 }
 
 async function RelatedProducts({ product, lowStockThreshold }: { product: Product; lowStockThreshold: number }) {
@@ -142,7 +181,7 @@ async function RelatedProducts({ product, lowStockThreshold }: { product: Produc
   return (
     <ProductRow
       id="related"
-      title="You may also like"
+      title={`More ${product.categoryName.toLowerCase()}`}
       href={`/products?category=${product.categoryId}`}
       products={related}
       lowStockThreshold={lowStockThreshold}

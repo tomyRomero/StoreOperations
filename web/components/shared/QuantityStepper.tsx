@@ -15,22 +15,26 @@ type Props = {
   className?: string;
 };
 
-// − [n] +, kept between min and max. The number is announced as it changes.
+// − [n] +, kept between min and max, in a pill. The number is announced as it changes.
 export function QuantityStepper({ value, onChange, min = 1, max = 99, disabled, label = "Quantity", size = "md", className }: Props) {
   const button = cn(
-    "inline-flex items-center justify-center text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-40",
-    size === "sm" ? "size-8" : "size-10"
+    "inline-flex items-center justify-center rounded-full bg-foreground/6 text-foreground transition-colors hover:bg-foreground/12 disabled:pointer-events-none disabled:opacity-40",
+    size === "sm" ? "size-8" : "size-11",
   );
 
   return (
-    <div role="group" aria-label={label} className={cn("inline-flex items-center rounded-md border border-input", className)}>
-      <button type="button" className={cn(button, "rounded-l-md")} onClick={() => onChange(value - 1)} disabled={disabled || value <= min} aria-label="One less">
+    <div
+      role="group"
+      aria-label={label}
+      className={cn("inline-flex shrink-0 items-center gap-0.5 rounded-full border border-input", size === "sm" ? "h-10 px-1" : "h-[58px] px-1.5", className)}
+    >
+      <button type="button" className={button} onClick={() => onChange(value - 1)} disabled={disabled || value <= min} aria-label="One less">
         <Minus className="size-4" aria-hidden />
       </button>
-      <output aria-live="polite" className={cn("min-w-8 text-center font-semibold tabular-nums", size === "sm" ? "text-sm" : "text-base")}>
+      <output aria-live="polite" className={cn("text-center font-semibold tabular-nums", size === "sm" ? "min-w-7 text-sm" : "min-w-9 text-base")}>
         {value}
       </output>
-      <button type="button" className={cn(button, "rounded-r-md")} onClick={() => onChange(value + 1)} disabled={disabled || value >= max} aria-label="One more">
+      <button type="button" className={button} onClick={() => onChange(value + 1)} disabled={disabled || value >= max} aria-label="One more">
         <Plus className="size-4" aria-hidden />
       </button>
     </div>
