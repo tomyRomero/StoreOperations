@@ -14,10 +14,14 @@ public sealed class AdminProductsController(ProductAdminService products) : Admi
     public async Task<Paged<AdminProductResponse>> List(
         [FromQuery, StringLength(100)] string? search,
         [FromQuery] ProductStatus status = ProductStatus.Active,
+        [FromQuery] int? categoryId = null,
+        [FromQuery] StockLevel? stock = null,
+        [FromQuery] bool onDeal = false,
+        [FromQuery] AdminProductSort sort = AdminProductSort.Name,
         [FromQuery, Range(1, 10_000)] int page = 1,
         [FromQuery, Range(1, 100)] int pageSize = 20,
         CancellationToken ct = default) =>
-        await products.ListAsync(new AdminProductQuery(search, status, page, pageSize), ct);
+        await products.ListAsync(new AdminProductQuery(search, status, categoryId, stock, onDeal, sort, page, pageSize), ct);
 
     [HttpGet("{id:int}")]
     [ProducesResponseType<AdminProductResponse>(StatusCodes.Status200OK)]

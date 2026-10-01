@@ -9,7 +9,37 @@ public enum ProductStatus
     All,
 }
 
-public sealed record AdminProductQuery(string? Search, ProductStatus Status, int Page, int PageSize);
+// How much is left, against the low-stock threshold in Store settings: in_stock is above it, low is
+// at or under it but not sold out
+public enum StockLevel
+{
+    InStock,
+    Low,
+    SoldOut,
+}
+
+// A column and its direction: price is cheapest first, price_desc priciest first
+public enum AdminProductSort
+{
+    Name,
+    NameDesc,
+    Price,
+    PriceDesc,
+    Stock,
+    StockDesc,
+    Created,
+    CreatedDesc,
+}
+
+public sealed record AdminProductQuery(
+    string? Search,
+    ProductStatus Status,
+    int? CategoryId,
+    StockLevel? Stock,
+    bool OnDeal,
+    AdminProductSort Sort,
+    int Page,
+    int PageSize);
 
 public record ProductRequest
 {

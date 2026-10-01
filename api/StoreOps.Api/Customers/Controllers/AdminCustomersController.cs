@@ -13,10 +13,11 @@ public sealed class AdminCustomersController(AdminCustomerService customers) : A
     public async Task<Paged<AdminCustomerSummaryResponse>> List(
         [FromQuery, StringLength(100)] string? search,
         [FromQuery] AccountRole? role,
+        [FromQuery] AdminCustomerSort sort = AdminCustomerSort.JoinedDesc,
         [FromQuery, Range(1, 10_000)] int page = 1,
         [FromQuery, Range(1, 100)] int pageSize = 20,
         CancellationToken ct = default) =>
-        await customers.ListAsync(new AdminCustomerQuery(search, role, page, pageSize), ct);
+        await customers.ListAsync(new AdminCustomerQuery(search, role, sort, page, pageSize), ct);
 
     [HttpGet("{id:int}")]
     [ProducesResponseType<AdminCustomerResponse>(StatusCodes.Status200OK)]

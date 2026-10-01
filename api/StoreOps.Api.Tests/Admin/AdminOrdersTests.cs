@@ -31,6 +31,22 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(newerNumber, byNumber.GetProperty("orderNumber").GetString());
     }
 
+    [Theory]
+    [InlineData("sort=placed", "cheap", "dear")]
+    [InlineData("sort=total", "cheap", "dear")]
+    [InlineData("sort=total_desc", "dear", "cheap")]
+    public async Task Orders_can_be_sorted_by_date_or_total(string query, string first, string second)
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (_, cheap) = await PlacedOrderAsync(priceCents: 500);
+        var (_, dear) = await PlacedOrderAsync(priceCents: 9000);
+        var names = new Dictionary<string, string> { ["cheap"] = cheap, ["dear"] = dear };
+
+        var numbers = (await ListAsync(admin, $"{query}&pageSize=100")).Select(o => o.GetProperty("orderNumber").GetString());
+
+        Assert.Equal(new[] { names[first], names[second] }, numbers.Where(n => n == cheap || n == dear));
+    }
+
     [Fact]
     public async Task The_order_page_shows_the_customer_the_payment_and_what_can_happen_next()
     {

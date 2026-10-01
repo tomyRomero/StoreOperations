@@ -29,9 +29,25 @@ public sealed class ProductAdminService(AppDbContext db, ImageStorage images, Ti
         if (query.Search?.Trim() is { Length: > 0 } search)
             products = products.Where(p => p.Name.Contains(search) || p.Category.Name.Contains(search));
 
+        if (query.CategoryId is { } categoryId)
+            products = products.Where(p => p.CategoryId == categoryId);
+
+        if (query.OnDeal)
+            products = products.Where(p => p.CompareAtPriceCents != null);
+
+        if (query.Stock is { } level)
+        {
+            var low = await db.StoreSettings.Select(s => s.LowStockThreshold).SingleAsync(ct);
+            products = level switch
+            {
+                StockLevel.SoldOut => products.Where(p => p.Stock <= 0),
+                StockLevel.Low => products.Where(p => p.Stock > 0 && p.Stock <= low),
+                _ => products.Where(p => p.Stock > low),
+            };
+        }
+
         var totalCount = await products.CountAsync(ct);
-        var items = await products
-            .OrderBy(p => p.Name).ThenBy(p => p.Id)
+        var items = await Sorted(products, query.Sort)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(ToResponse)
@@ -39,6 +55,19 @@ public sealed class ProductAdminService(AppDbContext db, ImageStorage images, Ti
 
         return new Paged<AdminProductResponse>(items, query.Page, query.PageSize, totalCount);
     }
+
+    // The id breaks ties, so a product never shows up on two pages
+    private static IQueryable<Product> Sorted(IQueryable<Product> products, AdminProductSort sort) => sort switch
+    {
+        AdminProductSort.NameDesc => products.OrderByDescending(p => p.Name).ThenBy(p => p.Id),
+        AdminProductSort.Price => products.OrderBy(p => p.PriceCents).ThenBy(p => p.Id),
+        AdminProductSort.PriceDesc => products.OrderByDescending(p => p.PriceCents).ThenBy(p => p.Id),
+        AdminProductSort.Stock => products.OrderBy(p => p.Stock).ThenBy(p => p.Id),
+        AdminProductSort.StockDesc => products.OrderByDescending(p => p.Stock).ThenBy(p => p.Id),
+        AdminProductSort.Created => products.OrderBy(p => p.CreatedAtUtc).ThenBy(p => p.Id),
+        AdminProductSort.CreatedDesc => products.OrderByDescending(p => p.CreatedAtUtc).ThenByDescending(p => p.Id),
+        _ => products.OrderBy(p => p.Name).ThenBy(p => p.Id),
+    };
 
     public async Task<AdminProductResponse?> GetAsync(int id, CancellationToken ct) =>
         await db.Products.Where(p => p.Id == id).Select(ToResponse).SingleOrDefaultAsync(ct);

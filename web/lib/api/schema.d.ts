@@ -115,6 +115,7 @@ export interface paths {
                     search?: string;
                     status?: components["schemas"]["OrderStatus"];
                     customerId?: number;
+                    sort?: components["schemas"]["AdminOrderSort"];
                     page?: number;
                     pageSize?: number;
                 };
@@ -741,6 +742,7 @@ export interface paths {
                 query?: {
                     search?: string;
                     role?: components["schemas"]["AccountRole"];
+                    sort?: components["schemas"]["AdminCustomerSort"];
                     page?: number;
                     pageSize?: number;
                 };
@@ -1249,6 +1251,10 @@ export interface paths {
                 query?: {
                     search?: string;
                     status?: components["schemas"]["ProductStatus"];
+                    categoryId?: number;
+                    stock?: components["schemas"]["StockLevel"];
+                    onDeal?: boolean;
+                    sort?: components["schemas"]["AdminProductSort"];
                     page?: number;
                     pageSize?: number;
                 };
@@ -2540,6 +2546,8 @@ export interface components {
             addresses: components["schemas"]["AddressResponse"][];
             recentOrders: components["schemas"]["AdminOrderSummaryResponse"][];
         };
+        /** @enum {unknown} */
+        AdminCustomerSort: "joined" | "joined_desc" | "username" | "username_desc";
         AdminCustomerSummaryResponse: {
             /** Format: int32 */
             id: number;
@@ -2582,6 +2590,8 @@ export interface components {
             /** Format: byte */
             rowVersion: string;
         };
+        /** @enum {unknown} */
+        AdminOrderSort: "placed" | "placed_desc" | "total" | "total_desc";
         AdminOrderStepResponse: {
             status: components["schemas"]["OrderStatus"];
             /** Format: date-time */
@@ -2627,6 +2637,8 @@ export interface components {
             /** Format: byte */
             rowVersion: string;
         };
+        /** @enum {unknown} */
+        AdminProductSort: "name" | "name_desc" | "price" | "price_desc" | "stock" | "stock_desc" | "created" | "created_desc";
         BulkFailureOfint: {
             /** Format: int32 */
             id: number;
@@ -3052,6 +3064,8 @@ export interface components {
             /** Format: int32 */
             count: number;
         };
+        /** @enum {unknown} */
+        StockLevel: "in_stock" | "low" | "sold_out" | null;
         StoreSettingsResponse: {
             storeName: string;
             supportEmail: null | string;

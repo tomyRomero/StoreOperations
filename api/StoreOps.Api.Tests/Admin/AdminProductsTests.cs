@@ -182,6 +182,43 @@ public class AdminProductsTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task The_admin_list_filters_by_category_stock_level_and_deal()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (suffix, _, low, _) = await ThreeProductsAsync(admin);
+        int easels;
+        await using (var db = api.CreateContext())
+        {
+            var category = db.Categories.Add(new Category { Name = $"Easels {suffix}", ImageKey = "seed/categories/paint.jpg" }).Entity;
+            await db.SaveChangesAsync(Ct);
+            easels = category.Id;
+        }
+        await admin.PostAsJsonAsync("/api/admin/products/bulk", new { ids = new[] { low }, action = "move", categoryId = easels }, Ct);
+
+        // The low-stock threshold is the Store setting's default, 5
+        Assert.Equal([$"Sold out {suffix}"], await NamesAsync(admin, suffix, "stock=sold_out"));
+        Assert.Equal([$"Low {suffix}"], await NamesAsync(admin, suffix, "stock=low"));
+        Assert.Equal([$"Plenty {suffix}"], await NamesAsync(admin, suffix, "stock=in_stock"));
+        Assert.Equal([$"Plenty {suffix}"], await NamesAsync(admin, suffix, "onDeal=true"));
+        Assert.Equal([$"Low {suffix}"], await NamesAsync(admin, suffix, $"categoryId={easels}"));
+    }
+
+    [Theory]
+    [InlineData("", "Low", "Plenty", "Sold out")]
+    [InlineData("sort=name_desc", "Sold out", "Plenty", "Low")]
+    [InlineData("sort=price", "Sold out", "Plenty", "Low")]
+    [InlineData("sort=price_desc", "Low", "Plenty", "Sold out")]
+    [InlineData("sort=stock_desc", "Plenty", "Low", "Sold out")]
+    [InlineData("sort=created_desc", "Plenty", "Low", "Sold out")]
+    public async Task The_admin_list_sorts_by_any_column(string query, params string[] order)
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var (suffix, _, _, _) = await ThreeProductsAsync(admin);
+
+        Assert.Equal(order.Select(name => $"{name} {suffix}"), await NamesAsync(admin, suffix, query));
+    }
+
+    [Fact]
     public async Task Products_are_archived_in_bulk_with_a_report_of_each()
     {
         var admin = await api.CreateAdminClientAsync();
@@ -237,6 +274,21 @@ public class AdminProductsTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(brushes, (await GetAsync(admin, first)).GetProperty("categoryId").GetInt32());
         Assert.Equal(brushes, (await GetAsync(admin, second)).GetProperty("categoryId").GetInt32());
     }
+
+    // Added in this order: sold out at $5, three left at $15, plenty on a deal at $7.50 (from $10)
+    private async Task<(string Suffix, int SoldOut, int Low, int Plenty)> ThreeProductsAsync(HttpClient admin)
+    {
+        var suffix = Guid.NewGuid().ToString("N")[..8];
+        var soldOut = await api.AddProductAsync(priceCents: 500, stock: 0, name: $"Sold out {suffix}");
+        var low = await api.AddProductAsync(priceCents: 1500, stock: 3, name: $"Low {suffix}");
+        var plenty = await api.AddProductAsync(priceCents: 1000, stock: 20, name: $"Plenty {suffix}");
+        var deal = await admin.PutAsJsonAsync($"/api/admin/products/{plenty}/deal", new { dealPriceCents = 750 }, Ct);
+        Assert.Equal(HttpStatusCode.OK, deal.StatusCode);
+        return (suffix, soldOut, low, plenty);
+    }
+
+    private static async Task<List<string>> NamesAsync(HttpClient admin, string suffix, string query) =>
+        NamesIn(await admin.GetFromJsonAsync<JsonElement>($"/api/admin/products?search={suffix}&{query}", Ct));
 
     private sealed record NewProduct(string Name, string Description, int CategoryId, int PriceCents, int Stock, string ImageKey);
 

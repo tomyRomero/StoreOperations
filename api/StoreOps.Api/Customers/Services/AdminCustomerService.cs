@@ -51,8 +51,15 @@ public sealed class AdminCustomerService(
         }
 
         var totalCount = await accounts.CountAsync(ct);
-        var items = await accounts
-            .OrderByDescending(u => u.CreatedAtUtc).ThenByDescending(u => u.Id)
+        // The id breaks ties, so an account never shows up on two pages
+        var sorted = query.Sort switch
+        {
+            AdminCustomerSort.Joined => accounts.OrderBy(u => u.CreatedAtUtc).ThenBy(u => u.Id),
+            AdminCustomerSort.Username => accounts.OrderBy(u => u.UserName).ThenBy(u => u.Id),
+            AdminCustomerSort.UsernameDesc => accounts.OrderByDescending(u => u.UserName).ThenBy(u => u.Id),
+            _ => accounts.OrderByDescending(u => u.CreatedAtUtc).ThenByDescending(u => u.Id),
+        };
+        var items = await sorted
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(u => new AdminCustomerSummaryResponse(
@@ -91,7 +98,7 @@ public sealed class AdminCustomerService(
         if (account is null)
             return null;
 
-        var recent = await orders.ListAsync(new AdminOrderQuery(null, null, id, 1, RecentOrderCount), ct);
+        var recent = await orders.ListAsync(new AdminOrderQuery(null, null, id, AdminOrderSort.PlacedDesc, 1, RecentOrderCount), ct);
 
         return new AdminCustomerResponse(
             account.Id,

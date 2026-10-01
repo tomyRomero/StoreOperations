@@ -3,7 +3,17 @@ using StoreOps.Api.Domain;
 
 namespace StoreOps.Api.Orders.Models;
 
-public sealed record AdminOrderQuery(string? Search, OrderStatus? Status, int? CustomerId, int Page, int PageSize);
+// A column and its direction: placed_desc is newest first
+public enum AdminOrderSort
+{
+    Placed,
+    PlacedDesc,
+    Total,
+    TotalDesc,
+}
+
+public sealed record AdminOrderQuery(
+    string? Search, OrderStatus? Status, int? CustomerId, AdminOrderSort Sort, int Page, int PageSize);
 
 public sealed record AdminOrderSummaryResponse(
     string OrderNumber,

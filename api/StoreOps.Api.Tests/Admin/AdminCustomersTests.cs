@@ -31,6 +31,24 @@ public class AdminCustomersTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
+    public async Task Accounts_can_be_sorted_by_join_date_or_username()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var older = await MeAsync(await api.CreateCustomerClientAsync());
+        var newer = await MeAsync(await api.CreateCustomerClientAsync());
+        var (byNameFirst, byNameSecond) = string.CompareOrdinal(older.Username, newer.Username) < 0 ? (older, newer) : (newer, older);
+
+        int[] Pair(List<JsonElement> list) => list
+            .Select(c => c.GetProperty("id").GetInt32())
+            .Where(id => id == older.Id || id == newer.Id)
+            .ToArray();
+
+        Assert.Equal(new[] { older.Id, newer.Id }, Pair(await ListAsync(admin, "sort=joined&pageSize=100")));
+        Assert.Equal(new[] { byNameFirst.Id, byNameSecond.Id }, Pair(await ListAsync(admin, "sort=username&pageSize=100")));
+        Assert.Equal(new[] { byNameSecond.Id, byNameFirst.Id }, Pair(await ListAsync(admin, "sort=username_desc&pageSize=100")));
+    }
+
+    [Fact]
     public async Task Accounts_can_be_filtered_by_role()
     {
         var admin = await api.CreateAdminClientAsync();

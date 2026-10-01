@@ -15,10 +15,11 @@ public sealed class AdminOrdersController(AdminOrderService orders) : AdminContr
         [FromQuery, StringLength(100)] string? search,
         [FromQuery] OrderStatus? status,
         [FromQuery] int? customerId,
+        [FromQuery] AdminOrderSort sort = AdminOrderSort.PlacedDesc,
         [FromQuery, Range(1, 10_000)] int page = 1,
         [FromQuery, Range(1, 100)] int pageSize = 20,
         CancellationToken ct = default) =>
-        await orders.ListAsync(new AdminOrderQuery(search, status, customerId, page, pageSize), ct);
+        await orders.ListAsync(new AdminOrderQuery(search, status, customerId, sort, page, pageSize), ct);
 
     [HttpGet("{orderNumber}")]
     [ProducesResponseType<AdminOrderResponse>(StatusCodes.Status200OK)]

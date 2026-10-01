@@ -9,7 +9,16 @@ public enum AccountRole
     Admin,
 }
 
-public sealed record AdminCustomerQuery(string? Search, AccountRole? Role, int Page, int PageSize);
+// A column and its direction: joined_desc is newest accounts first
+public enum AdminCustomerSort
+{
+    Joined,
+    JoinedDesc,
+    Username,
+    UsernameDesc,
+}
+
+public sealed record AdminCustomerQuery(string? Search, AccountRole? Role, AdminCustomerSort Sort, int Page, int PageSize);
 
 public sealed record AdminCustomerSummaryResponse(
     int Id,

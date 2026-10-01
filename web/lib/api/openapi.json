@@ -141,6 +141,14 @@
             }
           },
           {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "default": "placed_desc",
+              "$ref": "#/components/schemas/AdminOrderSort"
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "schema": {
@@ -886,6 +894,14 @@
             }
           },
           {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "default": "joined_desc",
+              "$ref": "#/components/schemas/AdminCustomerSort"
+            }
+          },
+          {
             "name": "page",
             "in": "query",
             "schema": {
@@ -1491,6 +1507,37 @@
             "schema": {
               "default": "active",
               "$ref": "#/components/schemas/ProductStatus"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "stock",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/StockLevel"
+            }
+          },
+          {
+            "name": "onDeal",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "default": "name",
+              "$ref": "#/components/schemas/AdminProductSort"
             }
           },
           {
@@ -3392,6 +3439,14 @@
           }
         }
       },
+      "AdminCustomerSort": {
+        "enum": [
+          "joined",
+          "joined_desc",
+          "username",
+          "username_desc"
+        ]
+      },
       "AdminCustomerSummaryResponse": {
         "required": [
           "id",
@@ -3550,6 +3605,14 @@
           }
         }
       },
+      "AdminOrderSort": {
+        "enum": [
+          "placed",
+          "placed_desc",
+          "total",
+          "total_desc"
+        ]
+      },
       "AdminOrderStepResponse": {
         "required": [
           "status",
@@ -3702,6 +3765,18 @@
             "format": "byte"
           }
         }
+      },
+      "AdminProductSort": {
+        "enum": [
+          "name",
+          "name_desc",
+          "price",
+          "price_desc",
+          "stock",
+          "stock_desc",
+          "created",
+          "created_desc"
+        ]
       },
       "BulkFailureOfint": {
         "required": [
@@ -5290,6 +5365,14 @@
             "format": "int32"
           }
         }
+      },
+      "StockLevel": {
+        "enum": [
+          "in_stock",
+          "low",
+          "sold_out",
+          null
+        ]
       },
       "StoreSettingsResponse": {
         "required": [

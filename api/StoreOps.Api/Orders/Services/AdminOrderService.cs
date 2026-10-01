@@ -54,8 +54,15 @@ public sealed class AdminOrderService(
                 || o.ShipTo.RecipientName.Contains(search));
 
         var totalCount = await orders.CountAsync(ct);
-        var items = await orders
-            .OrderByDescending(o => o.PlacedAtUtc).ThenByDescending(o => o.Id)
+        // The id breaks ties, so an order never shows up on two pages
+        var sorted = query.Sort switch
+        {
+            AdminOrderSort.Placed => orders.OrderBy(o => o.PlacedAtUtc).ThenBy(o => o.Id),
+            AdminOrderSort.Total => orders.OrderBy(o => o.TotalCents).ThenByDescending(o => o.Id),
+            AdminOrderSort.TotalDesc => orders.OrderByDescending(o => o.TotalCents).ThenByDescending(o => o.Id),
+            _ => orders.OrderByDescending(o => o.PlacedAtUtc).ThenByDescending(o => o.Id),
+        };
+        var items = await sorted
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(o => new AdminOrderSummaryResponse(
