@@ -1,35 +1,55 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { CardTitle, CardDescription, CardHeader, CardContent, CardFooter, Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import AddressCard from "@/components/cards/AddressCard";
+import { MapPin, Plus } from "lucide-react";
+import { AddressBook } from "@/components/account/AddressBook";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
+import { Button } from "@/components/ui/button";
 import { getAddresses } from "@/lib/data/account";
 
-const page = async () => {
+export const metadata: Metadata = { title: "Addresses" };
 
-  const addresses = await getAddresses()
+export default async function AddressesPage() {
+  const addresses = await getAddresses();
 
   return (
-    <section className="md:pt-28 max-md:pt-24 lg:pt-0 overflow-auto">
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-heading3-bold">Shipping Addresses</CardTitle>
-        <CardDescription>Manage your shipping addresses for a seamless checkout experience</CardDescription>
-      </CardHeader>
-      {addresses === null ? (
-        <CardContent className="text-red-500">Couldn&apos;t load your addresses. Please try again later.</CardContent>
-      ) : addresses.length === 0 ? (
-        <CardContent>No addresses have been added yet.</CardContent>
-      ) : (
-        <AddressCard addresses={addresses} />
-      )}
-      <CardFooter>
-        <Button asChild size="sm" className="bg-black text-white border border-black" variant={"ghost"}>
-          <Link href="/account/addaddress">Add new address</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-    </section>
-  )
-}
+    <div className="grid gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="grid gap-1">
+          <h1 className="text-h1">Addresses</h1>
+          <p className="text-muted-foreground">Where we ship. The default is picked for you at checkout.</p>
+        </div>
+        {addresses && addresses.length > 0 && (
+          <Button asChild variant="outline">
+            <Link href="/account/addaddress">
+              <Plus aria-hidden />
+              Add an address
+            </Link>
+          </Button>
+        )}
+      </div>
 
-export default page;
+      {addresses === null ? (
+        <ErrorState
+          title="We couldn't load your addresses"
+          action={<RetryButton />}
+        />
+      ) : addresses.length === 0 ? (
+        <EmptyState
+          icon={MapPin}
+          title="No saved addresses"
+          action={
+            <Button asChild>
+              <Link href="/account/addaddress">Add an address</Link>
+            </Button>
+          }
+        >
+          Save one now and checkout skips straight to payment.
+        </EmptyState>
+      ) : (
+        <AddressBook addresses={addresses} />
+      )}
+    </div>
+  );
+}

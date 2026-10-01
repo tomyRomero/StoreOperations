@@ -1,23 +1,22 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import AddAddressForm from "@/components/forms/AddAddressForm"
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import AddAddressForm from "@/components/forms/AddAddressForm";
 
-const Page = () => {
+export const metadata: Metadata = { title: "Add an address" };
+
+export default function AddAddressPage() {
   return (
-    <section className="md:pt-28 max-md:pt-24 lg:pt-0 overflow-auto">
-      <div className="flex items-center gap-4 pb-4">
-        <Button asChild size="icon" variant="outline">
-          <Link href="/account/myaddresses">
-            <Image src={"/assets/back.png"} alt="" width={24} height={24} />
-            <span className="sr-only">Back to your addresses</span>
-          </Link>
-        </Button>
-        <h4>Back</h4>
+    <div className="grid max-w-2xl gap-6">
+      <Link href="/account/myaddresses" className="inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="size-4" aria-hidden />
+        Addresses
+      </Link>
+      <div className="grid gap-1">
+        <h1 className="text-h1">Add an address</h1>
+        <p className="text-muted-foreground">We ship within the United States.</p>
       </div>
       <AddAddressForm />
-    </section>
-  )
+    </div>
+  );
 }
-
-export default Page;

@@ -251,6 +251,11 @@
     border-color: var(--color-border);
   }
 
+  /* Anything scrolled to or focused stops below the sticky header instead of behind it */
+  html {
+    scroll-padding-top: 6rem;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

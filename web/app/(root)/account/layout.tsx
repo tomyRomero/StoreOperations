@@ -1,20 +1,23 @@
-import AccountDashboard from "@/components/nav/AccountDashboard";
-import MobileAccountDashboard from "@/components/nav/MobileAccountDashboard";
+import type { Metadata } from "next";
+import { AccountNav } from "@/components/account/AccountNav";
 import { requireUser } from "@/lib/session";
 
-export default async function Layout ({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = { title: { default: "Your account", template: "%s · Your account · Palettehub" } };
 
-    const user = await requireUser("/account")
+// The account area: its own menu beside (or above, on phones) each page
+export default async function AccountLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireUser("/account");
 
-    return (
-      <div className="max-xxs:mt-16 mt-20 md:mt-24 lg:mt-32 grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <AccountDashboard username={user.username} email={user.email}/>
-        <div className="flex flex-col">
-        <MobileAccountDashboard username={user.username}/>
-          <main className="flex flex-1 p-4 flex-col max-xxs:mt-8 md:pt-0 sm:pt-20 lg:pt-4">
-            <section>{children}</section>
-          </main>
+  return (
+    <div className="container grid grid-cols-1 gap-6 py-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12 lg:py-12">
+      <aside className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-28 lg:self-start">
+        <div className="max-lg:hidden">
+          <p className="truncate font-semibold">{user.username}</p>
+          <p className="truncate text-sm text-muted-foreground">{user.email}</p>
         </div>
-      </div>
-    );
-  }
+        <AccountNav />
+      </aside>
+      <div className="min-w-0">{children}</div>
+    </div>
+  );
+}

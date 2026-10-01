@@ -1,166 +1,103 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../ui/form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { useRouter } from 'next/navigation';
-import { useToast } from '../ui/use-toast';
-import { api } from '@/lib/api/browser';
-import { fieldErrors, problemMessage } from '@/lib/api/problems';
-import { newPassword } from '@/lib/validation/password';
-import { useState } from 'react';
-import Image from 'next/image';
+import { useForm, useWatch } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Button } from "../ui/button";
+import { useToast } from "../ui/use-toast";
+import { api } from "@/lib/api/browser";
+import { fieldErrors, problemMessage } from "@/lib/api/problems";
+import { newPassword } from "@/lib/validation/password";
+import { PasswordChecklist, PasswordInput } from "./PasswordInput";
 
 const FormSchema = z
   .object({
-    password: z.string().min(1, 'Enter your current password'),
+    password: z.string().min(1, "Enter your current password"),
     newPassword: newPassword,
-    confirmNewPassword: z.string().min(1, 'Password confirmation is required'),
+    confirmNewPassword: z.string().min(1, "Type the new password again"),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    path: ['confirmNewPassword'],
-    message: 'Passwords do not match',
+    path: ["confirmNewPassword"],
+    message: "The two new passwords don't match",
   });
 
+// Changing it signs out every other session; this one stays signed in
 const ChangePasswordForm = () => {
-  const [loading, setLoading] = useState(false);
-
-  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      password: '',
-      newPassword: '',
-      confirmNewPassword: '',
-    },
+    defaultValues: { password: "", newPassword: "", confirmNewPassword: "" },
   });
+  const typed = useWatch({ control: form.control, name: "newPassword" });
 
-  // Changing it signs out every other session; this one stays signed in
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    setLoading(true)
-    const { error, response } = await api.POST('/api/auth/change-password', {
+    const { error, response } = await api.POST("/api/auth/change-password", {
       body: { currentPassword: values.password, newPassword: values.newPassword },
     });
 
     if (!response.ok) {
       const errors = fieldErrors(error);
-      if (errors.currentPassword) form.setError('password', { message: errors.currentPassword });
-      if (errors.newPassword) form.setError('newPassword', { message: errors.newPassword });
-      toast({
-        title: "Couldn't change your password",
-        description: problemMessage(error),
-        variant: "destructive",
-      })
-      setLoading(false)
+      if (errors.currentPassword) form.setError("password", { message: errors.currentPassword }, { shouldFocus: true });
+      if (errors.newPassword) form.setError("newPassword", { message: errors.newPassword });
+      toast({ title: "Couldn't change your password", description: problemMessage(error), variant: "destructive" });
       return;
     }
 
-    toast({ title: "Password changed", description: "You've been signed out everywhere else." })
-    router.push('/account');
+    toast({ variant: "success", title: "Password changed", description: "You've been signed out everywhere else." });
+    form.reset();
   };
 
   return (
-    <div className='bg-white p-4 rounded-lg max-w-2xl mx-auto'>
-        <Button 
-        className="flex px-6 border border-black" 
-        variant="ghost" 
-        onClick={()=> {
-          router.push("/account")
-        }}>
-          <Image
-            src="/assets/back.png"
-            alt="go back icon"
-            width={32}
-            height={32}
-            className="px-1"
-          />
-          <span className="ml-2">Go Back</span>
-        </Button>
-        <br></br>
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='w-full'>
-        <div className='space-y-2'>
-          <h1>Password must contain at least one capitalized letter, at least one number, at least one special character and be at least nine characters long</h1>
-          <FormField
-            control={form.control}
-            name='password'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='font-bold'>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type='password'
-                    placeholder='Enter your old password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-           <FormField
-            control={form.control}
-            name='newPassword'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='font-bold'>Enter your New Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Re-Enter your password'
-                    type='password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='confirmNewPassword'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='font-bold'>Re-Enter your New Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Re-Enter your password'
-                    type='password'
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-     
-        <div className="flex justify-center">
-            <Button className={`w-3/4 mt-6 ${loading ? 'border border-black bg-white' : ''}`} type="submit">
-              {!loading ? (
-                <h1>Change Password</h1>
-              ) : (
-                <Image src="/assets/lineloader.svg" alt="loading image" width={24} height={24} />
-              )}
-            </Button>
-          </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid max-w-md gap-5" noValidate>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Current password</FormLabel>
+              <FormControl>
+                <PasswordInput autoComplete="current-password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="newPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New password</FormLabel>
+              <FormControl>
+                <PasswordInput autoComplete="new-password" {...field} />
+              </FormControl>
+              <PasswordChecklist value={typed} />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmNewPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New password, again</FormLabel>
+              <FormControl>
+                <PasswordInput autoComplete="new-password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" size="lg" className="justify-self-start" loading={form.formState.isSubmitting}>
+          Change password
+        </Button>
       </form>
     </Form>
-    </div>
   );
 };
 
 export default ChangePasswordForm;
-
-
