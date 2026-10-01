@@ -41,3 +41,6 @@ export type AccountRole = NonNullable<Schemas["AccountRole"]>;
 export type ActivityEntry = Schemas["ActivityEntryResponse"];
 export type ActivityEntity = NonNullable<Schemas["ActivityEntity"]>;
 export type Subscriber = Schemas["SubscriberResponse"];
+export type Dashboard = Schemas["DashboardResponse"];
+export type Comparison = Schemas["Comparison"];
+export type DailyRevenue = Schemas["DailyRevenue"];

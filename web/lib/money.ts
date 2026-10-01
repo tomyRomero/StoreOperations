@@ -5,6 +5,13 @@ export function formatMoney(cents: number): string {
   return dollars.format(cents / 100);
 }
 
+const shortDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 });
+
+// Short amounts for chart axes, such as "$250" and "$2.5K"
+export function formatMoneyShort(cents: number): string {
+  return shortDollars.format(cents / 100);
+}
+
 // A price typed into a form ("18", "18.5", "18.50") as cents, or null when it isn't a price.
 // Read digit by digit, so 0.29 never becomes 28 cents through floating point.
 export function parseDollars(text: string): number | null {

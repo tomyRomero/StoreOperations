@@ -1,10 +1,16 @@
 import "server-only";
 
 import { serverApi } from "../api/server";
-import type { ActivityEntity, AdminSettings } from "../api/types";
+import type { ActivityEntity, AdminSettings, Dashboard } from "../api/types";
 
 // The store as a whole, for the admin pages: settings, the activity log and the newsletter. The API refuses
 // these to anyone who isn't an admin.
+
+// How the store did over the last `days` days (in its time zone), against the days before
+export async function getDashboard(days: number): Promise<Dashboard | null> {
+  const { data } = await serverApi().GET("/api/admin/dashboard", { params: { query: { days } } });
+  return data ?? null;
+}
 
 export async function getAdminSettings(): Promise<AdminSettings | null> {
   const { data } = await serverApi().GET("/api/admin/settings");
