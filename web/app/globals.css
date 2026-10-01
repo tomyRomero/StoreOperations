@@ -88,6 +88,12 @@
   @variant dark {
     --glow-strength: 1;
   }
+
+  /* Form fields: roomy on the storefront (52px tall, 14px corners, 15px text from tablets up; phones get
+     16px so iOS doesn't zoom in on focus). The console sets its own, compact ones below. */
+  --field-height: 3.25rem;
+  --field-radius: 14px;
+  --field-text: 0.9375rem;
 }
 
 :root[data-theme="light"] {
@@ -105,6 +111,9 @@
   --accent-subtle: #eef1ff;
   --accent-ink: #2440b8;
   --ring: #2f5bff;
+  --field-height: 2.5rem;
+  --field-radius: 4px;
+  --field-text: 0.875rem;
 }
 
 /* For the rare style a token can't express, such as which icon the theme switch shows. Matches when
@@ -206,11 +215,11 @@
 
   /* Crisp shapes for the admin console: 4px for badges, inputs and chips, 6px for buttons and cards, 10px
      for drawers and dialogs. The storefront is softer: 14px fields, 24px cards, 32px product stages,
-     and pill buttons (rounded-full). */
+     and pill buttons (rounded-full). Fields follow --field-radius, so each side sets its own. */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
-  --radius-field: 14px;
+  --radius-field: var(--field-radius);
   --radius-card: 24px;
   --radius-stage: 32px;
 

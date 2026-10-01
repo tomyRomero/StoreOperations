@@ -16,7 +16,7 @@ function SelectTrigger({ className, children, ...props }: React.ComponentProps<t
     <SelectPrimitive.Trigger
       className={cn(
         fieldClasses,
-        "flex h-10 items-center justify-between gap-2 py-2 text-left data-placeholder:text-muted-foreground [&>span]:line-clamp-1",
+        "flex h-(--field-height) items-center justify-between gap-2 py-2 text-left data-placeholder:text-muted-foreground [&>span]:line-clamp-1",
         className
       )}
       {...props}
