@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { LockKeyhole } from "lucide-react";
-import { Button } from "../ui/button";
+import { LoaderCircle, LockKeyhole } from "lucide-react";
 import { formatMoney } from "@/lib/money";
 
 // Stripe's Payment Element for the quote's PaymentIntent. Card details go straight to Stripe and never
@@ -49,13 +48,16 @@ const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
         </p>
       )}
 
-      <Button id="submit" size="lg" className="w-full" disabled={!stripe || !elements} loading={isLoading}>
+      <button
+        id="submit"
+        disabled={!stripe || !elements || isLoading}
+        aria-busy={isLoading || undefined}
+        className="mt-2 inline-flex h-[62px] w-full items-center justify-center gap-2.5 rounded-full bg-primary text-[17px] font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_24px_60px_rgb(61_139_255/0.35)] transition-colors hover:bg-primary/85 disabled:opacity-70"
+      >
+        {isLoading ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : <LockKeyhole className="size-4" aria-hidden />}
         Pay {formatMoney(totalCents)}
-      </Button>
-      <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-        <LockKeyhole className="size-3.5" aria-hidden />
-        Secured by Stripe. Your card details never reach our servers.
-      </p>
+      </button>
+      <p className="text-center text-[13px] text-muted-foreground">Card details go straight to Stripe and never touch our servers.</p>
     </form>
   );
 };

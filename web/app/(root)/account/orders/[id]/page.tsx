@@ -89,7 +89,7 @@ export default async function OrderPage(props: Props) {
             Items
           </h2>
           <OrderLines lines={order.lines} />
-          <OrderTotals totals={order} />
+          <OrderTotals totals={order} state={order.shipTo.state} />
         </section>
         <section aria-labelledby="ship-heading" className="grid gap-1 rounded-md border p-5 text-sm sm:p-6">
           <h2 id="ship-heading" className="mb-2 text-h3">

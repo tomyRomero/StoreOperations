@@ -13,7 +13,7 @@ const page = async (props: { searchParams: Promise<{ payment_intent?: string }> 
   const settings = await getStoreSettings();
 
   return (
-    <div className="container py-12 lg:py-20">
+    <div className="container relative isolate py-12 lg:py-20">
       <OrderResult paymentIntentId={paymentIntentId} supportEmail={settings?.supportEmail ?? null} />
     </div>
   );

@@ -12,3 +12,8 @@ export const usStates = [
   ["TN", "Tennessee"], ["TX", "Texas"], ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"],
   ["WA", "Washington"], ["WV", "West Virginia"], ["WI", "Wisconsin"], ["WY", "Wyoming"],
 ] as const;
+
+// "Illinois" for "IL"; anything unknown comes back as it was
+export function stateName(code: string): string {
+  return usStates.find(([postal]) => postal === code)?.[1] ?? code;
+}
