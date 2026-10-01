@@ -1,97 +1,144 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { Package, Plus, SearchX } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { FilterTabs } from "@/components/admin/list/FilterTabs";
+import { ListSearch } from "@/components/admin/list/ListSearch";
+import { ParamSelect } from "@/components/admin/list/ParamSelect";
+import { ProductsTable } from "@/components/admin/products/ProductsTable";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { RetryButton } from "@/components/shared/RetryButton";
 import { Button } from "@/components/ui/button";
-import { TableHead, TableRow, TableHeader, TableBody, Table } from "@/components/ui/table";
-import ProductRow from "@/components/tables/ProductRow";
-import Pagination from "@/components/shared/Pagination";
-import SearchBar from "@/components/forms/SearchBar";
-import type { ProductStatus } from "@/lib/api/types";
-import { getAdminProducts } from "@/lib/data/admin-catalog";
-import { getStoreSettings } from "@/lib/data/catalog";
+import { Pagination } from "@/components/ui/pagination";
+import type { AdminProductSort, ProductStatus, StockLevel } from "@/lib/api/types";
+import { firstValue, listHref, nextSort, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
+import { adminProductsPageSize, getAdminCategories, getAdminProducts } from "@/lib/data/admin-catalog";
+import { getAdminSettings } from "@/lib/data/admin-store";
+import type { SearchParams } from "@/lib/paging";
 
+export const metadata: Metadata = { title: "Products" };
+
+const path = "/admin/products";
 const tabs: { status: ProductStatus; label: string }[] = [
   { status: "active", label: "In the store" },
   { status: "archived", label: "Archived" },
   { status: "all", label: "All" },
 ];
+const stockLevels: { value: StockLevel; label: string }[] = [
+  { value: "in_stock", label: "In stock" },
+  { value: "low", label: "Low stock" },
+  { value: "sold_out", label: "Sold out" },
+];
+const sorts: AdminProductSort[] = ["name", "name_desc", "price", "price_desc", "stock", "stock_desc", "created", "created_desc"];
 
-export default async function Page(
-  props: {
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-  }
-) {
-  const searchParams = await props.searchParams;
-  const search = searchParams.q ?? "";
-  const status = tabs.find((t) => t.status === searchParams.status)?.status ?? "active";
-  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
+// The catalog as the store manages it, archived products included: found by name, narrowed by category,
+// stock and deals, sorted by any column, and changed in bulk from the ticked rows
+export default async function ProductsPage(props: { searchParams: Promise<SearchParams> }) {
+  const params = await props.searchParams;
+  const search = firstValue(params.q)?.trim() ?? "";
+  const status = oneOf(params.status, ["archived", "all"] as const) ?? "active";
+  const categoryId = Number.parseInt(firstValue(params.category) ?? "", 10) || undefined;
+  const stock = oneOf(params.stock, stockLevels.map((s) => s.value));
+  const onDeal = firstValue(params.deal) === "1";
+  const sort = oneOf(params.sort, sorts);
+  const page = pageNumber(params.page);
 
-  const [products, settings] = await Promise.all([
-    getAdminProducts({ search, status, page: pageNumber }),
-    getStoreSettings(),
+  const [products, categories, settings] = await Promise.all([
+    getAdminProducts({ search, status, categoryId, stock, onDeal, sort, page }),
+    getAdminCategories(),
+    getAdminSettings(),
   ]);
 
-  // Keeps the search and the tab while paging or switching tabs
-  const pathWith = (next: ProductStatus) => {
-    const params = new URLSearchParams();
-    if (search) params.set("q", search);
-    if (next !== "active") params.set("status", next);
-    return `/admin/products?${params.toString()}`;
+  const href = (changes: Record<string, string | undefined>) => listHref(path, withParams(params, changes));
+  // Newest first is the default, so it has no ?sort of its own
+  const sortHref = (column: string, firstDescending: boolean) => {
+    const next = nextSort(sort ?? "created_desc", column, firstDescending);
+    return href({ sort: next === "created_desc" ? undefined : next });
   };
+  const filtered = Boolean(search || categoryId || stock || onDeal || status !== "active");
 
   return (
-    <section className="grid grid-cols-1 gap-4">
-      <div className="flex items-center">
-        <h1 className="font-semibold text-heading4-bold">Products</h1>
-        <Button asChild className="ml-auto" size="sm">
-          <Link href="/admin/products/new">Add product</Link>
-        </Button>
-      </div>
-      <SearchBar placeholder="Search products by name or category" />
-      <nav aria-label="Filter products" className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <Link
-            key={tab.status}
-            href={pathWith(tab.status)}
-            aria-current={tab.status === status ? "page" : undefined}
-            className={`rounded-full border px-3 py-1 text-sm ${tab.status === status ? "bg-black text-white border-black" : "hover:bg-gray-100"}`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
-      <div className="border shadow-xs rounded-lg">
-        {!products || !settings ? (
-          <p className="p-10 text-center text-red-600">Failed to load products. Please try again later.</p>
-        ) : products.totalCount === 0 ? (
-          <p className="p-10">{search || status !== "active" ? "No products match." : "No products yet. Click Add product to get started."}</p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-bold text-black w-[80px]"><span className="sr-only">Image</span></TableHead>
-                <TableHead className="font-bold text-black max-w-[150px]">Name</TableHead>
-                <TableHead className="font-bold text-black">Actions</TableHead>
-                <TableHead className="font-bold text-black text-center">Stock</TableHead>
-                <TableHead className="font-bold text-black text-center">Price</TableHead>
-                <TableHead className="font-bold text-black">Category</TableHead>
-                <TableHead className="font-bold text-black">Added</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.items.map((product) => (
-                <ProductRow key={product.id} product={product} lowStockThreshold={settings.lowStockThreshold} timeZone={settings.timeZoneId} />
-              ))}
-            </TableBody>
-          </Table>
-        )}
+    <>
+      <AdminPageHeader
+        title="Products"
+        description={products ? `${products.totalCount} ${products.totalCount === 1 ? "product" : "products"}${filtered ? " match" : " in the store"}` : undefined}
+        actions={
+          <Button asChild>
+            <Link href="/admin/products/new">
+              <Plus aria-hidden />
+              Add product
+            </Link>
+          </Button>
+        }
+      />
+
+      <div className="mb-4 grid gap-3">
+        <FilterTabs
+          label="Show products"
+          tabs={tabs.map((tab) => ({ label: tab.label, href: href({ status: tab.status === "active" ? undefined : tab.status }), current: tab.status === status }))}
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <ListSearch label="Search products by name" />
+          <ParamSelect
+            label="Category"
+            param="category"
+            anyLabel="All categories"
+            options={(categories ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
+          />
+          <ParamSelect label="Stock" param="stock" anyLabel="Any stock" options={stockLevels} />
+          <ParamSelect label="Deals" param="deal" anyLabel="On sale or not" options={[{ value: "1", label: "On sale" }]} />
+        </div>
       </div>
 
-      {products && (
-        <Pagination
-          path={`${pathWith(status)}&`}
-          pageNumber={products.page}
-          isNext={products.page < products.totalPages}
-        />
+      {!products || !categories || !settings ? (
+        <ErrorState title="We couldn't load the products" action={<RetryButton />} />
+      ) : products.items.length === 0 ? (
+        filtered ? (
+          <EmptyState
+            icon={SearchX}
+            title="No products match"
+            action={
+              <Button asChild variant="outline">
+                <Link href={path}>Show all products</Link>
+              </Button>
+            }
+          >
+            Try another search or filter.
+          </EmptyState>
+        ) : (
+          <EmptyState
+            icon={Package}
+            title="No products yet"
+            action={
+              <Button asChild>
+                <Link href="/admin/products/new">Add the first product</Link>
+              </Button>
+            }
+          >
+            Products you add appear in the store straight away.
+          </EmptyState>
+        )
+      ) : (
+        <div className="grid gap-4">
+          <ProductsTable
+            products={products.items}
+            categories={categories}
+            lowStockThreshold={settings.lowStockThreshold}
+            timeZone={settings.timeZoneId}
+            sort={sort ?? "created_desc"}
+            sortHrefs={{ name: sortHref("name", false), price: sortHref("price", true), stock: sortHref("stock", false), created: sortHref("created", true) }}
+          />
+          <Pagination
+            pathname={path}
+            searchParams={params}
+            page={products.page}
+            totalPages={products.totalPages}
+            totalCount={products.totalCount}
+            pageSize={adminProductsPageSize}
+          />
+        </div>
       )}
-    </section>
+    </>
   );
 }
