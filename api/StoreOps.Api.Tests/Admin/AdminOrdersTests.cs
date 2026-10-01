@@ -29,6 +29,9 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Equal(olderNumber, byEmail.GetProperty("orderNumber").GetString());
         Assert.Equal(older.Email, byEmail.GetProperty("customerEmail").GetString());
         Assert.Equal(newerNumber, byNumber.GetProperty("orderNumber").GetString());
+        // A paid order waiting to ship can be shipped, cancelled or refunded
+        Assert.Equal(new[] { "shipped", "cancelled", "refunded" },
+            byNumber.GetProperty("nextStatuses").EnumerateArray().Select(s => s.GetString()));
     }
 
     [Theory]

@@ -3647,6 +3647,7 @@
         "required": [
           "orderNumber",
           "status",
+          "nextStatuses",
           "placedAtUtc",
           "customerName",
           "customerEmail",
@@ -3660,6 +3661,12 @@
           },
           "status": {
             "$ref": "#/components/schemas/OrderStatus"
+          },
+          "nextStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderStatus"
+            }
           },
           "placedAtUtc": {
             "type": "string",

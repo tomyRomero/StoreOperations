@@ -66,7 +66,8 @@ public sealed class AdminOrderService(
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(o => new AdminOrderSummaryResponse(
-                o.OrderNumber, o.Status, o.PlacedAtUtc, o.User.UserName!, o.User.Email!, o.Lines.Sum(l => l.Quantity), o.TotalCents))
+                o.OrderNumber, o.Status, Order.NextStatuses(o.Status), o.PlacedAtUtc, o.User.UserName!, o.User.Email!,
+                o.Lines.Sum(l => l.Quantity), o.TotalCents))
             .ToListAsync(ct);
 
         return new Paged<AdminOrderSummaryResponse>(items, query.Page, query.PageSize, totalCount);

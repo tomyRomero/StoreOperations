@@ -2602,6 +2602,7 @@ export interface components {
         AdminOrderSummaryResponse: {
             orderNumber: string;
             status: components["schemas"]["OrderStatus"];
+            nextStatuses: components["schemas"]["OrderStatus"][];
             /** Format: date-time */
             placedAtUtc: string;
             customerName: string;

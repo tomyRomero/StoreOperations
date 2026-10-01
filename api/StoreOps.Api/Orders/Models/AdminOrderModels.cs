@@ -15,9 +15,12 @@ public enum AdminOrderSort
 public sealed record AdminOrderQuery(
     string? Search, OrderStatus? Status, int? CustomerId, AdminOrderSort Sort, int Page, int PageSize);
 
+// NextStatuses lets the list's bulk bar say which selected orders a change applies to (and what it
+// refunds) before anything is sent
 public sealed record AdminOrderSummaryResponse(
     string OrderNumber,
     OrderStatus Status,
+    IReadOnlyList<OrderStatus> NextStatuses,
     DateTime PlacedAtUtc,
     string CustomerName,
     string CustomerEmail,
