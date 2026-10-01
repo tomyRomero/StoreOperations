@@ -45,6 +45,9 @@ public sealed class ImageStorage(IAmazonS3 s3, IOptions<StorageOptions> options)
             Key = key,
             InputStream = body,
             ContentType = contentType,
+            // Sign the whole body at once instead of in chunks. R2 rejects chunked signing, and the
+            // image is already in memory, so hashing it up front costs nothing.
+            UseChunkEncoding = false,
         }, ct);
     }
 
