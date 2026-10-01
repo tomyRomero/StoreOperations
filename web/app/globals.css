@@ -94,6 +94,9 @@
   --field-height: 3.25rem;
   --field-radius: 14px;
   --field-text: 0.9375rem;
+
+  /* Buttons are pills on the storefront; the console keeps crisp 6px corners */
+  --button-radius: 9999px;
 }
 
 :root[data-theme="light"] {
@@ -114,6 +117,7 @@
   --field-height: 2.5rem;
   --field-radius: 4px;
   --field-text: 0.875rem;
+  --button-radius: 6px;
 }
 
 /* For the rare style a token can't express, such as which icon the theme switch shows. Matches when
@@ -215,11 +219,12 @@
 
   /* Crisp shapes for the admin console: 4px for badges, inputs and chips, 6px for buttons and cards, 10px
      for drawers and dialogs. The storefront is softer: 14px fields, 24px cards, 32px product stages,
-     and pill buttons (rounded-full). Fields follow --field-radius, so each side sets its own. */
+     and pill buttons. Fields and buttons follow --field-radius and --button-radius, so each side sets its own. */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
   --radius-field: var(--field-radius);
+  --radius-button: var(--button-radius);
   --radius-card: 24px;
   --radius-stage: 32px;
 

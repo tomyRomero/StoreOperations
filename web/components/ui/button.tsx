@@ -5,9 +5,10 @@ import { LoaderCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-// Ink-black primary actions, a solid ink outline for secondary ones. Focus uses the site-wide ring.
+// Ink-black primary actions, a solid ink outline for secondary ones. Pills on the storefront, 6px corners
+// in the console (--button-radius). Focus uses the site-wide ring.
 const buttonVariants = cva(
-  "relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors duration-[120ms] disabled:pointer-events-none disabled:opacity-50 aria-busy:opacity-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "relative inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-semibold transition-colors duration-[120ms] disabled:pointer-events-none disabled:opacity-50 aria-busy:opacity-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
