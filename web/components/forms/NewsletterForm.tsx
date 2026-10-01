@@ -1,158 +1,140 @@
 "use client"
 
-import React, { useState } from 'react'
-import { CardTitle, CardDescription, CardHeader,CardFooter, Card } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import { Button } from '../ui/button';
+import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "../ui/use-toast";
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import Image from 'next/image'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from '../ui/use-toast';
+import { api } from '@/lib/api/browser';
+import { fieldErrors, problemMessage } from '@/lib/api/problems';
 
-const NewsletterForm = ({emails} : {emails: string[]}) => {
+const FormSchema = z.object({
+  subject: z.string().trim().min(1, 'Enter a subject').max(150, 'Use at most 150 characters'),
+  body: z.string().trim().min(20, 'Write at least 20 characters').max(10_000, 'Use at most 10,000 characters'),
+});
 
-    const [loading, setLoading] = useState(false)
+type Values = z.infer<typeof FormSchema>;
 
-    const FormSchema = z.object({
-        message: z
-        .string()
-        .min(1, 'Message is required')
-        .min(20, 'Message must have than more 20 characters'), 
-      });
-    
+// Writes a plain-text newsletter. The API queues one email per subscriber, each with its own
+// unsubscribe link, and a test goes to the signed-in admin only.
+const NewsletterForm = ({ subscriberCount }: { subscriberCount: number }) => {
+  const [sending, setSending] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
-      const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-        message: ""
-        },
-      });
+  const form = useForm<Values>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: { subject: "", body: "" },
+  });
 
- // Function to send email for a single subscriber
-const sendEmailToSubscriber = async (subscriberEmail: string, message: string) => {
-    try {
+  const send = async (test: boolean) => {
+    const values = form.getValues();
+    setSending(true);
+    const { data, error } = test
+      ? await api.POST("/api/admin/newsletter/send-test", { body: values })
+      : await api.POST("/api/admin/newsletter/send", { body: values });
+    setSending(false);
 
-        const nodeMailerData = {
-            email: subscriberEmail,
-            name: "",
-            items: {},
-            event: "newsletter",
-            pricing: {},
-            address: {}, 
-            orderId: "",
-            message: message
-        }
-
-      const currentURL = process.env.NEXT_PUBLIC_URL;
-      const response = await axios.post(`${currentURL}/api/nodemailer`, nodeMailerData);
-  
-      if (response.status === 201) {
-        console.log(`Email sent successfully to ${subscriberEmail}`);
-        return { email: subscriberEmail, status: 'success' };
-      } else {
-        console.error(`Failed to send email to ${subscriberEmail}`);
-        return { email: subscriberEmail, status: 'failed' };
+    if (!data) {
+      for (const [field, message] of Object.entries(fieldErrors(error))) {
+        if (field in values) form.setError(field as keyof Values, { message });
       }
-    } catch (error) {
-      console.error('Error sending email:', error);
-      return { email: subscriberEmail, status: `error: ${error}` };
+      toast({ title: test ? "Couldn't send the test" : "Couldn't send the newsletter", description: problemMessage(error), variant: "destructive" });
+      return;
     }
-  };
 
-  // Function to send emails to all subscribers
-const sendEmailsToSubscribers = async (subscribedEmails: string[], message: string) => {
-    const emailStatuses = [];
-  
-    for (const email of subscribedEmails) {
-      const status = await sendEmailToSubscriber(email, message);
-      emailStatuses.push(status);
+    if (test) {
+      toast({ title: "Test sent to your email" });
+      return;
     }
-  
-    return emailStatuses;
+    toast({ title: "Newsletter on its way", description: `Queued for ${data.recipients} subscriber${data.recipients === 1 ? "" : "s"}.` });
+    form.reset();
   };
-
-      const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-        setLoading(true);
-        const userConfirmed = window.confirm(`Are you ready to send out the newsletter? Clicking okay will send an email to all subscribed emails!`);
-
-        if (userConfirmed) {
-            try {
-              const status = await sendEmailsToSubscribers(emails, values.message);
-              console.log('Status of newsletter emails:', status);
-        
-              const statusMessages = status.map(({ email, status }) => `${email}: ${status}`);
-              toast({
-                title: "Newsletter Results",
-                description: statusMessages.join('\n'), // Join individual status messages with newline
-              });
-            } catch (error) {
-              console.error('Error sending newsletter emails:', error);
-              toast({
-                title: "Error",
-                description: "Failed to send newsletter emails. Please try again later.",
-                variant: "destructive"
-              });
-            }
-          }
-
-          setLoading(false)
-      }
 
   return (
-    <Card className="w-full max-w-lg mx-auto p-4">
+    <Card className="w-full max-w-2xl mx-auto">
     <CardHeader>
-      <CardTitle className="text-heading3-bold">New message to all subscribed to newsletter</CardTitle>
-      <CardDescription>Enter the details of your message below.</CardDescription>
+      <CardTitle className="text-heading3-bold">Write a newsletter</CardTitle>
+      <CardDescription>Plain text. Each email ends with a link to unsubscribe.</CardDescription>
     </CardHeader>
-    
+    <CardContent>
     <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}
-           encType="multipart/form-data"
-           className='p-4'
-          >
+      <form className="grid gap-4" onSubmit={form.handleSubmit(() => setConfirming(true))}>
         <FormField
-           control={form.control}
-           name='message'
-           render={({ field }) => (
-        <FormItem className="space-y-2 pb-3">
-          <FormLabel>Message</FormLabel>
-          <FormControl>
-             <Textarea placeholder="Enter Message for Newsletter Email" 
-             {...field}
-             />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-           )}
-         />
-             <Image
-              src={"/assets/spinner.svg"}
-              alt={"loader"}
-              width={100}
-              height={100}
-              className={`${loading? "" : "hidden"} mx-auto`}
-            />
-    <CardFooter>
-      <div className="mx-auto">
-      <Button className="bg-black text-white border border-black" variant={"ghost"}>
-        Send message
-      </Button>
-      </div>
-    </CardFooter>
-    </form>
+          control={form.control}
+          name='subject'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='body'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message</FormLabel>
+              <FormControl>
+                <Textarea rows={10} {...field} />
+              </FormControl>
+              <FormDescription>Blank lines start new paragraphs.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex flex-wrap gap-4">
+          <Button type="button" variant="outline" disabled={sending} onClick={form.handleSubmit(() => send(true))}>
+            Send me a test
+          </Button>
+          <Button type="submit" disabled={sending || subscriberCount === 0}>
+            Send to {subscriberCount} subscriber{subscriberCount === 1 ? "" : "s"}
+          </Button>
+        </div>
+      </form>
     </Form>
+    </CardContent>
+
+    <AlertDialog open={confirming} onOpenChange={setConfirming}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Send this newsletter to {subscriberCount} subscriber{subscriberCount === 1 ? "" : "s"}?</AlertDialogTitle>
+          <AlertDialogDescription>Emails can&apos;t be called back once they&apos;re sent. Send yourself a test first if you haven&apos;t.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Not yet</AlertDialogCancel>
+          <AlertDialogAction onClick={() => void send(false)}>Send newsletter</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </Card>
   )
 }
 
-export default NewsletterForm
+export default NewsletterForm;

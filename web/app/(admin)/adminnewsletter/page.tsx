@@ -1,16 +1,50 @@
+import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card";
 import NewsletterSubscribers from "@/components/cards/NewsletterSubscribers";
 import NewsletterForm from "@/components/forms/NewsletterForm";
-import { getAllSubscribedEmails } from "@/lib/data/admin";
+import SearchBar from "@/components/forms/SearchBar";
+import Pagination from "@/components/shared/Pagination";
+import { getStoreSettings } from "@/lib/data/catalog";
+import { getSubscribers } from "@/lib/data/admin-store";
 
-const page = async ()=> {
+const page = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
+  const search = searchParams.q ?? "";
+  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
 
-  const emails = await getAllSubscribedEmails();
+  // The total for the send button counts everyone, whatever the search shows
+  const [subscribers, everyone, settings] = await Promise.all([
+    getSubscribers({ search, page: pageNumber }),
+    search ? getSubscribers({}) : null,
+    getStoreSettings(),
+  ]);
+  const total = (search ? everyone : subscribers)?.totalCount ?? 0;
 
   return (
-    <section className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col h-full">
-    <NewsletterSubscribers emails={emails} />
-    <br/>
-      <NewsletterForm emails={emails}/>
+    <section className="md:pt-24 max-sm:pt-20 lg:pt-0 flex flex-col gap-6 h-full">
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-heading3-bold">Subscribers</CardTitle>
+          <CardDescription>{total} subscribed to the newsletter.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <SearchBar routeType="adminnewsletter" placeholder="Search subscribers by email" />
+          {!subscribers || !settings ? (
+            <p className="text-red-600">Couldn&apos;t load subscribers. Please try again.</p>
+          ) : subscribers.totalCount === 0 ? (
+            <p>{search ? "No subscribers match." : "No subscribers yet."}</p>
+          ) : (
+            <NewsletterSubscribers subscribers={subscribers.items} timeZone={settings.timeZoneId} />
+          )}
+          {subscribers && (
+            <Pagination
+              path={`/adminnewsletter?${search ? `q=${encodeURIComponent(search)}&` : ""}`}
+              pageNumber={subscribers.page}
+              isNext={subscribers.page < subscribers.totalPages}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <NewsletterForm subscriberCount={total} />
     </section>
   )
 }

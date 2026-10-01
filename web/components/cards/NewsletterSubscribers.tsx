@@ -1,80 +1,48 @@
 "use client"
 
-import React from 'react';
-import { Button } from '../ui/button';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { Card } from '../ui/card';
-import { usePathname } from 'next/navigation';
-import { unsubscribeFromNewsletter } from '@/lib/actions/store.actions';
+import { useRouter } from 'next/navigation';
+import { Button } from '../ui/button';
 import { toast } from '../ui/use-toast';
+import { api } from '@/lib/api/browser';
+import { problemMessage } from '@/lib/api/problems';
+import type { Subscriber } from '@/lib/api/types';
+import { formatDate } from '@/lib/format';
 
-interface NewsletterSubscribersProps {
-  emails: string[];
-}
+// One page of subscribers. Removing someone deletes their address: the store keeps no list of who left.
+const NewsletterSubscribers = ({ subscribers, timeZone }: { subscribers: Subscriber[]; timeZone: string }) => {
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const router = useRouter();
 
-const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ emails }) => {
-  const path = usePathname();
+  const remove = async (subscriber: Subscriber) => {
+    if (!window.confirm(`Remove ${subscriber.email} from the newsletter? They won't get any more newsletters.`)) return;
 
-  const handleUnsubscribe = async (index: number) => {
-    const email = emails[index];
-    const userConfirmed = window.confirm(`Are you sure you want to unsubscribe this user? They will no longer receive newsletter messages.`);
-    
-    if (userConfirmed) {
-      try {
-        const unsubscribed = await unsubscribeFromNewsletter(email, path);
+    setBusyId(subscriber.id);
+    const { error, response } = await api.POST("/api/admin/newsletter/subscribers/remove", { body: { ids: [subscriber.id] } });
+    setBusyId(null);
 
-        if (unsubscribed) {
-          toast({
-            title: "Success",
-            description: `Successfully unsubscribed ${email}`,
-          });
-        } else {
-          throw new Error("Failed to unsubscribe");
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: `Failed to unsubscribe ${email}. Please try again.`,
-          variant: "destructive",
-        });
-      }
+    if (!response.ok) {
+      toast({ title: "Couldn't remove the subscriber", description: problemMessage(error), variant: "destructive" });
+      return;
     }
+    toast({ title: `${subscriber.email} removed` });
+    router.refresh();
   };
 
   return (
-    <>
-      <h3 className="mx-auto text-heading4-bold font-semibold mb-2">Subscribed Emails</h3>
-      <Card className="w-full max-w-lg mx-auto max-h-[200px] overflow-y-auto">
-        <div className="p-4">
-          <div className="divide-y divide-gray-200">
-            {emails.map((email, index) => (
-              <div key={index} className="flex py-2">
-                <span>{email}</span>
-                <div className="ml-auto">
-                  <Button variant="ghost" onClick={() => handleUnsubscribe(index)}>
-                    <Image 
-                      src="/assets/delete.png" 
-                      alt="Delete icon" 
-                      width={24} 
-                      height={24} 
-                    />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-      <p className="w-full text-center text-subtle-semibold text-gray-400">Scroll to view more</p>
-      <div className="mx-auto">
-        <Image 
-          src="/assets/downarrow.png" 
-          alt="Down arrow icon" 
-          width={24} 
-          height={24} 
-        />
-      </div>
-    </>
+    <ul className="divide-y divide-gray-200">
+      {subscribers.map((subscriber) => (
+        <li key={subscriber.id} className="flex items-center gap-4 py-2">
+          <span className="min-w-0 truncate">{subscriber.email}</span>
+          <span className="ml-auto whitespace-nowrap text-sm text-gray-500">since {formatDate(subscriber.subscribedAtUtc, timeZone)}</span>
+          <Button variant="ghost" size="icon" disabled={busyId !== null} onClick={() => remove(subscriber)}>
+            <Image src="/assets/delete.png" alt="" width={24} height={24} />
+            <span className="sr-only">Remove {subscriber.email}</span>
+          </Button>
+        </li>
+      ))}
+    </ul>
   );
 };
 

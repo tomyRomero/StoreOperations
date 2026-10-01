@@ -1,73 +1,77 @@
+import Link from "next/link";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import ActivityCard from "@/components/cards/ActivityCard";
-import { getAllActivity } from "@/lib/data/admin";
 import Pagination from "@/components/shared/Pagination";
+import type { ActivityEntity } from "@/lib/api/types";
+import { getStoreSettings } from "@/lib/data/catalog";
+import { getActivity } from "@/lib/data/admin-store";
+
+const tabs: { entity?: ActivityEntity; label: string }[] = [
+  { label: "Everything" },
+  { entity: "order", label: "Orders" },
+  { entity: "product", label: "Products" },
+  { entity: "category", label: "Categories" },
+  { entity: "user", label: "Accounts" },
+  { entity: "newsletter_subscriber", label: "Newsletter" },
+  { entity: "store_settings", label: "Settings" },
+];
 
 const Page = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-  try {
-    // Get Activity Pagination Results
-    const results = await getAllActivity(
-      searchParams?.page ? +searchParams.page : 1, // Fallback to page 1
-      5 // Page size
-    );
+  const entity = tabs.find((t) => t.entity !== undefined && t.entity === searchParams.type)?.entity;
+  const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
+  const [activity, settings] = await Promise.all([getActivity({ entityType: entity, page: pageNumber }), getStoreSettings()]);
+  const now = new Date();
 
-    return (
+  const pathFor = (next?: ActivityEntity) => (next ? `/adminactivity?type=${next}` : "/adminactivity?");
+
+  return (
       <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
-        <div className="grid grid-cols-1 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 max-w-3xl mx-auto gap-4">
           <Card>
-            <CardHeader className="flex items-center gap-4">
+            <CardHeader className="gap-4">
               <CardTitle className="text-heading4-bold">Recent Activity</CardTitle>
+              <nav aria-label="Filter activity" className="flex flex-wrap gap-2">
+                {tabs.map((tab) => (
+                  <Link
+                    key={tab.label}
+                    href={pathFor(tab.entity)}
+                    aria-current={tab.entity === entity ? "page" : undefined}
+                    className={`rounded-full border px-3 py-1 text-sm ${tab.entity === entity ? "bg-black text-white border-black" : "hover:bg-gray-100"}`}
+                  >
+                    {tab.label}
+                  </Link>
+                ))}
+              </nav>
             </CardHeader>
-            <CardContent className="mx-auto">
-              <div className="flex items-center gap-4 max-xxs:mx-auto w-full">
-                <div className="border-b border-gray-300 w-full"></div>
-              </div>
-
-              {results.activities.length > 0 ? (
-                results.activities.map((activity: any, index) => (
-                  <ActivityCard
-                    key={index}
-                    action={activity.action}
-                    details={activity.details}
-                    timestamp={activity.timestamp}
-                  />
-                ))
+            <CardContent>
+              {!activity || !settings ? (
+                <p className="text-center py-4 text-red-600">Failed to load recent activity. Please try again later.</p>
+              ) : activity.totalCount === 0 ? (
+                <p className="text-center py-4">Nothing here yet.</p>
               ) : (
-                <h2 className="text-center py-4">No recent activity found.</h2>
+                <ul className="divide-y">
+                  {activity.items.map((entry) => (
+                    <ActivityCard key={entry.id} entry={entry} timeZone={settings.timeZoneId} now={now} />
+                  ))}
+                </ul>
               )}
             </CardContent>
           </Card>
         </div>
 
-        <Pagination
-          path={"/adminactivity?"}
-          pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={results.isNext}
-        />
+        {activity && (
+          <Pagination
+            path={entity ? `${pathFor(entity)}&` : pathFor()}
+            pageNumber={activity.page}
+            isNext={activity.page < activity.totalPages}
+          />
+        )}
       </section>
-    );
-  } catch (error) {
-    return (
-      <section className="md:pt-24 max-sm:pt-20 lg:pt-0">
-        <div className="grid grid-cols-1 max-w-2xl mx-auto">
-          <Card>
-            <CardHeader className="flex items-center gap-4">
-              <CardTitle className="text-heading4-bold">Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="mx-auto">
-              <h2 className="text-center py-4 text-red-600">
-                Failed to load recent activity. Please try again later.
-              </h2>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    );
-  }
+  );
 };
 
 export default Page;

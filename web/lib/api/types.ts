@@ -38,3 +38,6 @@ export type ProductStatus = Schemas["ProductStatus"];
 export type AdminCustomerSummary = Schemas["AdminCustomerSummaryResponse"];
 export type AdminCustomer = Schemas["AdminCustomerResponse"];
 export type AccountRole = NonNullable<Schemas["AccountRole"]>;
+export type ActivityEntry = Schemas["ActivityEntryResponse"];
+export type ActivityEntity = NonNullable<Schemas["ActivityEntity"]>;
+export type Subscriber = Schemas["SubscriberResponse"];
