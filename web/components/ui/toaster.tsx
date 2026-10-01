@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 const icons = {
   default: <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />,
   success: <CircleCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />,
-  destructive: <CircleAlert className="mt-0.5 size-4 shrink-0 text-sale" aria-hidden />,
+  destructive: <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />,
 }
 
 export function Toaster() {

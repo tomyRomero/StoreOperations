@@ -54,7 +54,7 @@ export function DeleteCategoryButton({ category }: { category: AdminCategory }) 
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Keep it</AlertDialogCancel>
-          <AlertDialogAction className="bg-sale text-white hover:bg-sale/90" onClick={() => void remove()}>
+          <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => void remove()}>
             Delete category
           </AlertDialogAction>
         </AlertDialogFooter>

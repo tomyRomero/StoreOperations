@@ -37,7 +37,7 @@ function DropdownMenuItem({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & { inset?: boolean; variant?: "destructive" }) {
   return (
     <DropdownMenuPrimitive.Item
-      className={cn(itemClasses, inset && "pl-8", variant === "destructive" && "text-sale focus:bg-sale-subtle", className)}
+      className={cn(itemClasses, inset && "pl-8", variant === "destructive" && "text-destructive focus:bg-destructive-subtle", className)}
       {...props}
     />
   )

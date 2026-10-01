@@ -227,7 +227,7 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
                     void apply();
                   }}
                   disabled={working}
-                  className={refunds(target) ? "bg-sale text-white hover:bg-sale/90" : undefined}
+                  className={refunds(target) ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
                 >
                   {working
                     ? "Working…"

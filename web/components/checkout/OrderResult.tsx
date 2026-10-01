@@ -92,7 +92,7 @@ const OrderResult = ({ paymentIntentId, supportEmail }: { paymentIntentId: strin
 
   if (outcome === "failed") {
     return (
-      <Message icon={CircleX} tone="sale" title="Your payment didn't go through">
+      <Message icon={CircleX} tone="danger" title="Your payment didn't go through">
         You haven&apos;t been charged. Try again, or use another payment method.
         <Actions primary={{ href: "/checkout", label: "Try again" }} />
       </Message>
@@ -162,7 +162,7 @@ function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: strin
 const tones = {
   neutral: "bg-muted text-foreground",
   warning: "bg-warning-subtle text-warning",
-  sale: "bg-sale-subtle text-sale",
+  danger: "bg-destructive-subtle text-destructive",
 };
 
 function Message({ icon: Icon, title, tone = "neutral", spin, children }: { icon: LucideIcon; title: string; tone?: keyof typeof tones; spin?: boolean; children: React.ReactNode }) {

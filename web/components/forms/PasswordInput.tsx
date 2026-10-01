@@ -32,7 +32,7 @@ export function PasswordChecklist({ value, id }: { value: string; id?: string })
     <ul id={id} className="grid gap-1 text-sm" aria-label="Password requirements">
       {passwordChecks(value).map((check) => (
         <li key={check.label} className={cn("flex items-center gap-2", check.met ? "text-success" : "text-muted-foreground")}>
-          <span aria-hidden className={cn("flex size-4 items-center justify-center rounded-full text-[10px] font-bold", check.met ? "bg-success text-white" : "border border-input")}>
+          <span aria-hidden className={cn("flex size-4 items-center justify-center rounded-full text-[10px] font-bold", check.met ? "bg-success text-success-foreground" : "border border-input")}>
             {check.met ? "✓" : ""}
           </span>
           {check.label}

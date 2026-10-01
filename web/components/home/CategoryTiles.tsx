@@ -4,8 +4,8 @@ import { ArrowRight } from "lucide-react";
 import type { Category } from "@/lib/api/types";
 import { SectionHeading } from "./SectionHeading";
 
-// Each tile carries a small marker in one of the brand pigments, in order
-const markers = ["bg-pigment-magenta", "bg-pigment-cobalt", "bg-pigment-yellow", "bg-pigment-green"];
+// Each tile carries a small marker in one of the brand glows, in order
+const markers = ["bg-glow-pink", "bg-glow-blue", "bg-glow-amber", "bg-glow-green"];
 
 export function CategoryTiles({ categories }: { categories: Category[] }) {
   if (categories.length === 0) return null;

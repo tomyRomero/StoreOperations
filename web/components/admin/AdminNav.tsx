@@ -52,7 +52,7 @@ export function AdminNav({ toShip, onNavigate }: Props) {
                 <Icon className="size-4 shrink-0" aria-hidden />
                 {label}
                 {href === "/admin/orders" && toShip > 0 && (
-                  <span className="ml-auto rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-white tabular-nums">
+                  <span className="ml-auto rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground tabular-nums">
                     {toShip}
                     <span className="sr-only"> to ship</span>
                   </span>

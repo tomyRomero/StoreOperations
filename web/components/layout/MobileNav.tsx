@@ -12,11 +12,12 @@ import type { Category } from "@/lib/api/types";
 import { currentPath, signInPath } from "@/lib/sign-in-path";
 import { useSignOut } from "@/lib/use-sign-out";
 import { HeaderSearch } from "./HeaderSearch";
+import { ThemeToggle } from "./ThemeToggle";
 
 const linkClasses = "flex min-h-11 items-center rounded-md px-3 font-semibold transition-colors hover:bg-muted";
 
-// The phone menu: search, the categories and the account pages, in a drawer from the left. Following
-// a link closes it.
+// The phone menu: search, the categories, the account pages and the light and dark switch, in a drawer
+// from the left. Following a link closes it.
 export function MobileNav({ categories, storeName }: { categories: Category[]; storeName: string }) {
   const [open, setOpen] = useState(false);
   const user = useCurrentUser();
@@ -125,6 +126,8 @@ export function MobileNav({ categories, storeName }: { categories: Category[]; s
               </li>
             </ul>
           </nav>
+
+          <ThemeToggle withLabel className={`${linkClasses} -mt-4 w-full`} />
         </div>
       </SheetContent>
     </Sheet>

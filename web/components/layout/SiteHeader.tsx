@@ -7,9 +7,10 @@ import { CartButton } from "./CartButton";
 import { HeaderSearch } from "./HeaderSearch";
 import { MobileNav } from "./MobileNav";
 import { MobileSearch } from "./MobileSearch";
+import { ThemeToggle } from "./ThemeToggle";
 
 // The storefront header: the palette stripe, the logo, the categories (from the store), search, the
-// account menu and the cart. It stays at the top while the page scrolls.
+// account menu, the light and dark switch (in the menu on phones) and the cart. It stays at the top while the page scrolls.
 export function SiteHeader({ categories, storeName }: { categories: Category[]; storeName: string }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
@@ -50,6 +51,7 @@ export function SiteHeader({ categories, storeName }: { categories: Category[]; 
             <MobileSearch />
             <AccountMenu />
           </Suspense>
+          <ThemeToggle className="size-10 justify-center rounded-md hover:bg-muted max-lg:hidden" />
           <CartButton />
         </div>
       </div>

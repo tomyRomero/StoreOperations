@@ -80,7 +80,7 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
 function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
   const { error, formItemId } = useFormField()
 
-  return <Label className={cn(error && "text-sale", className)} htmlFor={formItemId} {...props} />
+  return <Label className={cn(error && "text-destructive", className)} htmlFor={formItemId} {...props} />
 }
 
 function FormControl(props: React.ComponentProps<typeof Slot>) {
@@ -111,7 +111,7 @@ function FormMessage({ className, children, ...props }: React.ComponentProps<"p"
   }
 
   return (
-    <p id={formMessageId} className={cn("text-sm font-medium text-sale", className)} {...props}>
+    <p id={formMessageId} className={cn("text-sm font-medium text-destructive", className)} {...props}>
       {body}
     </p>
   )

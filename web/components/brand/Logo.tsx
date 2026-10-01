@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
-// The brand's four pigments, in the order they appear in the mark and the stripe
-const pigments = ["bg-pigment-magenta", "bg-pigment-cobalt", "bg-pigment-yellow", "bg-pigment-green"];
+// Four of the brand glows, in the order they appear in the mark and the stripe
+const pigments = ["bg-glow-pink", "bg-glow-blue", "bg-glow-amber", "bg-glow-green"];
 
 // The mark: four paint chips, one per pigment. Decorative, so screen readers skip it.
 export function PaletteMark({ className }: { className?: string }) {

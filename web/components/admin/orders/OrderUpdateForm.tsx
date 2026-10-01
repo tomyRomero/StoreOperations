@@ -265,7 +265,7 @@ export function OrderUpdateForm({ order, emailByDefault }: { order: AdminOrder; 
           <AlertDialogFooter>
             <AlertDialogCancel>Keep the order</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-sale text-white hover:bg-sale/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (confirming) void save(confirming, true);
                 setConfirming(null);

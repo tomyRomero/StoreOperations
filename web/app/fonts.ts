@@ -1,17 +1,16 @@
-import { Bricolage_Grotesque, Figtree } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 
-// Bricolage Grotesque for display and headings (its optical-size axis keeps small headings readable),
-// Figtree for text, UI and numbers. Both are variable fonts served from this site, not from Google.
-// Shared by the root layout and the page shown when the root layout itself fails.
-const display = Bricolage_Grotesque({
+// Geist for text, headings and UI; Geist Mono for small labels, order numbers and tracking codes. Both are
+// variable fonts served from this site, not from Google. Shared by the root layout and the page shown when
+// the root layout itself fails.
+const sans = Geist({
   subsets: ["latin"],
-  axes: ["opsz"],
-  variable: "--font-bricolage",
+  variable: "--font-geist",
 });
 
-const sans = Figtree({
+const mono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-figtree",
+  variable: "--font-geist-mono",
 });
 
-export const fontVariables = `${display.variable} ${sans.variable}`;
+export const fontVariables = `${sans.variable} ${mono.variable}`;

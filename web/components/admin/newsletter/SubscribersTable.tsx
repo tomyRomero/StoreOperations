@@ -98,7 +98,7 @@ export function SubscribersTable({ subscribers, timeZone }: { subscribers: Subsc
           <AlertDialogFooter>
             <AlertDialogCancel disabled={working}>Keep them</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-sale text-white hover:bg-sale/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={working}
               onClick={(event) => {
                 event.preventDefault();

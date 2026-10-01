@@ -1,52 +1,123 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Dark mode is out of scope; the dark: classes some components carry only apply under a .dark class
-   that is never set, rather than following the visitor's system setting. */
-@custom-variant dark (&:is(.dark *));
-
 /*
-  Swatch design tokens (DESIGN.md section 2). Components use the semantic names (bg-card,
-  text-muted-foreground, border-input), never raw hex, so a later dark mode is a matter of redefining them.
-  Contrast on white: foreground 18.6:1, muted-foreground 6.8:1, accent 5.9:1, input borders 3.4:1.
+  Night Studio design tokens. Every color is written once as light-dark(light, dark), so the whole site
+  follows the color-scheme set on <html> below: the visitor's device setting, until they pick light or
+  dark with the switch in the header, which the root layout then reads from the "theme" cookie.
+  Components use the semantic names (bg-card, text-muted-foreground, border-input), never raw hex.
+  Contrast, light / dark, on the page background: foreground 18.3 / 18.2:1, muted-foreground 6.8 / 7.8:1,
+  faint 4.9 / 5.9:1, every status color at least 5:1, input borders and the focus ring at least 3:1.
 */
 :root {
-  --background: #ffffff;
-  --foreground: #111318;
-  --card: #ffffff;
-  --card-foreground: #111318;
-  --popover: #ffffff;
-  --popover-foreground: #111318;
-  --muted: #f3f4f6;
-  --muted-foreground: #555b66;
-  --border: #e4e6ea;
-  --input: #868c97;
-  --primary: #111318;
-  --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #111318;
+  color-scheme: light dark;
 
-  /* The one interface accent: links, focus, selected states, the chart line */
-  --accent: #b8168f;
-  --accent-foreground: #ffffff;
-  --accent-subtle: #fce8f6;
-  --accent-ink: #8a0f6b;
-  --ring: #b8168f;
+  --background: light-dark(#f6f6f7, #09090b);
+  --foreground: light-dark(#0c0c12, #f4f4f5);
+  --card: light-dark(#ffffff, #111114);
+  --card-foreground: var(--foreground);
+  --popover: light-dark(#ffffff, #131316);
+  --popover-foreground: var(--foreground);
+  --muted: light-dark(#f2f2f4, #18181c);
+  --muted-foreground: light-dark(#55555e, #a1a1aa);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
 
-  /* Status colors, always with a label or an icon */
-  --sale: #c42b1c;
-  --sale-subtle: #fdecea;
-  --success: #0b7a52;
-  --success-subtle: #e5f4ed;
-  --warning: #8c5a00;
-  --warning-subtle: #fff2d3;
+  /* Hairlines between areas are decorative; a form field's border has to be seen, so it is 3:1 */
+  --border: light-dark(rgb(12 12 18 / 0.08), rgb(255 255 255 / 0.08));
+  --input: light-dark(#8a8a93, #6b6b74);
 
-  /* The brand pigments: the logo mark, the stripe across the top and category markers. Decorative
-     only, never text or meaning. */
-  --pigment-magenta: #b8168f;
-  --pigment-cobalt: #1f4fe0;
-  --pigment-yellow: #f5c400;
-  --pigment-green: #00866e;
+  /* Primary actions are ink on the page: near-black in light, near-white in dark */
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+
+  /* The text steps between foreground and muted: labels, then long-form reading text. Faint is the
+     quietest text that still passes AA, for timestamps and hints; placeholders use muted-foreground. */
+  --ink-2: light-dark(#3f3f46, #d4d4d8);
+  --ink-3: light-dark(#4b4b53, #b4b4bc);
+  --faint: light-dark(#6b6b74, #8b8b94);
+
+  /* Surfaces beyond the card: sunk wells, a third step for chips and tracks, the row under the pointer */
+  --surface-sunk: light-dark(#fafafb, #0e0e11);
+  --surface-3: light-dark(#ebebee, #1e1e24);
+  --surface-hover: light-dark(#fbfbfc, #141418);
+  --chip: light-dark(#e4e4e7, #3f3f46);
+  --scrim: light-dark(rgb(24 24 32 / 0.3), rgb(5 5 7 / 0.62));
+
+  /* The stage a product stands on: a soft gradient the cut-out photo floats over */
+  --stage-end: light-dark(#ffffff, #0e0e12);
+  --stage-blue: light-dark(#e6edff, #131a33);
+  --stage-violet: light-dark(#ede8ff, #1d1733);
+
+  /* Cut-outs cast a real shadow, much lighter on a light page */
+  --shadow: light-dark(rgb(0 0 0 / 0.23), rgb(0 0 0 / 0.6));
+  --shadow-strong: light-dark(rgb(0 0 0 / 0.27), rgb(0 0 0 / 0.7));
+
+  /* The one interface accent: links, selected states, the chart line. Focus is the brand violet. */
+  --accent: light-dark(#5b3fd9, #c9bcff);
+  --accent-foreground: light-dark(#ffffff, #09090b);
+  --accent-subtle: light-dark(rgb(139 108 255 / 0.12), rgb(139 108 255 / 0.18));
+  --accent-ink: light-dark(#4c33c2, #d9d0ff);
+  --ring: #8b6cff;
+
+  /* Status colors, always with a label or an icon. Each solid fill has its own text color. Sale is the
+     brand pink for prices and deals; anything wrong or irreversible is destructive red. */
+  --sale: light-dark(#c2185b, #ff7ab8);
+  --sale-foreground: light-dark(#ffffff, #09090b);
+  --sale-subtle: light-dark(rgb(255 79 163 / 0.12), rgb(255 79 163 / 0.16));
+  --success: light-dark(#047857, #6ee7b7);
+  --success-foreground: light-dark(#ffffff, #09090b);
+  --success-subtle: light-dark(rgb(52 211 153 / 0.14), rgb(52 211 153 / 0.14));
+  --warning: light-dark(#8a5a00, #fde7a9);
+  --warning-subtle: light-dark(rgb(255 197 61 / 0.18), rgb(255 197 61 / 0.14));
+  --info: light-dark(#1d4ed8, #bfd8ff);
+  --info-subtle: light-dark(rgb(61 139 255 / 0.12), rgb(61 139 255 / 0.16));
+  --destructive: light-dark(#b91c1c, #fca5a5);
+  --destructive-foreground: light-dark(#ffffff, #09090b);
+  --destructive-subtle: light-dark(rgb(220 38 38 / 0.1), rgb(248 113 113 / 0.14));
+
+  /* The brand glows behind products, the logo and the hero. Decorative only, never text or meaning,
+     and the same in both modes. They burn a little softer on a light page. */
+  --glow-pink: #ff4fa3;
+  --glow-violet: #8b6cff;
+  --glow-blue: #3d8bff;
+  --glow-green: #34d399;
+  --glow-amber: #ffc53d;
+  --glow-orange: #ff8a3d;
+  --glow-strength: 0.7;
+  @variant dark {
+    --glow-strength: 1;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* The admin console stays light until it has a dark design of its own, and keeps the StoreOps cobalt */
+:root:has([data-console]) {
+  color-scheme: light;
+  --accent: #2f4be0;
+  --accent-subtle: #eef1ff;
+  --accent-ink: #2440b8;
+  --ring: #2f5bff;
+}
+
+/* For the rare style a token can't express, such as which icon the theme switch shows. Matches when
+   the page is dark, by the visitor's choice or by following a dark device. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
 }
 
 @theme inline {
@@ -58,61 +129,90 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-faint: var(--faint);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-surface-3: var(--surface-3);
+  --color-surface-hover: var(--surface-hover);
+  --color-chip: var(--chip);
+  --color-scrim: var(--scrim);
+  --color-stage-end: var(--stage-end);
+  --color-stage-blue: var(--stage-blue);
+  --color-stage-violet: var(--stage-violet);
+  --color-shadow: var(--shadow);
+  --color-shadow-strong: var(--shadow-strong);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-subtle: var(--accent-subtle);
   --color-accent-ink: var(--accent-ink);
   --color-ring: var(--ring);
   --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
   --color-sale-subtle: var(--sale-subtle);
-  --color-destructive: var(--sale);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-success-subtle: var(--success-subtle);
   --color-warning: var(--warning);
   --color-warning-subtle: var(--warning-subtle);
-  --color-pigment-magenta: var(--pigment-magenta);
-  --color-pigment-cobalt: var(--pigment-cobalt);
-  --color-pigment-yellow: var(--pigment-yellow);
-  --color-pigment-green: var(--pigment-green);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-glow-pink: var(--glow-pink);
+  --color-glow-violet: var(--glow-violet);
+  --color-glow-blue: var(--glow-blue);
+  --color-glow-green: var(--glow-green);
+  --color-glow-amber: var(--glow-amber);
+  --color-glow-orange: var(--glow-orange);
 
-  /* Set by next/font in app/layout.tsx */
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-bricolage), var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  /* Set by next/font in app/fonts.ts. Headings have their own family so a store can give them a
+     different face later; Night Studio uses Geist for both. */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @theme {
-  /* Type scale: Bricolage Grotesque for display and h1-h3 (set on the elements below), Figtree for the rest */
-  --text-display: clamp(2.5rem, 5vw, 4.25rem);
-  --text-display--line-height: 1;
-  --text-display--letter-spacing: -0.03em;
-  --text-display--font-weight: 800;
-  --text-h1: clamp(2rem, 3.5vw, 2.75rem);
-  --text-h1--line-height: 1.05;
-  --text-h1--letter-spacing: -0.025em;
-  --text-h1--font-weight: 800;
-  --text-h2: 1.75rem;
-  --text-h2--line-height: 1.15;
-  --text-h2--letter-spacing: -0.015em;
-  --text-h2--font-weight: 700;
+  /* Type scale: Geist throughout, headings at 600 with tight tracking that tightens as the size grows */
+  --text-display: clamp(2.75rem, 6vw, 5rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.055em;
+  --text-display--font-weight: 600;
+  --text-h1: clamp(2.25rem, 4vw, 3rem);
+  --text-h1--line-height: 1;
+  --text-h1--letter-spacing: -0.05em;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.875rem;
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.035em;
+  --text-h2--font-weight: 600;
   --text-h3: 1.375rem;
-  --text-h3--line-height: 1.25;
-  --text-h3--font-weight: 700;
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.025em;
+  --text-h3--font-weight: 600;
   --text-h4: 1.125rem;
   --text-h4--line-height: 1.4;
   --text-h4--font-weight: 600;
   --text-body-lg: 1.125rem;
   --text-body-lg--line-height: 1.6;
 
-  /* Crisp shapes: 4px for badges, inputs and chips, 6px for buttons and cards, 10px for drawers and dialogs */
+  /* Crisp shapes for the admin console: 4px for badges, inputs and chips, 6px for buttons and cards, 10px
+     for drawers and dialogs. The storefront is softer: 14px fields, 24px cards, 32px product stages,
+     and pill buttons (rounded-full). */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
+  --radius-field: 14px;
+  --radius-card: 24px;
+  --radius-stage: 32px;
 
   /* Quick motion: 120ms hover, 200ms menus and toasts, 320ms drawers */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -171,7 +271,7 @@
     font-family: var(--font-display);
   }
 
-  /* One visible focus ring for everything focusable: 2px accent with a 2px gap */
+  /* One visible focus ring for everything focusable: 2px violet with a 2px gap */
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;

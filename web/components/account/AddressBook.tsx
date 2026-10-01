@@ -71,7 +71,7 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
             )}
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="sm" variant="ghost" className="text-sale hover:bg-sale-subtle" disabled={busyId !== null}>
+                <Button size="sm" variant="ghost" className="text-destructive hover:bg-destructive-subtle" disabled={busyId !== null}>
                   Delete<span className="sr-only"> the address for {address.recipientName}</span>
                 </Button>
               </AlertDialogTrigger>

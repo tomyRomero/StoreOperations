@@ -44,7 +44,7 @@ const SubscribeForm = () => {
       <h2 id="newsletter-heading" className="mb-2 font-sans text-sm font-semibold">
         Newsletter
       </h2>
-      <p className="mb-4 text-sm text-white/75">New supplies and deals, about once a month. Leave any time.</p>
+      <p className="mb-4 text-sm text-primary-foreground/75">New supplies and deals, about once a month. Leave any time.</p>
       {subscribed ? (
         <p role="status" className="flex items-center gap-2 text-sm font-semibold">
           <CircleCheck className="size-4" aria-hidden />
@@ -62,11 +62,11 @@ const SubscribeForm = () => {
                   <FormControl>
                     <Input type="email" autoComplete="email" placeholder="you@example.com" {...field} />
                   </FormControl>
-                  <FormMessage className="text-white" />
+                  <FormMessage className="text-primary-foreground" />
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="secondary" loading={form.formState.isSubmitting} className="bg-white hover:bg-white/90">
+            <Button type="submit" variant="secondary" loading={form.formState.isSubmitting} className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
               Subscribe
             </Button>
           </form>

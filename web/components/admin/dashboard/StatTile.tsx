@@ -27,11 +27,11 @@ export function StatTile({ label, comparison, format, previousPeriod, hero, clas
         {delta ? (
           <>
             <Icon
-              className={cn("size-4 shrink-0", delta.direction === "up" && "text-success", delta.direction === "down" && "text-sale")}
+              className={cn("size-4 shrink-0", delta.direction === "up" && "text-success", delta.direction === "down" && "text-destructive")}
               aria-hidden
             />
             <span>
-              <span className={cn("font-semibold", delta.direction === "up" && "text-success", delta.direction === "down" && "text-sale")}>
+              <span className={cn("font-semibold", delta.direction === "up" && "text-success", delta.direction === "down" && "text-destructive")}>
                 {delta.direction === "same" ? "No change" : `${delta.direction === "up" ? "Up" : "Down"} ${delta.percent}%`}
               </span>{" "}
               on {previousPeriod} ({format(comparison.previous)})

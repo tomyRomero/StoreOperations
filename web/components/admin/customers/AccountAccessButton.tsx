@@ -70,7 +70,7 @@ export function AccountAccessButton({ customer }: { customer: AdminCustomer }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Keep it active</AlertDialogCancel>
-          <AlertDialogAction className="bg-sale text-white hover:bg-sale/90" onClick={() => void change()}>
+          <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => void change()}>
             Disable account
           </AlertDialogAction>
         </AlertDialogFooter>

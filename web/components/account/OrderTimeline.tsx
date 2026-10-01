@@ -41,7 +41,7 @@ export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: str
               aria-hidden
               className={cn(
                 "relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full",
-                step.state === "ended" && "bg-sale text-white",
+                step.state === "ended" && "bg-destructive text-destructive-foreground",
                 filled && step.state !== "current" && "bg-primary text-primary-foreground",
                 step.state === "current" && "bg-accent ring-4 ring-accent-subtle",
                 step.state === "upcoming" && "border-2 border-input bg-card"
@@ -51,7 +51,7 @@ export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: str
               {step.state === "ended" && <X className="size-3.5" />}
             </span>
             <div className="grid gap-0.5">
-              <span className={cn("text-sm font-semibold", step.state === "upcoming" && "text-muted-foreground", step.state === "ended" && "text-sale")}>
+              <span className={cn("text-sm font-semibold", step.state === "upcoming" && "text-muted-foreground", step.state === "ended" && "text-destructive")}>
                 {step.label}
                 <span className="sr-only">
                   {step.state === "done" ? " (done)" : step.state === "current" ? " (current step)" : step.state === "upcoming" ? " (not yet)" : ""}

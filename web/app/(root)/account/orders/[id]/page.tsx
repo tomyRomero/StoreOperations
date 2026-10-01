@@ -57,7 +57,7 @@ export default async function OrderPage(props: Props) {
         </h2>
         <OrderTimeline order={order} timeZone={settings.timeZoneId} />
         {ended && (
-          <p className="rounded-md bg-sale-subtle p-3 text-sm">
+          <p className="rounded-md bg-destructive-subtle p-3 text-sm">
             {order.status === "cancelled" ? "This order was cancelled" : "This order was refunded"}, and the payment was returned in full.
             {lastNote ? ` ${lastNote}` : ""}
           </p>

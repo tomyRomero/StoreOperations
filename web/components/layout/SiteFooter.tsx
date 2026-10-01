@@ -10,7 +10,7 @@ type Props = {
   supportEmail: string | null;
 };
 
-const linkClasses = "text-sm text-white/75 transition-colors hover:text-white hover:underline underline-offset-4";
+const linkClasses = "text-sm text-primary-foreground/75 transition-colors hover:text-primary-foreground hover:underline underline-offset-4";
 
 // Shop, help, the store, and the newsletter
 export function SiteFooter({ categories, storeName, supportEmail }: Props) {
@@ -82,9 +82,9 @@ export function SiteFooter({ categories, storeName, supportEmail }: Props) {
         <SubscribeForm />
       </div>
 
-      <div className="border-t border-white/15">
-        <div className="container flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-white/75">
-          <Logo name={storeName} className="text-white" />
+      <div className="border-t border-primary-foreground/15">
+        <div className="container flex flex-wrap items-center justify-between gap-4 py-6 text-sm text-primary-foreground/75">
+          <Logo name={storeName} className="text-primary-foreground" />
           <p>
             © {new Date().getFullYear()} {storeName}. Art supplies, shipped across the US.
           </p>

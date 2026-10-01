@@ -44,7 +44,7 @@ const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
       <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
 
       {message && (
-        <p id="payment-message" role="alert" className="text-sm font-semibold text-sale">
+        <p id="payment-message" role="alert" className="text-sm font-semibold text-destructive">
           {message}
         </p>
       )}

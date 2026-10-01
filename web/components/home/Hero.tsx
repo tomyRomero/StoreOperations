@@ -27,7 +27,7 @@ export function Hero() {
             Artist-grade paint, brushes and canvas for studio days and weekend projects.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="bg-white text-foreground hover:bg-white/90">
+            <Button asChild size="lg" className="bg-white text-black hover:bg-white/90">
               <Link href="/products">Shop all supplies</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">

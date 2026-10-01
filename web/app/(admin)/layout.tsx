@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-// The admin area: the sections on the left (a drawer on phones), who is signed in at the top
+// The admin area: the sections on the left (a drawer on phones), who is signed in at the top. The console
+// marker keeps it light whatever the storefront's mode (see globals.css).
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Fail closed: only a user the API confirms as admin gets in. The API also refuses every admin
   // request from anyone else, so this only spares them a broken page.
@@ -24,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const toShip = (await countOrders("pending")) ?? 0;
 
   return (
-    <div className="min-h-screen bg-muted/50 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <div data-console className="min-h-screen bg-muted/50 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
       <SkipLink />
       <aside className="sticky top-0 flex h-screen flex-col border-r bg-card max-lg:hidden">
         <PaletteStripe />
