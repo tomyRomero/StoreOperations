@@ -1,4 +1,5 @@
-// Where the .NET API listens (the same default as lib/api/config.ts)
+// Where the .NET API listens (the same default as lib/api/config.ts). Read when building: the rewrite's
+// destination is fixed in the build, so API_URL must be set for `next build` as well as `next start`.
 const apiUrl = process.env.API_URL ?? "http://localhost:5200";
 
 /** @type {import('next').NextConfig} */
