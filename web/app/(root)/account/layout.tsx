@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { AccountNav } from "@/components/account/AccountNav";
 import { getAddresses, getOrders } from "@/lib/data/account";
+import { getStoreSettings } from "@/lib/data/catalog";
 import { requireUser } from "@/lib/session";
 
-export const metadata: Metadata = { title: { default: "Your account", template: "%s · Your account · Palettehub" } };
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getStoreSettings();
+  return { title: { default: "Your account", template: `%s · Your account · ${settings?.storeName ?? "Palettehub"}` } };
+}
 
 // The account area: its menu beside (or above, on phones) each page, under a soft pink glow
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
