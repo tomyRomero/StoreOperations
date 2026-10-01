@@ -44,6 +44,11 @@ export function SiteFooter({ categories, storeName, supportEmail }: Props) {
               </Link>
             </li>
             <li>
+              <Link href="/shipping-returns" className={linkClasses}>
+                Shipping and returns
+              </Link>
+            </li>
+            <li>
               <Link href="/account/orders" className={linkClasses}>
                 Track an order
               </Link>
@@ -63,7 +68,12 @@ export function SiteFooter({ categories, storeName, supportEmail }: Props) {
           <ul className="grid gap-2.5">
             <li>
               <Link href="/about" className={linkClasses}>
-                About and privacy
+                About us
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy" className={linkClasses}>
+                Privacy
               </Link>
             </li>
           </ul>

@@ -1,175 +1,145 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../ui/form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from '../ui/use-toast'
-import { api } from '@/lib/api/browser'
-import { fieldErrors, problemMessage } from '@/lib/api/problems'
+import { useState } from "react";
+import { CircleCheck } from "lucide-react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
+import { useCurrentUser } from "../CurrentUserProvider";
+import { api } from "@/lib/api/browser";
+import { fieldErrors, problemMessage } from "@/lib/api/problems";
+import { FormAlert } from "./FormAlert";
+
+// The same limits as the API's ContactRequest
+const FormSchema = z.object({
+  name: z.string().trim().min(1, "Enter your name").max(100, "Use at most 100 characters"),
+  email: z.string().trim().min(1, "Enter your email").email("Enter an email address").max(256),
+  subject: z.string().trim().min(1, "Enter a subject").max(150, "Use at most 150 characters"),
+  message: z.string().trim().min(10, "Write at least 10 characters").max(5000, "Use at most 5000 characters"),
+});
+
+type Values = z.infer<typeof FormSchema>;
 
 const ContactForm = () => {
-const [loading, setLoading] = useState(false)
+  const user = useCurrentUser();
+  const [refusal, setRefusal] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
-const FormSchema = z
-  .object({
-    firstname: z.string().trim().min(1, 'Enter your first name').max(50, 'Use at most 50 characters'),
-    lastname: z.string().trim().min(1, 'Enter your last name').max(49, 'Use at most 49 characters'),
-    email: z.string().trim().min(1, 'Enter your email').email('Enter an email address').max(256),
-    subject: z.string().trim().min(1, 'Enter a subject').max(150, 'Use at most 150 characters'),
-    message: z.string().trim().min(10, 'Write at least 10 characters').max(5000, 'Use at most 5000 characters'),
-  });
-
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<Values>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      firstname: '',
-      lastname: '',
-      email: '',
-      subject: '',
-      message: '',
-    },
+    // A signed-in customer's email is already known
+    defaultValues: { name: "", email: user?.email ?? "", subject: "", message: "" },
   });
 
   // The message goes to the store's support inbox with the customer's address as Reply-To. Nothing
   // is emailed to the address typed in, so the form can't be used to send mail to strangers.
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
-    setLoading(true)
-    const { error, response } = await api.POST('/api/contact', {
-      body: { name: `${values.firstname} ${values.lastname}`, email: values.email, subject: values.subject, message: values.message },
-    })
-    setLoading(false)
+  const onSubmit = async (values: Values) => {
+    setRefusal(null);
+    const { error, response } = await api.POST("/api/contact", { body: values });
 
     if (!response.ok) {
-      for (const [field, message] of Object.entries(fieldErrors(error))) {
-        if (field === 'email' || field === 'subject' || field === 'message') form.setError(field, { message })
-      }
       // What they wrote stays in the form, so it isn't lost
-      toast({ title: "Couldn't send your message", description: problemMessage(error), variant: "destructive" })
-      return
+      const errors = Object.entries(fieldErrors(error)).filter(([field]) => field in values);
+      errors.forEach(([field, message], index) => form.setError(field as keyof Values, { message }, { shouldFocus: index === 0 }));
+      if (errors.length === 0) setRefusal(problemMessage(error));
+      return;
     }
 
-    toast({ title: "Message sent", description: `We'll reply to ${values.email}.` })
-    form.reset();
+    setSentTo(values.email);
+  };
+
+  if (sentTo) {
+    return (
+      <div role="status" className="grid justify-items-center gap-3 py-8 text-center">
+        <span className="flex size-12 items-center justify-center rounded-full bg-success-subtle">
+          <CircleCheck className="size-6 text-success" aria-hidden />
+        </span>
+        <p className="font-display text-h3">Message sent</p>
+        <p className="text-muted-foreground">Thanks for writing. We&apos;ll reply to {sentTo}.</p>
+        <Button
+          variant="outline"
+          className="mt-2"
+          onClick={() => {
+            form.reset({ ...form.getValues(), subject: "", message: "" });
+            setSentTo(null);
+          }}
+        >
+          Send another message
+        </Button>
+      </div>
+    );
   }
 
-
   return (
-    <div className="mx-auto max-w-2xl flex flex-col items-center justify-center space-y-4 text-center">
-    <div className="space-y-2">
-      <h2 className="text-heading3-bold tracking-tighter pt-4">Contact Us</h2>
-      <p className="mx-auto text-gray-500 md:text-xl">
-        Fill out the form below and we&apos;ll get back to you as soon as possible.
-      </p>
-    </div>
-
-    <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
+    <div className="grid gap-6">
+      {refusal && <FormAlert>{refusal}</FormAlert>}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5" noValidate>
+          <div className="grid gap-5 sm:grid-cols-2">
             <FormField
-                control={form.control}
-                name='firstname'
-                render={({ field }) => (
+              control={form.control}
+              name="name"
+              render={({ field }) => (
                 <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                    <Input placeholder='Enter your first name' {...field} />
-                    </FormControl>
-                    <FormMessage />
+                  <FormLabel>Your name</FormLabel>
+                  <FormControl>
+                    <Input autoComplete="name" {...field} />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-                )}
+              )}
             />
-        </div>
-        <div className="space-y-2">
-        <FormField
-                control={form.control}
-                name='lastname'
-                render={({ field }) => (
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                    <Input placeholder='Enter your last name' {...field} />
-                    </FormControl>
-                    <FormMessage />
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" autoComplete="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-                )}
+              )}
             />
-        </div>
-      </div>
-      <div className="space-y-2">
-      <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                    <Input placeholder='Enter your email' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-      </div>
-      <div className="space-y-2">
-        <FormField
-                control={form.control}
-                name='subject'
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <FormControl>
-                    <Input placeholder='Enter your subject' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-      </div>
-      <div className="space-y-2">
-      <FormField
-                control={form.control}
-                name='message'
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Message</FormLabel>
-                    <FormControl>
-                    <Textarea placeholder='Enter your desired message' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
-      </div>
-      <div className="py-2">
-      <Button
-      className="bg-black text-white border border-black"
-      variant={"ghost"}
-      type='submit'
-      disabled={loading}
-      >
-      {loading ? "Sending..." : "Send message"}
-      </Button>
-      </div>
-      <br/>
+          </div>
+          <FormField
+            control={form.control}
+            name="subject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message</FormLabel>
+                <FormControl>
+                  <Textarea rows={6} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" size="lg" className="justify-self-start" loading={form.formState.isSubmitting}>
+            Send message
+          </Button>
+        </form>
+      </Form>
     </div>
-    </form>
-    </Form>
-  </div>
-  )
-}
+  );
+};
 
-export default ContactForm
+export default ContactForm;

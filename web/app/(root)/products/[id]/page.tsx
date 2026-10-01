@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -113,6 +114,11 @@ export default async function ProductPage(props: Props) {
                       {returnsSummary(settings)}.{settings.returnPolicyNote ? ` ${settings.returnPolicyNote}` : ""}
                     </li>
                     <li>Tax is added at checkout, once we know where it&apos;s going.</li>
+                    <li>
+                      <Link href="/shipping-returns" className="font-semibold text-accent underline-offset-4 hover:underline">
+                        Shipping and returns in full
+                      </Link>
+                    </li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>
