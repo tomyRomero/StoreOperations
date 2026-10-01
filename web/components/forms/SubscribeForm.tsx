@@ -1,28 +1,33 @@
 "use client"
 
 import React, { useState } from 'react'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
-import { useForm} from 'react-hook-form';
+import Image from 'next/image';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
 import {
     Form,
     FormControl,
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
   } from "@/components/ui/form";
-import { subscribeToNewsletter } from '@/lib/actions/store.actions';
 import { toast } from '../ui/use-toast';
-import Image from 'next/image';
+import { api } from '@/lib/api/browser';
+import { problemMessage } from '@/lib/api/problems';
 
+const FormSchema = z.object({
+  email: z.string().trim().min(1, 'Enter your email').email('Enter an email address').max(256),
+});
+
+// The API answers the same way whether or not the address was already on the list, so this form
+// can't be used to find out who subscribes. The address gets an email saying it's subscribed,
+// with a link to leave.
 const SubscribeForm = () => {
     const [loading, setLoading] = useState(false)
-
-    const FormSchema = z.object({
-        email: z.string().min(1, 'Email is required').email('Invalid email'),
-      });
 
       const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -33,21 +38,14 @@ const SubscribeForm = () => {
 
       const onSubmit = async (values: z.infer<typeof FormSchema>)=> {
         setLoading(true)
-        const result = await subscribeToNewsletter(values.email);
-
-        if(result === 'Failed to add email to newsletter')
-        {
-            toast({
-                title: "Error",
-                description: `${result}`, 
-                variant: "destructive",
-              })
-        }else{
-            toast({
-                description: `${result}`, 
-              })
-        }
+        const { error, response } = await api.POST("/api/newsletter", { body: { email: values.email } });
         setLoading(false)
+
+        if (!response.ok) {
+          toast({ title: "Couldn't subscribe you", description: problemMessage(error), variant: "destructive" })
+          return
+        }
+        toast({ title: "Thanks for subscribing!", description: "We've emailed you to confirm." })
         form.reset();
       }
 
@@ -56,35 +54,25 @@ const SubscribeForm = () => {
           <h3 className="font-semibold mb-2">Newsletter</h3>
           <p className="text-white mb-4">Subscribe to our newsletter for latest updates</p>
           <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='flex text-black space-x-2 items-center'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='flex text-black space-x-2 items-start' noValidate>
           <FormField
             control={form.control}
             name='email'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="sr-only">Email</FormLabel>
                 <FormControl>
-                  <Input placeholder='mail@example.com' {...field} />
+                  <Input type="email" autoComplete="email" placeholder='mail@example.com' {...field} />
                 </FormControl>
+                <FormMessage className="text-red-300" />
               </FormItem>
             )}
           />
-            <div className='pt-8'>
-            <Button className={` ${loading ? "bg-white" : "bg-black border border-white text-white"}`} variant={"ghost"} type="submit">
-              
-              {loading ?  (
-              <Image
-             src={"/assets/lineloader.svg"}
-             alt={"loader"}
-             width={30}
-             height={30}
-             className={`${loading ? "" : "hidden"} mx-auto`}
-             />
-             ) : "Subscribe"}
-              
-              </Button>
-            </div>
-            
+            <Button className={` ${loading ? "bg-white" : "bg-black border border-white text-white"}`} variant={"ghost"} type="submit" disabled={loading}>
+              {loading ? (
+                <Image src={"/assets/lineloader.svg"} alt="Subscribing" width={30} height={30} className="mx-auto" />
+              ) : "Subscribe"}
+            </Button>
           </form>
           </Form>
         </div>

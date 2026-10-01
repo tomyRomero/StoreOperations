@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -16,29 +15,20 @@ import {
 } from '../ui/form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import axios from 'axios'
 import { toast } from '../ui/use-toast'
+import { api } from '@/lib/api/browser'
+import { fieldErrors, problemMessage } from '@/lib/api/problems'
 
 const ContactForm = () => {
 const [loading, setLoading] = useState(false)
 
 const FormSchema = z
-//Added strict password params to ensure safety from brute force attacks
   .object({
-    firstname: z
-    .string()
-    .min(1, 'First Name Required'),
-    lastname: z
-    .string()
-    .min(1, 'Last Name Required'),
-    email: z.string().min(1, 'Email is required').email('Invalid email'),
-    subject: z
-    .string()
-    .min(1, 'Subject Required'),
-    message: z
-    .string()
-    .min(10, 'Message Required and must be at least 10 characters long'),
-
+    firstname: z.string().trim().min(1, 'Enter your first name').max(50, 'Use at most 50 characters'),
+    lastname: z.string().trim().min(1, 'Enter your last name').max(49, 'Use at most 49 characters'),
+    email: z.string().trim().min(1, 'Enter your email').email('Enter an email address').max(256),
+    subject: z.string().trim().min(1, 'Enter a subject').max(150, 'Use at most 150 characters'),
+    message: z.string().trim().min(10, 'Write at least 10 characters').max(5000, 'Use at most 5000 characters'),
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -52,48 +42,25 @@ const FormSchema = z
     },
   });
 
+  // The message goes to the store's support inbox with the customer's address as Reply-To. Nothing
+  // is emailed to the address typed in, so the form can't be used to send mail to strangers.
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     setLoading(true)
-    try {
-        const nodeMailerData = {
-            email: values.email,
-            name: `${values.firstname} ${values.lastname}`,
-            items: {},
-            event: "support",
-            pricing: {},
-            address: {}, 
-            orderId: "",
-            message: values.message
-        }
+    const { error, response } = await api.POST('/api/contact', {
+      body: { name: `${values.firstname} ${values.lastname}`, email: values.email, subject: values.subject, message: values.message },
+    })
+    setLoading(false)
 
-      const currentURL = process.env.NEXT_PUBLIC_URL;
-      const response = await axios.post(`${currentURL}/api/nodemailer`, nodeMailerData);
-
-      if (response.status === 201) {
-        toast({
-            title: "Success",
-            description: `Your message was delivered`,
-          });
-       
-      } else {
-        toast({
-            title: "Failed to Send Email",
-            description: `Something went wrong, please try again later, or email us directly using our contact information.`,
-            variant:"destructive"
-          });
-       
+    if (!response.ok) {
+      for (const [field, message] of Object.entries(fieldErrors(error))) {
+        if (field === 'email' || field === 'subject' || field === 'message') form.setError(field, { message })
       }
-    }catch(error)
-    {
-        console.log(error)
-        toast({
-            title: "An Error Occured",
-            description: `${error} , please try again later, or email us directly using our contact information.`,
-            variant:"destructive"
-          });
+      // What they wrote stays in the form, so it isn't lost
+      toast({ title: "Couldn't send your message", description: problemMessage(error), variant: "destructive" })
+      return
     }
 
-    setLoading(false)
+    toast({ title: "Message sent", description: `We'll reply to ${values.email}.` })
     form.reset();
   }
 
@@ -187,21 +154,14 @@ const FormSchema = z
                 )}
             />
       </div>
-      <Image
-             
-              src={"/assets/spinner.svg"}
-              alt={"loader"}
-              width={100}
-              height={100}
-              className={`${loading ? "" : "hidden"} mx-auto`}
-            />
       <div className="py-2">
       <Button
       className="bg-black text-white border border-black"
       variant={"ghost"}
       type='submit'
+      disabled={loading}
       >
-      Submit
+      {loading ? "Sending..." : "Send message"}
       </Button>
       </div>
       <br/>
