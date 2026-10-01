@@ -16,7 +16,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
     <CartProvider>
       <SkipLink />
       {user?.isAdmin && <AdminBar />}
-      <SiteHeader categories={categories} storeName={storeName} hasDeals={deals} />
+      <SiteHeader categories={categories} storeName={storeName} hasDeals={deals} lowStockThreshold={settings?.lowStockThreshold ?? 5} />
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
         {children}
       </main>

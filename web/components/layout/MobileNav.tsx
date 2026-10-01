@@ -9,14 +9,13 @@ import { useCurrentUser } from "@/components/CurrentUserProvider";
 import type { Category } from "@/lib/api/types";
 import { currentPath, signInPath } from "@/lib/sign-in-path";
 import { useSignOut } from "@/lib/use-sign-out";
-import { HeaderSearch } from "./HeaderSearch";
 import { ThemeToggle } from "./ThemeToggle";
 
 const linkClasses = "flex min-h-11 items-center rounded-xl px-3 font-medium transition-colors hover:bg-foreground/5";
 const groupLabel = "px-3 pb-1 font-mono text-xs uppercase tracking-[0.08em] text-faint";
 
-// The phone menu: search, the categories, the account pages and the light and dark switch, in a drawer
-// from the left. Following a link closes it.
+// The phone menu: the categories, the account pages and the light and dark switch, in a drawer from the
+// left. Following a link closes it. Search is the icon beside the bag.
 export function MobileNav({ categories, storeName, hasDeals }: { categories: Category[]; storeName: string; hasDeals: boolean }) {
   const [open, setOpen] = useState(false);
   const user = useCurrentUser();
@@ -41,11 +40,9 @@ export function MobileNav({ categories, storeName, hasDeals }: { categories: Cat
               <Logo name={storeName} compact />
             </div>
           </SheetTitle>
-          <SheetDescription className="sr-only">Search, shop by category and your account</SheetDescription>
+          <SheetDescription className="sr-only">Shop by category, your account and help</SheetDescription>
         </SheetHeader>
         <div className="grid gap-6 px-3 py-5">
-          <HeaderSearch className="px-2" onSearch={close} />
-
           <nav aria-label="Shop">
             <p className={groupLabel}>Shop</p>
             <ul>
