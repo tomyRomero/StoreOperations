@@ -1,93 +1,138 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import { PackageSearch } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ErrorState } from "@/components/shared/ErrorState";
+import { ActiveFilters } from "@/components/products/ActiveFilters";
+import { MobileFilters } from "@/components/products/MobileFilters";
+import { ProductCard } from "@/components/products/ProductCard";
+import { ProductFilters } from "@/components/products/ProductFilters";
+import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
+import { SortSelect } from "@/components/products/SortSelect";
+import type { Category } from "@/lib/api/types";
+import { getCategories, getProducts, getStoreSettings } from "@/lib/data/catalog";
+import type { SearchParams } from "@/lib/paging";
+import { activeFilterCount, parseProductFilters, productFiltersHref, sortOptions, type ProductFilters as Filters } from "@/lib/product-filters";
 
-import Filters from '@/components/shared/Filter'
-import React from 'react'
-import { getCategories, getProducts } from '@/lib/data/catalog'
-import type { ProductSort } from '@/lib/api/types'
-import ProductCard from '@/components/cards/ProductCard'
-import Pagination from '@/components/shared/Pagination'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
+const pageSize = 12;
 
-// The API's sort names, plus the old "lowest"/"highest" links
-const sorts: Record<string, ProductSort> = {
-  cheapest: "cheapest", lowest: "cheapest",
-  priciest: "priciest", highest: "priciest",
-  newest: "newest", oldest: "oldest",
-};
+type Props = { searchParams: Promise<SearchParams> };
 
-const page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
+function pageTitle(filters: Filters, categories: Category[]): string {
+  if (filters.q) return `Results for “${filters.q}”`;
+  if (filters.categoryIds.length === 1) return categories.find((c) => c.id === filters.categoryIds[0])?.name ?? "Shop";
+  return "Shop all supplies";
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const filters = parseProductFilters(await props.searchParams);
+  return { title: pageTitle(filters, filters.categoryIds.length === 1 ? await getCategories() : []) };
+}
+
+// One page for browsing, filtering and search. Everything it shows comes from the address.
+export default async function ProductsPage(props: Props) {
   const searchParams = await props.searchParams;
-  const categories = await getCategories()
+  const filters = parseProductFilters(searchParams);
+  const [categories, settings] = await Promise.all([getCategories(), getStoreSettings()]);
+  const href = productFiltersHref(filters);
 
-  // ?categories=1,2 checks those categories' boxes
-  const categoriesArray = (searchParams.categories ?? "").split(',').filter((id) => /^\d+$/.test(id))
-  const sort = sorts[searchParams.sorted ?? ""] ?? "cheapest"
-  const pageNumber = Math.max(1, Number(searchParams.page) || 1)
+  return (
+    <div className="container pb-12 pt-28 lg:pt-36">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/products" }, ...(href !== "/products" ? [{ label: pageTitle(filters, categories) }] : [])]} />
+      <h1 className="mt-4 text-h1">{pageTitle(filters, categories)}</h1>
 
-  const serverProducts = await getProducts({
-    categoryIds: categoriesArray.map(Number),
-    sort,
-    page: pageNumber,
-    pageSize: 8,
-  })
+      <div className="mt-8 grid gap-10 lg:grid-cols-[220px_1fr]">
+        <aside aria-label="Filters" className="max-lg:hidden">
+          {/* Keyed by the address, so the boxes always match the list after back and forward */}
+          <ProductFilters key={href} categories={categories} filters={filters} idPrefix="side" autoApply />
+        </aside>
 
-  if (!serverProducts) {
+        <div className="grid min-w-0 content-start gap-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <MobileFilters key={href} categories={categories} filters={filters} activeCount={activeFilterCount(filters)} />
+            <div className="ml-auto">
+              <SortSelect filters={filters} />
+            </div>
+          </div>
+          <ActiveFilters filters={filters} categories={categories} />
+
+          {/* The filters stay put while a new set of products loads */}
+          <Suspense key={href} fallback={<ProductGridSkeleton />}>
+            <ProductResults filters={filters} searchParams={searchParams} lowStockThreshold={settings?.lowStockThreshold ?? 5} />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function ProductResults({ filters, searchParams, lowStockThreshold }: { filters: Filters; searchParams: SearchParams; lowStockThreshold: number }) {
+  const products = await getProducts({
+    categoryIds: filters.categoryIds,
+    search: filters.q,
+    inStock: filters.inStock,
+    minPriceCents: filters.minCents,
+    maxPriceCents: filters.maxCents,
+    sort: sortOptions[filters.sort].api,
+    page: filters.page,
+    pageSize,
+  });
+
+  if (!products) {
     return (
-      <section className="mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20">
-        <h1 className="text-red-500">Failed to load products. Please try again later.</h1>
-      </section>
+      <ErrorState
+        title="We couldn't load the products"
+        action={
+          <Button asChild>
+            <a href={productFiltersHref(filters)}>Try again</a>
+          </Button>
+        }
+      />
     );
   }
 
-  const createPaginationPath = ()=> {
-   const params = new URLSearchParams();
-   params.append('categories', categoriesArray.join(','));
-   params.append('sorted', sort);
-   return `/products?${params.toString()}&`
+  if (products.items.length === 0) {
+    const pastTheEnd = products.totalCount > 0;
+    return (
+      <EmptyState
+        icon={PackageSearch}
+        title={pastTheEnd ? "There's nothing on this page" : filters.q ? `Nothing matches “${filters.q}”` : "No products match these filters"}
+        action={
+          <Button asChild>
+            <Link href={pastTheEnd ? productFiltersHref({ ...filters, page: 1 }) : "/products"}>{pastTheEnd ? "Go to the first page" : "See all supplies"}</Link>
+          </Button>
+        }
+      >
+        {pastTheEnd ? "The list is shorter than this page number." : "Try another word, or remove a filter to see more."}
+      </EmptyState>
+    );
   }
-  
+
   return (
-    
-    <section className="mt-14 mx-auto px-4 md:px-14 py-8 lg:px-20 max-xs:pt-28">
-       <div className="grid xl:grid-cols-4 gap-10 items-start">
-          <Filters categoriesList={categories} categoryParams={categoriesArray} sortParams={sort}/>
-          <div className="xl:col-span-3 lg:mt-6 xl:mt-14 grid gap-6 md:gap-8 max-sm:p-0">
-            <div>
-          <Link href="/search">
-                <Button className="flex px-2 border border-black" variant="ghost">
-                  <Image
-                    src="/assets/searchblack.png"
-                    alt="search icon"
-                    width={28}
-                    height={28}
-                  />
-                  <span className="ml-2">Search Products</span>
-                </Button>
-              </Link>
-              </div>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {serverProducts.items.map((product)=> (
-                    <ProductCard key={product.id} product={product} />
-                    ))}
-
-                    {serverProducts.items.length === 0 && (
-                      <h1>No Products</h1>
-                    )}
-                </div>
-                <div className='mx-auto'>
-                    <h4 className={`text-body-bold ${serverProducts.totalPages <= 1 ? 'hidden' : ''}`}>Showing {pageNumber} of {serverProducts.totalPages} Pages</h4>
-                    <Pagination
-                      path={createPaginationPath()}
-                      pageNumber={pageNumber}
-                      isNext={pageNumber < serverProducts.totalPages}
-                    />
-              </div>
-      </div>
-      </div>
-  </section>
-  )
+    <div className="grid gap-10">
+      <h2 className="sr-only">Products</h2>
+      <p className="-mt-2 text-sm text-muted-foreground" aria-live="polite">
+        {products.totalCount === 1 ? "1 product" : `${products.totalCount} products`}
+      </p>
+      <ul className="-mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 xl:grid-cols-4">
+        {products.items.map((product, index) => (
+          <li key={product.id}>
+            <ProductCard product={product} lowStockThreshold={lowStockThreshold} priority={index < 4} />
+          </li>
+        ))}
+      </ul>
+      <Pagination
+        pathname="/products"
+        searchParams={searchParams}
+        page={products.page}
+        totalPages={products.totalPages}
+        totalCount={products.totalCount}
+        pageSize={products.pageSize}
+      />
+    </div>
+  );
 }
-
-
-export default page

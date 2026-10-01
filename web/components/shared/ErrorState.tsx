@@ -9,11 +9,13 @@ type Props = {
   children?: React.ReactNode;
   // Renders the part of the page that failed again (an error boundary's reset)
   onRetry?: () => void;
+  // Or any other way forward, such as a link that reloads the page
+  action?: React.ReactNode;
   className?: string;
 };
 
 // Something failed: say so plainly and offer to try again. Details stay in the server's logs.
-export function ErrorState({ title = "Something went wrong", children, onRetry, className }: Props) {
+export function ErrorState({ title = "Something went wrong", children, onRetry, action, className }: Props) {
   return (
     <div role="alert" className={cn("flex flex-col items-center gap-3 rounded-md border px-6 py-12 text-center", className)}>
       <span className="flex size-12 items-center justify-center rounded-full bg-sale-subtle">
@@ -29,6 +31,7 @@ export function ErrorState({ title = "Something went wrong", children, onRetry, 
           Try again
         </Button>
       )}
+      {action && <div className="mt-2 flex flex-wrap justify-center gap-3">{action}</div>}
     </div>
   );
 }
