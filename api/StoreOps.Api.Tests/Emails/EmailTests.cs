@@ -49,7 +49,7 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
         Assert.Equal("Order confirmation from Palettehub", toCustomer.Subject);
         Assert.Contains(orderNumber, toCustomer.HtmlBody);
         Assert.Contains("$18.50", toCustomer.HtmlBody);
-        Assert.Contains($"http://localhost:3200/orders/{orderNumber}", toCustomer.HtmlBody);
+        Assert.Contains($"http://localhost:3200/account/orders/{orderNumber}", toCustomer.HtmlBody);
         Assert.Contains(orderNumber, toCustomer.TextBody);
 
         var toStore = (await QueuedToAsync(StoreInbox)).Single(m => m.Subject == $"New order {orderNumber}");

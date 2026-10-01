@@ -130,7 +130,7 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
         var email = Assert.Single(await StatusEmailsToAsync(sale.Email));
         Assert.Equal($"Your order is on its way ({number})", email.Subject);
         Assert.Contains(TrackingNumber, email.HtmlBody);
-        Assert.Contains($"http://localhost:3200/orders/{number}", email.HtmlBody);
+        Assert.Contains($"http://localhost:3200/account/orders/{number}", email.HtmlBody);
         Assert.Contains(TrackingNumber, email.TextBody);
     }
 
