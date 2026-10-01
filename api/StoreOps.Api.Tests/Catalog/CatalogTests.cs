@@ -88,6 +88,26 @@ public class CatalogTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
     }
 
     [Fact]
+    public async Task Sold_out_products_can_be_left_out()
+    {
+        var all = await GetAsync("/api/products?pageSize=50");
+        var inStock = await GetAsync("/api/products?inStock=true&pageSize=50");
+
+        Assert.Contains("Chalk Paint", NamesIn(all));
+        Assert.DoesNotContain("Chalk Paint", NamesIn(inStock));
+        Assert.Equal(12, inStock.GetProperty("totalCount").GetInt32());
+    }
+
+    [Fact]
+    public async Task Products_can_be_filtered_by_price_including_both_ends()
+    {
+        var page = await GetAsync("/api/products?minPriceCents=2200&maxPriceCents=2900");
+
+        Assert.Equal(new[] { "Brush Set", "Landscape Canvas", "Watercolor Set" }, NamesIn(page).Order());
+        Assert.Equal(new[] { "Fine Brush" }, NamesIn(await GetAsync("/api/products?maxPriceCents=699")));
+    }
+
+    [Fact]
     public async Task A_product_has_everything_its_page_shows()
     {
         var product = await GetAsync($"/api/products/{await IdOfAsync("Chalk Paint")}");
@@ -141,6 +161,7 @@ public class CatalogTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
     [InlineData("page=0", "page")]
     [InlineData("pageSize=51", "pageSize")]
     [InlineData("sort=random", "sort")]
+    [InlineData("minPriceCents=-1", "minPriceCents")]
     public async Task Bad_list_options_are_field_errors(string queryString, string field)
     {
         var response = await _client.GetAsync($"/api/products?{queryString}", Ct);

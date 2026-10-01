@@ -11,7 +11,15 @@ public enum ProductSort
 
 // What the storefront asked for. The controller binds and validates each value from the query string.
 public sealed record ProductQuery(
-    IReadOnlyList<int> CategoryIds, string? Search, bool OnDeal, ProductSort Sort, int Page, int PageSize);
+    IReadOnlyList<int> CategoryIds,
+    string? Search,
+    bool OnDeal,
+    bool InStock,
+    int? MinPriceCents,
+    int? MaxPriceCents,
+    ProductSort Sort,
+    int Page,
+    int PageSize);
 
 public sealed record CategoryResponse(int Id, string Name, string ImageUrl);
 

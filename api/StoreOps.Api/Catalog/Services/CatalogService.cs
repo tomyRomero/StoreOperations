@@ -31,6 +31,15 @@ public sealed class CatalogService(AppDbContext db)
         if (query.OnDeal)
             products = products.Where(p => p.CompareAtPriceCents != null);
 
+        if (query.InStock)
+            products = products.Where(p => p.Stock > 0);
+
+        if (query.MinPriceCents is { } min)
+            products = products.Where(p => p.PriceCents >= min);
+
+        if (query.MaxPriceCents is { } max)
+            products = products.Where(p => p.PriceCents <= max);
+
         if (query.Search?.Trim() is { Length: > 0 } search)
             products = products.Where(p => p.Name.Contains(search) || p.Category.Name.Contains(search));
 

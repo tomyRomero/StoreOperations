@@ -19,16 +19,21 @@ public sealed class CatalogController(CatalogService catalog) : ControllerBase
 
     // Each option is its own query parameter, so an error names exactly what the client sent.
     // ?categoryId=1&categoryId=2 shows products in either category; search matches product and category names.
+    // The price range is in cents and includes both ends.
     [HttpGet("products")]
     public async Task<Paged<ProductResponse>> Products(
         [FromQuery] int[] categoryId,
         [FromQuery, StringLength(100)] string? search,
         [FromQuery] bool onDeal,
+        [FromQuery] bool inStock,
+        [FromQuery, Range(0, int.MaxValue)] int? minPriceCents,
+        [FromQuery, Range(0, int.MaxValue)] int? maxPriceCents,
         [FromQuery] ProductSort sort = ProductSort.Newest,
         [FromQuery, Range(1, 10_000)] int page = 1,
         [FromQuery, Range(1, 50)] int pageSize = 20,
         CancellationToken ct = default) =>
-        await catalog.GetProductsAsync(new ProductQuery(categoryId, search, onDeal, sort, page, pageSize), ct);
+        await catalog.GetProductsAsync(
+            new ProductQuery(categoryId, search, onDeal, inStock, minPriceCents, maxPriceCents, sort, page, pageSize), ct);
 
     [HttpGet("products/{id:int}")]
     [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]

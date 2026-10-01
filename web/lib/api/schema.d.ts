@@ -1624,6 +1624,9 @@ export interface paths {
                     categoryId?: number[];
                     search?: string;
                     onDeal?: boolean;
+                    inStock?: boolean;
+                    minPriceCents?: number;
+                    maxPriceCents?: number;
                     sort?: components["schemas"]["ProductSort"];
                     page?: number;
                     pageSize?: number;
