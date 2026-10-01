@@ -6,11 +6,12 @@ import CategoryRow from '@/components/tables/CategoryRow';
 import SearchBar from '@/components/forms/SearchBar';
 import { getAdminCategories } from '@/lib/data/admin-catalog';
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   // A store has a handful of categories, so they all come at once and the search filters them here
   const search = (searchParams.q ?? "").trim().toLowerCase();
   const categories = await getAdminCategories();

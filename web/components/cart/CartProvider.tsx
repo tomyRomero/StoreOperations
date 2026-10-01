@@ -34,26 +34,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const signedIn = user !== null;
   const [cart, setCart] = useState<Cart | null>(null);
 
-  const refresh = useCallback(async () => {
+  // The cart as it is now, or null when the API can't answer (the cart shown stays as it was)
+  const load = useCallback(async (): Promise<Cart | null> => {
     const guestLines = readGuestCart();
 
     if (signedIn) {
       const { data } = guestLines.length > 0
         ? await api.POST("/api/cart/merge", { body: { items: guestLines } })
         : await api.GET("/api/cart");
-      if (data) {
-        if (guestLines.length > 0) writeGuestCart([]);
-        setCart(data);
-      }
-      return;
+      if (data && guestLines.length > 0) writeGuestCart([]);
+      return data ?? null;
     }
 
-    setCart(guestLines.length > 0 ? (await priceGuestCart(guestLines)) ?? emptyCart : emptyCart);
+    return guestLines.length > 0 ? (await priceGuestCart(guestLines)) ?? emptyCart : emptyCart;
   }, [signedIn]);
 
+  const refresh = useCallback(async () => {
+    const loaded = await load();
+    if (loaded) setCart(loaded);
+  }, [load]);
+
+  // On first load, and again when the visitor signs in or out. An answer that arrives after that
+  // changed again is dropped, so it can't overwrite the newer cart.
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let current = true;
+    void load().then((loaded) => {
+      if (current && loaded) setCart(loaded);
+    });
+    return () => {
+      current = false;
+    };
+  }, [load]);
 
   // Every signed-in change answers with the whole cart, so the page shows exactly what the API saved
   const applied = useCallback((data: Cart | undefined, error: unknown): boolean => {

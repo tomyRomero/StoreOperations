@@ -3,7 +3,8 @@ import AddProductForm from '@/components/forms/AddProductForm';
 import ErrorMessage from '@/components/shared/Error';
 import { getAdminCategories, getAdminProduct } from '@/lib/data/admin-catalog';
 
-export default async function page({ params }: { params: { id: string } }) {
+export default async function page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
 
   const [product, categories] = await Promise.all([getAdminProduct(Number(params.id)), getAdminCategories()])
 

@@ -3,7 +3,8 @@ import ErrorMessage from "@/components/shared/Error"
 import { getAdminOrder } from "@/lib/data/admin-orders"
 import { getAdminSettings } from "@/lib/data/admin-store"
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async (props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
 
   const [order, settings] = await Promise.all([getAdminOrder(params.id), getAdminSettings()])
 

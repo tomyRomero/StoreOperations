@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -73,7 +73,7 @@ export default function OrderForm({ order, emailByDefault }: { order: AdminOrder
     },
   });
 
-  const statusChanges = form.watch("status") !== order.status;
+  const statusChanges = useWatch({ control: form.control, name: "status" }) !== order.status;
 
   const save = async (values: Values, confirmRefund: boolean) => {
     setSaving(true);

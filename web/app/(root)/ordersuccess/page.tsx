@@ -3,7 +3,8 @@ import { getStoreSettings } from "@/lib/data/catalog";
 import { requireUser } from "@/lib/session";
 
 // Where Stripe sends the customer after paying, with the PaymentIntent's id in the address
-const page = async ({ searchParams }: { searchParams: { payment_intent?: string } }) => {
+const page = async (props: { searchParams: Promise<{ payment_intent?: string }> }) => {
+  const searchParams = await props.searchParams;
   const paymentIntentId = searchParams.payment_intent ?? "";
   await requireUser(`/ordersuccess?payment_intent=${encodeURIComponent(paymentIntentId)}`);
   const settings = await getStoreSettings();

@@ -17,6 +17,42 @@ import NavMenu from './NavMenu';
 import { storeDetails } from '@/lib/constants';
 
 
+// Signed in: the account (or admin) page and a way out. Otherwise a way in that comes back here.
+function AuthButton() {
+  const router = useRouter();
+  const user = useCurrentUser();
+  const signOut = useSignOut();
+  const currentPath = usePathname();
+
+  if (user) {
+    return (
+      <>
+        <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={() => router.push("/account")}>
+        <Image
+          src="/assets/profile.png"
+          alt="price icon"
+          width={32}
+          height={32}
+          className="px-1 max-md:hidden"
+        />
+        <span className="ml-2">{user.isAdmin? "Admin" : "Account"}</span>
+      </Button>
+        <Button variant="destructive" className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut(currentPath)}>
+          LOGOUT
+          </Button>
+      </>
+    );
+  }
+  return (
+    <>
+      <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200"
+        onClick={()=> router.push(signInPath(currentPath))}>
+          LOGIN
+        </Button>
+    </>
+  );
+}
+
 const Nav = () => {
 
   const [isActive, setIsActive] = useState(false);
@@ -24,42 +60,6 @@ const Nav = () => {
 
   const router = useRouter();
   const user = useCurrentUser();
-  const signOut = useSignOut();
-  const currentPath =  usePathname();
-
-  const goAccount = ()=> {
-    router.push("/account")
-  }
-
-  function AuthButton() {
-    if (user) {
-      return (
-        <>
-          <Button className="flex sm:px-2 xs:px-0.5" variant="ghost" onClick={goAccount}>
-          <Image
-            src="/assets/profile.png"
-            alt="price icon"
-            width={32}
-            height={32}
-            className="px-1 max-md:hidden"
-          />
-          <span className="ml-2">{user.isAdmin? "Admin" : "Account"}</span>
-        </Button>
-          <Button variant="destructive" className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut(currentPath)}>
-            LOGOUT
-            </Button>
-        </>
-      );
-    }
-    return (
-      <>
-        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" 
-          onClick={()=> router.push(signInPath(currentPath))}>
-            LOGIN
-          </Button>
-      </>
-    );
-  }
 
   return (
     <div className='relative'>

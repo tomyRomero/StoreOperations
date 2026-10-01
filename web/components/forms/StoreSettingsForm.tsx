@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from "next/navigation";
@@ -97,7 +97,7 @@ export default function StoreSettingsForm({ settings }: { settings: AdminSetting
     },
   });
 
-  const returnsAllowed = form.watch("returnPolicy") !== "no_returns";
+  const returnsAllowed = useWatch({ control: form.control, name: "returnPolicy" }) !== "no_returns";
   const zones = timeZones.some(([id]) => id === settings.timeZoneId) ? timeZones : [...timeZones, [settings.timeZoneId, settings.timeZoneId] as [string, string]];
 
   const onSubmit = async (values: Values) => {

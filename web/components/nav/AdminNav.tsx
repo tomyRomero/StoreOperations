@@ -9,39 +9,38 @@ import { useCurrentUser } from '../CurrentUserProvider';
 import { useSignOut } from '@/lib/use-sign-out';
 
 
-export default function Nav() {
-
+// Signed in: who it is and a way out. Otherwise a way in.
+function AuthButton() {
   const router = useRouter();
-
-  function AuthButton() {
-    const user = useCurrentUser();
-    const signOut = useSignOut();
-    if (user) {
-      return (
-        <>
-          <Button className="sm:px-2 xs:px-0.5 hidden lg:flex" variant="ghost">
-          <Image
-            src="/assets/profile.png"
-            alt="profile icon"
-            width={32}
-            height={32}
-            className="px-1"
-          />
-          <span className="ml-2">Welcome Admin</span>
-        </Button>
-          <Button variant="destructive" className="flex sm:px-6 px-1.5  xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut("/")}>
-            LOGOUT
-            </Button>
-        </>
-      );
-    }
+  const user = useCurrentUser();
+  const signOut = useSignOut();
+  if (user) {
     return (
       <>
-        <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" onClick={() => router.push("/sign-in")}>LOGIN</Button>
+        <Button className="sm:px-2 xs:px-0.5 hidden lg:flex" variant="ghost">
+        <Image
+          src="/assets/profile.png"
+          alt="profile icon"
+          width={32}
+          height={32}
+          className="px-1"
+        />
+        <span className="ml-2">Welcome Admin</span>
+      </Button>
+        <Button variant="destructive" className="flex sm:px-6 px-1.5  xs:px-2.5 py-3 bg-black rounded-lg" onClick={() => signOut("/")}>
+          LOGOUT
+          </Button>
       </>
     );
   }
+  return (
+    <>
+      <Button className="flex sm:px-6 xs:px-2.5 py-3 bg-black rounded-lg  hover:text-black hover:bg-gray-200" onClick={() => router.push("/sign-in")}>LOGIN</Button>
+    </>
+  );
+}
 
+export default function Nav() {
   return (
     <header className="border-b-2 bg-white fixed flex z-50 w-full flex-wrap items-center xs:py-6 xs:px-4 sm:py-6 sm:px-14 px-4 py-4 md:py-8 md:px-18 lg:py-10 lg:px-32 xl:px-36">
       <Link className="sm:mr-6 xs:mr-2 first-letter:flex" href="/">

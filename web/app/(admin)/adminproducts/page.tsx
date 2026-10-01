@@ -14,11 +14,12 @@ const tabs: { status: ProductStatus; label: string }[] = [
   { status: "all", label: "All" },
 ];
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const search = searchParams.q ?? "";
   const status = tabs.find((t) => t.status === searchParams.status)?.status ?? "active";
   const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);

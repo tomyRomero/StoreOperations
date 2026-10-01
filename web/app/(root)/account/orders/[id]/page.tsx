@@ -6,7 +6,8 @@ import CustomerOrderDetailsCards from "@/components/cards/CustomerOrderDetailsCa
 import { getOrder } from "@/lib/data/account";
 import { getStoreSettings } from "@/lib/data/catalog";
 
-const page = async ({ params }: { params: { id: string } }) =>  {
+const page = async (props: { params: Promise<{ id: string }> }) =>  {
+  const params = await props.params;
 
   const [order, settings] = await Promise.all([getOrder(params.id), getStoreSettings()]);
 

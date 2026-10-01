@@ -3,7 +3,8 @@ import { getProduct, getRelatedProducts } from '@/lib/data/catalog'
 import React from 'react'
 import { redirect } from 'next/navigation'
 
-const page = async ({ params }: { params: { id: string } }) => {
+const page = async (props: { params: Promise<{ id: string }> }) => {
+  const params = await props.params;
   const id = Number(params.id)
   const product = Number.isInteger(id) && id > 0 ? await getProduct(id) : null
 

@@ -5,7 +5,8 @@ import ChooseAddress from "@/components/checkout/ChooseAddress"
 import { getAddresses } from "@/lib/data/account"
 import { requireUser } from "@/lib/session"
 
-const Page = async ({ searchParams }: { searchParams: { address?: string } }) => {
+const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
+  const searchParams = await props.searchParams;
   await requireUser("/address")
   const addresses = await getAddresses()
 

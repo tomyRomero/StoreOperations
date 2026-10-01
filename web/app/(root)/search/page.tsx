@@ -7,11 +7,8 @@ import Image from 'next/image';
 import React from 'react'
 import ProductCard from '@/components/cards/ProductCard';
 
-const page = async ({
-    searchParams,
-  }: {
-    searchParams: { [key: string]: string | undefined };
-  }) => {
+const page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
+    const searchParams = await props.searchParams;
 
     // Matches product and category names, newest first
     const pageNumber = Math.max(1, Number(searchParams.page) || 1);

@@ -16,11 +16,12 @@ const tabs: { entity?: ActivityEntity; label: string }[] = [
   { entity: "store_settings", label: "Settings" },
 ];
 
-const Page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+const Page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   const entity = tabs.find((t) => t.entity !== undefined && t.entity === searchParams.type)?.entity;
   const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
   const [activity, settings] = await Promise.all([getActivity({ entityType: entity, page: pageNumber }), getStoreSettings()]);

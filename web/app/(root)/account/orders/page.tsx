@@ -6,7 +6,8 @@ import Pagination from "@/components/shared/Pagination";
 import { getOrders } from "@/lib/data/account";
 import { getStoreSettings } from "@/lib/data/catalog";
 
-const page = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
+const page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
+  const searchParams = await props.searchParams;
   const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);
   const [orders, settings] = await Promise.all([getOrders(pageNumber), getStoreSettings()]);
 

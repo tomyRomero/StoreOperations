@@ -12,11 +12,12 @@ const tabs: { role?: AccountRole; label: string }[] = [
   { role: "admin", label: "Admins" },
 ];
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const search = searchParams.q ?? "";
   const role = tabs.find((t) => t.role !== undefined && t.role === searchParams.role)?.role;
   const pageNumber = Math.max(1, Number.parseInt(searchParams.page ?? "1", 10) || 1);

@@ -4,7 +4,7 @@ import { sessionCookie } from "./lib/api/config";
 // A smoother experience only: signed-out visitors go straight to sign-in instead of a page that
 // would fail. It only looks for the cookie. The API decides who is really signed in, and the admin
 // layout checks the role.
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (request.cookies.has(sessionCookie)) return NextResponse.next();
 
   const signIn = new URL("/sign-in", request.url);

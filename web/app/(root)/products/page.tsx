@@ -16,11 +16,8 @@ const sorts: Record<string, ProductSort> = {
   newest: "newest", oldest: "oldest",
 };
 
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
+const page = async (props: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
+  const searchParams = await props.searchParams;
   const categories = await getCategories()
 
   // ?categories=1,2 checks those categories' boxes

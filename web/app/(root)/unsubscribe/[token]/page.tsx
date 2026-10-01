@@ -3,7 +3,8 @@ import { getStoreSettings } from "@/lib/data/catalog"
 
 // Every newsletter links here with the subscriber's own token. The token alone is enough to leave,
 // so nobody has to sign in, and nothing on this page says whether the address is still subscribed.
-const page = async ({ params }: { params: { token: string } }) => {
+const page = async (props: { params: Promise<{ token: string }> }) => {
+  const params = await props.params;
   const settings = await getStoreSettings()
 
   return (

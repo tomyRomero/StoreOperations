@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { getAdminOrder } from "@/lib/data/admin-orders";
 import { getStoreSettings } from "@/lib/data/catalog";
 
-const page = async ({ params }: { params: { id: string } }) =>  {
+const page = async (props: { params: Promise<{ id: string }> }) =>  {
+  const params = await props.params;
 
   const [order, settings] = await Promise.all([getAdminOrder(params.id), getStoreSettings()])
 

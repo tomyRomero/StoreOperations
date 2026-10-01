@@ -10,7 +10,7 @@ import type { CurrentUser } from "./api/types";
 // Who is signed in, asked once per request: React's cache shares the answer between the layout and the page.
 // The API checks the cookie, so an expired or signed-out session is simply null.
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
-  if (!cookies().has(sessionCookie)) return null;
+  if (!(await cookies()).has(sessionCookie)) return null;
   const { data } = await serverApi().GET("/api/auth/me");
   return data ?? null;
 });

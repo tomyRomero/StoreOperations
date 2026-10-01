@@ -4,7 +4,8 @@ import { getAddresses } from '@/lib/data/account';
 import { requireUser } from '@/lib/session';
 
 // Pays for the cart, shipped to the address chosen in the step before (or the default address)
-const Page = async ({ searchParams }: { searchParams: { address?: string } }) => {
+const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
+  const searchParams = await props.searchParams;
   await requireUser("/checkout");
   const addresses = await getAddresses();
 
