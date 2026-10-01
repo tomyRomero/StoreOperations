@@ -10,7 +10,7 @@ export function AdminBar() {
           <span className="font-semibold">Admin view.</span>
           <span className="max-sm:hidden"> You&apos;re seeing the store as customers do.</span>
         </p>
-        <Link href="/adminactivity" className="inline-flex shrink-0 items-center gap-1 font-semibold underline-offset-4 hover:underline">
+        <Link href="/admin" className="inline-flex shrink-0 items-center gap-1 font-semibold underline-offset-4 hover:underline">
           Back to dashboard
           <ArrowRight className="size-4" aria-hidden />
         </Link>

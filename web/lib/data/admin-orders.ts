@@ -19,3 +19,9 @@ export async function getAdminOrder(orderNumber: string): Promise<AdminOrder | n
   const { data } = await serverApi().GET("/api/admin/orders/{orderNumber}", { params: { path: { orderNumber } } });
   return data ?? null;
 }
+
+// How many orders have a status, such as the paid orders still waiting to ship. Null when the API can't answer.
+export async function countOrders(status: OrderStatus): Promise<number | null> {
+  const { data } = await serverApi().GET("/api/admin/orders", { params: { query: { status, pageSize: 1 } } });
+  return data?.totalCount ?? null;
+}

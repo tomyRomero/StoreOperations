@@ -11,7 +11,7 @@ export const OrderRow = ({ order, timeZone }: { order: AdminOrderSummary; timeZo
     <TableRow>
     <TableCell>
       <Button asChild className="bg-black text-white border border-black" variant="ghost">
-        <Link href={`/adminorders/${order.orderNumber}`}>
+        <Link href={`/admin/orders/${order.orderNumber}`}>
           View<span className="sr-only"> order {order.orderNumber}</span>
         </Link>
       </Button>

@@ -49,7 +49,7 @@ export default function AddCategoryForm({ category }: { category: AdminCategory 
 
     if (response.ok) {
       toast({ title: category ? "Category saved" : "Category added" });
-      router.push('/admincategories');
+      router.push('/admin/categories');
       router.refresh();
       return;
     }
@@ -63,7 +63,7 @@ export default function AddCategoryForm({ category }: { category: AdminCategory 
   return (
     <div className="flex flex-col max-w-md mx-auto">
       <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
-        <Link href={'/admincategories'}>
+        <Link href={'/admin/categories'}>
           <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
           <span className="ml-2">Go Back</span>
         </Link>

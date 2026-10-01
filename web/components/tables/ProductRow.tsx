@@ -43,7 +43,7 @@ const ProductRow = ({ product, lowStockThreshold, timeZone }: Props) => {
   return (
       <TableRow className={archived ? "opacity-60" : ""}>
         <TableCell>
-          <Link href={`/adminaddproduct/${product.id}`}>
+          <Link href={`/admin/products/${product.id}`}>
             <Image
               alt=""
               className="aspect-square rounded-md object-cover"
@@ -54,17 +54,17 @@ const ProductRow = ({ product, lowStockThreshold, timeZone }: Props) => {
           </Link>
         </TableCell>
         <TableCell className="font-bold hover:underline">
-          <Link href={`/adminaddproduct/${product.id}`}>{product.name}</Link>
+          <Link href={`/admin/products/${product.id}`}>{product.name}</Link>
           {archived && <span className="ml-2 font-normal text-gray-500">(archived)</span>}
         </TableCell>
         <TableCell>
           <div className='flex flex-wrap gap-2'>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/adminaddproduct/${product.id}`}>Edit</Link>
+              <Link href={`/admin/products/${product.id}`}>Edit</Link>
             </Button>
             {!archived && (
               <Button asChild size="sm" variant="outline">
-                <Link href={`/adminaddproduct/deal/${product.id}`}>{product.compareAtPriceCents !== null ? "View Deal" : "Make Deal"}</Link>
+                <Link href={`/admin/products/${product.id}/deal`}>{product.compareAtPriceCents !== null ? "View Deal" : "Make Deal"}</Link>
               </Button>
             )}
             <Button size="sm" variant="outline" onClick={toggleArchive} disabled={busy}>

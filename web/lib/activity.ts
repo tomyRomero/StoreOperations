@@ -21,21 +21,21 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
 
   switch (entry.action) {
     case "user_registered":
-      return { text: `${detail(entry, "username") ?? "Someone"} created an account`, href: id ? `/adminusers/${id}` : undefined }
+      return { text: `${detail(entry, "username") ?? "Someone"} created an account`, href: id ? `/admin/customers/${id}` : undefined }
     case "customer_disabled":
-      return { text: `${who} disabled ${username}`, href: id ? `/adminusers/${id}` : undefined }
+      return { text: `${who} disabled ${username}`, href: id ? `/admin/customers/${id}` : undefined }
     case "customer_enabled":
-      return { text: `${who} enabled ${username} again`, href: id ? `/adminusers/${id}` : undefined }
+      return { text: `${who} enabled ${username} again`, href: id ? `/admin/customers/${id}` : undefined }
     case "admin_role_granted":
-      return { text: `${username} was made an admin on the server`, href: id ? `/adminusers/${id}` : undefined }
+      return { text: `${username} was made an admin on the server`, href: id ? `/admin/customers/${id}` : undefined }
     case "admin_role_removed":
-      return { text: `${username} is no longer an admin`, href: id ? `/adminusers/${id}` : undefined }
+      return { text: `${username} is no longer an admin`, href: id ? `/admin/customers/${id}` : undefined }
     case "newsletter_subscribed":
-      return { text: "Someone subscribed to the newsletter", href: "/adminnewsletter" }
+      return { text: "Someone subscribed to the newsletter", href: "/admin/newsletter" }
     case "newsletter_unsubscribed":
-      return { text: "Someone unsubscribed from the newsletter", href: "/adminnewsletter" }
+      return { text: "Someone unsubscribed from the newsletter", href: "/admin/newsletter" }
     case "subscribers_removed":
-      return { text: `${who} removed ${detail(entry, "count") ?? "some"} subscribers`, href: "/adminnewsletter" }
+      return { text: `${who} removed ${detail(entry, "count") ?? "some"} subscribers`, href: "/admin/newsletter" }
     case "newsletter_sent":
       return { text: `${who} sent "${detail(entry, "subject") ?? "a newsletter"}" to ${detail(entry, "recipients") ?? "the"} subscribers` }
     case "order_created": {
@@ -43,7 +43,7 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
       const refunded = detail(entry, "refunded") === true ? ", then refunded it" : ""
       return {
         text: `New order${orderNumber ? ` #${orderNumber}` : ""}${typeof total === "number" ? ` for ${formatMoney(total)}` : ""}${refunded}`,
-        href: orderNumber ? `/adminorders/${orderNumber}` : undefined,
+        href: orderNumber ? `/admin/orders/${orderNumber}` : undefined,
       }
     }
     case "order_status_changed": {
@@ -52,37 +52,37 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
       return {
         text: `${who} marked order${orderNumber ? ` #${orderNumber}` : ""} ${typeof to === "string" ? orderStatusLabel(to as OrderStatus).toLowerCase() : "changed"}` +
           (typeof refunded === "number" ? ` and refunded ${formatMoney(refunded)}` : ""),
-        href: orderNumber ? `/adminorders/${orderNumber}` : undefined,
+        href: orderNumber ? `/admin/orders/${orderNumber}` : undefined,
       }
     }
     case "product_created":
-      return { text: `${who} added ${name}`, href: id ? `/adminaddproduct/${id}` : undefined }
+      return { text: `${who} added ${name}`, href: id ? `/admin/products/${id}` : undefined }
     case "product_updated":
-      return { text: `${who} updated ${name}`, href: id ? `/adminaddproduct/${id}` : undefined }
+      return { text: `${who} updated ${name}`, href: id ? `/admin/products/${id}` : undefined }
     case "product_archived":
-      return { text: `${who} archived ${name}`, href: id ? `/adminaddproduct/${id}` : undefined }
+      return { text: `${who} archived ${name}`, href: id ? `/admin/products/${id}` : undefined }
     case "product_restored":
-      return { text: `${who} put ${name} back in the store`, href: id ? `/adminaddproduct/${id}` : undefined }
+      return { text: `${who} put ${name} back in the store`, href: id ? `/admin/products/${id}` : undefined }
     case "deal_started": {
       const price = detail(entry, "dealPriceCents")
-      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/adminaddproduct/deal/${id}` : undefined }
+      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/admin/products/${id}/deal` : undefined }
     }
     case "deal_ended":
-      return { text: `${who} ended the deal on ${name}`, href: id ? `/adminaddproduct/${id}` : undefined }
+      return { text: `${who} ended the deal on ${name}`, href: id ? `/admin/products/${id}` : undefined }
     case "category_created":
-      return { text: `${who} added the ${detail(entry, "name") ?? ""} category`, href: id ? `/adminaddcategory/${id}` : undefined }
+      return { text: `${who} added the ${detail(entry, "name") ?? ""} category`, href: id ? `/admin/categories/${id}` : undefined }
     case "category_updated": {
       const previous = detail(entry, "previousName")
       return {
         text: previous && previous !== detail(entry, "name")
           ? `${who} renamed the ${previous} category to ${detail(entry, "name")}`
           : `${who} updated the ${detail(entry, "name") ?? ""} category`,
-        href: id ? `/adminaddcategory/${id}` : undefined,
+        href: id ? `/admin/categories/${id}` : undefined,
       }
     }
     case "category_deleted":
       return { text: `${who} deleted the ${detail(entry, "name") ?? ""} category` }
     case "settings_changed":
-      return { text: `${who} changed the store settings`, href: "/adminsettings" }
+      return { text: `${who} changed the store settings`, href: "/admin/settings" }
   }
 }

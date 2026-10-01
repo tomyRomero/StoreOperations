@@ -52,7 +52,7 @@ const MakeDealForm = ({ product }: { product: AdminProduct }) => {
 
   const done = (title: string) => {
     toast({ title });
-    router.push("/adminproducts");
+    router.push("/admin/products");
     router.refresh();
   };
 
@@ -86,7 +86,7 @@ const MakeDealForm = ({ product }: { product: AdminProduct }) => {
   return (
       <div className="flex flex-col max-w-lg mx-auto">
       <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
-        <Link href={'/adminproducts'}>
+        <Link href={'/admin/products'}>
           <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
           <span className="ml-2">Go Back</span>
         </Link>

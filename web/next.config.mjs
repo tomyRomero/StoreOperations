@@ -4,6 +4,27 @@ const apiUrl = process.env.API_URL ?? "http://localhost:5200";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // The admin pages used to live at /adminorders, /adminaddproduct/3 and so on. Old bookmarks still
+  // land on the same page under /admin. Query strings (filters, search) carry over.
+  async redirects() {
+    return [
+      ["/adminactivity", "/admin/activity"],
+      ["/adminorders/updateorder/:orderNumber", "/admin/orders/:orderNumber"],
+      ["/adminorders/:orderNumber", "/admin/orders/:orderNumber"],
+      ["/adminorders", "/admin/orders"],
+      ["/adminaddproduct/deal/:id", "/admin/products/:id"],
+      ["/adminaddproduct/:id", "/admin/products/:id"],
+      ["/adminaddproduct", "/admin/products/new"],
+      ["/adminproducts", "/admin/products"],
+      ["/adminaddcategory/:id", "/admin/categories/:id"],
+      ["/adminaddcategory", "/admin/categories/new"],
+      ["/admincategories", "/admin/categories"],
+      ["/adminusers/:id", "/admin/customers/:id"],
+      ["/adminusers", "/admin/customers"],
+      ["/adminnewsletter", "/admin/newsletter"],
+      ["/adminsettings", "/admin/settings"],
+    ].map(([source, destination]) => ({ source, destination, permanent: true }));
+  },
   async rewrites() {
     return {
       // Every /api/* request goes to the .NET API, before Next looks at its own routes. The browser only

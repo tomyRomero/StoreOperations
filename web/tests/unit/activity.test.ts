@@ -21,12 +21,12 @@ describe("activity sentences", () => {
       entityId: 7,
       actor: "demo-admin",
       details: { orderNumber: "SEED0003", from: "pending", to: "cancelled", refundedCents: 6596 },
-    }))).toEqual({ text: "demo-admin marked order #SEED0003 cancelled and refunded $65.96", href: "/adminorders/SEED0003" });
+    }))).toEqual({ text: "demo-admin marked order #SEED0003 cancelled and refunded $65.96", href: "/admin/orders/SEED0003" });
   });
 
   it("still read when an entry has no details", () => {
     expect(describeActivity(entry({ action: "order_created" }))).toEqual({ text: "New order", href: undefined });
-    expect(describeActivity(entry({ action: "user_registered", entityId: 2 }))).toEqual({ text: "Someone created an account", href: "/adminusers/2" });
+    expect(describeActivity(entry({ action: "user_registered", entityId: 2 }))).toEqual({ text: "Someone created an account", href: "/admin/customers/2" });
   });
 
   it("name a renamed category's old and new names", () => {

@@ -68,7 +68,7 @@ export function MobileNav({ categories, storeName }: { categories: Category[]; s
                 <>
                   {user.isAdmin && (
                     <li>
-                      <Link href="/adminactivity" onClick={close} className={linkClasses}>
+                      <Link href="/admin" onClick={close} className={linkClasses}>
                         Admin dashboard
                       </Link>
                     </li>

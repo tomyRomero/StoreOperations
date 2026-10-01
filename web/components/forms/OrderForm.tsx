@@ -99,7 +99,7 @@ export default function OrderForm({ order, emailByDefault }: { order: AdminOrder
           ? `Order ${orderStatusLabel(values.status).toLowerCase()} and ${formatMoney(order.totalCents)} refunded`
           : "Order updated",
       });
-      router.push(`/adminorders/${order.orderNumber}`);
+      router.push(`/admin/orders/${order.orderNumber}`);
       router.refresh();
       return;
     }
@@ -126,7 +126,7 @@ export default function OrderForm({ order, emailByDefault }: { order: AdminOrder
   return (
     <div className="flex flex-col max-w-md mx-auto">
       <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
-        <Link href={`/adminorders/${order.orderNumber}`}>
+        <Link href={`/admin/orders/${order.orderNumber}`}>
           <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
           <span className="ml-2">Go Back</span>
         </Link>

@@ -46,7 +46,7 @@ export function AccountMenu() {
         <DropdownMenuSeparator />
         {user.isAdmin && (
           <DropdownMenuItem asChild>
-            <Link href="/adminactivity">
+            <Link href="/admin">
               <LayoutDashboard aria-hidden />
               Admin dashboard
             </Link>

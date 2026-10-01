@@ -52,7 +52,7 @@ const OrderDetailsCards = ({ order, timeZone }: { order: AdminOrder; timeZone: s
             <div className="flex items-center">
               <dt className="font-bold text-black">Customer:</dt>
               <dd className="ml-auto text-right font-medium">
-                <Link className="underline hover:text-blue" href={`/adminusers/${order.customerId}`}>{order.customerName}</Link>
+                <Link className="underline hover:text-blue" href={`/admin/customers/${order.customerId}`}>{order.customerName}</Link>
                 <div className="text-gray-500">{order.customerEmail}</div>
               </dd>
             </div>

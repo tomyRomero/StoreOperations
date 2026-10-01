@@ -34,7 +34,7 @@ const CategoryRow = ({ category }: { category: AdminCategory }) => {
   return (
     <TableRow>
       <TableCell>
-        <Link href={`/adminaddcategory/${category.id}`}>
+        <Link href={`/admin/categories/${category.id}`}>
           <Image
             alt=""
             className="aspect-square rounded-md object-cover"
@@ -47,7 +47,7 @@ const CategoryRow = ({ category }: { category: AdminCategory }) => {
       <TableCell>
         <div className='flex flex-wrap gap-2'>
           <Button asChild size="sm" variant="outline">
-            <Link href={`/adminaddcategory/${category.id}`}>Edit</Link>
+            <Link href={`/admin/categories/${category.id}`}>Edit</Link>
           </Button>
           {category.canDelete && (
             <Button size="sm" variant="outline" onClick={deleteCategory} disabled={busy}>
@@ -56,7 +56,7 @@ const CategoryRow = ({ category }: { category: AdminCategory }) => {
           )}
         </div>
       </TableCell>
-      <TableCell className="font-bold hover:underline"><Link href={`/adminaddcategory/${category.id}`}>{category.name}</Link></TableCell>
+      <TableCell className="font-bold hover:underline"><Link href={`/admin/categories/${category.id}`}>{category.name}</Link></TableCell>
       <TableCell className="text-center">{category.productCount}</TableCell>
     </TableRow>
   )

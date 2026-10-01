@@ -13,7 +13,7 @@ const ErrorMessage = () => {
     }
 
   return (
-    <section className="md:pt-24 max-sm:pt-20 lg:pt-0 ">
+    <section className="">
     
     <Button className="flex px-6 border border-black" variant="ghost" onClick = {handleBack}>
         <Image

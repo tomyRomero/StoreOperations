@@ -25,7 +25,7 @@ const UsersTable = ({ users, timeZone }: { users: AdminCustomerSummary[]; timeZo
       <TableRow key={user.id}>
         <TableCell>
           <Button asChild className='bg-black text-white border border-black' variant={"ghost"}>
-            <Link href={`/adminusers/${user.id}`}>View<span className="sr-only"> {user.username}</span></Link>
+            <Link href={`/admin/customers/${user.id}`}>View<span className="sr-only"> {user.username}</span></Link>
           </Button>
         </TableCell>
         <TableCell className="font-medium">{user.username}</TableCell>

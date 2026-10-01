@@ -77,7 +77,7 @@ const AddProductForm = ({ product, categories }: { product: AdminProduct | null;
 
     if (response.ok) {
       toast({ title: product ? "Product saved" : "Product added" });
-      router.push('/adminproducts');
+      router.push('/admin/products');
       router.refresh();
       return;
     }
@@ -99,7 +99,7 @@ const AddProductForm = ({ product, categories }: { product: AdminProduct | null;
   return (
       <div className="flex flex-col max-w-lg mx-auto">
       <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
-        <Link href={'/adminproducts'}>
+        <Link href={'/admin/products'}>
           <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
           <span className="ml-2">Go Back</span>
         </Link>
@@ -158,7 +158,7 @@ const AddProductForm = ({ product, categories }: { product: AdminProduct | null;
           </Select>
           {categories.length === 0 && (
             <FormDescription>
-              There are no categories yet. <Link className="underline" href="/adminaddcategory">Add one</Link> first.
+              There are no categories yet. <Link className="underline" href="/admin/categories/new">Add one</Link> first.
             </FormDescription>
           )}
           <FormMessage />

@@ -15,7 +15,7 @@ const AdminUserCard = ({ customer, timeZone }: { customer: AdminCustomer; timeZo
   return (
     <>
     <Button asChild className="flex w-fit px-6 border border-black" variant="ghost">
-      <Link href="/adminusers">
+      <Link href="/admin/customers">
         <Image src="/assets/back.png" alt="" width={32} height={32} className="px-1" />
         <span className="ml-2">Go Back</span>
       </Link>
@@ -76,7 +76,7 @@ const AdminUserCard = ({ customer, timeZone }: { customer: AdminCustomer; timeZo
         <div className="flex items-center mb-2">
           <h2 className="font-semibold">Latest orders</h2>
           {customer.orderCount > 0 && (
-            <Link className="ml-auto underline" href={`/adminorders?customer=${customer.id}`}>All orders</Link>
+            <Link className="ml-auto underline" href={`/admin/orders?customer=${customer.id}`}>All orders</Link>
           )}
         </div>
         {customer.recentOrders.length === 0 ? (
@@ -85,7 +85,7 @@ const AdminUserCard = ({ customer, timeZone }: { customer: AdminCustomer; timeZo
           <ul className="grid gap-2">
             {customer.recentOrders.map((order) => (
               <li key={order.orderNumber} className="flex flex-wrap items-center gap-4">
-                <Link className="font-medium underline" href={`/adminorders/${order.orderNumber}`}>#{order.orderNumber}</Link>
+                <Link className="font-medium underline" href={`/admin/orders/${order.orderNumber}`}>#{order.orderNumber}</Link>
                 <OrderStatusBadge status={order.status} />
                 <span>{formatMoney(order.totalCents)}</span>
                 <span className="text-gray-500">{formatDate(order.placedAtUtc, timeZone)}</span>
