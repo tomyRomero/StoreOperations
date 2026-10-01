@@ -41,7 +41,7 @@ export default async function ProductsPage(props: Props) {
   const href = productFiltersHref(filters);
 
   return (
-    <div className="container pb-12 pt-28 lg:pt-36">
+    <div className="container py-8 lg:py-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Shop", href: "/products" }, ...(href !== "/products" ? [{ label: pageTitle(filters, categories) }] : [])]} />
       <h1 className="mt-4 text-h1">{pageTitle(filters, categories)}</h1>
 

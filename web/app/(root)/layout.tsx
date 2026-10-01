@@ -1,24 +1,25 @@
-import Nav from "@/components/nav/Nav";
-import Footer from "@/components/shared/Footer";
-import { redirect } from "next/navigation";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { AdminBar } from "@/components/layout/AdminBar";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SkipLink } from "@/components/layout/SkipLink";
+import { getCategories, getStoreSettings } from "@/lib/data/catalog";
 import { getCurrentUser } from "@/lib/session";
 
+// The storefront's frame. Admins can browse it too, with a bar that leads back to the dashboard.
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser();
-
-  if (user?.isAdmin) {
-    redirect("/adminactivity");
-  }
+  const [user, categories, settings] = await Promise.all([getCurrentUser(), getCategories(), getStoreSettings()]);
+  const storeName = settings?.storeName ?? "Palettehub";
 
   return (
     <CartProvider>
-      <Nav />
-      <main className="flex flex-col items-center">
-        <section className="main-container w-full mt-0.5 z-10! overflow-auto">{children}</section>
-        <br />
+      <SkipLink />
+      {user?.isAdmin && <AdminBar />}
+      <SiteHeader categories={categories} storeName={storeName} />
+      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        {children}
       </main>
-      <Footer />
+      <SiteFooter categories={categories} storeName={storeName} supportEmail={settings?.supportEmail ?? null} />
     </CartProvider>
   );
 }

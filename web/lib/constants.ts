@@ -2,59 +2,6 @@ import hero from "@/public/assets/art.jpg"
 import auth from "@/public/assets/auth.jpg"
 import icon from "@/public/assets/icon.png"
 
-//Used for nav menu 
-export const loggedInNavLinks =
-[
-{
-  title: "Home",
-  path: "/", 
-  image: "/assets/layout.png"
-},
-{
-title: "Search",
-path: "/search", 
-image: "/assets/searchblack.png"
-},
-{
-  title: "Shop",
-  path: "/products", 
-  image: "/assets/price.png"
-},
-{
-  title: "Account",
-  path: "/account",
-  image: "/assets/profile.png"
-},
-{
-  title: "Logout",
-  path: "/logout",
-  image: "/assets/logout.png"
-}
-]
-
-export const loggedOutNavLinks = [
-  {
-      title: "Home",
-      path: "/", 
-      image: "/assets/layout.png"
-  },
-  {
-    title: "Search",
-    path: "/search", 
-    image: "/assets/searchblack.png"
-  },
-  {
-      title: "Shop",
-      path: "/products", 
-      image: "/assets/price.png"
-  },
-  {
-      title: "Login",
-      path: "/login",
-      image: "/assets/login.png"
-  },
-]
-
 //used in navs folder, admin dashboard mobile admin dashboard
 export const navItems = [
     { title: 'Recent Activity', url: '/adminactivity', img: '/assets/bell.png' },
@@ -83,45 +30,6 @@ export const navItems = [
     },
 
   }
-
-  //Used in footer
-  export const footerNavLinks = [
-        {
-          title: "Home",
-          link: "/"
-        },
-        {
-          title: "Shop",
-          link: "/products"
-        },
-        {
-          title: "About Us",
-          link: "/about"
-        },
-        {
-          title: "Contact Us",
-          link: "/contact"
-        }
-      ]
-
-//Used in footer
-export const footerSocials = [
-        {
-          icon: "/assets/facebook.png",
-          title: "facebook icon",
-          link: "https://facebook.com"
-        },
-        {
-          icon: "/assets/instagram.png",
-          title: "instagram icon",
-          link: "https://instagram.com"
-        },
-        {
-          icon: "/assets/twitter.png",
-          title: "twitter icon",
-          link: "https://twitter.com"
-        }
-      ]
 
 //Used in promotions
 export const promotionInclusions = [

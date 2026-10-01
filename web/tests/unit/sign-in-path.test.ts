@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { safeReturnPath, signInPath } from "@/lib/sign-in-path";
+import { currentPath, safeReturnPath, signInPath } from "@/lib/sign-in-path";
 
 describe("signInPath", () => {
   it("comes back to the page, query string included", () => {
     expect(signInPath("/ordersuccess?payment_intent=pi_1")).toBe("/sign-in?callbackUrl=%2Fordersuccess%3Fpayment_intent%3Dpi_1");
+  });
+});
+
+describe("currentPath", () => {
+  it("keeps the query, so the page comes back as it was", () => {
+    expect(currentPath("/products", new URLSearchParams("q=canvas&sort=price-asc"))).toBe("/products?q=canvas&sort=price-asc");
+    expect(currentPath("/cart", new URLSearchParams())).toBe("/cart");
   });
 });
 
