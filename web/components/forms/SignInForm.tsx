@@ -73,7 +73,12 @@ const SignInForm = ({ storeName }: { storeName: string }) => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <div className="flex items-baseline justify-between gap-3">
+                  <FormLabel>Password</FormLabel>
+                  <Link href="/forgot-password" className="text-[13px] font-medium text-accent underline-offset-4 hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
                 <FormControl>
                   <PasswordInput autoComplete="current-password" {...field} />
                 </FormControl>
