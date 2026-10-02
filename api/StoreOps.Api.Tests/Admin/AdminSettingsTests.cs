@@ -110,7 +110,6 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
     [InlineData("shippingFlatRateCents", -1)]
     [InlineData("freeShippingThresholdCents", 0)]
     [InlineData("supportEmail", "not-an-email")]
-    [InlineData("storeName", "")]
     public async Task Invalid_settings_are_refused_on_their_field(string field, object value)
     {
         var admin = await api.CreateAdminClientAsync();

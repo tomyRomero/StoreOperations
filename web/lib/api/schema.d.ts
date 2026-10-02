@@ -65,6 +65,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/storefront": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["StorefrontSettingsResponse"];
+                        "application/json": components["schemas"]["StorefrontSettingsResponse"];
+                        "text/json": components["schemas"]["StorefrontSettingsResponse"];
+                    };
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateStorefrontRequest"];
+                    "text/json": components["schemas"]["UpdateStorefrontRequest"];
+                    "application/*+json": components["schemas"]["UpdateStorefrontRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["StorefrontSettingsResponse"];
+                        "application/json": components["schemas"]["StorefrontSettingsResponse"];
+                        "text/json": components["schemas"]["StorefrontSettingsResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/store": {
         parameters: {
             query?: never;
@@ -2883,6 +2947,8 @@ export interface components {
         ForgotPasswordRequest: {
             email: string;
         };
+        /** @enum {unknown} */
+        HomeSection: "categories" | "deals" | "new_in" | "newsletter";
         /** Format: binary */
         IFormFile: string;
         JsonElement: unknown;
@@ -3118,6 +3184,7 @@ export interface components {
             /** Format: int32 */
             lowStockThreshold: number;
             timeZoneId: string;
+            storefront: components["schemas"]["StorefrontResponse"];
         };
         RegisterRequest: {
             username: string;
@@ -3143,6 +3210,13 @@ export interface components {
             /** Format: int32 */
             quantity: number;
         };
+        SocialLinks: {
+            instagram: null | string;
+            tikTok: null | string;
+            pinterest: null | string;
+            youTube: null | string;
+            facebook: null | string;
+        };
         StartCheckoutRequest: {
             /** Format: int32 */
             addressId: number;
@@ -3154,8 +3228,36 @@ export interface components {
         };
         /** @enum {unknown} */
         StockLevel: "in_stock" | "low" | "sold_out" | null;
-        StoreSettingsResponse: {
+        StorefrontResponse: {
+            theme: components["schemas"]["StorefrontTheme"];
+            tagline: null | string;
+            description: null | string;
+            logoUrl: null | string;
+            accentColor: null | string;
+            productNoun: string;
+            productNounPlural: string;
+            heroHeadline: null | string;
+            heroHighlight: null | string;
+            heroText: null | string;
+            heroButtonLabel: null | string;
+            homeSections: components["schemas"]["HomeSection"][];
+            aboutText: null | string;
+            contactPhone: null | string;
+            contactAddress: null | string;
+            social: components["schemas"]["SocialLinks"];
+        };
+        StorefrontSettingsResponse: {
             storeName: string;
+            logoImageKey: null | string;
+            storefront: components["schemas"]["StorefrontResponse"];
+            /** Format: date-time */
+            updatedAtUtc: string;
+            /** Format: byte */
+            rowVersion: string;
+        };
+        /** @enum {unknown} */
+        StorefrontTheme: "night_studio" | "atelier";
+        StoreSettingsResponse: {
             supportEmail: null | string;
             /** Format: int32 */
             shippingFlatRateCents: number;
@@ -3218,8 +3320,32 @@ export interface components {
             stock: number;
             imageKey: string;
         };
-        UpdateStoreSettingsRequest: {
+        UpdateStorefrontRequest: {
             storeName: string;
+            theme: components["schemas"]["StorefrontTheme"];
+            tagline?: null | string;
+            description?: null | string;
+            logoImageKey?: null | string;
+            accentColor?: null | string;
+            productNoun: string;
+            productNounPlural: string;
+            heroHeadline?: null | string;
+            heroHighlight?: null | string;
+            heroText?: null | string;
+            heroButtonLabel?: null | string;
+            homeSections: components["schemas"]["HomeSection"][];
+            aboutText?: null | string;
+            contactPhone?: null | string;
+            contactAddress?: null | string;
+            instagramUrl?: null | string;
+            tikTokUrl?: null | string;
+            pinterestUrl?: null | string;
+            youTubeUrl?: null | string;
+            facebookUrl?: null | string;
+            /** Format: byte */
+            rowVersion: string;
+        };
+        UpdateStoreSettingsRequest: {
             supportEmail?: null | string;
             /** Format: int32 */
             shippingFlatRateCents: number;

@@ -34,7 +34,7 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
 
         var queued = Assert.Single(await QueuedToAsync(email));
         Assert.Equal(EmailKind.Welcome, queued.Kind);
-        Assert.Equal("Welcome to Palettehub!", queued.Subject);
+        Assert.Equal("Welcome to My store!", queued.Subject);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
 
         var toCustomer = (await QueuedToAsync(sale.Email)).Single(m => m.Kind == EmailKind.OrderConfirmation);
         var orderNumber = await OrderNumberOfAsync(sale);
-        Assert.Equal("Order confirmation from Palettehub", toCustomer.Subject);
+        Assert.Equal("Order confirmation from My store", toCustomer.Subject);
         Assert.Contains(orderNumber, toCustomer.HtmlBody);
         Assert.Contains("$18.50", toCustomer.HtmlBody);
         Assert.Contains($"http://localhost:3200/account/orders/{orderNumber}", toCustomer.HtmlBody);
@@ -94,7 +94,7 @@ public class EmailTests(ApiFixture api, MailpitFixture mailpit) : IClassFixture<
         await SendDueAsync(withMailpit);
 
         var delivered = await mailpit.MessagesToAsync(sale.Email);
-        Assert.Contains(delivered, m => m.Subject == "Order confirmation from Palettehub" && m.Html.Contains("Thanks for your order!"));
+        Assert.Contains(delivered, m => m.Subject == "Order confirmation from My store" && m.Html.Contains("Thanks for your order!"));
         Assert.All(await QueuedToAsync(sale.Email), m => Assert.Equal(EmailStatus.Sent, m.Status));
     }
 

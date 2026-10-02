@@ -60,11 +60,25 @@ public static class DevSeeder
         await db.Database.EnsureDeletedAsync(cancellationToken);
         await db.Database.MigrateAsync(cancellationToken);
 
-        // The demo store's own policies over the defaults a new store starts with: free shipping over $75,
-        // so the bag has progress toward it to show, and an address for questions
+        // The demo store, Palettehub, over the defaults a new store starts with: its name and storefront,
+        // free shipping over $75 (so the bag has progress toward it to show) and an address for questions.
+        // The phone number is one of the 555-01xx numbers kept for fiction.
         var settings = await db.StoreSettings.SingleAsync(cancellationToken);
+        settings.StoreName = "Palettehub";
         settings.FreeShippingThresholdCents = 7500;
         settings.SupportEmail = "support@palettehub.test";
+        settings.Tagline = "Supplies for people who make things.";
+        settings.Description = "Artist-grade paint, brushes and canvas, shipped across the US.";
+        settings.ProductNoun = "supply";
+        settings.ProductNounPlural = "supplies";
+        settings.HeroHeadline = "Every color.";
+        settings.HeroHighlight = "One studio.";
+        settings.HeroText = "Paint, brushes and canvas for people who make things.";
+        settings.HeroButtonLabel = "Shop the supplies";
+        settings.AboutText =
+            "Palettehub started as one shelf in a shared studio, stocked with the paint and brushes we kept running out of.\n\n" +
+            "We still choose every supply for how it handles, not how it looks on a shelf, and we keep the range small so each one earns its place.";
+        settings.ContactPhone = "+1 (555) 010-0142";
 
         var now = DateTime.UtcNow;
 

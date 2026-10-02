@@ -53,6 +53,9 @@ public class DevSeederTests(ApiFixture api) : IClassFixture<ApiFixture>
         var settings = await db.StoreSettings.SingleAsync(Ct);
         Assert.Equal(7500, settings.FreeShippingThresholdCents);
         Assert.Equal("support@palettehub.test", settings.SupportEmail);
+        // Palettehub is the demo's data, not the code's: a new store starts as "My store"
+        Assert.Equal("Palettehub", settings.StoreName);
+        Assert.Equal("supplies", settings.ProductNounPlural);
 
         var admin = await users.FindByEmailAsync("admin@example.test");
         var customer = await users.FindByEmailAsync("customer@example.test");

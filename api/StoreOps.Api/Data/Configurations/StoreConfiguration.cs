@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StoreOps.Api.Domain;
 
@@ -13,6 +14,36 @@ public class StoreSettingsConfiguration : IEntityTypeConfiguration<StoreSettings
         settings.Property(s => s.SupportEmail).HasMaxLength(256);
         settings.Property(s => s.ReturnPolicyNote).HasMaxLength(500);
         settings.Property(s => s.TimeZoneId).HasMaxLength(64).IsUnicode(false);
+
+        settings.Property(s => s.Theme).HasDefaultValue(StorefrontTheme.NightStudio).HasSentinel(StorefrontTheme.NightStudio);
+        settings.Property(s => s.Tagline).HasMaxLength(120);
+        settings.Property(s => s.Description).HasMaxLength(300);
+        settings.Property(s => s.LogoImageKey).HasMaxLength(300).IsUnicode(false);
+        settings.Property(s => s.AccentColor).HasMaxLength(7).IsUnicode(false);
+        settings.Property(s => s.ProductNoun).HasMaxLength(40).HasDefaultValue("product");
+        settings.Property(s => s.ProductNounPlural).HasMaxLength(40).HasDefaultValue("products");
+        settings.Property(s => s.HeroHeadline).HasMaxLength(80);
+        settings.Property(s => s.HeroHighlight).HasMaxLength(80);
+        settings.Property(s => s.HeroText).HasMaxLength(300);
+        settings.Property(s => s.HeroButtonLabel).HasMaxLength(40);
+        settings.Property(s => s.AboutText).HasMaxLength(4000);
+        settings.Property(s => s.ContactPhone).HasMaxLength(40);
+        settings.Property(s => s.ContactAddress).HasMaxLength(300);
+        foreach (var link in new[] { "InstagramUrl", "TikTokUrl", "PinterestUrl", "YouTubeUrl", "FacebookUrl" })
+            settings.Property<string?>(link).HasMaxLength(300);
+
+        // The home page's rows by name, in order: "Categories,NewIn,Newsletter"
+        settings.Property(s => s.HomeSections)
+            .HasConversion(
+                sections => string.Join(',', sections),
+                text => text.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(Enum.Parse<HomeSection>).ToList(),
+                new ValueComparer<List<HomeSection>>(
+                    (a, b) => a!.SequenceEqual(b!),
+                    sections => sections.Aggregate(0, (hash, s) => HashCode.Combine(hash, s)),
+                    sections => sections.ToList()))
+            .HasMaxLength(100)
+            .IsUnicode(false)
+            .HasDefaultValue(StoreSettings.DefaultHomeSections.ToList());
         // Two admins saving settings at once
         settings.Property(s => s.RowVersion).IsRowVersion();
 
@@ -28,13 +59,16 @@ public class StoreSettingsConfiguration : IEntityTypeConfiguration<StoreSettings
                 "([ReturnPolicy] = 'NoReturns' AND [ReturnWindowDays] IS NULL) " +
                 "OR ([ReturnPolicy] <> 'NoReturns' AND [ReturnWindowDays] BETWEEN 1 AND 365)");
             t.HasCheckConstraint("CK_StoreSettings_LowStockThreshold", "[LowStockThreshold] >= 0");
+            t.HasCheckConstraint("CK_StoreSettings_Theme", Sql.InEnum<StorefrontTheme>("Theme"));
+            t.HasCheckConstraint("CK_StoreSettings_AccentColor", "[AccentColor] IS NULL OR [AccentColor] LIKE '#[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]'");
         });
 
-        // The defaults match what the store charges today: $10 flat shipping, no free-shipping threshold
+        // A new store's starting point: $10 flat shipping, no free-shipping threshold. The demo seed
+        // fills in Palettehub's name and storefront.
         settings.HasData(new StoreSettings
         {
             Id = StoreSettings.SingletonId,
-            StoreName = "Palettehub",
+            StoreName = "My store",
             ShippingFlatRateCents = 1000,
             ReturnPolicy = ReturnPolicy.NoReturns,
             LowStockThreshold = 5,

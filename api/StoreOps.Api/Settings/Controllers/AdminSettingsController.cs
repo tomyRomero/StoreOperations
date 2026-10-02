@@ -19,3 +19,18 @@ public sealed class AdminSettingsController(StoreSettingsService settings) : Adm
         return error is not null ? this.ErrorResponse(error) : Ok(saved);
     }
 }
+
+[Route("api/admin/storefront")]
+public sealed class AdminStorefrontController(StoreSettingsService settings) : AdminControllerBase
+{
+    [HttpGet]
+    public async Task<StorefrontSettingsResponse> Get(CancellationToken ct) => await settings.GetStorefrontAsync(ct);
+
+    [HttpPut]
+    [ProducesResponseType<StorefrontSettingsResponse>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Update(UpdateStorefrontRequest request, CancellationToken ct)
+    {
+        var (saved, error) = await settings.UpdateStorefrontAsync(request, AdminId, ct);
+        return error is not null ? this.ErrorResponse(error) : Ok(saved);
+    }
+}

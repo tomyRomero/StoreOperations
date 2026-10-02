@@ -81,6 +81,82 @@
         }
       }
     },
+    "/api/admin/storefront": {
+      "get": {
+        "tags": [
+          "AdminStorefront"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminStorefront"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStorefrontRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStorefrontRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStorefrontRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorefrontSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/store": {
       "get": {
         "tags": [
@@ -4477,6 +4553,14 @@
           }
         }
       },
+      "HomeSection": {
+        "enum": [
+          "categories",
+          "deals",
+          "new_in",
+          "newsletter"
+        ]
+      },
       "IFormFile": {
         "type": "string",
         "format": "binary"
@@ -5295,7 +5379,8 @@
           "returnWindowDays",
           "returnPolicyNote",
           "lowStockThreshold",
-          "timeZoneId"
+          "timeZoneId",
+          "storefront"
         ],
         "type": "object",
         "properties": {
@@ -5341,6 +5426,9 @@
           },
           "timeZoneId": {
             "type": "string"
+          },
+          "storefront": {
+            "$ref": "#/components/schemas/StorefrontResponse"
           }
         }
       },
@@ -5445,6 +5533,48 @@
           }
         }
       },
+      "SocialLinks": {
+        "required": [
+          "instagram",
+          "tikTok",
+          "pinterest",
+          "youTube",
+          "facebook"
+        ],
+        "type": "object",
+        "properties": {
+          "instagram": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tikTok": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pinterest": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "youTube": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "facebook": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "StartCheckoutRequest": {
         "required": [
           "addressId"
@@ -5483,9 +5613,153 @@
           null
         ]
       },
-      "StoreSettingsResponse": {
+      "StorefrontResponse": {
+        "required": [
+          "theme",
+          "tagline",
+          "description",
+          "logoUrl",
+          "accentColor",
+          "productNoun",
+          "productNounPlural",
+          "heroHeadline",
+          "heroHighlight",
+          "heroText",
+          "heroButtonLabel",
+          "homeSections",
+          "aboutText",
+          "contactPhone",
+          "contactAddress",
+          "social"
+        ],
+        "type": "object",
+        "properties": {
+          "theme": {
+            "$ref": "#/components/schemas/StorefrontTheme"
+          },
+          "tagline": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "logoUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accentColor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "productNoun": {
+            "type": "string"
+          },
+          "productNounPlural": {
+            "type": "string"
+          },
+          "heroHeadline": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroHighlight": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroButtonLabel": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "homeSections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HomeSection"
+            }
+          },
+          "aboutText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactAddress": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "social": {
+            "$ref": "#/components/schemas/SocialLinks"
+          }
+        }
+      },
+      "StorefrontSettingsResponse": {
         "required": [
           "storeName",
+          "logoImageKey",
+          "storefront",
+          "updatedAtUtc",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "storeName": {
+            "type": "string"
+          },
+          "logoImageKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "storefront": {
+            "$ref": "#/components/schemas/StorefrontResponse"
+          },
+          "updatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "rowVersion": {
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "StorefrontTheme": {
+        "enum": [
+          "night_studio",
+          "atelier"
+        ]
+      },
+      "StoreSettingsResponse": {
+        "required": [
           "supportEmail",
           "shippingFlatRateCents",
           "freeShippingThresholdCents",
@@ -5500,9 +5774,6 @@
         ],
         "type": "object",
         "properties": {
-          "storeName": {
-            "type": "string"
-          },
           "supportEmail": {
             "type": [
               "null",
@@ -5729,14 +6000,13 @@
           }
         }
       },
-      "UpdateStoreSettingsRequest": {
+      "UpdateStorefrontRequest": {
         "required": [
           "storeName",
-          "shippingFlatRateCents",
-          "returnPolicy",
-          "lowStockThreshold",
-          "emailCustomerOnStatusUpdateByDefault",
-          "timeZoneId",
+          "theme",
+          "productNoun",
+          "productNounPlural",
+          "homeSections",
           "rowVersion"
         ],
         "type": "object",
@@ -5746,6 +6016,172 @@
             "minLength": 0,
             "type": "string"
           },
+          "theme": {
+            "$ref": "#/components/schemas/StorefrontTheme"
+          },
+          "tagline": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "logoImageKey": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "accentColor": {
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "productNoun": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": "string"
+          },
+          "productNounPlural": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": "string"
+          },
+          "heroHeadline": {
+            "maxLength": 80,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroHighlight": {
+            "maxLength": 80,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroText": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "heroButtonLabel": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "homeSections": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HomeSection"
+            }
+          },
+          "aboutText": {
+            "maxLength": 4000,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactPhone": {
+            "maxLength": 40,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactAddress": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instagramUrl": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "tikTokUrl": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pinterestUrl": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "youTubeUrl": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "facebookUrl": {
+            "maxLength": 300,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "rowVersion": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "format": "byte"
+          }
+        }
+      },
+      "UpdateStoreSettingsRequest": {
+        "required": [
+          "shippingFlatRateCents",
+          "returnPolicy",
+          "lowStockThreshold",
+          "emailCustomerOnStatusUpdateByDefault",
+          "timeZoneId",
+          "rowVersion"
+        ],
+        "type": "object",
+        "properties": {
           "supportEmail": {
             "maxLength": 256,
             "minLength": 0,
@@ -5831,6 +6267,9 @@
   "tags": [
     {
       "name": "AdminSettings"
+    },
+    {
+      "name": "AdminStorefront"
     },
     {
       "name": "Store"

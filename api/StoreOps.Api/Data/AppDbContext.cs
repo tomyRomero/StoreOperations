@@ -44,6 +44,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         StoreAsName<CheckoutStatus>(builder, 16);
         StoreAsName<Carrier>(builder, 16);
         StoreAsName<ReturnPolicy>(builder, 16);
+        StoreAsName<StorefrontTheme>(builder, 20);
         StoreAsName<EmailStatus>(builder, 16);
         StoreAsName<EmailKind>(builder, 40);
         StoreAsName<ActivityAction>(builder, 50);

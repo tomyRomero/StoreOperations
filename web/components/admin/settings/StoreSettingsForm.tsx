@@ -51,7 +51,6 @@ const dollars = (max: number, message: string) =>
   }, message);
 
 const FormSchema = z.object({
-  storeName: z.string().trim().min(1, 'Enter the store name').max(100, 'Use at most 100 characters'),
   supportEmail: z.union([z.literal(""), z.string().trim().email('Enter an email address').max(256)]),
   shippingFlatRate: dollars(100_000, 'Enter an amount up to $1,000, like 10.00'),
   freeShippingThreshold: z.union([z.literal(""), dollars(10_000_000, 'Enter an amount up to $100,000, or leave it empty')])
@@ -75,7 +74,7 @@ const formFieldFor: Record<string, keyof Values> = {
   freeShippingThresholdCents: "freeShippingThreshold",
 };
 
-// The store's policies, saved together. Saved with the version it was opened at, so two admins
+// The store's policies, saved together. Its name, look and words are in Theme and brand. Saved with the version it was opened at, so two admins
 // can't overwrite each other's changes.
 export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
   const [saving, setSaving] = useState(false);
@@ -84,7 +83,6 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
   const form = useForm<Values>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      storeName: settings.storeName,
       supportEmail: settings.supportEmail ?? "",
       shippingFlatRate: dollarsText(settings.shippingFlatRateCents),
       freeShippingThreshold: settings.freeShippingThresholdCents === null ? "" : dollarsText(settings.freeShippingThresholdCents),
@@ -112,7 +110,6 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
     setSaving(true);
     const { data, error } = await api.PUT("/api/admin/settings", {
       body: {
-        storeName: values.storeName,
         supportEmail: values.supportEmail || null,
         shippingFlatRateCents: parseDollars(values.shippingFlatRate)!,
         freeShippingThresholdCents: values.freeShippingThreshold ? parseDollars(values.freeShippingThreshold) : null,
@@ -163,35 +160,20 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
           <h2 id="store-heading" className={heading}>
             Store
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="storeName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Store name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="supportEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Support email (optional)</FormLabel>
-                  <FormControl>
-                    <Input type="email" {...field} />
-                  </FormControl>
-                  <FormDescription>Contact form messages come here. Without it, the form is closed.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="supportEmail"
+            render={({ field }) => (
+              <FormItem className="sm:max-w-md">
+                <FormLabel>Support email (optional)</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormDescription>Contact form messages come here. Without it, the form is closed.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="timeZoneId"
