@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, LoaderCircle, Plus, Truck } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "../ui/button";
 import { AddressForm } from "../forms/AddressForm";
 import { useCart } from "../cart/CartProvider";
 import { CheckoutBagSummary } from "./CheckoutBagSummary";
+import { ContinueToPayment, DeliveryOption, stepLegend } from "./ShippingStep";
 import type { Address } from "@/lib/api/types";
-import { shippingFor, toFreeShipping, type ShippingSettings } from "@/lib/cart";
+import type { ShippingSettings } from "@/lib/cart";
 import { addressLines } from "@/lib/format";
-import { formatMoney } from "@/lib/money";
 
 type Props = {
   addresses: Address[];
@@ -19,8 +18,6 @@ type Props = {
   selectedId?: number;
   shipping: ShippingSettings;
 };
-
-const legend = "mb-3.5 font-sans text-lg font-semibold";
 
 // Checkout's first step. Tax depends on the address, so it comes before payment.
 export function ChooseAddress({ addresses, selectedId, shipping }: Props) {
@@ -30,9 +27,6 @@ export function ChooseAddress({ addresses, selectedId, shipping }: Props) {
   const [chosenId, setChosenId] = useState(initial?.id);
   const [adding, setAdding] = useState(addresses.length === 0);
   const [going, setGoing] = useState(false);
-  const subtotal = cart?.subtotalCents ?? 0;
-  const shippingCents = shippingFor(subtotal, shipping);
-  const missing = toFreeShipping(subtotal, shipping);
 
   const continueWith = (id: number) => {
     setGoing(true);
@@ -48,7 +42,7 @@ export function ChooseAddress({ addresses, selectedId, shipping }: Props) {
         </div>
 
         <fieldset>
-          <legend className={legend}>Ship to</legend>
+          <legend className={stepLegend}>Ship to</legend>
           <p className="-mt-2 mb-3.5 text-sm text-muted-foreground">We ship within the United States. Tax is worked out for this address.</p>
           {addresses.length > 0 && !adding && (
             <div className="grid gap-3 sm:grid-cols-2">
@@ -105,44 +99,9 @@ export function ChooseAddress({ addresses, selectedId, shipping }: Props) {
           )}
         </fieldset>
 
-        {shipping && (
-          <section aria-labelledby="delivery-heading">
-            <h2 id="delivery-heading" className={legend}>
-              Delivery
-            </h2>
-            <div className="flex items-center gap-4 rounded-[20px] border border-glow-violet/60 bg-glow-violet/8 px-5 py-4.5">
-              <span aria-hidden className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-foreground/6">
-                <Truck className="size-[22px]" strokeWidth={1.8} />
-              </span>
-              <span className="grid grow gap-0.5">
-                <span className="text-[15px] font-semibold">Standard shipping, tracked</span>
-                <span className="text-[13px] text-muted-foreground">
-                  {missing === null ? "To any address in the United States" : missing === 0 ? "Free on this order" : `Add ${formatMoney(missing)} more to your bag and it's free`}
-                </span>
-              </span>
-              <span className="font-mono text-[15px] font-medium">{shippingCents === 0 ? "Free" : shippingCents === null ? "" : formatMoney(shippingCents)}</span>
-            </div>
-          </section>
-        )}
+        {shipping && <DeliveryOption shipping={shipping} subtotalCents={cart?.subtotalCents ?? 0} />}
 
-        {!adding && (
-          <div className="flex flex-wrap-reverse items-center justify-between gap-4">
-            <Link href="/cart" className="inline-flex items-center gap-1.5 text-[15px] text-ink-2 hover:text-foreground">
-              <ArrowLeft className="size-4" aria-hidden />
-              Back to bag
-            </Link>
-            <button
-              type="button"
-              disabled={chosenId === undefined || going}
-              onClick={() => chosenId !== undefined && continueWith(chosenId)}
-              className="inline-flex h-[58px] items-center gap-2.5 rounded-button bg-primary px-8 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-60 max-sm:w-full max-sm:justify-center"
-            >
-              {going && <LoaderCircle className="size-4 animate-spin" aria-hidden />}
-              Continue to payment
-              <ArrowRight className="size-4" aria-hidden />
-            </button>
-          </div>
-        )}
+        {!adding && <ContinueToPayment going={going} disabled={chosenId === undefined} onContinue={() => chosenId !== undefined && continueWith(chosenId)} />}
       </div>
 
       <CheckoutBagSummary shipping={shipping} />
