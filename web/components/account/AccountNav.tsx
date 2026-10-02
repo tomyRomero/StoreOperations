@@ -21,7 +21,7 @@ export function AccountNav({ username, email, orderCount, addressCount }: Props)
   const items = [
     { label: "Overview", href: "/account", icon: LayoutGrid, count: null },
     { label: "Orders", href: "/account/orders", icon: Package, count: orderCount },
-    { label: "Addresses", href: "/account/myaddresses", icon: MapPin, count: addressCount },
+    { label: "Addresses", href: "/account/addresses", icon: MapPin, count: addressCount },
     { label: "Password", href: "/account/password", icon: KeyRound, count: null },
   ];
   const isActive = (href: string) => (href === "/account" ? pathname === href : pathname.startsWith(href));

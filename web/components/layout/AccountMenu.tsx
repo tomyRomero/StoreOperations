@@ -63,7 +63,7 @@ export function AccountMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/account/myaddresses">
+          <Link href="/account/addresses">
             <MapPin aria-hidden />
             Addresses
           </Link>

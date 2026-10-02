@@ -92,7 +92,7 @@ export function MobileNav({ categories, hasDeals }: { categories: Category[]; ha
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/myaddresses" onClick={close} className={linkClasses}>
+                    <Link href="/account/addresses" onClick={close} className={linkClasses}>
                       Addresses
                     </Link>
                   </li>

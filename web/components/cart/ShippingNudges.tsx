@@ -7,7 +7,7 @@ import { QuickAddButton } from "@/components/products/QuickAddButton";
 import { toFreeShipping, type ShippingSettings } from "@/lib/cart";
 import { formatMoney, formatMoneyBrief } from "@/lib/money";
 import { useCart } from "./CartProvider";
-import { useShippingNudges } from "./useShippingNudges";
+import { useShippingNudges } from "./use-shipping-nudges";
 
 type Props = {
   shipping: ShippingSettings;

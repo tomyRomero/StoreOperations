@@ -16,7 +16,7 @@ export default async function AccountOverviewPage() {
   const tiles = [
     { href: "/account/orders", icon: Package, glow: "bg-glow-blue", title: "Orders", text: orders ? (orderCount === 1 ? "1 order so far" : `${orderCount} orders so far`) : "Track and review", cta: "See all" },
     {
-      href: "/account/myaddresses",
+      href: "/account/addresses",
       icon: MapPin,
       glow: "bg-glow-green",
       title: "Addresses",

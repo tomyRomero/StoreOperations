@@ -4,8 +4,8 @@ const apiUrl = process.env.API_URL ?? "http://localhost:5200";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // The admin pages used to live at /adminorders, /adminaddproduct/3 and so on. Old bookmarks still
-  // land on the same page under /admin. Query strings (filters, search) carry over.
+  // Addresses from the first version of the store (/adminorders, /adminaddproduct/3, /account/myaddresses)
+  // redirect to their current pages. Query strings (filters, search) carry over.
   async redirects() {
     return [
       ["/adminactivity", "/admin/activity"],
@@ -23,6 +23,7 @@ const nextConfig = {
       ["/adminusers", "/admin/customers"],
       ["/adminnewsletter", "/admin/newsletter"],
       ["/adminsettings", "/admin/settings"],
+      ["/account/myaddresses", "/account/addresses"],
     ].map(([source, destination]) => ({ source, destination, permanent: true }));
   },
   async rewrites() {
