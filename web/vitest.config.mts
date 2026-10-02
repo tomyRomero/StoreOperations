@@ -11,5 +11,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // Behind UTC, so a date shown in the wrong time zone is a day off and fails on any machine, CI's
+    // (which runs in UTC) included
+    env: { TZ: "America/Los_Angeles" },
   },
 });
