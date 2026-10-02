@@ -1,6 +1,6 @@
 # StoreOps
 
-StoreOps is an online store platform: a storefront for customers and a console for the people who run the store. Each store runs its own copy, with its own name, look, words, settings, catalog and payments, all set from the console. **Palettehub**, a small art-supply shop, is the demo store you see in the screenshots; nothing about it is written into the code.
+StoreOps is an online store platform: a storefront for customers and a console for the people who run the store. Each store runs its own copy, with its own name, look, words, settings, catalog and payments, all set from the console. **Palettehub**, a small art-supply shop, is the demo store you see in the screenshots. It exists only as seed data: nothing about it is written into the storefront or the console.
 
 It is built as a production-style system rather than a template: a Next.js storefront and console, a .NET API with SQL Server, real Stripe payments (in test mode), transactional email, and tests that run in CI.
 
@@ -95,7 +95,7 @@ flowchart LR
 | API | ASP.NET Core 10 controllers, EF Core 10 with SQL Server, ASP.NET Core Identity (cookie sessions), Stripe.net, MailKit with Razor email templates, S3 SDK for images |
 | Tests | xUnit with Testcontainers (a real SQL Server and an S3 mock per run), Vitest |
 | Local stack | Docker Compose: SQL Server 2025, S3Mock, Mailpit |
-| CI | GitHub Actions: web lint, typecheck, unit tests and build; API build and tests |
+| CI | GitHub Actions: web lint, typecheck, unit tests and build; API formatting check, build and tests |
 
 ### Decisions worth knowing
 
@@ -172,7 +172,7 @@ The seed creates two accounts, `customer@example.test` and `admin@example.test`,
 ## Tests
 
 ```bash
-cd api && dotnet test                                          # integration tests against a real SQL Server in a container
+cd api && dotnet format --verify-no-changes && dotnet test    # formatting, then integration tests against a real SQL Server in a container
 cd web && npm run lint && npm run typecheck && npm test        # ESLint, TypeScript and Vitest
 ```
 
@@ -194,4 +194,4 @@ docker-compose.yml      the local stack
 
 ## Contact
 
-For inquiries or further information, please contact me at tomyflecther99@hotmail.com, or reach out to me at [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomy-romero-902476145/)
+For inquiries or further information, please contact me at tomyfletcher99@hotmail.com, or reach out to me at [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomy-romero-902476145/)
