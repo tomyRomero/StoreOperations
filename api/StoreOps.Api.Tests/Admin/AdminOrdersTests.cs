@@ -277,7 +277,7 @@ public class AdminOrdersTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task Cancelling_refunds_the_payment_in_full_before_it_is_recorded()
+    public async Task Cancelling_refunds_the_payment_in_full_and_reverses_its_tax()
     {
         var admin = await api.CreateAdminClientAsync();
         var (sale, number) = await PlacedOrderAsync();

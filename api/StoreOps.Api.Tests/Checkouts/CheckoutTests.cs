@@ -49,7 +49,7 @@ public class CheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 
     [Fact]
-    public async Task Shipping_is_free_above_the_stores_threshold()
+    public async Task Shipping_is_free_from_the_stores_threshold_up()
     {
         await using (var db = api.CreateContext())
             await db.StoreSettings.ExecuteUpdateAsync(s => s.SetProperty(x => x.FreeShippingThresholdCents, 5000), Ct);

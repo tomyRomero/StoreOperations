@@ -125,8 +125,10 @@ public class GuestCheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
         var archived = await guest.PostAsJsonAsync("/api/checkout/guest", Shopping.GuestCheckout("a@example.test", archivedId), Ct);
 
         Assert.Equal(HttpStatusCode.BadRequest, badEmail.StatusCode);
+        Assert.True((await BodyOf(badEmail)).GetProperty("errors").TryGetProperty("email", out _));
         Assert.Equal(HttpStatusCode.BadRequest, noAddress.StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, nothing.StatusCode);
+        Assert.True((await BodyOf(nothing)).GetProperty("errors").TryGetProperty("items", out _));
         Assert.Equal(HttpStatusCode.Conflict, archived.StatusCode);
         Assert.Equal("CART_NOT_READY", await CodeOf(archived));
     }

@@ -154,6 +154,10 @@ public class OrderPlacementTests(ApiFixture api) : IClassFixture<ApiFixture>
 
         Assert.Equal(HttpStatusCode.OK, otherEvent.StatusCode);
         Assert.Equal(HttpStatusCode.OK, otherPayment.StatusCode);
+        // Not this store's payment: no order, and its money is left alone
+        await using var db = api.CreateContext();
+        Assert.False(await db.Orders.AnyAsync(o => o.StripePaymentIntentId == stranger.Id, Ct));
+        Assert.DoesNotContain(stranger.Id, api.Payments.Refunds);
     }
 
     [Fact]
