@@ -7,6 +7,7 @@ import { ChevronDown } from "lucide-react";
 import { BulkBar, SelectBox, useSelection } from "@/components/admin/list/selection";
 import { SortableHead } from "@/components/admin/list/SortableHead";
 import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -163,7 +164,10 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-muted-foreground">{formatDate(order.placedAtUtc, timeZone)}</TableCell>
                   <TableCell className="max-w-56">
-                    <p className="truncate font-semibold">{order.customerName}</p>
+                    <p className="flex items-center gap-1.5 font-semibold">
+                      <span className="truncate">{order.customerName}</span>
+                      {order.isGuest && <Badge variant="outline">Guest</Badge>}
+                    </p>
                     <p className="truncate text-muted-foreground">{order.customerEmail}</p>
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{order.itemCount}</TableCell>

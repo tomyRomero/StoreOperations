@@ -6,6 +6,7 @@ import { ExternalLink } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { OrderUpdateForm } from "@/components/admin/orders/OrderUpdateForm";
 import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAdminOrder } from "@/lib/data/admin-orders";
 import { getAdminSettings } from "@/lib/data/admin-store";
@@ -123,13 +124,24 @@ export default async function AdminOrderPage(props: Props) {
             <h2 id="customer-heading" className="mb-2 text-h4">
               Customer
             </h2>
-            <Link href={`/admin/customers/${order.customerId}`} className="font-semibold hover:underline">
-              {order.customerName}
-            </Link>
+            {order.customerId === null ? (
+              // A guest has no account to open; their email finds their other orders
+              <p className="flex items-center gap-1.5 font-semibold">
+                {order.customerName}
+                <Badge variant="outline">Guest</Badge>
+              </p>
+            ) : (
+              <Link href={`/admin/customers/${order.customerId}`} className="font-semibold hover:underline">
+                {order.customerName}
+              </Link>
+            )}
             <a href={`mailto:${order.customerEmail}`} className="text-muted-foreground hover:underline">
               {order.customerEmail}
             </a>
-            <Link href={`/admin/orders?customer=${order.customerId}`} className="mt-2 font-semibold text-accent underline-offset-4 hover:underline">
+            <Link
+              href={order.customerId === null ? `/admin/orders?q=${encodeURIComponent(order.customerEmail)}` : `/admin/orders?customer=${order.customerId}`}
+              className="mt-2 font-semibold text-accent underline-offset-4 hover:underline"
+            >
               All their orders
             </Link>
           </section>
