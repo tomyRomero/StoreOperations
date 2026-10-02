@@ -136,7 +136,7 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
               type="button"
               disabled={chosenId === undefined || going}
               onClick={() => chosenId !== undefined && continueWith(chosenId)}
-              className="inline-flex h-[58px] items-center gap-2.5 rounded-full bg-primary px-8 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-60 max-sm:w-full max-sm:justify-center"
+              className="inline-flex h-[58px] items-center gap-2.5 rounded-button bg-primary px-8 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-60 max-sm:w-full max-sm:justify-center"
             >
               {going && <LoaderCircle className="size-4 animate-spin" aria-hidden />}
               Continue to payment

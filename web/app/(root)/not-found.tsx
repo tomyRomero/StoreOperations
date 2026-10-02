@@ -42,7 +42,7 @@ export default async function NotFound() {
             placeholder={`Search ${many}`}
             className="h-12 min-w-0 flex-1 rounded-full bg-transparent px-4.5 text-base text-foreground placeholder:text-muted-foreground"
           />
-          <button type="submit" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
+          <button type="submit" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-button bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
             <Search className="size-4" aria-hidden />
             Search
           </button>

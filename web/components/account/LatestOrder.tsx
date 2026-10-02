@@ -71,10 +71,10 @@ export function LatestOrder({ order, timeZone }: { order: Order; timeZone: strin
       </ol>
 
       <div className="flex flex-wrap gap-2.5">
-        <Link href={`/account/orders/${order.orderNumber}`} className="inline-flex h-11.5 items-center rounded-full bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
+        <Link href={`/account/orders/${order.orderNumber}`} className="inline-flex h-11.5 items-center rounded-button bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
           Track order<span className="sr-only"> #{order.orderNumber}</span>
         </Link>
-        <Link href="/account/orders" className="inline-flex h-11.5 items-center rounded-full border border-foreground/16 px-5 text-[15px] font-medium transition-colors hover:bg-foreground/5">
+        <Link href="/account/orders" className="inline-flex h-11.5 items-center rounded-button border border-foreground/16 px-5 text-[15px] font-medium transition-colors hover:bg-foreground/5">
           All orders
         </Link>
       </div>

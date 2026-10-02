@@ -84,7 +84,7 @@ export default async function OrderPage(props: Props) {
                   href={order.trackingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center gap-1 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/85"
+                  className="inline-flex h-9 items-center gap-1 rounded-button bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/85"
                 >
                   Track {order.carrier && order.carrier !== "other" ? `on ${carrierName(order.carrier)}` : "package"}
                   <ArrowUpRight className="size-3.5" aria-hidden />

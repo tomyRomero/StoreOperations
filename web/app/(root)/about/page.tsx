@@ -135,7 +135,7 @@ export default async function AboutPage() {
           </div>
           <Link
             href="/contact"
-            className="inline-flex h-14 items-center gap-2.5 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-glow transition-colors hover:bg-primary/85"
+            className="inline-flex h-14 items-center gap-2.5 rounded-button bg-primary px-7 text-base font-semibold text-primary-foreground shadow-glow transition-colors hover:bg-primary/85"
           >
             Send us a message
             <ArrowRight className="size-4" aria-hidden />

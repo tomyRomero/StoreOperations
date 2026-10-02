@@ -25,7 +25,7 @@ export function EmptyCart({ categories, onNavigate }: { categories: Category[]; 
             Shop {category.name.toLowerCase()}
           </Link>
         ))}
-        <Link href="/products" onClick={onNavigate} className="inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
+        <Link href="/products" onClick={onNavigate} className="inline-flex h-11 items-center rounded-button bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
           Shop all
         </Link>
       </div>

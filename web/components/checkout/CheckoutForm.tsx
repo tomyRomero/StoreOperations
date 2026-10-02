@@ -52,7 +52,7 @@ const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
         id="submit"
         disabled={!stripe || !elements || isLoading}
         aria-busy={isLoading || undefined}
-        className="mt-2 inline-flex h-[62px] w-full items-center justify-center gap-2.5 rounded-full bg-primary text-[17px] font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_24px_60px_color-mix(in_oklab,var(--glow-blue)_35%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-70"
+        className="mt-2 inline-flex h-[62px] w-full items-center justify-center gap-2.5 rounded-button bg-primary text-[17px] font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_24px_60px_color-mix(in_oklab,var(--glow-blue)_35%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-70"
       >
         {isLoading ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : <LockKeyhole className="size-4" aria-hidden />}
         Pay {formatMoney(totalCents)}

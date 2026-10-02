@@ -58,7 +58,7 @@ export function ContentPage({ eyebrow, title, lead, facts, children }: PageProps
                 <span className="text-[17px] font-semibold">Still have a question?</span>
                 <span className="text-sm text-muted-foreground">A person replies by email.</span>
               </p>
-              <Link href="/contact" className="inline-flex h-11.5 items-center rounded-full bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
+              <Link href="/contact" className="inline-flex h-11.5 items-center rounded-button bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
                 Contact us
               </Link>
             </div>

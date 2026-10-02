@@ -18,7 +18,7 @@ type Props = {
 };
 
 const checkoutButton =
-  "inline-flex items-center justify-center gap-2.5 rounded-full bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/85";
+  "inline-flex items-center justify-center gap-2.5 rounded-button bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/85";
 
 // The totals and the way to checkout. Tax depends on the address, so checkout adds it. Guests sign in
 // first and come back to the bag, which then holds what they picked as a guest.
@@ -56,7 +56,7 @@ export function CartSummary({ cart, shipping, variant = "drawer", onNavigate }: 
         <p className="-mt-1.5 text-[13px] text-muted-foreground">Shipping and tax are added at checkout.</p>
         {blocked}
         <div className="grid grid-cols-[1fr_1.6fr] gap-2.5">
-          <Link href="/cart" onClick={onNavigate} className="inline-flex h-[54px] items-center justify-center rounded-full border border-foreground/16 text-[15px] font-semibold transition-colors hover:bg-foreground/5">
+          <Link href="/cart" onClick={onNavigate} className="inline-flex h-[54px] items-center justify-center rounded-button border border-foreground/16 text-[15px] font-semibold transition-colors hover:bg-foreground/5">
             View bag
           </Link>
           {checkout}

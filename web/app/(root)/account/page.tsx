@@ -44,7 +44,7 @@ export default async function AccountOverviewPage() {
             {orders === null ? "We couldn't load your orders" : "No orders yet"}
           </h2>
           <p className="text-muted-foreground">{orders === null ? "Try again in a moment." : "When you place an order, you can follow it here, from the warehouse to your door."}</p>
-          <Link href="/products" className="inline-flex h-11.5 items-center gap-2 rounded-full bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
+          <Link href="/products" className="inline-flex h-11.5 items-center gap-2 rounded-button bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
             Start shopping
             <ArrowRight className="size-4" aria-hidden />
           </Link>

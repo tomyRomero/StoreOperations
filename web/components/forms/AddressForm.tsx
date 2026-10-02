@@ -192,7 +192,7 @@ const AddressForm = ({ address, onSaved, onCancel, submitLabel = "Save address",
             {submitLabel}
           </Button>
           {onCancel && (
-            <Button type="button" size="lg" variant="ghost" className="rounded-full border border-foreground/16 px-6" onClick={onCancel}>
+            <Button type="button" size="lg" variant="ghost" className="border border-foreground/16 px-6" onClick={onCancel}>
               Cancel
             </Button>
           )}

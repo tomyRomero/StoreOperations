@@ -87,7 +87,7 @@ export function MobileFilters({ categories, counts, filters }: Props) {
             <button
               type="submit"
               onClick={() => setOpen(false)}
-              className="mt-1 h-14 w-full rounded-full bg-primary text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/85"
+              className="mt-1 h-14 w-full rounded-button bg-primary text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/85"
             >
               <span aria-live="polite">{showLabel}</span>
             </button>

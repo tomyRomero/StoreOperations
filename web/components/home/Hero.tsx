@@ -68,7 +68,7 @@ export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many
       <div className="mt-9 flex flex-wrap justify-center gap-3 lg:mt-10">
         <Link
           href="/products"
-          className="inline-flex h-14 items-center gap-2.5 rounded-full bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_35%,transparent)] transition-colors hover:bg-primary/85"
+          className="inline-flex h-14 items-center gap-2.5 rounded-button bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_35%,transparent)] transition-colors hover:bg-primary/85"
         >
           {copy.button}
           <ArrowRight className="size-4" strokeWidth={2.4} aria-hidden />
@@ -76,7 +76,7 @@ export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many
         {topDeal && (
           <Link
             href="/products?sale=1"
-            className="inline-flex h-14 items-center rounded-full border border-foreground/16 px-6.5 text-base font-medium transition-colors hover:bg-foreground/5"
+            className="inline-flex h-14 items-center rounded-button border border-foreground/16 px-6.5 text-base font-medium transition-colors hover:bg-foreground/5"
           >
             See the sale
           </Link>
