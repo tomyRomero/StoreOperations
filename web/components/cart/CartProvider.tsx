@@ -12,7 +12,7 @@ import { toast } from "../ui/use-toast";
 // never shows a stale price or promises stock that's gone.
 type GuestLine = { productId: number; quantity: number };
 
-const guestCartKey = "palettehub-cart";
+const guestCartKey = "storeops-cart";
 const emptyCart: Cart = { lines: [], itemCount: 0, subtotalCents: 0, canCheckout: false };
 
 type CartContextValue = {

@@ -45,7 +45,7 @@ public static class AuthServiceCollectionExtensions
 
         services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.Name = "palettehub_session";
+            options.Cookie.Name = "storeops_session";
             // JavaScript can never read it
             options.Cookie.HttpOnly = true;
             // Lax, not Strict: customers come back from Stripe's payment page through a cross-site

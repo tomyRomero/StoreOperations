@@ -14,7 +14,8 @@ public sealed class EmailOptions
     public string? Password { get; set; }
 
     public string FromAddress { get; set; } = "";
-    public string FromName { get; set; } = "Palettehub";
+    // Empty sends as the store's name from Store settings
+    public string? FromName { get; set; }
 
     // The background sender. Tests switch it off and send when they choose.
     public bool SendInBackground { get; set; } = true;

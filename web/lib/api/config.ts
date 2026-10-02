@@ -3,4 +3,4 @@
 export const apiUrl = process.env.API_URL ?? "http://localhost:5200";
 
 // The API's sign-in cookie. Next only checks that it's there (proxy.ts); only the API can read it.
-export const sessionCookie = "palettehub_session";
+export const sessionCookie = "storeops_session";

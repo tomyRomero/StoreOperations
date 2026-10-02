@@ -31,6 +31,10 @@ public sealed class EmailOutboxSender(
         if (due.Count == 0)
             return 0;
 
+        var fromName = string.IsNullOrWhiteSpace(email.FromName)
+            ? await db.StoreSettings.Select(s => s.StoreName).SingleAsync(ct)
+            : email.FromName;
+
         using var smtp = new SmtpClient();
         try
         {
@@ -52,7 +56,7 @@ public sealed class EmailOutboxSender(
         {
             try
             {
-                await smtp.SendAsync(ToMime(message, email), ct);
+                await smtp.SendAsync(ToMime(message, new MailboxAddress(fromName, email.FromAddress)), ct);
                 message.Attempts++;
                 message.Status = EmailStatus.Sent;
                 message.SentAtUtc = clock.GetUtcNow().UtcDateTime;
@@ -92,10 +96,10 @@ public sealed class EmailOutboxSender(
         _ => TimeSpan.FromHours(4),
     };
 
-    private static MimeMessage ToMime(EmailOutboxMessage message, EmailOptions email)
+    private static MimeMessage ToMime(EmailOutboxMessage message, MailboxAddress from)
     {
         var mime = new MimeMessage { Subject = message.Subject };
-        mime.From.Add(new MailboxAddress(email.FromName, email.FromAddress));
+        mime.From.Add(from);
         mime.To.Add(MailboxAddress.Parse(message.ToAddress));
         if (message.ReplyToAddress is not null)
             mime.ReplyTo.Add(MailboxAddress.Parse(message.ReplyToAddress));

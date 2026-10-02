@@ -36,7 +36,7 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
     {
         var response = await RegisterAsync(api.Factory.CreateClient(), NewEmail());
 
-        var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"), c => c.StartsWith("palettehub_session=", StringComparison.Ordinal));
+        var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"), c => c.StartsWith("storeops_session=", StringComparison.Ordinal));
         Assert.Contains("httponly", cookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=lax", cookie, StringComparison.OrdinalIgnoreCase);
     }

@@ -64,7 +64,7 @@ public sealed class AuthService(
 {
     // Names nobody may register, so no customer can pose as the store or its staff
     private static readonly HashSet<string> ReservedUsernames =
-        new(StringComparer.OrdinalIgnoreCase) { "admin", "administrator", "root", "system", "support", "api", "www", "palettehub", "storeops" };
+        new(StringComparer.OrdinalIgnoreCase) { "admin", "administrator", "root", "system", "support", "api", "www", "storeops" };
 
     // Checked when an email matches no account, so an unknown email takes as long as a wrong password
     private static readonly ApplicationUser NobodyUser = new();
