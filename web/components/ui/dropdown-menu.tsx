@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, Circle } from "lucide-react"
+import * as React from "react";
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { Check, Circle } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const DropdownMenu = DropdownMenuPrimitive.Root
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
-const DropdownMenuGroup = DropdownMenuPrimitive.Group
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
+const DropdownMenu = DropdownMenuPrimitive.Root;
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
+const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
 const itemClasses =
-  "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-hidden transition-colors focus:bg-muted data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0"
+  "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-hidden transition-colors focus:bg-muted data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0";
 
 function DropdownMenuContent({ className, sideOffset = 6, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
@@ -26,7 +26,7 @@ function DropdownMenuContent({ className, sideOffset = 6, ...props }: React.Comp
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
-  )
+  );
 }
 
 function DropdownMenuItem({
@@ -40,7 +40,7 @@ function DropdownMenuItem({
       className={cn(itemClasses, inset && "pl-8", variant === "destructive" && "text-destructive focus:bg-destructive-subtle", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DropdownMenuCheckboxItem({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) {
@@ -53,7 +53,7 @@ function DropdownMenuCheckboxItem({ className, children, ...props }: React.Compo
       </span>
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
-  )
+  );
 }
 
 function DropdownMenuRadioItem({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) {
@@ -66,7 +66,7 @@ function DropdownMenuRadioItem({ className, children, ...props }: React.Componen
       </span>
       {children}
     </DropdownMenuPrimitive.RadioItem>
-  )
+  );
 }
 
 function DropdownMenuLabel({ className, inset, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & { inset?: boolean }) {
@@ -75,11 +75,11 @@ function DropdownMenuLabel({ className, inset, ...props }: React.ComponentProps<
       className={cn("px-2 py-1.5 text-xs font-semibold text-muted-foreground", inset && "pl-8", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator className={cn("-mx-1 my-1 h-px bg-border", className)} {...props} />
+  return <DropdownMenuPrimitive.Separator className={cn("-mx-1 my-1 h-px bg-border", className)} {...props} />;
 }
 
 export {
@@ -93,4 +93,4 @@ export {
   DropdownMenuSeparator,
   DropdownMenuGroup,
   DropdownMenuRadioGroup,
-}
+};

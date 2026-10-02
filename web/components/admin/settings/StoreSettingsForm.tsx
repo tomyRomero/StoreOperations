@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
 import { useState } from "react";
-import { useForm, useWatch } from 'react-hook-form';
-import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -51,19 +51,19 @@ const dollars = (max: number, message: string) =>
   }, message);
 
 const FormSchema = z.object({
-  supportEmail: z.union([z.literal(""), z.string().trim().email('Enter an email address').max(256)]),
-  shippingFlatRate: dollars(100_000, 'Enter an amount up to $1,000, like 10.00'),
-  freeShippingThreshold: z.union([z.literal(""), dollars(10_000_000, 'Enter an amount up to $100,000, or leave it empty')])
-    .refine((text) => text === "" || parseDollars(text)! >= 1, 'Enter an amount, or leave it empty'),
+  supportEmail: z.union([z.literal(""), z.string().trim().email("Enter an email address").max(256)]),
+  shippingFlatRate: dollars(100_000, "Enter an amount up to $1,000, like 10.00"),
+  freeShippingThreshold: z.union([z.literal(""), dollars(10_000_000, "Enter an amount up to $100,000, or leave it empty")])
+    .refine((text) => text === "" || parseDollars(text)! >= 1, "Enter an amount, or leave it empty"),
   returnPolicy: z.enum(["no_returns", "exchanges", "refunds"]),
   returnWindowDays: z.string(),
-  returnPolicyNote: z.string().trim().max(500, 'Use at most 500 characters'),
-  lowStockThreshold: z.string().regex(/^\d{1,4}$/, 'Enter a whole number').refine((t) => Number(t) <= 1000, 'Use at most 1000'),
+  returnPolicyNote: z.string().trim().max(500, "Use at most 500 characters"),
+  lowStockThreshold: z.string().regex(/^\d{1,4}$/, "Enter a whole number").refine((t) => Number(t) <= 1000, "Use at most 1000"),
   emailCustomerOnStatusUpdateByDefault: z.boolean(),
-  timeZoneId: z.string().min(1, 'Choose a time zone'),
+  timeZoneId: z.string().min(1, "Choose a time zone"),
 }).refine(
   (v) => v.returnPolicy === "no_returns" || (/^\d{1,3}$/.test(v.returnWindowDays) && Number(v.returnWindowDays) >= 1 && Number(v.returnWindowDays) <= 365),
-  { path: ["returnWindowDays"], message: 'Enter a number of days from 1 to 365' },
+  { path: ["returnWindowDays"], message: "Enter a number of days from 1 to 365" },
 );
 
 type Values = z.infer<typeof FormSchema>;

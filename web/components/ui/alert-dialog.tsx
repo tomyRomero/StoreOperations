@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import * as React from "react";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
-import { useReturnFocus } from "@/components/ui/use-return-focus"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { useReturnFocus } from "@/components/ui/use-return-focus";
 
 // Confirms an action that can't be undone, naming the consequence. Radix traps focus, closes on Esc
 // and returns focus to whatever opened it (see useReturnFocus).
-const AlertDialog = AlertDialogPrimitive.Root
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
-const AlertDialogPortal = AlertDialogPrimitive.Portal
+const AlertDialog = AlertDialogPrimitive.Root;
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
 function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {
   return (
@@ -22,11 +22,11 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AlertDialogContent({ className, onCloseAutoFocus, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
-  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus)
+  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus);
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
@@ -40,31 +40,31 @@ function AlertDialogContent({ className, onCloseAutoFocus, ...props }: React.Com
         onCloseAutoFocus={handleCloseAutoFocus}
       />
     </AlertDialogPortal>
-  )
+  );
 }
 
 function AlertDialogHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("grid gap-2 text-left", className)} {...props} />
+  return <div className={cn("grid gap-2 text-left", className)} {...props} />;
 }
 
 function AlertDialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />
+  return <div className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)} {...props} />;
 }
 
 function AlertDialogTitle({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {
-  return <AlertDialogPrimitive.Title className={cn("font-display text-h3", className)} {...props} />
+  return <AlertDialogPrimitive.Title className={cn("font-display text-h3", className)} {...props} />;
 }
 
 function AlertDialogDescription({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {
-  return <AlertDialogPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />
+  return <AlertDialogPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
 
 function AlertDialogAction({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
-  return <AlertDialogPrimitive.Action className={cn(buttonVariants(), className)} {...props} />
+  return <AlertDialogPrimitive.Action className={cn(buttonVariants(), className)} {...props} />;
 }
 
 function AlertDialogCancel({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {
-  return <AlertDialogPrimitive.Cancel className={cn(buttonVariants({ variant: "outline" }), className)} {...props} />
+  return <AlertDialogPrimitive.Cancel className={cn(buttonVariants({ variant: "outline" }), className)} {...props} />;
 }
 
 export {
@@ -79,4 +79,4 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-}
+};

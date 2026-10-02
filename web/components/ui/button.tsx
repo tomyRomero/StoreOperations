@@ -1,9 +1,9 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { LoaderCircle } from "lucide-react"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { LoaderCircle } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 // Ink-black primary actions, a solid ink outline for secondary ones. Pills on the storefront, 6px corners
 // in the console (--button-radius). Focus uses the site-wide ring.
@@ -34,7 +34,7 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 type ButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -50,7 +50,7 @@ function Button({ className, variant, size, asChild = false, loading = false, di
       <Slot className={cn(buttonVariants({ variant, size, className }))} {...props}>
         {children}
       </Slot>
-    )
+    );
   }
 
   return (
@@ -69,7 +69,7 @@ function Button({ className, variant, size, asChild = false, loading = false, di
         children
       )}
     </button>
-  )
+  );
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };

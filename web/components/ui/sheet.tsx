@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as SheetPrimitive from "@radix-ui/react-dialog"
-import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
+import * as React from "react";
+import * as SheetPrimitive from "@radix-ui/react-dialog";
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { useReturnFocus } from "@/components/ui/use-return-focus"
+import { cn } from "@/lib/utils";
+import { useReturnFocus } from "@/components/ui/use-return-focus";
 
 // A drawer from the side of the screen (the cart, the mobile menu, mobile filters), built on Radix Dialog:
 // focus stays inside while it's open, Esc closes it, the page behind is inert, and focus goes back to
 // the button that opened it.
-const Sheet = SheetPrimitive.Root
-const SheetTrigger = SheetPrimitive.Trigger
-const SheetClose = SheetPrimitive.Close
-const SheetPortal = SheetPrimitive.Portal
+const Sheet = SheetPrimitive.Root;
+const SheetTrigger = SheetPrimitive.Trigger;
+const SheetClose = SheetPrimitive.Close;
+const SheetPortal = SheetPrimitive.Portal;
 
 function SheetOverlay({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
   return (
@@ -25,7 +25,7 @@ function SheetOverlay({ className, ...props }: React.ComponentProps<typeof Sheet
       )}
       {...props}
     />
-  )
+  );
 }
 
 const sheetVariants = cva(
@@ -44,7 +44,7 @@ const sheetVariants = cva(
       side: "right",
     },
   }
-)
+);
 
 function SheetContent({
   side = "right",
@@ -53,7 +53,7 @@ function SheetContent({
   onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>) {
-  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus)
+  const { noteOpener, handleCloseAutoFocus } = useReturnFocus(onCloseAutoFocus);
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -70,23 +70,23 @@ function SheetContent({
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>
-  )
+  );
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("grid gap-1 border-b px-5 py-4 pr-14", className)} {...props} />
+  return <div className={cn("grid gap-1 border-b px-5 py-4 pr-14", className)} {...props} />;
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return <div className={cn("mt-auto grid gap-3 border-t px-5 py-4", className)} {...props} />
+  return <div className={cn("mt-auto grid gap-3 border-t px-5 py-4", className)} {...props} />;
 }
 
 function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
-  return <SheetPrimitive.Title className={cn("font-display text-h3", className)} {...props} />
+  return <SheetPrimitive.Title className={cn("font-display text-h3", className)} {...props} />;
 }
 
 function SheetDescription({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) {
-  return <SheetPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />
+  return <SheetPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
 
-export { Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription }
+export { Sheet, SheetPortal, SheetOverlay, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription };

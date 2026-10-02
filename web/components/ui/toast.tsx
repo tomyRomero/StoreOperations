@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as ToastPrimitives from "@radix-ui/react-toast"
-import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
+import * as React from "react";
+import * as ToastPrimitives from "@radix-ui/react-toast";
+import { cva, type VariantProps } from "class-variance-authority";
+import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 // Radix announces toasts to screen readers. They sit above dialogs and drawers (z-60): at the top on
 // phones, bottom right on larger screens.
-const ToastProvider = ToastPrimitives.Provider
+const ToastProvider = ToastPrimitives.Provider;
 
 function ToastViewport({ className, ...props }: React.ComponentProps<typeof ToastPrimitives.Viewport>) {
   return (
@@ -20,7 +20,7 @@ function ToastViewport({ className, ...props }: React.ComponentProps<typeof Toas
       )}
       {...props}
     />
-  )
+  );
 }
 
 const toastVariants = cva(
@@ -37,10 +37,10 @@ const toastVariants = cva(
       variant: "default",
     },
   }
-)
+);
 
 function Toast({ className, variant, ...props }: React.ComponentProps<typeof ToastPrimitives.Root> & VariantProps<typeof toastVariants>) {
-  return <ToastPrimitives.Root className={cn(toastVariants({ variant }), className)} {...props} />
+  return <ToastPrimitives.Root className={cn(toastVariants({ variant }), className)} {...props} />;
 }
 
 function ToastAction({ className, ...props }: React.ComponentProps<typeof ToastPrimitives.Action>) {
@@ -52,7 +52,7 @@ function ToastAction({ className, ...props }: React.ComponentProps<typeof ToastP
       )}
       {...props}
     />
-  )
+  );
 }
 
 function ToastClose({ className, ...props }: React.ComponentProps<typeof ToastPrimitives.Close>) {
@@ -65,15 +65,15 @@ function ToastClose({ className, ...props }: React.ComponentProps<typeof ToastPr
     >
       <X className="size-4" aria-hidden />
     </ToastPrimitives.Close>
-  )
+  );
 }
 
 function ToastTitle({ className, ...props }: React.ComponentProps<typeof ToastPrimitives.Title>) {
-  return <ToastPrimitives.Title className={cn("text-sm font-semibold", className)} {...props} />
+  return <ToastPrimitives.Title className={cn("text-sm font-semibold", className)} {...props} />;
 }
 
 function ToastDescription({ className, ...props }: React.ComponentProps<typeof ToastPrimitives.Description>) {
-  return <ToastPrimitives.Description className={cn("text-sm text-muted-foreground", className)} {...props} />
+  return <ToastPrimitives.Description className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
 
 type ToastProps = React.ComponentProps<typeof Toast>
@@ -90,4 +90,4 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
-}
+};

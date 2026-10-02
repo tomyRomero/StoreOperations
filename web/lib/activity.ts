@@ -4,10 +4,10 @@ import { formatMoney } from "./money";
 
 // One value from the entry's details, which differ by action (see the API's activity entries)
 function detail(entry: ActivityEntry, key: string): string | number | boolean | undefined {
-  const details = entry.details
-  if (typeof details !== "object" || details === null) return undefined
-  const value = (details as Record<string, unknown>)[key]
-  return typeof value === "string" || typeof value === "number" || typeof value === "boolean" ? value : undefined
+  const details = entry.details;
+  if (typeof details !== "object" || details === null) return undefined;
+  const value = (details as Record<string, unknown>)[key];
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean" ? value : undefined;
 }
 
 // The settings Theme and brand publishes; everything else in a settings change is a policy
@@ -15,86 +15,86 @@ const storefrontSettings = new Set([
   "storeName", "theme", "tagline", "description", "logoImageKey", "accentColor", "productNoun", "productNounPlural", "heroHeadline",
   "heroHighlight", "heroText", "heroButtonLabel", "homeSections", "aboutText", "contactPhone", "contactAddress", "instagramUrl",
   "tikTokUrl", "pinterestUrl", "youTubeUrl", "facebookUrl",
-])
+]);
 
 // What happened, in a sentence, and where to see it. Older entries may lack some details, so every
 // sentence still reads without them.
 export function describeActivity(entry: ActivityEntry): { text: string; href?: string } {
-  const who = entry.actor ?? "Someone"
-  const name = detail(entry, "name") ?? "a product"
-  const username = detail(entry, "username") ?? "an account"
-  const orderNumber = detail(entry, "orderNumber")
-  const id = entry.entityId
+  const who = entry.actor ?? "Someone";
+  const name = detail(entry, "name") ?? "a product";
+  const username = detail(entry, "username") ?? "an account";
+  const orderNumber = detail(entry, "orderNumber");
+  const id = entry.entityId;
 
   switch (entry.action) {
     case "user_registered":
-      return { text: `${detail(entry, "username") ?? "Someone"} created an account`, href: id ? `/admin/customers/${id}` : undefined }
+      return { text: `${detail(entry, "username") ?? "Someone"} created an account`, href: id ? `/admin/customers/${id}` : undefined };
     case "customer_disabled":
-      return { text: `${who} disabled ${username}`, href: id ? `/admin/customers/${id}` : undefined }
+      return { text: `${who} disabled ${username}`, href: id ? `/admin/customers/${id}` : undefined };
     case "customer_enabled":
-      return { text: `${who} enabled ${username} again`, href: id ? `/admin/customers/${id}` : undefined }
+      return { text: `${who} enabled ${username} again`, href: id ? `/admin/customers/${id}` : undefined };
     case "admin_role_granted":
-      return { text: `${username} was made an admin on the server`, href: id ? `/admin/customers/${id}` : undefined }
+      return { text: `${username} was made an admin on the server`, href: id ? `/admin/customers/${id}` : undefined };
     case "admin_role_removed":
-      return { text: `${username} is no longer an admin`, href: id ? `/admin/customers/${id}` : undefined }
+      return { text: `${username} is no longer an admin`, href: id ? `/admin/customers/${id}` : undefined };
     case "newsletter_subscribed":
-      return { text: "Someone subscribed to the newsletter", href: "/admin/newsletter" }
+      return { text: "Someone subscribed to the newsletter", href: "/admin/newsletter" };
     case "newsletter_unsubscribed":
-      return { text: "Someone unsubscribed from the newsletter", href: "/admin/newsletter" }
+      return { text: "Someone unsubscribed from the newsletter", href: "/admin/newsletter" };
     case "subscribers_removed":
-      return { text: `${who} removed ${detail(entry, "count") ?? "some"} subscribers`, href: "/admin/newsletter" }
+      return { text: `${who} removed ${detail(entry, "count") ?? "some"} subscribers`, href: "/admin/newsletter" };
     case "newsletter_sent":
-      return { text: `${who} sent "${detail(entry, "subject") ?? "a newsletter"}" to ${detail(entry, "recipients") ?? "the"} subscribers` }
+      return { text: `${who} sent "${detail(entry, "subject") ?? "a newsletter"}" to ${detail(entry, "recipients") ?? "the"} subscribers` };
     case "order_created": {
-      const total = detail(entry, "totalCents")
-      const refunded = detail(entry, "refunded") === true ? ", then refunded it" : ""
+      const total = detail(entry, "totalCents");
+      const refunded = detail(entry, "refunded") === true ? ", then refunded it" : "";
       return {
         text: `New order${orderNumber ? ` #${orderNumber}` : ""}${typeof total === "number" ? ` for ${formatMoney(total)}` : ""}${refunded}`,
         href: orderNumber ? `/admin/orders/${orderNumber}` : undefined,
-      }
+      };
     }
     case "order_status_changed": {
-      const to = detail(entry, "to")
-      const refunded = detail(entry, "refundedCents")
+      const to = detail(entry, "to");
+      const refunded = detail(entry, "refundedCents");
       return {
         text: `${who} marked order${orderNumber ? ` #${orderNumber}` : ""} ${typeof to === "string" ? orderStatusLabel(to as OrderStatus).toLowerCase() : "changed"}` +
           (typeof refunded === "number" ? ` and refunded ${formatMoney(refunded)}` : ""),
         href: orderNumber ? `/admin/orders/${orderNumber}` : undefined,
-      }
+      };
     }
     case "product_created":
-      return { text: `${who} added ${name}`, href: id ? `/admin/products/${id}` : undefined }
+      return { text: `${who} added ${name}`, href: id ? `/admin/products/${id}` : undefined };
     case "product_updated":
-      return { text: `${who} updated ${name}`, href: id ? `/admin/products/${id}` : undefined }
+      return { text: `${who} updated ${name}`, href: id ? `/admin/products/${id}` : undefined };
     case "product_archived":
-      return { text: `${who} archived ${name}`, href: id ? `/admin/products/${id}` : undefined }
+      return { text: `${who} archived ${name}`, href: id ? `/admin/products/${id}` : undefined };
     case "product_restored":
-      return { text: `${who} put ${name} back in the store`, href: id ? `/admin/products/${id}` : undefined }
+      return { text: `${who} put ${name} back in the store`, href: id ? `/admin/products/${id}` : undefined };
     case "deal_started": {
-      const price = detail(entry, "dealPriceCents")
-      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/admin/products/${id}` : undefined }
+      const price = detail(entry, "dealPriceCents");
+      return { text: `${who} started a deal on ${name}${typeof price === "number" ? ` at ${formatMoney(price)}` : ""}`, href: id ? `/admin/products/${id}` : undefined };
     }
     case "deal_ended":
-      return { text: `${who} ended the deal on ${name}`, href: id ? `/admin/products/${id}` : undefined }
+      return { text: `${who} ended the deal on ${name}`, href: id ? `/admin/products/${id}` : undefined };
     case "category_created":
-      return { text: `${who} added the ${detail(entry, "name") ?? ""} category`, href: id ? `/admin/categories/${id}` : undefined }
+      return { text: `${who} added the ${detail(entry, "name") ?? ""} category`, href: id ? `/admin/categories/${id}` : undefined };
     case "category_updated": {
-      const previous = detail(entry, "previousName")
+      const previous = detail(entry, "previousName");
       return {
         text: previous && previous !== detail(entry, "name")
           ? `${who} renamed the ${previous} category to ${detail(entry, "name")}`
           : `${who} updated the ${detail(entry, "name") ?? ""} category`,
         href: id ? `/admin/categories/${id}` : undefined,
-      }
+      };
     }
     case "category_deleted":
-      return { text: `${who} deleted the ${detail(entry, "name") ?? ""} category` }
+      return { text: `${who} deleted the ${detail(entry, "name") ?? ""} category` };
     case "settings_changed": {
-      const changes = (entry.details as { changes?: unknown } | null)?.changes
-      const changed = changes && typeof changes === "object" ? Object.keys(changes) : []
+      const changes = (entry.details as { changes?: unknown } | null)?.changes;
+      const changed = changes && typeof changes === "object" ? Object.keys(changes) : [];
       return changed.length > 0 && changed.every((key) => storefrontSettings.has(key))
         ? { text: `${who} published changes to the storefront`, href: "/admin/storefront" }
-        : { text: `${who} changed the store settings`, href: "/admin/settings" }
+        : { text: `${who} changed the store settings`, href: "/admin/settings" };
     }
   }
 }

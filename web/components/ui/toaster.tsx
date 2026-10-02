@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { CircleAlert, CircleCheck, Info } from "lucide-react"
-import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
-import { useToast } from "@/components/ui/use-toast"
+import { CircleAlert, CircleCheck, Info } from "lucide-react";
+import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // Each kind of toast has its own icon, so it never relies on color alone
 const icons = {
   default: <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />,
   success: <CircleCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />,
   destructive: <CircleAlert className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />,
-}
+};
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToast();
 
   return (
     <ToastProvider>
@@ -27,9 +27,9 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-        )
+        );
       })}
       <ToastViewport />
     </ToastProvider>
-  )
+  );
 }

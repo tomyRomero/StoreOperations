@@ -1,6 +1,6 @@
-import type { OrderStatus } from "@/lib/api/types"
-import { orderStatusLabel } from "@/lib/format"
-import { cn } from "@/lib/utils"
+import type { OrderStatus } from "@/lib/api/types";
+import { orderStatusLabel } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 // Waiting on the store is amber, on its way is blue, done is green, and an order that ended (cancelled
 // or refunded) is a quiet grey. The dot only repeats the color: the label always says which.
