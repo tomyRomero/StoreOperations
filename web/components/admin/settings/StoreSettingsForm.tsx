@@ -5,6 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { FormActions } from "@/components/admin/FormActions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -366,11 +367,11 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
           />
         </section>
 
-        <div>
+        <FormActions>
           <Button type="submit" size="lg" loading={saving}>
             Save settings
           </Button>
-        </div>
+        </FormActions>
       </form>
     </Form>
   );

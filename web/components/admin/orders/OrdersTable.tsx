@@ -134,7 +134,7 @@ export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault 
         </DropdownMenu>
       </BulkBar>
 
-      <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="min-w-0 overflow-clip rounded-xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow>

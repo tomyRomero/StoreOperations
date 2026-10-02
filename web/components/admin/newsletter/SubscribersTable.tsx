@@ -56,7 +56,7 @@ export function SubscribersTable({ subscribers, timeZone }: { subscribers: Subsc
         </Button>
       </BulkBar>
 
-      <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="min-w-0 overflow-clip rounded-xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormActions } from "@/components/admin/FormActions";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { Button } from "@/components/ui/button";
@@ -85,11 +86,11 @@ export function CategoryForm({ category }: { category: AdminCategory | null }) {
             </FormItem>
           )}
         />
-        <div>
+        <FormActions>
           <Button type="submit" loading={form.formState.isSubmitting}>
             {category ? "Save changes" : "Add category"}
           </Button>
-        </div>
+        </FormActions>
       </form>
     </Form>
   );

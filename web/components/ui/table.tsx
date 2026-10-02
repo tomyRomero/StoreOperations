@@ -2,17 +2,21 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-// A wide table scrolls inside its own box, so the page itself never scrolls sideways
+// Below 1280px a wide table scrolls sideways inside its own box, so the page itself never does. From
+// 1280px every console table fits, and without that box the header row can stay in view (TableHeader).
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div className="relative w-full overflow-x-auto">
+    <div className="relative w-full max-xl:overflow-x-auto">
       <table className={cn("w-full caption-bottom text-sm", className)} {...props} />
     </div>
   );
 }
 
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return <thead className={cn("bg-muted [&_tr]:border-b", className)} {...props} />;
+  // Stays under the console's top bar (h-14) while the rows scroll. A card around the table clips with
+  // overflow-clip (and min-w-0, so it can still shrink), not overflow-hidden, which would hold the header
+  // inside the card.
+  return <thead className={cn("bg-muted xl:sticky xl:top-14 xl:z-10 [&_tr]:border-b", className)} {...props} />;
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {

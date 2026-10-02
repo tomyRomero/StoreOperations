@@ -5,6 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Check, Monitor, Moon, Smartphone, Sun } from "lucide-react";
+import { FormActions } from "@/components/admin/FormActions";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -96,32 +97,9 @@ export function StorefrontEditor({ storefront }: { storefront: AdminStorefront }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="grid gap-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="grid gap-1">
-            <h1 className="font-sans text-[28px] font-semibold leading-tight tracking-[-0.03em]">Theme and brand</h1>
-            <p className="text-muted-foreground">How the store looks and what it says. The preview shows every change before you publish it.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <p role="status" className="mr-1 inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium text-ink-2">
-              {dirty ? (
-                <>
-                  <span aria-hidden className="size-1.5 rounded-full bg-warning" />
-                  {changed.length === 1 ? "1 unpublished change" : `${changed.length} unpublished changes`}
-                </>
-              ) : (
-                <>
-                  <Check className="size-3.5 text-success" aria-hidden />
-                  Published
-                </>
-              )}
-            </p>
-            <Button type="button" variant="secondary" disabled={!dirty || publishing} onClick={() => form.reset(defaults)}>
-              Discard
-            </Button>
-            <Button type="submit" loading={publishing} disabled={!dirty}>
-              Publish to store
-            </Button>
-          </div>
+        <div className="grid gap-1">
+          <h1 className="font-sans text-[28px] font-semibold leading-tight tracking-[-0.03em]">Theme and brand</h1>
+          <p className="text-muted-foreground">How the store looks and what it says. The preview shows every change before you publish it.</p>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
@@ -330,6 +308,28 @@ export function StorefrontEditor({ storefront }: { storefront: AdminStorefront }
             <StorefrontPreview src={previewSrc} device={device} />
           </section>
         </div>
+
+        <FormActions className="justify-end">
+          <p role="status" className="mr-1 inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium text-ink-2">
+            {dirty ? (
+              <>
+                <span aria-hidden className="size-1.5 rounded-full bg-warning" />
+                {changed.length === 1 ? "1 unpublished change" : `${changed.length} unpublished changes`}
+              </>
+            ) : (
+              <>
+                <Check className="size-3.5 text-success" aria-hidden />
+                Published
+              </>
+            )}
+          </p>
+          <Button type="button" variant="secondary" disabled={!dirty || publishing} onClick={() => form.reset(defaults)}>
+            Discard
+          </Button>
+          <Button type="submit" loading={publishing} disabled={!dirty}>
+            Publish to store
+          </Button>
+        </FormActions>
       </form>
     </Form>
   );

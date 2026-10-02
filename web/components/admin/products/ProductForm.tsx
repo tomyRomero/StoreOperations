@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormActions } from "@/components/admin/FormActions";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { FormAlert } from "@/components/forms/FormAlert";
 import { Button } from "@/components/ui/button";
@@ -207,11 +208,11 @@ export function ProductForm({ product, categories }: { product: AdminProduct | n
             )}
           />
         </fieldset>
-        <div>
+        <FormActions>
           <Button type="submit" loading={form.formState.isSubmitting} disabled={archived}>
             {product ? "Save changes" : "Add product"}
           </Button>
-        </div>
+        </FormActions>
       </form>
     </Form>
   );
