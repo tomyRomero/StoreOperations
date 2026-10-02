@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, upgrade]
+    branches: [main]
   pull_request:
 
 # Cancel an in-progress run when a newer commit arrives on the same branch
@@ -62,5 +62,9 @@ jobs:
 
       # --locked-mode fails if packages.lock.json is out of date, so CI builds exactly what was committed
       - run: dotnet restore --locked-mode
+
+      # The layout .editorconfig and the .NET formatter agree on
+      - run: dotnet format --no-restore --verify-no-changes
+
       - run: dotnet build --no-restore --configuration Release
       - run: dotnet test --no-build --configuration Release
