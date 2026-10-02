@@ -53,5 +53,12 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.2"
-  }
+  },
+  "browserslist": [
+    "chrome >= 123",
+    "edge >= 123",
+    "firefox >= 120",
+    "safari >= 17.5",
+    "ios_saf >= 17.5"
+  ]
 }
