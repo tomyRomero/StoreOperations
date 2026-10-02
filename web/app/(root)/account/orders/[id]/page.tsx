@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { BuyAgainButton } from "@/components/account/BuyAgainButton";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { OrderLines, OrderTotals } from "@/components/checkout/OrderLines";
 import { CopyButton } from "@/components/shared/CopyButton";
@@ -50,12 +51,15 @@ export default async function OrderPage(props: Props) {
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="grid gap-2.5">
-          <h1 className="text-[36px] font-semibold leading-none tracking-[-0.05em] sm:text-5xl">
-            Order <span className="font-mono font-medium tracking-[-0.02em]">#{order.orderNumber}</span>
-          </h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h1 className="text-[36px] font-semibold leading-none tracking-[-0.05em] sm:text-5xl">
+              Order <span className="font-mono font-medium tracking-[-0.02em]">#{order.orderNumber}</span>
+            </h1>
+            <OrderStatusBadge status={order.status} className="h-8 px-3.5 text-sm" />
+          </div>
           <p className="text-[15px] text-muted-foreground">Placed {formatDate(order.placedAtUtc, settings.timeZoneId)}</p>
         </div>
-        <OrderStatusBadge status={order.status} className="h-8 px-3.5 text-sm" />
+        <BuyAgainButton lines={order.lines} />
       </div>
 
       <section aria-labelledby="progress-heading" className="relative isolate grid gap-7 overflow-hidden rounded-[28px] border bg-card p-6 sm:p-7">
