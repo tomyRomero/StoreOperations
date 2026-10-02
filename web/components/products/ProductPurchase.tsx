@@ -42,6 +42,15 @@ export function ProductPurchase({ product }: { product: Product }) {
     }
   };
 
+  if (!cart.canShop) {
+    return (
+      <p className="rounded-2xl border border-border bg-foreground/5 px-5 py-4 text-sm text-muted-foreground">
+        You&apos;re signed in as an admin, and admin accounts don&apos;t buy from the store. To try checkout, open the store
+        in a private window and shop as a guest.
+      </p>
+    );
+  }
+
   if (soldOut) {
     return (
       <button type="button" disabled className={cn(addButton, "w-full cursor-not-allowed bg-foreground/10 text-muted-foreground hover:bg-foreground/10 disabled:opacity-100")}>

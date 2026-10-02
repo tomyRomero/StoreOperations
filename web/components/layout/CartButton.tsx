@@ -6,8 +6,10 @@ import { cn } from "@/lib/utils";
 
 // The item count is announced when it changes
 export function CartButton() {
-  const { itemCount, openCart } = useCart();
+  const { canShop, itemCount, openCart } = useCart();
   const label = itemCount === 1 ? "Bag, 1 item" : `Bag, ${itemCount} items`;
+
+  if (!canShop) return null;
 
   return (
     <>

@@ -27,6 +27,8 @@ export function QuickAddButton({ productId, name, className, children }: Props) 
     if (added) cart.openCart(productId, button);
   };
 
+  if (!cart.canShop) return null;
+
   return (
     <button
       type="button"

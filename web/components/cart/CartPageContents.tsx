@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Store } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Category } from "@/lib/api/types";
 import type { ShippingSettings } from "@/lib/cart";
@@ -22,7 +24,7 @@ type Props = {
 
 // The bag as a page, for links to /cart and for coming back after sign-in
 export function CartPageContents({ shipping, categories, lowStockThreshold, guestCheckout }: Props) {
-  const { cart, itemCount } = useCart();
+  const { canShop, cart, itemCount } = useCart();
 
   return (
     <>
@@ -37,7 +39,19 @@ export function CartPageContents({ shipping, categories, lowStockThreshold, gues
         </Link>
       </div>
 
-      {!cart ? (
+      {!canShop ? (
+        <EmptyState
+          icon={Store}
+          title="Admin accounts don't shop"
+          action={
+            <Button asChild className="rounded-full">
+              <Link href="/admin">Go to the console</Link>
+            </Button>
+          }
+        >
+          To try checkout, open the store in a private window and shop as a guest.
+        </EmptyState>
+      ) : !cart ? (
         <div className="grid gap-3" role="status" aria-busy="true" aria-label="Loading your bag">
           <Skeleton className="h-44 w-full rounded-[24px]" />
           <Skeleton className="h-44 w-full rounded-[24px]" />

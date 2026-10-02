@@ -16,6 +16,8 @@ const guestCartKey = "storeops-cart";
 const emptyCart: Cart = { lines: [], itemCount: 0, subtotalCents: 0, canCheckout: false };
 
 type CartContextValue = {
+  // False for admins: their accounts run the store and don't buy from it, so the store offers them no bag
+  canShop: boolean;
   // Null until the first answer from the API
   cart: Cart | null;
   itemCount: number;
@@ -47,6 +49,7 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const user = useCurrentUser();
   const signedIn = user !== null;
+  const canShop = !user?.isAdmin;
   const [cart, setCart] = useState<Cart | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [justAdded, setJustAdded] = useState<number | null>(null);
@@ -61,6 +64,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // The cart as it is now, or null when the API can't answer (the cart shown stays as it was)
   const load = useCallback(async (): Promise<Cart | null> => {
+    // A bag built before signing in as an admin stays in this browser for when they sign out
+    if (!canShop) return emptyCart;
     const guestLines = readGuestCart();
 
     if (signedIn) {
@@ -72,7 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     return guestLines.length > 0 ? (await priceGuestCart(guestLines)) ?? emptyCart : emptyCart;
-  }, [signedIn]);
+  }, [signedIn, canShop]);
 
   const refresh = useCallback(async () => {
     const loaded = await load();
@@ -192,6 +197,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<CartContextValue>(() => ({
+    canShop,
     cart,
     itemCount: cart?.itemCount ?? 0,
     isInCart: (productId) => cart?.lines.some((l) => l.productId === productId) ?? false,
@@ -207,7 +213,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     openCart,
     openedFrom,
     closeCart,
-  }), [cart, add, setQuantity, remove, lastRemoved, undoRemove, refresh, forgetBought, isOpen, justAdded, openCart, closeCart]);
+  }), [canShop, cart, add, setQuantity, remove, lastRemoved, undoRemove, refresh, forgetBought, isOpen, justAdded, openCart, closeCart]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

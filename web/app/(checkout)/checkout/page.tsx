@@ -27,6 +27,9 @@ const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
     );
   }
 
+  // Admin accounts don't buy from the store; the bag says so
+  if (user.isAdmin) redirect("/cart");
+
   const addresses = await getAddresses();
   const chosen = Number(searchParams.address);
   const address = addresses?.find((a) => a.id === chosen) ?? addresses?.find((a) => a.isDefault);

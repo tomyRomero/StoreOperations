@@ -26,6 +26,9 @@ const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
     );
   }
 
+  // Admin accounts don't buy from the store; the bag says so
+  if (user.isAdmin) redirect("/cart");
+
   const addresses = await getAddresses();
   return (
     <div className="container max-w-[1240px] pb-20 pt-10 lg:pt-14">
