@@ -39,7 +39,7 @@ const SignUpForm = ({ storeName }: { storeName: string }) => {
     resolver: zodResolver(FormSchema),
     defaultValues: { username: "", email: "", password: "" },
   });
-  const typed = useWatch({ control: form.control, name: "password" });
+  const [typed, username, email] = useWatch({ control: form.control, name: ["password", "username", "email"] });
 
   // Creating the account also signs in, so the new customer goes straight back to where they were.
   // Passwords are sent exactly as typed: the API hashes them and never needs them escaped.
@@ -100,7 +100,7 @@ const SignUpForm = ({ storeName }: { storeName: string }) => {
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />
                 </FormControl>
-                <PasswordChecklist value={typed} />
+                <PasswordChecklist value={typed} personal={[username, email]} />
                 <FormMessage />
               </FormItem>
             )}

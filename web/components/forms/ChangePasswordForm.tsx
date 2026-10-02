@@ -10,6 +10,7 @@ import { useToast } from "../ui/use-toast";
 import { api } from "@/lib/api/browser";
 import { fieldErrors, problemMessage } from "@/lib/api/problems";
 import { newPassword } from "@/lib/validation/password";
+import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { PasswordChecklist, PasswordInput } from "./PasswordInput";
 
 const FormSchema = z
@@ -32,6 +33,7 @@ const ChangePasswordForm = () => {
     defaultValues: { password: "", newPassword: "", confirmNewPassword: "" },
   });
   const typed = useWatch({ control: form.control, name: "newPassword" });
+  const user = useCurrentUser();
   const again = useWatch({ control: form.control, name: "confirmNewPassword" });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
@@ -76,7 +78,7 @@ const ChangePasswordForm = () => {
               <FormControl>
                 <PasswordInput autoComplete="new-password" {...field} />
               </FormControl>
-              <PasswordChecklist value={typed} />
+              <PasswordChecklist value={typed} personal={user ? [user.username, user.email] : []} />
               <FormMessage />
             </FormItem>
           )}

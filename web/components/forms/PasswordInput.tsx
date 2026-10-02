@@ -5,6 +5,7 @@ import { Check, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { passwordChecks } from "@/lib/validation/password";
+import { passwordStrength } from "@/lib/validation/password-strength";
 
 // A password field with a show/hide toggle inside it. The toggle keeps one name and says whether it's on.
 export function PasswordInput({ className, ...props }: Omit<React.ComponentProps<typeof Input>, "type">) {
@@ -26,18 +27,29 @@ export function PasswordInput({ className, ...props }: Omit<React.ComponentProps
   );
 }
 
-// The rules for a new password, ticked off as it's typed. The bar above fills with each rule met; it
-// only repeats the list, so screen readers skip it.
-export function PasswordChecklist({ value, id }: { value: string; id?: string }) {
+const strengthColors = ["", "bg-destructive", "bg-glow-amber", "bg-glow-green", "bg-success"];
+
+// How strong the new password is, then the rules ticked off as it's typed. The bar fills with the strength;
+// the words beside it say the same, with a tip while it's weak. Personal details (the name and email) make
+// a password weaker when they're in it.
+export function PasswordChecklist({ value, id, personal = [] }: { value: string; id?: string; personal?: string[] }) {
   const checks = passwordChecks(value);
-  const met = checks.filter((check) => check.met).length;
+  const strength = passwordStrength(value, personal);
 
   return (
     <div className="grid gap-2.5">
-      <div aria-hidden className="grid grid-cols-4 gap-1.5">
-        {checks.map((check, i) => (
-          <span key={check.label} className={cn("h-[5px] rounded-full transition-colors", i >= met ? "bg-foreground/10" : met === checks.length ? "bg-glow-green" : "bg-glow-amber")} />
-        ))}
+      <div className="grid gap-1.5">
+        <div aria-hidden className="grid grid-cols-4 gap-1.5">
+          {[1, 2, 3, 4].map((step) => (
+            <span key={step} className={cn("h-[5px] rounded-full transition-colors", step <= strength.score ? strengthColors[strength.score] : "bg-foreground/10")} />
+          ))}
+        </div>
+        {strength.label && (
+          <p className="text-[13px] text-ink-2">
+            <span className="font-semibold">{strength.label}</span>
+            {strength.hint && <span className="text-muted-foreground">. {strength.hint}</span>}
+          </p>
+        )}
       </div>
       <ul id={id} className="grid gap-2 text-[13px] sm:grid-cols-2" aria-label="Password requirements">
         {checks.map((check) => (
