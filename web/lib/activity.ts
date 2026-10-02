@@ -10,6 +10,13 @@ function detail(entry: ActivityEntry, key: string): string | number | boolean | 
   return typeof value === "string" || typeof value === "number" || typeof value === "boolean" ? value : undefined
 }
 
+// The settings Theme and brand publishes; everything else in a settings change is a policy
+const storefrontSettings = new Set([
+  "storeName", "theme", "tagline", "description", "logoImageKey", "accentColor", "productNoun", "productNounPlural", "heroHeadline",
+  "heroHighlight", "heroText", "heroButtonLabel", "homeSections", "aboutText", "contactPhone", "contactAddress", "instagramUrl",
+  "tikTokUrl", "pinterestUrl", "youTubeUrl", "facebookUrl",
+])
+
 // What happened, in a sentence, and where to see it. Older entries may lack some details, so every
 // sentence still reads without them.
 export function describeActivity(entry: ActivityEntry): { text: string; href?: string } {
@@ -82,8 +89,13 @@ export function describeActivity(entry: ActivityEntry): { text: string; href?: s
     }
     case "category_deleted":
       return { text: `${who} deleted the ${detail(entry, "name") ?? ""} category` }
-    case "settings_changed":
-      return { text: `${who} changed the store settings`, href: "/admin/settings" }
+    case "settings_changed": {
+      const changes = (entry.details as { changes?: unknown } | null)?.changes
+      const changed = changes && typeof changes === "object" ? Object.keys(changes) : []
+      return changed.length > 0 && changed.every((key) => storefrontSettings.has(key))
+        ? { text: `${who} published changes to the storefront`, href: "/admin/storefront" }
+        : { text: `${who} changed the store settings`, href: "/admin/settings" }
+    }
   }
 }
 

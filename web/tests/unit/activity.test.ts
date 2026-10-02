@@ -24,6 +24,13 @@ describe("activity sentences", () => {
     }))).toEqual({ text: "demo-admin marked order #SEED0003 cancelled and refunded $65.96", href: "/admin/orders/SEED0003" });
   });
 
+  it("tell a published storefront from a change to the store's policies", () => {
+    const change = (changes: Record<string, unknown>) => entry({ action: "settings_changed", actor: "demo-admin", details: { changes } });
+    expect(describeActivity(change({ heroHeadline: { from: null, to: "Paint loud." } }))).toEqual({ text: "demo-admin published changes to the storefront", href: "/admin/storefront" });
+    expect(describeActivity(change({ shippingFlatRateCents: { from: 1000, to: 800 } }))).toEqual({ text: "demo-admin changed the store settings", href: "/admin/settings" });
+    expect(describeActivity(entry({ action: "settings_changed" })).href).toBe("/admin/settings");
+  });
+
   it("still read when an entry has no details", () => {
     expect(describeActivity(entry({ action: "order_created" }))).toEqual({ text: "New order", href: undefined });
     expect(describeActivity(entry({ action: "user_registered", entityId: 2 }))).toEqual({ text: "Someone created an account", href: "/admin/customers/2" });
