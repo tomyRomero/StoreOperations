@@ -7,6 +7,7 @@ type Props = {
   imageUrl: string;
   // The next/image sizes hint for where the stage is used
   sizes: string;
+  // Above the fold: fetched straight away, ahead of the page's other images
   priority?: boolean;
   // Sold out: the product fades back
   dimmed?: boolean;
@@ -32,7 +33,8 @@ export function ProductStage({ productId, imageUrl, sizes, priority = false, dim
           alt=""
           fill
           sizes={sizes}
-          priority={priority}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           className={cn("object-contain [filter:drop-shadow(0_30px_34px_var(--shadow))]", dimmed && "opacity-45")}
         />
       </div>

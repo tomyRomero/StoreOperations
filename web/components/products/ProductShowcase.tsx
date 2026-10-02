@@ -29,7 +29,7 @@ export function ProductShowcase({ productId, name, imageUrl }: Props) {
         <DialogTrigger asChild>
           <button type="button" className="absolute inset-[11%_10%_10%] cursor-zoom-in rounded-3xl sm:inset-[13%_15%_12%]" aria-label={`Zoom in on ${name}`}>
             <span className="absolute inset-0 animate-float">
-              <Image src={imageUrl} alt={name} fill priority sizes="(min-width: 1024px) 560px, 80vw" className="object-contain [filter:drop-shadow(0_40px_50px_var(--shadow-strong))]" />
+              <Image src={imageUrl} alt={name} fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 560px, 80vw" className="object-contain [filter:drop-shadow(0_40px_50px_var(--shadow-strong))]" />
             </span>
           </button>
         </DialogTrigger>

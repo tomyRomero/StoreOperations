@@ -22,7 +22,7 @@ export default async function NotFound() {
           <span className="text-brand-gradient select-none text-[150px] font-semibold leading-none tracking-[-0.08em] opacity-90 sm:text-[260px]">404</span>
           {drifting && (
             <span className="absolute left-1/2 top-[42%] h-[60%] w-[32%] -translate-x-1/2 -translate-y-1/2 rotate-[32deg] animate-float sm:w-[20%]">
-              <Image src={drifting.imageUrl} alt="" fill priority sizes="(min-width: 640px) 30vw, 46vw" className="object-contain [filter:drop-shadow(0_40px_50px_var(--shadow-strong))]" />
+              <Image src={drifting.imageUrl} alt="" fill loading="eager" fetchPriority="high" sizes="(min-width: 640px) 30vw, 46vw" className="object-contain [filter:drop-shadow(0_40px_50px_var(--shadow-strong))]" />
             </span>
           )}
         </div>

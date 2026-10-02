@@ -103,7 +103,9 @@ export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many
                 src={product.imageUrl}
                 alt=""
                 fill
-                priority
+                // All three are above the fold; the middle one, the largest, is the page's largest paint
+                loading="eager"
+                fetchPriority={i === 1 ? "high" : "auto"}
                 sizes="(min-width: 1024px) 360px, 38vw"
                 className={cn("object-contain", i === 1 ? "[filter:drop-shadow(0_40px_50px_var(--shadow-strong))]" : "[filter:drop-shadow(0_30px_40px_var(--shadow))]")}
               />
