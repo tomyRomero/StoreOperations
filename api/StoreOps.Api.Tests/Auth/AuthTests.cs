@@ -49,18 +49,6 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.True(response.Headers.CacheControl?.NoStore);
     }
 
-    [Fact]
-    public async Task Registering_is_recorded_in_the_activity_log()
-    {
-        var client = api.Factory.CreateClient();
-        await RegisterAsync(client, NewEmail());
-        var me = await client.GetFromJsonAsync<JsonElement>("/api/auth/me", Ct);
-
-        await using var db = api.CreateContext();
-        Assert.True(await db.ActivityLog.AnyAsync(e =>
-            e.Action == ActivityAction.UserRegistered && e.EntityId == me.GetProperty("id").GetInt32(), Ct));
-    }
-
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

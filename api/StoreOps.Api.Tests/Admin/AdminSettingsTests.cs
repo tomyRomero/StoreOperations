@@ -59,6 +59,7 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
             s["returnPolicy"] = "refunds";
             s["returnWindowDays"] = 30;
             s["supportEmail"] = " help@palettehub.test ";
+            s["timeZoneId"] = "America/Chicago";
         });
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -67,6 +68,7 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
         Assert.Equal("refunds", store.GetProperty("returnPolicy").GetString());
         Assert.Equal(30, store.GetProperty("returnWindowDays").GetInt32());
         Assert.Equal("help@palettehub.test", store.GetProperty("supportEmail").GetString());
+        Assert.Equal("America/Chicago", store.GetProperty("timeZoneId").GetString());
         Assert.Equal(800, await ShippingQuotedForAsync(priceCents: 1000));
 
         await using var db = api.CreateContext();
@@ -118,17 +120,6 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Assert.True((await BodyOf(response)).GetProperty("errors").TryGetProperty(field, out _));
-    }
-
-    [Fact]
-    public async Task The_dashboards_time_zone_can_be_changed()
-    {
-        var admin = await api.CreateAdminClientAsync();
-
-        var response = await SaveAsync(admin, await GetAsync(admin), s => s["timeZoneId"] = "America/Chicago");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal("America/Chicago", (await BodyOf(response)).GetProperty("timeZoneId").GetString());
     }
 
     // Left out, a setting would otherwise be saved as zero: free shipping, or "no returns"

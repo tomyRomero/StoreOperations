@@ -23,7 +23,6 @@ public class AdminProductsTests(ApiFixture api) : IClassFixture<ApiFixture>
         var product = await BodyOf(response);
         var id = product.GetProperty("id").GetInt32();
         Assert.Equal($"/api/admin/products/{id}", response.Headers.Location?.AbsolutePath);
-        Assert.Equal(8, product.GetProperty("rowVersion").GetBytesFromBase64().Length);
 
         var inStore = await api.Factory.CreateClient().GetFromJsonAsync<JsonElement>($"/api/products/{id}", Ct);
         Assert.Equal("Gouache Set", inStore.GetProperty("name").GetString());

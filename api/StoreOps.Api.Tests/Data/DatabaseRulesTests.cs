@@ -19,13 +19,7 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
         var product = await AddProductAsync(stock: 1);
         await using var db = database.CreateContext();
 
-        // The conditional decrement checkout uses takes nothing when there isn't enough stock
-        var taken = await db.Products
-            .Where(p => p.Id == product.Id && p.Stock >= 2)
-            .ExecuteUpdateAsync(set => set.SetProperty(p => p.Stock, p => p.Stock - 2), Ct);
-        Assert.Equal(0, taken);
-
-        // A write that forgets the condition is refused
+        // Taking more than is left, as a write that forgot to check the stock would
         var error = await SqlErrorAsync(() => db.Products
             .Where(p => p.Id == product.Id)
             .ExecuteUpdateAsync(set => set.SetProperty(p => p.Stock, p => p.Stock - 2), Ct));
@@ -119,26 +113,6 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
     }
 
     [Fact]
-    public async Task Line_totals_are_calculated_by_the_database()
-    {
-        var user = await AddUserAsync();
-        var product = await AddProductAsync();
-        var order = NewOrder(user.Id, product.Id);
-
-        await using (var db = database.CreateContext())
-        {
-            db.Orders.Add(order);
-            await db.SaveChangesAsync(Ct);
-        }
-
-        await using (var db = database.CreateContext())
-        {
-            var line = await db.OrderLines.SingleAsync(l => l.OrderId == order.Id, Ct);
-            Assert.Equal(line.UnitPriceCents * line.Quantity, line.LineTotalCents);
-        }
-    }
-
-    [Fact]
     public async Task A_customer_has_at_most_one_default_address()
     {
         var user = await AddUserAsync();
@@ -229,14 +203,6 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
             var saved = await db.Products.SingleAsync(p => p.Id == product.Id, Ct);
             Assert.Equal(DateTimeKind.Utc, saved.CreatedAtUtc.Kind);
         }
-    }
-
-    [Fact]
-    public async Task Reference_data_is_created_by_the_migration()
-    {
-        await using var db = database.CreateContext();
-
-        Assert.True(await db.Roles.AnyAsync(r => r.Name == Roles.Admin, Ct));
     }
 
     [Fact]

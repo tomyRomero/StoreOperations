@@ -60,24 +60,13 @@ public class SmokeTests(ApiFixture api) : IClassFixture<ApiFixture>
 // Runs in the Development environment, where the contract is published. Never touches a database.
 public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
 {
-    [Fact]
-    public async Task OpenApi_contract_is_published_in_development()
-    {
-        // The test API switched to Development. Its test settings still win over the developer's
-        // user secrets, so this never reaches the development database.
-        await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
-
-        var response = await development.CreateClient().GetAsync("/openapi/v1.json", TestContext.Current.CancellationToken);
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("\"openapi\"", await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-    }
-
     // The web app's TypeScript types are generated from a copy of the contract in web/lib/api. This
     // fails when the API changed and the copy wasn't regenerated, so a renamed field can't slip through.
     [Fact]
     public async Task The_web_apps_copy_of_the_contract_is_up_to_date()
     {
+        // The test API switched to Development. Its test settings still win over the developer's
+        // user secrets, so this never reaches the development database.
         await using var development = api.Factory.WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
         var served = JsonNode.Parse(await development.CreateClient().GetStringAsync("/openapi/v1.json", TestContext.Current.CancellationToken));
 

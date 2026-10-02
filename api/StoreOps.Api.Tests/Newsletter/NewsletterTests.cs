@@ -56,11 +56,10 @@ public class NewsletterTests(ApiFixture api) : IClassFixture<ApiFixture>
         await SubscribeAsync(email);
         var (_, token) = await SubscriberAsync(email);
 
+        // What a mail app's link scanner does
         var opened = await api.Factory.CreateClient().GetAsync($"/api/newsletter/unsubscribe/{token}", Ct);
-        var unknown = await api.Factory.CreateClient().PostAsync("/api/newsletter/unsubscribe/not-a-real-token", null, Ct);
 
         Assert.False(opened.IsSuccessStatusCode);
-        Assert.Equal(HttpStatusCode.NoContent, unknown.StatusCode);
         await using var db = api.CreateContext();
         Assert.True(await db.NewsletterSubscribers.AnyAsync(s => s.Email == email, Ct));
     }

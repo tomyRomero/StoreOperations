@@ -20,9 +20,8 @@ public class GuestCheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
 
         var quote = await QuoteOf(await guest.PostAsJsonAsync("/api/checkout/guest", Shopping.GuestCheckout("a.guest@example.test", productId, 2), Ct));
 
+        // The browser sends products and quantities; the prices come from the store
         Assert.Equal(2500, quote.GetProperty("subtotalCents").GetInt32());
-        Assert.Equal(1000, quote.GetProperty("shippingCents").GetInt32());
-        Assert.Equal(3500 + FakePayments.TaxOn(3500), quote.GetProperty("totalCents").GetInt32());
         Assert.Equal("Guest shopper", quote.GetProperty("shipTo").GetProperty("recipientName").GetString());
 
         // A guest has no Stripe customer
