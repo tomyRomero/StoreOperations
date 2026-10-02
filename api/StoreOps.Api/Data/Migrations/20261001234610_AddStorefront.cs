@@ -158,8 +158,12 @@ namespace StoreOps.Api.Data.Migrations
                 maxLength: 300,
                 nullable: true);
 
-            // The model's seed row now names a new store "My store". An existing store keeps its name, and
-            // the new columns' defaults fill in the rest, so the seed row isn't rewritten here.
+            // A new store is now "My store", not the demo's name. Only a settings row nobody has ever saved
+            // (still at its creation time) is renamed; an existing store keeps its name, and the new columns'
+            // defaults fill in the rest.
+            migrationBuilder.Sql(
+                "UPDATE [StoreSettings] SET [StoreName] = N'My store' " +
+                "WHERE [Id] = 1 AND [StoreName] = N'Palettehub' AND [UpdatedAtUtc] = '2026-09-30T00:00:00';");
 
             migrationBuilder.AddCheckConstraint(
                 name: "CK_StoreSettings_AccentColor",

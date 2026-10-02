@@ -16,14 +16,18 @@ public class AdminStorefrontTests(ApiFixture api) : IClassFixture<ApiFixture>, I
     public async ValueTask InitializeAsync()
     {
         await using var db = api.CreateContext();
-        await db.StoreSettings.ExecuteUpdateAsync(s => s
-            .SetProperty(x => x.StoreName, "My store")
-            .SetProperty(x => x.Theme, StorefrontTheme.NightStudio)
-            .SetProperty(x => x.Tagline, (string?)null)
-            .SetProperty(x => x.LogoImageKey, (string?)null)
-            .SetProperty(x => x.AccentColor, (string?)null)
-            .SetProperty(x => x.HeroHeadline, (string?)null)
-            .SetProperty(x => x.InstagramUrl, (string?)null), Ct);
+        var settings = await db.StoreSettings.SingleAsync(Ct);
+        settings.StoreName = "My store";
+        settings.Theme = StorefrontTheme.NightStudio;
+        settings.Tagline = null;
+        settings.LogoImageKey = null;
+        settings.AccentColor = null;
+        settings.ProductNoun = "product";
+        settings.ProductNounPlural = "products";
+        settings.HeroHeadline = null;
+        settings.HomeSections = [.. StoreSettings.DefaultHomeSections];
+        settings.InstagramUrl = null;
+        await db.SaveChangesAsync(Ct);
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
