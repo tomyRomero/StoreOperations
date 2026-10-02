@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StoreOps.Api.Auth.Models;
@@ -119,12 +118,9 @@ public sealed class AuthService(
         RegisterResult result;
         try
         {
-            // The connection retries transient failures, so the transaction runs as one retriable unit
-            result = await db.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+            result = await db.InTransactionAsync(async () =>
             {
-                db.ChangeTracker.Clear();
-                await using var transaction = await db.Database.BeginTransactionAsync(ct);
-
+                // Identity validates before it writes, so a refused sign-up leaves nothing to commit
                 var user = new ApplicationUser { UserName = username, Email = request.Email.Trim() };
                 var created = await users.CreateAsync(user, request.Password);
                 if (!created.Succeeded)
@@ -140,11 +136,10 @@ public sealed class AuthService(
                 });
                 await emails.AddWelcomeAsync(user.UserName!, user.Email!, ct);
                 await db.SaveChangesAsync(ct);
-                await transaction.CommitAsync(ct);
                 return RegisterResult.Created(user);
-            });
+            }, ct);
         }
-        catch (DbUpdateException error) when (error.InnerException is SqlException { Number: 2601 or 2627 })
+        catch (DbUpdateException error) when (error.IsUniqueViolation())
         {
             // Two sign-ups for the same email or username at the same moment: the unique index decides
             return RegisterResult.Exists();

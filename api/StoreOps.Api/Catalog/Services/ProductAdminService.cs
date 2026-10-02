@@ -56,19 +56,6 @@ public sealed class ProductAdminService(AppDbContext db, ImageStorage images, Ti
         return new Paged<AdminProductResponse>(items, query.Page, query.PageSize, totalCount);
     }
 
-    // The id breaks ties, so a product never shows up on two pages
-    private static IQueryable<Product> Sorted(IQueryable<Product> products, AdminProductSort sort) => sort switch
-    {
-        AdminProductSort.NameDesc => products.OrderByDescending(p => p.Name).ThenBy(p => p.Id),
-        AdminProductSort.Price => products.OrderBy(p => p.PriceCents).ThenBy(p => p.Id),
-        AdminProductSort.PriceDesc => products.OrderByDescending(p => p.PriceCents).ThenBy(p => p.Id),
-        AdminProductSort.Stock => products.OrderBy(p => p.Stock).ThenBy(p => p.Id),
-        AdminProductSort.StockDesc => products.OrderByDescending(p => p.Stock).ThenBy(p => p.Id),
-        AdminProductSort.Created => products.OrderBy(p => p.CreatedAtUtc).ThenBy(p => p.Id),
-        AdminProductSort.CreatedDesc => products.OrderByDescending(p => p.CreatedAtUtc).ThenByDescending(p => p.Id),
-        _ => products.OrderBy(p => p.Name).ThenBy(p => p.Id),
-    };
-
     public async Task<AdminProductResponse?> GetAsync(int id, CancellationToken ct) =>
         await db.Products.Where(p => p.Id == id).Select(ToResponse).SingleOrDefaultAsync(ct);
 
@@ -295,6 +282,19 @@ public sealed class ProductAdminService(AppDbContext db, ImageStorage images, Ti
 
         return null;
     }
+
+    // The id breaks ties, so a product never shows up on two pages
+    private static IQueryable<Product> Sorted(IQueryable<Product> products, AdminProductSort sort) => sort switch
+    {
+        AdminProductSort.NameDesc => products.OrderByDescending(p => p.Name).ThenBy(p => p.Id),
+        AdminProductSort.Price => products.OrderBy(p => p.PriceCents).ThenBy(p => p.Id),
+        AdminProductSort.PriceDesc => products.OrderByDescending(p => p.PriceCents).ThenBy(p => p.Id),
+        AdminProductSort.Stock => products.OrderBy(p => p.Stock).ThenBy(p => p.Id),
+        AdminProductSort.StockDesc => products.OrderByDescending(p => p.Stock).ThenBy(p => p.Id),
+        AdminProductSort.Created => products.OrderBy(p => p.CreatedAtUtc).ThenBy(p => p.Id),
+        AdminProductSort.CreatedDesc => products.OrderByDescending(p => p.CreatedAtUtc).ThenByDescending(p => p.Id),
+        _ => products.OrderBy(p => p.Name).ThenBy(p => p.Id),
+    };
 
     // Names are unique among products in the store; archived products don't count
     private Task<bool> NameInUseAsync(string name, int? exceptId, CancellationToken ct) =>

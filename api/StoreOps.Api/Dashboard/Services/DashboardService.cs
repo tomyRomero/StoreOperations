@@ -91,11 +91,7 @@ public sealed class DashboardService(AppDbContext db, TimeProvider clock)
     // Accounts made in the period, not counting admins
     private Task<int> NewCustomersAsync(DateTime fromUtc, DateTime toUtc, CancellationToken ct)
     {
-        var adminIds =
-            from userRole in db.UserRoles
-            join role in db.Roles on userRole.RoleId equals role.Id
-            where role.Name == Roles.Admin
-            select userRole.UserId;
+        var adminIds = db.AdminUserIds();
         return db.Users.CountAsync(u => u.CreatedAtUtc >= fromUtc && u.CreatedAtUtc < toUtc && !adminIds.Contains(u.Id), ct);
     }
 

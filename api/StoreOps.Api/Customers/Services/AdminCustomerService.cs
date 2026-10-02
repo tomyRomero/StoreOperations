@@ -31,13 +31,11 @@ public sealed class AdminCustomerService(
 {
     public const int RecentOrderCount = 5;
 
-    private static readonly string AdminRoleName = Roles.Admin.ToUpperInvariant();
-
     // Newest first. Search matches the username or email, or the account's id.
     public async Task<Paged<AdminCustomerSummaryResponse>> ListAsync(AdminCustomerQuery query, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
-        var adminIds = AdminIds();
+        var adminIds = db.AdminUserIds();
 
         var accounts = db.Users.AsQueryable();
         if (query.Role is { } role)
@@ -78,7 +76,7 @@ public sealed class AdminCustomerService(
     public async Task<AdminCustomerResponse?> GetAsync(int id, CancellationToken ct)
     {
         var now = clock.GetUtcNow();
-        var adminIds = AdminIds();
+        var adminIds = db.AdminUserIds();
 
         var account = await db.Users
             .Where(u => u.Id == id)
@@ -127,7 +125,8 @@ public sealed class AdminCustomerService(
         {
             user.LockoutEnabled = true;
             user.LockoutEnd = DateTimeOffset.MaxValue;
-            db.ActivityLog.Add(Activity.Entry(ActivityAction.CustomerDisabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
+            db.ActivityLog.Add(Activity.Entry(
+                ActivityAction.CustomerDisabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
 
             // A new security stamp is what ends the account's open sessions. Identity saves the user
             // through this same database context, so the lockout, the stamp and the activity entry
@@ -148,7 +147,8 @@ public sealed class AdminCustomerService(
         if (await users.IsLockedOutAsync(user))
         {
             user.LockoutEnd = null;
-            db.ActivityLog.Add(Activity.Entry(ActivityAction.CustomerEnabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
+            db.ActivityLog.Add(Activity.Entry(
+                ActivityAction.CustomerEnabled, ActivityEntity.User, id, adminId, new { username = user.UserName }, clock));
 
             // Saves the user and the activity entry together, as above
             if (!(await users.UpdateAsync(user)).Succeeded)
@@ -157,11 +157,4 @@ public sealed class AdminCustomerService(
 
         return (await GetAsync(id, ct), null);
     }
-
-    // The ids of admin accounts, as a subquery EF folds into the query that uses it
-    private IQueryable<int> AdminIds() =>
-        from userRole in db.UserRoles
-        join role in db.Roles on userRole.RoleId equals role.Id
-        where role.NormalizedName == AdminRoleName
-        select userRole.UserId;
 }
