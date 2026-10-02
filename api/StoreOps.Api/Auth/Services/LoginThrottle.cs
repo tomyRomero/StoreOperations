@@ -57,6 +57,13 @@ public sealed class LoginThrottle(IDistributedCache cache, TimeProvider clock, I
     // After a successful sign-in, so someone who finally remembers their password starts from zero
     public Task ClearAsync(string email, CancellationToken ct) => cache.RemoveAsync(AttemptsKey(email), ct);
 
+    // After a password reset: whoever was guessing no longer knows the password, so the lock ends too
+    public async Task EndLockAsync(string email, CancellationToken ct)
+    {
+        await cache.RemoveAsync(LockKey(email), ct);
+        await cache.RemoveAsync(AttemptsKey(email), ct);
+    }
+
     private static string AttemptsKey(string email) => $"login-throttle:attempts:{Hash(email)}";
 
     private static string LockKey(string email) => $"login-throttle:locked:{Hash(email)}";

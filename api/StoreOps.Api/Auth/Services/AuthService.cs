@@ -242,7 +242,7 @@ public sealed class AuthService(
                 ["newPassword"] = reset.Errors.Select(e => e.Description).ToArray(),
             });
 
-        await throttle.ClearAsync(user.Email!, ct);
+        await throttle.EndLockAsync(user.Email!, ct);
         logger.LogInformation("User {UserId} reset their password", user.Id);
         return new ResetPasswordResult(ResetPasswordOutcome.Reset);
     }
