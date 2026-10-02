@@ -44,6 +44,9 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
     <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12">
       <div className="grid gap-9">
         <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] lg:text-5xl">Where should it go?</h1>
+        <div className="-mt-3 lg:hidden">
+          <CheckoutBagSummary shipping={shipping} variant="folded" />
+        </div>
 
         <fieldset>
           <legend className={legend}>Ship to</legend>
