@@ -367,7 +367,7 @@ The schema is created and changed by EF Core migrations.
 
 Made by Tomy F. Romero. Questions about the project are welcome at tomyfletcher99@hotmail.com.
 
-Released under the MIT License; see [license](license).
+© 2024–2026 Tomy F. Romero. All rights reserved. The code is public to read, but isn't licensed for reuse; see [LICENSE](LICENSE).
 
 [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tomyromero/)
 [![Portfolio](https://img.shields.io/badge/-Portfolio-5800FF?style=flat&logo=vercel&logoColor=white)](https://tomyromero.vercel.app)
