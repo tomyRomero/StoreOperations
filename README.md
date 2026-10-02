@@ -156,9 +156,10 @@ You need Docker, the .NET 10 SDK and Node.js 24. For payments, a Stripe account 
 
    The seed rebuilds the database from scratch. To keep your data after pulling a change to the schema, run `dotnet ef database update --project StoreOps.Api` instead.
 
-   In another terminal, forward Stripe's webhooks to it:
+   In another terminal, forward Stripe's webhooks to it. Without this, a paid order waits on "processing" forever. `stripe listen` prints the webhook signing secret: it's the `whsec_...` that goes in `Stripe:WebhookSecret` above, and it stays the same each time.
 
    ```bash
+   stripe login   # once
    stripe listen --forward-to localhost:5200/api/stripe/webhook
    ```
 
