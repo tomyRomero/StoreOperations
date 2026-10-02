@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace StoreOps.Api.Images;
+namespace StoreOps.Api.Images.Controllers;
 
 [ApiController]
 [Route("api/images")]

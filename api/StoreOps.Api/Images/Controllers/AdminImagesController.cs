@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using StoreOps.Api.Common;
+using StoreOps.Api.Images.Models;
 
-namespace StoreOps.Api.Images;
-
-public sealed record UploadedImageResponse(string Key, string Url);
+namespace StoreOps.Api.Images.Controllers;
 
 [Route("api/admin/images")]
 public sealed class AdminImagesController(ImageStorage images) : AdminControllerBase
@@ -13,8 +12,8 @@ public sealed class AdminImagesController(ImageStorage images) : AdminController
     // Room for the multipart wrapping around the file
     private const int MaxRequestBytes = MaxBytes + 64 * 1024;
 
-    // Upload first, then save the returned key on a product or category. The API names the file,
-    // so an upload can never overwrite another image.
+    // Upload first, then save the returned key on a product, a category or the store's logo. The API
+    // names the file, so an upload can never overwrite another image.
     [HttpPost]
     [RequestSizeLimit(MaxRequestBytes)]
     [RequestFormLimits(MultipartBodyLengthLimit = MaxRequestBytes)]
