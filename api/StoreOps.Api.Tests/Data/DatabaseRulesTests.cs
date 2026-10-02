@@ -180,18 +180,32 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
     }
 
     [Fact]
-    public async Task There_is_exactly_one_settings_row_with_todays_defaults()
+    public async Task There_is_only_ever_one_settings_row()
+    {
+        await using var db = database.CreateContext();
+
+        db.StoreSettings.Add(new StoreSettings { Id = 2, StoreName = "Second store", TimeZoneId = "UTC" });
+
+        var error = await SqlErrorAsync(() => db.SaveChangesAsync(Ct));
+        Assert.Contains("CK_StoreSettings_Singleton", error.Message);
+    }
+
+    // What a store that has never been set up runs on
+    [Fact]
+    public async Task A_new_store_starts_from_the_migrations_defaults()
     {
         await using var db = database.CreateContext();
 
         var settings = await db.StoreSettings.SingleAsync(Ct);
+
+        Assert.Equal("My store", settings.StoreName);
         Assert.Equal(1000, settings.ShippingFlatRateCents);
         Assert.Null(settings.FreeShippingThresholdCents);
         Assert.Equal(ReturnPolicy.NoReturns, settings.ReturnPolicy);
-
-        db.StoreSettings.Add(new StoreSettings { Id = 2, StoreName = "Second store", TimeZoneId = "UTC" });
-        var error = await SqlErrorAsync(() => db.SaveChangesAsync(Ct));
-        Assert.Contains("CK_StoreSettings_Singleton", error.Message);
+        Assert.True(settings.GuestCheckout);
+        Assert.Equal(StorefrontTheme.NightStudio, settings.Theme);
+        Assert.Equal([HomeSection.Categories, HomeSection.NewIn, HomeSection.Newsletter], settings.HomeSections);
+        Assert.Null(settings.HeroHeadline);
     }
 
     [Fact]

@@ -33,20 +33,6 @@ public class AdminStorefrontTests(ApiFixture api) : IClassFixture<ApiFixture>, I
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
-    public async Task A_new_store_starts_with_its_name_the_default_rows_and_generic_words()
-    {
-        var store = await api.Factory.CreateClient().GetFromJsonAsync<JsonElement>("/api/store", Ct);
-        var storefront = store.GetProperty("storefront");
-
-        Assert.Equal("My store", store.GetProperty("storeName").GetString());
-        Assert.Equal("night_studio", storefront.GetProperty("theme").GetString());
-        Assert.Equal(["categories", "new_in", "newsletter"], storefront.GetProperty("homeSections").EnumerateArray().Select(s => s.GetString()));
-        Assert.Equal("products", storefront.GetProperty("productNounPlural").GetString());
-        Assert.Equal(JsonValueKind.Null, storefront.GetProperty("heroHeadline").ValueKind);
-        Assert.Equal(JsonValueKind.Null, storefront.GetProperty("logoUrl").ValueKind);
-    }
-
-    [Fact]
     public async Task Published_changes_reach_the_storefront_and_are_logged()
     {
         var admin = await api.CreateAdminClientAsync();
