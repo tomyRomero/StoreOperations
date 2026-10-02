@@ -5,8 +5,6 @@ import { ProductRow } from "@/components/home/ProductRow";
 import { getProducts, getStoreSettings } from "@/lib/data/catalog";
 import { nounsOf } from "@/lib/storefront";
 
-// A mistyped or old link: a product drifting over the 404, a search, the ways back into the shop, and the
-// newest products to carry on from
 export default async function NotFound() {
   const [newest, settings] = await Promise.all([getProducts({ sort: "newest", pageSize: 8 }), getStoreSettings()]);
   const products = newest?.items ?? [];

@@ -8,8 +8,7 @@ import { cn } from "@/lib/utils";
 
 const href = (days: DashboardRange) => (days === 30 ? "/admin" : `/admin?days=${days}`);
 
-// The period picker above everything it scopes. While the next period loads, the current figures stay
-// in place, dimmed, instead of flashing skeletons.
+// While the next period loads, the current figures stay in place, dimmed, instead of flashing skeletons
 export function RangePicker({ days, children }: { days: DashboardRange; children: React.ReactNode }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();

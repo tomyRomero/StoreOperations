@@ -14,7 +14,7 @@ type Props = {
   className?: string;
 };
 
-// A figure, and how it compares with the period before. Up is good for every figure shown here.
+// A figure and its change from the period before. Up is good for every figure shown here.
 export function StatTile({ label, comparison, format, previousPeriod, hero, className }: Props) {
   const delta = change(comparison);
   const Icon = delta?.direction === "up" ? ArrowUpRight : delta?.direction === "down" ? ArrowDownRight : Minus;

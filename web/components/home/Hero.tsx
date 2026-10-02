@@ -27,8 +27,6 @@ const places = [
   "right-[4%] bottom-[14%] h-[48%] w-[28%] rotate-14 sm:right-[12%] sm:h-[60%] sm:w-[24%]",
 ];
 
-// The opening: a sale announcement, the headline, the shipping promise and the way in, then the store's
-// products standing in the light on a wide stage
 export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many }: Props) {
   const saving = topDeal?.compareAtPriceCents ? percentOff(topDeal.priceCents, topDeal.compareAtPriceCents) : 0;
   // The middle spot is the largest, so the first product stands there

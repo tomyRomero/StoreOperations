@@ -5,7 +5,6 @@ import { getAddresses, getOrder, getOrders } from "@/lib/data/account";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { requireUser } from "@/lib/session";
 
-// A greeting, the latest order and how far it has got, and the way to everything else
 export default async function AccountOverviewPage() {
   const user = await requireUser("/account");
   const [orders, addresses, settings] = await Promise.all([getOrders(1, 1), getAddresses(), getStoreSettings()]);

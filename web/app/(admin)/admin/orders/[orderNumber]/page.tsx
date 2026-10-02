@@ -20,8 +20,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 const card = "rounded-xl border bg-card p-5";
 
-// One order as the store sees it: what was bought and what it cost, its history, and beside it the
-// panel that moves it on, with the customer, the address and the payment
 export default async function AdminOrderPage(props: Props) {
   const { orderNumber } = await props.params;
   const [order, settings] = await Promise.all([getAdminOrder(orderNumber), getAdminSettings()]);

@@ -10,7 +10,6 @@ type Props = {
   actions?: React.ReactNode;
 };
 
-// Every admin page starts the same way: an optional way back, the title, and its main actions
 export function AdminPageHeader({ title, description, back, actions }: Props) {
   return (
     <div className="mb-6 grid gap-3">

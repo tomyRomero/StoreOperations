@@ -15,9 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const glows = ["bg-glow-pink", "bg-glow-violet", "bg-glow-blue", "bg-glow-green"];
 const numbers = ["text-sale", "text-accent", "text-info", "text-success"];
 
-// The store, its story, its categories and how ordering works. The headline is the store's tagline, the lead
-// its description and the story its About text, all from Theme and brand; the rest comes from the live
-// catalog and Store settings.
+// The headline, lead and story come from Theme and brand; the rest from the catalog and Store settings
 export default async function AboutPage() {
   const [categories, settings] = await Promise.all([getCategories(), getStoreSettings()]);
   const summaries = await Promise.all(categories.map((category) => getCategorySummary(category.id)));

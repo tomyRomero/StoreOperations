@@ -10,9 +10,7 @@ const steps = [
   { id: "payment", label: "Payment", path: "/checkout" },
 ] as const;
 
-// ① Shipping ── ② Payment, from the address. A done step is green with a check and leads back to it,
-// keeping the chosen address; the current one is ink with a violet ring. Phones show only the current
-// step's name.
+// A finished step links back to it, keeping the chosen address. Phones show only the current step's name.
 export function CheckoutSteps() {
   const pathname = usePathname();
   const address = useSearchParams().get("address");

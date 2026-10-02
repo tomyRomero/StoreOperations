@@ -26,7 +26,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 const card = "rounded-xl border bg-card p-5 sm:p-6";
 
-// One product: its details on the left, its deal on the right, and archiving at the top
 export default async function AdminProductPage(props: Props) {
   const [product, categories, settings] = await Promise.all([productFor(props), getAdminCategories(), getAdminSettings()]);
   if (!product || !categories || !settings) notFound();

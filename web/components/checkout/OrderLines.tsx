@@ -6,7 +6,7 @@ type Line = { productId: number; name: string; quantity: number; lineTotalCents:
 
 type Totals = { subtotalCents: number; shippingCents: number; taxCents: number; totalCents: number };
 
-// What's being bought, each in its glow, at the prices in the quote or the order
+// Prices come from the quote or the order, never from the bag
 export function OrderLines({ lines }: { lines: Line[] }) {
   return (
     <ul className="grid gap-3.5">

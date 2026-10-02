@@ -9,8 +9,7 @@ const places = [
   "right-[9%] top-[36%] h-[25%] w-[22%] rotate-16",
 ];
 
-// Beside sign-in and sign-up on large screens: the store's products in the studio light, and what an
-// account is for. The pictures are decoration, so they have no alt text.
+// The pictures are decoration, so they have no alt text
 export function AuthArt({ products }: { products: Product[] }) {
   return (
     <aside aria-label="Why have an account" className="relative isolate flex min-h-[640px] flex-col justify-end overflow-hidden rounded-[32px] border bg-[radial-gradient(80%_70%_at_50%_110%,var(--stage-violet),var(--surface-sunk)_70%)] p-10 max-lg:hidden">

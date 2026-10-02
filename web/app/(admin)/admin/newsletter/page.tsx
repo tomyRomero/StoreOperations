@@ -16,7 +16,6 @@ export const metadata: Metadata = { title: "Newsletter" };
 
 const path = "/admin/newsletter";
 
-// Write and send the newsletter, and look after the list it goes to
 export default async function NewsletterPage(props: { searchParams: Promise<SearchParams> }) {
   const params = await props.searchParams;
   const search = firstValue(params.q)?.trim() ?? "";

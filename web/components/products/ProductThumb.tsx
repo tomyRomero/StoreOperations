@@ -10,8 +10,7 @@ type Props = {
   sizes: string;
 };
 
-// A small product picture in its own glow, for bag lines and suggestions. Decorative: the product's name
-// is always beside it.
+// Decorative: the product's name is always beside it
 export function ProductThumb({ productId, imageUrl, className, sizes }: Props) {
   return (
     <span className={cn("relative grid shrink-0 place-items-center overflow-hidden bg-muted", className)} style={{ "--glow": glowFor(productId) } as React.CSSProperties}>

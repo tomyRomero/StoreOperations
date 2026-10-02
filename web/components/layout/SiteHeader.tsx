@@ -16,9 +16,6 @@ type Props = {
   lowStockThreshold: number;
 };
 
-// The storefront header, frosted over the page as it scrolls. Large screens: the logo, the shop pill in
-// the middle, then search (the ⌘K palette), light and dark, the account and the bag. Phones: the menu
-// (which holds the account and the theme switch), the logo in the middle, search and the bag.
 export function SiteHeader({ categories, hasDeals, lowStockThreshold }: Props) {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/75 backdrop-blur-xl">

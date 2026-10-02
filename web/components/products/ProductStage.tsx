@@ -16,9 +16,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-// A product standing in its own light: a soft glow in the color picked for it, and the picture fitted
-// inside, never cropped. Cut-outs float with a real shadow; a photo shows whole, like a print. Inside a
-// .group, hovering lifts the glow and brings the product closer.
+// The picture is fitted inside the stage, never cropped. Inside a .group, hovering lifts the glow.
 export function ProductStage({ productId, imageUrl, sizes, priority = false, dimmed = false, className, children }: Props) {
   return (
     <div className={cn("relative isolate overflow-hidden", className)} style={{ "--glow": glowFor(productId) } as React.CSSProperties}>

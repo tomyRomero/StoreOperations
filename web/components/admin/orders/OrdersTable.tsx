@@ -42,9 +42,8 @@ const bulkStatuses: OrderStatus[] = ["shipped", "delivered", "cancelled", "refun
 const refunds = (status: OrderStatus) => status === "cancelled" || status === "refunded";
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
-// The orders table, with ticks for changing many orders' status at once. Each change goes only to the
-// ticked orders that can make it (an order that's delivered can't be shipped again), and the API checks
-// every one again. Cancelling or refunding gives the money back, so the dialog says exactly how much.
+// A bulk status change applies only to the ticked orders that allow it (a delivered order can't be
+// shipped again), and the API checks each one again.
 export function OrdersTable({ orders, timeZone, sort, sortHrefs, emailByDefault }: Props) {
   const router = useRouter();
   const selection = useSelection(orders.map((o) => o.orderNumber));

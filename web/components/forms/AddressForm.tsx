@@ -15,8 +15,8 @@ import { fieldErrors, problemMessage } from "@/lib/api/problems";
 import type { Address } from "@/lib/api/types";
 import { usStates } from "@/lib/us-states";
 
-// The store ships within the United States, as it always has. The API accepts any country, so this
-// form is where that rule lives; Stripe Tax works out the tax for the address at checkout.
+// The store ships within the United States. The API accepts any country, so this form is where that
+// rule lives; Stripe Tax works out the tax for the address at checkout.
 const FormSchema = z.object({
   recipientName: z.string().trim().min(1, "Enter the recipient's name").max(100, "Use at most 100 characters"),
   line1: z.string().trim().min(1, "Enter a street address").max(200, "Use at most 200 characters"),

@@ -23,10 +23,10 @@ export async function getAdminStorefront(): Promise<AdminStorefront | null> {
   return data ?? null;
 }
 
-// The activity log, newest first: everything customers and admins did, optionally about one kind of thing
 export const activityPageSize = 30;
 export const subscribersPageSize = 20;
 
+// The activity log, newest first: everything customers and admins did, optionally about one kind of thing
 export async function getActivity({ entityType, page = 1 }: { entityType?: ActivityEntity; page?: number }) {
   const { data } = await serverApi().GET("/api/admin/activity", { params: { query: { entityType, page, pageSize: activityPageSize } } });
   return data ?? null;

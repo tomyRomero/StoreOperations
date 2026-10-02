@@ -10,8 +10,7 @@ type Props = {
   imageUrl: string;
 };
 
-// The product page's stage: the product floating in its own light over a faint grid, tinted with its
-// glow. Clicking it opens the picture as large as the screen allows.
+// Clicking the product opens the picture as large as the screen allows
 export function ProductShowcase({ productId, name, imageUrl }: Props) {
   const glow = glowFor(productId);
 

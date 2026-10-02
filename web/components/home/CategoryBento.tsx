@@ -16,7 +16,6 @@ type Props = {
   deals: Product[];
 };
 
-// The three category tiles: large, tall and small, each with its own glow and the picture tilted
 const looks = [
   {
     tile: "col-span-2 h-[230px] md:h-[320px] lg:row-span-2 lg:h-auto",
@@ -40,8 +39,7 @@ const looks = [
 
 const label = "font-mono text-[13px] font-medium uppercase tracking-[0.06em]";
 
-// Shop by category, as a bento: the three categories, the shipping promise with the bag's progress
-// toward free shipping, how tracking works, and what's on sale. Phones keep the categories and shipping.
+// Phones keep the category tiles and the shipping tile; the rest show from tablets up
 export function CategoryBento({ tiles, settings, deals }: Props) {
   const best = deals.reduce((most, deal) => Math.max(most, deal.compareAtPriceCents ? percentOff(deal.priceCents, deal.compareAtPriceCents) : 0), 0);
   const dealNames = deals.length > 2 ? `${deals[0].name}, ${deals[1].name} and more` : deals.map((deal) => deal.name).join(" and ");

@@ -14,8 +14,6 @@ type Props = {
   heading?: "h2" | "h3";
 };
 
-// One order in the history: its first product, number, date, status and total. The whole row opens the
-// order. On phones the status drops under the number and the arrow goes.
 export function OrderCard({ order, timeZone, heading: Heading = "h3" }: Props) {
   const ended = order.status === "cancelled" || order.status === "refunded";
 

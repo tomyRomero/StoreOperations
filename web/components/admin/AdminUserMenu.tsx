@@ -13,7 +13,6 @@ import {
 import { useCurrentUser } from "@/components/CurrentUserProvider";
 import { useSignOut } from "@/lib/use-sign-out";
 
-// Who is signed in, at the foot of the sidebar, with the way back to the store and the way out
 export function AdminUserMenu() {
   const user = useCurrentUser();
   const signOut = useSignOut();

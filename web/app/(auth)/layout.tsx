@@ -7,8 +7,7 @@ import { getDeals, getProducts } from "@/lib/data/catalog";
 import { getCurrentUser } from "@/lib/session";
 import { stageProducts } from "@/lib/stage";
 
-// Sign-in and sign-up: the store's products in the studio light on large screens (the same three as the
-// home page's stage), the form beside them. Someone already signed in goes back to the store.
+// Someone already signed in goes back to the store
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const [user, deals, newest] = await Promise.all([getCurrentUser(), getDeals(), getProducts({ sort: "newest", pageSize: 3 })]);
   if (user) {

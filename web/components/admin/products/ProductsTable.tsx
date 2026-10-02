@@ -42,8 +42,7 @@ type Pending = { action: "archive" } | { action: "end_deal" } | { action: "move"
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
-// The products table. Ticked products can be archived, taken off sale, or moved to another category
-// together; each action applies to the ticked products it makes sense for, and the dialog says which.
+// A bulk action applies only to the ticked products it makes sense for, and the dialog says which
 export function ProductsTable({ products, categories, lowStockThreshold, timeZone, sort, sortHrefs }: Props) {
   const router = useRouter();
   const selection = useSelection(products.map((p) => p.id));

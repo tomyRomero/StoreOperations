@@ -2,8 +2,7 @@ import type { OrderStatus } from "@/lib/api/types";
 import { orderStatusLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-// Waiting on the store is amber, on its way is blue, done is green, and an order that ended (cancelled
-// or refunded) is a quiet grey. The dot only repeats the color: the label always says which.
+// The dot only repeats the color; the label always says the status
 const tones: Record<OrderStatus, string> = {
   pending: "bg-warning-subtle text-warning [--dot:var(--glow-amber)]",
   shipped: "bg-info-subtle text-info [--dot:var(--glow-blue)]",

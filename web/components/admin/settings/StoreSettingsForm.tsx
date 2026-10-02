@@ -74,8 +74,8 @@ const formFieldFor: Record<string, keyof Values> = {
   freeShippingThresholdCents: "freeShippingThreshold",
 };
 
-// The store's policies, saved together. Its name, look and words are in Theme and brand. Saved with the version it was opened at, so two admins
-// can't overwrite each other's changes.
+// The store's policies, saved together with the version they were opened at, so two admins can't
+// overwrite each other's changes. The name, look and words are edited in Theme and brand.
 export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
   const [saving, setSaving] = useState(false);
   const router = useRouter();

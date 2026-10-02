@@ -12,8 +12,8 @@ export type Bar = {
   text: string;
 };
 
-// Horizontal bars for one measure across a few named things. Every value is written at the end of its
-// bar, so nothing depends on reading the bar's length or color. Bars share one color: they are one series.
+// Horizontal bars for one measure. Each value is written at the end of its bar, so nothing depends on
+// reading the bar's length.
 export function BarList({ bars, label }: { bars: Bar[]; label: string }) {
   const max = Math.max(...bars.map((bar) => bar.value), 0);
 

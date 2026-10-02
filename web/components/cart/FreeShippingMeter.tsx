@@ -14,8 +14,7 @@ type Props = {
   className?: string;
 };
 
-// How far the bag is from free shipping, with a bar that fills as it gets closer. Nothing when the store
-// has no threshold or ships everything free.
+// How far the bag is from free shipping. Nothing when the store has no threshold or ships everything free.
 export function FreeShippingMeter({ settings, variant = "panel", truck = false, className }: Props) {
   const { cart } = useCart();
   const subtotal = cart?.subtotalCents ?? 0;

@@ -10,8 +10,7 @@ import { formatMoney } from "@/lib/money";
 
 type Props = {
   shipping: ShippingSettings;
-  // Beside the step on large screens; folded under the heading on phones, like the payment step's, with the
-  // amount so far on show
+  // "folded" collapses it under the heading on phones, with the total on show
   variant?: "aside" | "folded";
 };
 

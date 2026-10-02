@@ -14,9 +14,8 @@ type Props = {
 
 const pill = "inline-flex h-7 items-center rounded-full border border-foreground/14 bg-foreground/10 px-3 font-mono text-xs font-medium backdrop-blur-md";
 
-// The product on its stage, then its name, price and a "+". The whole card opens the product (the name's
-// link is stretched over it); the "+" sits on top of it, outside the link, so there's never a button
-// inside a link.
+// The name's link is stretched over the whole card. The "+" sits on top of it, outside the link, so
+// there's never a button inside a link.
 export function ProductCard({ product, lowStockThreshold, priority = false }: Props) {
   const soldOut = product.stock <= 0;
   const regular = product.compareAtPriceCents;

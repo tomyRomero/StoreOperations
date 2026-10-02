@@ -25,8 +25,6 @@ import { cn } from "@/lib/utils";
 
 const textButton = "text-sm font-medium transition-colors disabled:opacity-50";
 
-// The address book, default first. Each address is edited in its own card and a new one is added under
-// them, without leaving the page. Deleting asks first; changes go to the API, then the page reloads its data.
 export function AddressBook({ addresses }: { addresses: Address[] }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<number | null>(null);

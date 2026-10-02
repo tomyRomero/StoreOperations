@@ -28,8 +28,7 @@ function headline(order: Order, timeZone: string): { label: string; value: strin
   return { label: "Status", value: order.status === "shipped" ? "On its way" : orderStatusLabel(order.status) };
 }
 
-// One of the customer's orders: where it is, what's in it, where it's going. Another customer's order
-// number simply isn't found.
+// Another customer's order number simply isn't found
 export default async function OrderPage(props: Props) {
   const { id } = await props.params;
   const [order, settings] = await Promise.all([getOrder(id), getStoreSettings()]);

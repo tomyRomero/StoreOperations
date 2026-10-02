@@ -18,8 +18,6 @@ const modes = {
   off: { label: "Payments off", dot: "bg-faint" },
 };
 
-// The store this console runs, at the top of the sidebar: its mark and name, whether it takes real
-// payments, and the way to it
 export function StoreCard({ storeName, payments }: Props) {
   const mode = modes[payments];
   const { logoUrl } = useStoreBrand();

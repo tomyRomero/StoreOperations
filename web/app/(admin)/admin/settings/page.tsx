@@ -7,7 +7,6 @@ import { getAdminSettings } from "@/lib/data/admin-store";
 
 export const metadata: Metadata = { title: "Settings" };
 
-// The store's policies, which the storefront, checkout and emails all read from the API
 export default async function SettingsPage() {
   const settings = await getAdminSettings();
 

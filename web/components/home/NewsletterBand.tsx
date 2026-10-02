@@ -1,7 +1,6 @@
 import SubscribeForm from "@/components/forms/SubscribeForm";
 
-// The newsletter, given the room to ask: a band with a gradient edge near the end of the home page.
-// The footer leaves its own form out on this page.
+// The home page's newsletter band. The footer leaves its own form out on this page.
 export function NewsletterBand({ many }: { many: string }) {
   return (
     <section aria-labelledby="newsletter-band-heading" className="container pt-18 lg:pt-40">

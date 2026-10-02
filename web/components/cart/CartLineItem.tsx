@@ -20,9 +20,7 @@ type Props = {
   onNavigate?: () => void;
 };
 
-// One line of the bag: the product in its glow, its price, a stepper and Remove, and the line's total
-// with the regular price struck through while it's on sale. A line the store can't sell as it is says
-// why, with a one-tap fix.
+// A line the store can't sell as it is says why, with a one-tap fix
 export function CartLineItem({ line, variant = "drawer", highlighted = false, onNavigate }: Props) {
   const cart = useCart();
   const [busy, setBusy] = useState(false);

@@ -81,8 +81,8 @@ export async function getRelatedProducts(id: number): Promise<Product[]> {
   return data ?? [];
 }
 
-// The store's policies as customers see them: shipping, returns, the support email
-// With the Theme and brand preview's unsaved values laid over it, when an admin's preview asks
+// The store's policies and storefront as customers see them. In an admin's Theme and brand preview, the
+// form's unsaved values are laid over them.
 export const getStoreSettings = cache(async (): Promise<StoreSettings | null> => {
   const [{ data }, draft] = await Promise.all([serverApi().GET("/api/store"), getPreviewDraft()]);
   if (!data) return null;

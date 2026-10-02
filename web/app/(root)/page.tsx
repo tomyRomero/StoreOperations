@@ -9,8 +9,7 @@ import { shippingSentence } from "@/lib/format";
 import { bySaving, stageProducts } from "@/lib/stage";
 import { defaultHomeSections, heroCopy, nounsOf } from "@/lib/storefront";
 
-// Everything on the home page comes from the store: its deals, newest products, categories and settings.
-// The hero comes first; the rows under it are the ones the store turned on in Theme and brand, in its order.
+// The rows under the hero are the ones the store turned on in Theme and brand, in its order
 export default async function Home() {
   const [categories, deals, newest, settings, inStockCount] = await Promise.all([
     getCategories(),

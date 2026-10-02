@@ -16,8 +16,6 @@ type Props = {
 const linkClasses = "text-[15px] text-ink-2 transition-colors duration-[120ms] hover:text-foreground";
 const headingClasses = "mb-1 font-mono text-xs font-medium uppercase tracking-[0.08em] text-faint";
 
-// The store's name and newsletter, then shop, help and the store's own pages, and the name again in large
-// fading type to close the page
 export function SiteFooter({ categories, settings, hasDeals }: Props) {
   const storeName = storeNameOf(settings);
   const supportEmail = settings?.supportEmail ?? null;

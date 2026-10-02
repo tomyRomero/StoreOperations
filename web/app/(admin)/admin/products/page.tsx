@@ -32,8 +32,6 @@ const stockLevels: { value: StockLevel; label: string }[] = [
 ];
 const sorts: AdminProductSort[] = ["name", "name_desc", "price", "price_desc", "stock", "stock_desc", "created", "created_desc"];
 
-// The catalog as the store manages it, archived products included: found by name, narrowed by category,
-// stock and deals, sorted by any column, and changed in bulk from the ticked rows
 export default async function ProductsPage(props: { searchParams: Promise<SearchParams> }) {
   const params = await props.searchParams;
   const search = firstValue(params.q)?.trim() ?? "";

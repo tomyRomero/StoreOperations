@@ -17,9 +17,7 @@ export const metadata: Metadata = {
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const payments = !publishableKey ? "off" : publishableKey.startsWith("pk_test_") ? "test" : "live";
 
-// The StoreOps console: its sidebar on the left (a drawer on phones), a top bar, and the page. The console
-// marker gives it the StoreOps cobalt and compact controls (see globals.css); light or dark follows the
-// same switch as the storefront.
+// The data-console marker gives the console its own accent and compact controls (see globals.css)
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   // Fail closed: only a user the API confirms as admin gets in. The API also refuses every admin
   // request from anyone else, so this only spares them a broken page.

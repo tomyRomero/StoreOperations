@@ -25,7 +25,6 @@ const path = "/admin/customers";
 const tabs: { role?: AccountRole; label: string }[] = [{ label: "Everyone" }, { role: "customer", label: "Customers" }, { role: "admin", label: "Admins" }];
 const sorts: AdminCustomerSort[] = ["joined", "joined_desc", "username", "username_desc"];
 
-// Every account, newest first: found by username, email or id, narrowed to customers or admins
 export default async function CustomersPage(props: { searchParams: Promise<SearchParams> }) {
   const params = await props.searchParams;
   const search = firstValue(params.q)?.trim() ?? "";

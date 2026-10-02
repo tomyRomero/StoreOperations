@@ -14,8 +14,7 @@ import type { SearchParams } from "@/lib/paging";
 
 export const metadata: Metadata = { title: "Categories" };
 
-// The store's categories as picture cards, like the store's own tiles. A store has a handful, so they
-// all come at once and the search narrows them here.
+// A store has a handful of categories, so they all load at once and the search narrows them here
 export default async function CategoriesPage(props: { searchParams: Promise<SearchParams> }) {
   const search = (firstValue((await props.searchParams).q) ?? "").trim().toLowerCase();
   const categories = await getAdminCategories();

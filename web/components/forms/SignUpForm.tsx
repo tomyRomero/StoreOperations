@@ -44,8 +44,7 @@ const SignUpForm = ({ storeName }: { storeName: string }) => {
   });
   const [typed, username, email] = useWatch({ control: form.control, name: ["password", "username", "email"] });
 
-  // Creating the account also signs in, so the new customer goes straight back to where they were.
-  // Passwords are sent exactly as typed: the API hashes them and never needs them escaped.
+  // Creating the account also signs in, so the new customer goes straight back to where they were
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     setRefusal(null);
     const { error, response } = await api.POST("/api/auth/register", { body: values });

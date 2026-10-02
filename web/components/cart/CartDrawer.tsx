@@ -13,10 +13,8 @@ import { FreeShippingMeter } from "./FreeShippingMeter";
 import { RemovedNotice } from "./RemovedNotice";
 import { ShippingNudges } from "./ShippingNudges";
 
-// The bag in a drawer from the right, full width on phones: what was just added, how close it is to free
-// shipping, the lines, what would ship it free, and the totals with the way to checkout. Radix keeps focus
-// inside, Esc closes it, and focus goes back to the button that opened it (an add button says which, see
-// openCart).
+// The bag in a drawer. Radix keeps focus inside and Esc closes it; focus then goes back to the button
+// that opened it (an add button passes itself, see openCart).
 export function CartDrawer({ shipping, categories }: { shipping: ShippingSettings; categories: Category[] }) {
   const { cart, itemCount, isOpen, justAdded, closeCart, openCart, openedFrom } = useCart();
   const added = justAdded !== null ? cart?.lines.find((line) => line.productId === justAdded) : undefined;

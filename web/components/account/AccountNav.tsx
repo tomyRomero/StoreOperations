@@ -14,8 +14,6 @@ type Props = {
   addressCount: number | null;
 };
 
-// The account's menu. On large screens a card beside each page: who's signed in, the pages with how many
-// orders and addresses there are, and the way out. On phones a row of tabs that scrolls sideways.
 export function AccountNav({ username, email, orderCount, addressCount }: Props) {
   const pathname = usePathname();
   const signOut = useSignOut();

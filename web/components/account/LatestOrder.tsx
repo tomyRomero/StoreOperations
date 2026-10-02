@@ -7,8 +7,6 @@ import { formatMoney } from "@/lib/money";
 import { orderProgress, type ProgressStep } from "@/lib/order-progress";
 import { cn } from "@/lib/utils";
 
-// A finished step fills green to blue, the step the order is in fills part way, the rest wait in grey;
-// an order that ended stops on a darker grey
 const bars: Record<ProgressStep["state"], string> = {
   done: "bg-linear-to-r from-glow-green to-glow-blue",
   current: "bg-[linear-gradient(90deg,var(--glow-blue)_55%,color-mix(in_oklab,var(--foreground)_10%,transparent)_55%)]",
@@ -18,7 +16,6 @@ const bars: Record<ProgressStep["state"], string> = {
 
 const spoken: Record<ProgressStep["state"], string> = { done: " (done)", current: " (current step)", upcoming: " (not yet)", ended: "" };
 
-// The account overview's lead: the newest order, what's in it, and how far it has got
 export function LatestOrder({ order, timeZone }: { order: Order; timeZone: string }) {
   const steps = orderProgress(order);
   const items = order.lines.reduce((sum, line) => sum + line.quantity, 0);

@@ -22,7 +22,7 @@ const FormSchema = z.object({
 
 type Values = z.infer<typeof FormSchema>;
 
-// Adds a category, or renames one and changes its picture (the store's category tiles use it)
+// Adds a category, or renames one and changes its picture
 export function CategoryForm({ category }: { category: AdminCategory | null }) {
   const router = useRouter();
   const [refusal, setRefusal] = useState<string | null>(null);

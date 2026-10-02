@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import type { Category } from "@/lib/api/types";
 
-// An empty bag with a way into each category
 export function EmptyCart({ categories, onNavigate }: { categories: Category[]; onNavigate?: () => void }) {
   return (
     <div className="relative isolate flex flex-col items-center gap-3 px-6 py-12 text-center">

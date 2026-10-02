@@ -15,8 +15,7 @@ import { ThemeToggle } from "./ThemeToggle";
 const linkClasses = "flex min-h-11 items-center rounded-xl px-3 font-medium transition-colors hover:bg-foreground/5";
 const groupLabel = "px-3 pb-1 font-mono text-xs uppercase tracking-[0.08em] text-faint";
 
-// The phone menu: the categories, the account pages and the light and dark switch, in a drawer from the
-// left. Following a link closes it. Search is the icon beside the bag.
+// The phone menu. Following a link closes it.
 export function MobileNav({ categories, hasDeals }: { categories: Category[]; hasDeals: boolean }) {
   const [open, setOpen] = useState(false);
   const { many } = useStoreBrand();

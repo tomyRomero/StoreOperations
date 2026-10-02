@@ -36,7 +36,6 @@ const icons: Record<ActivityEntity, LucideIcon> = {
   store_settings: Settings,
 };
 
-// Everything customers and admins did, newest first, by the store's day
 export default async function ActivityPage(props: { searchParams: Promise<SearchParams> }) {
   const params = await props.searchParams;
   const entity = oneOf(params.type, tabs.flatMap((t) => (t.entity ? [t.entity] : [])));

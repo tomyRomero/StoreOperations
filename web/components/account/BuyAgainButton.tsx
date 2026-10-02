@@ -6,8 +6,8 @@ import { useCart } from "@/components/cart/CartProvider";
 import { Button } from "@/components/ui/button";
 import type { OrderLine } from "@/lib/api/types";
 
-// Puts an order's items back in the bag, in the same quantities, then opens the bag. A line that can't be
-// bought now (sold out, fewer left, no longer sold) is said in its own message and the rest still go in.
+// Adds an order's items to the bag again, in the same quantities. Lines that can't be bought now (sold
+// out, fewer left, no longer sold) each get their own message, and the rest are still added.
 export function BuyAgainButton({ lines }: { lines: OrderLine[] }) {
   const cart = useCart();
   const [adding, setAdding] = useState(false);

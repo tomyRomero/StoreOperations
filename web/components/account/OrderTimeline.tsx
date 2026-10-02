@@ -4,9 +4,7 @@ import { formatDate, formatDay } from "@/lib/format";
 import { orderProgress } from "@/lib/order-progress";
 import { cn } from "@/lib/utils";
 
-// Placed ─ Shipped ─ Delivered: across the page on large screens, down it on phones. Done steps are
-// green with a tick, the current one is ink in a violet ring, the rest are hollow; a cancelled or
-// refunded order ends on a quiet grey cross. Every step also says in words where the order is.
+// Each step also says in words where the order is, so the colors are never the only signal
 export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: string }) {
   const steps = orderProgress(order);
 

@@ -72,8 +72,8 @@ function dollars(cents: number): string {
   return cents % 100 === 0 ? String(cents / 100) : (cents / 100).toFixed(2);
 }
 
-// How many filters narrow the list (search and sort don't count)
 // The same search and sort with every filter taken off, back on page 1
+// How many filters narrow the list (search and sort don't count)
 export function clearedFilters(filters: ProductFilters): ProductFilters {
   return { ...filters, categoryIds: [], onSale: false, inStock: false, minCents: null, maxCents: null, page: 1 };
 }

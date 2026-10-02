@@ -8,7 +8,7 @@ import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Checkout: shipping" };
 
-// Checkout's first step. Shipping comes from Store settings, so it matches what payment will charge.
+// Shipping comes from Store settings, so it matches what payment will charge
 const Page = async (props: { searchParams: Promise<{ address?: string }> }) => {
   const searchParams = await props.searchParams;
   await requireUser("/address");

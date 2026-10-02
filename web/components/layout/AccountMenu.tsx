@@ -18,8 +18,6 @@ import { cn } from "@/lib/utils";
 
 const circle = "inline-flex size-10 items-center justify-center rounded-full transition-colors duration-[120ms]";
 
-// Signed out: a way in that comes back to this page. Signed in: the account pages and a way out, behind
-// the shopper's initial.
 export function AccountMenu() {
   const user = useCurrentUser();
   const here = currentPath(usePathname(), useSearchParams());

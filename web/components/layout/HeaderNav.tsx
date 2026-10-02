@@ -14,8 +14,7 @@ type Props = {
   hasDeals: boolean;
 };
 
-// Shop, the store's first categories and Sale, as one pill. The link for the list being looked at is
-// marked current, whatever its search, price or sort.
+// The link for the list being viewed is marked current, whatever its search, price or sort
 export function HeaderNav({ categories, hasDeals }: Props) {
   const onList = usePathname() === "/products";
   const searchParams = useSearchParams();

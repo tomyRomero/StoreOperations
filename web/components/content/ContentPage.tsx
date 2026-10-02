@@ -20,8 +20,6 @@ const glows = ["bg-glow-green", "bg-glow-violet", "bg-glow-blue"];
 // A section's anchor, from its title: "Cookies and your browser" is #cookies-and-your-browser
 const anchor = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-// The reading pages (shipping and returns, privacy): a large title, the facts at a glance, then the
-// sections beside their contents, and a way to ask a person at the end
 export function ContentPage({ eyebrow, title, lead, facts, children }: PageProps) {
   const sections = Children.toArray(children)
     .filter(isValidElement<{ title: string }>)

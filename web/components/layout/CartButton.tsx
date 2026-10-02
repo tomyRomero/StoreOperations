@@ -4,8 +4,7 @@ import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/components/cart/CartProvider";
 import { cn } from "@/lib/utils";
 
-// Opens the bag drawer, with how many items are in it: an ink pill on large screens, an icon with a
-// badge on phones. The count is announced when it changes.
+// The item count is announced when it changes
 export function CartButton() {
   const { itemCount, openCart } = useCart();
   const label = itemCount === 1 ? "Bag, 1 item" : `Bag, ${itemCount} items`;

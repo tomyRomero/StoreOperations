@@ -8,8 +8,6 @@ import { AdminMobileNav } from "./AdminMobileNav";
 import { sectionLabel } from "./AdminNav";
 import type { ConsoleProps } from "./ConsoleSidebar";
 
-// Across the top of every console page: the section you're in, a warning while Stripe takes no real
-// money, the light or dark switch, and the way to the store
 export function ConsoleTopbar(props: ConsoleProps) {
   const pathname = usePathname();
 

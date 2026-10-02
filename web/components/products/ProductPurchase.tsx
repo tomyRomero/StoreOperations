@@ -11,9 +11,8 @@ import { cn } from "@/lib/utils";
 const addButton =
   "inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/85 disabled:opacity-70 sm:h-[58px]";
 
-// How many, and "Add to bag" with what they'd cost, which opens the bag drawer with the item highlighted
-// (adding more of something already in the bag raises its quantity). On phones the button also follows
-// along at the bottom of the screen once the main one scrolls away.
+// Adding opens the bag drawer with the item highlighted. On phones the button also follows along at
+// the bottom of the screen once the main one scrolls away.
 export function ProductPurchase({ product }: { product: Product }) {
   const cart = useCart();
   const [quantity, setQuantity] = useState(1);

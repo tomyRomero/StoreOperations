@@ -10,9 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: "Contact us", description: `Questions about a ${one} or an order? Send us a message.` };
 }
 
-// The form beside the quicker answers to the usual questions. Messages go to the support email in
-// Store settings, so the admin can change it without a release; the phone number and address show when
-// Theme and brand has them.
+// Messages go to the support email in Store settings, so the admin can change it without a release
 export default async function ContactPage() {
   const settings = await getStoreSettings();
   const { one } = nounsOf(settings);

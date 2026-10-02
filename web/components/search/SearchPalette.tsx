@@ -45,9 +45,8 @@ function categoryJumps(categories: Category[]): Option[] {
   return categories.map((category) => ({ kind: "jump", href: `/products?category=${category.id}`, label: category.name, meta: "Category", icon: "category" }));
 }
 
-// Search for the whole store in one place: products with their pictures as you type, the matching
-// categories and help pages, and every result for the words. Opens with ⌘K or Ctrl+K anywhere, with /,
-// or from the header. Arrow keys move, Enter opens, Escape closes.
+// Products, categories and help pages as you type. Opens with ⌘K or Ctrl+K anywhere, with /, or from
+// the header. Arrow keys move, Enter opens, Escape closes.
 export function SearchPalette({ categories, lowStockThreshold }: Props) {
   const { many } = useStoreBrand();
   const router = useRouter();

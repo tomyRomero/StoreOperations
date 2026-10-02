@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 type Crumb = { label: string; href?: string };
 
-// Home / Paint / Oil Paint Set, in small mono type. The last crumb is the current page and isn't a link.
+// The last crumb is the current page and isn't a link
 export function Breadcrumbs({ items, className }: { items: Crumb[]; className?: string }) {
   return (
     <nav aria-label="Breadcrumb" className={cn("font-mono text-[13px] text-faint", className)}>

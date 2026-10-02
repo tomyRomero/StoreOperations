@@ -23,8 +23,7 @@ const statuses: OrderStatus[] = ["pending", "shipped", "delivered", "cancelled",
 const count = (n: number) => n.toLocaleString("en-US");
 const cardClasses = "rounded-xl border bg-card p-5 sm:p-6";
 
-// The console's home: a greeting, then how the store is doing: sales over the chosen period against the one before, what needs doing now,
-// and where orders and sales come from. Days are the store's days, in its time zone.
+// Days are the store's days, in its time zone
 export default async function DashboardPage(props: { searchParams: Promise<{ days?: string | string[] }> }) {
   const days = parseRange((await props.searchParams).days);
   const [dashboard, settings, user] = await Promise.all([getDashboard(days), getStoreSettings(), getCurrentUser()]);

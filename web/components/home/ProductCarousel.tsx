@@ -20,8 +20,7 @@ function edges(list: HTMLElement) {
 const arrow =
   "grid size-12 place-items-center rounded-full border border-foreground/14 transition-colors enabled:hover:bg-foreground/6 disabled:text-faint disabled:opacity-60";
 
-// A titled row of products that scrolls sideways: swiped on phones, stepped a screen at a time with the
-// arrows on larger screens
+// Swiped on phones; on larger screens the arrows step a screen at a time
 export function ProductCarousel({ id, title, href, children }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
   const [{ atStart, atEnd }, setEdges] = useState({ atStart: true, atEnd: false });

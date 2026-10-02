@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 
 type Item = { href: string; label: string; icon: LucideIcon };
 
-// The console's sections, in groups as the StoreOps design draws them
 const groups: { label: string | null; items: Item[] }[] = [
   {
     label: null,

@@ -8,8 +8,7 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { storeNameOf } from "@/lib/storefront";
 
-// Checkout's own frame, with nothing to wander off to: the store's name (back to the store), where the
-// shopper is in checkout, and that it's secure. The bag is still there for the order summary.
+// Checkout has no store navigation to wander off to, only the way back to the store
 export default async function CheckoutLayout({ children }: { children: React.ReactNode }) {
   const settings = await getStoreSettings();
   const storeName = storeNameOf(settings);

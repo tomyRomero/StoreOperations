@@ -29,9 +29,8 @@ export function PasswordInput({ className, ...props }: Omit<React.ComponentProps
 
 const strengthColors = ["", "bg-destructive", "bg-glow-amber", "bg-glow-green", "bg-success"];
 
-// How strong the new password is, then the rules ticked off as it's typed. The bar fills with the strength;
-// the words beside it say the same, with a tip while it's weak. Personal details (the name and email) make
-// a password weaker when they're in it.
+// The strength meter, then the rules ticked off as the password is typed. Personal details (name and
+// email) count against a password that contains them.
 export function PasswordChecklist({ value, id, personal = [] }: { value: string; id?: string; personal?: string[] }) {
   const checks = passwordChecks(value);
   const strength = passwordStrength(value, personal);

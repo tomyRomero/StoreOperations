@@ -39,7 +39,6 @@ export function SelectBox({ label, checked, indeterminate = false, onChange }: C
   );
 }
 
-// Shown while rows are ticked: how many, what can be done to them, and a way to untick them all
 export function BulkBar({ count, noun, onClear, children }: { count: number; noun: [string, string]; onClear: () => void; children: React.ReactNode }) {
   const summary = `${count} ${count === 1 ? noun[0] : noun[1]} selected`;
 

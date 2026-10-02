@@ -19,8 +19,7 @@ type Props = {
   lowStockThreshold: number;
 };
 
-// The same bag as the drawer, with room: the lines as cards beside a summary that stays in view, and the
-// products that would ship it free underneath. For links to /cart and returning after sign-in.
+// The bag as a page, for links to /cart and for coming back after sign-in
 export function CartPageContents({ shipping, categories, lowStockThreshold }: Props) {
   const { cart, itemCount } = useCart();
 

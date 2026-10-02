@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 
-// The StoreOps mark, for the console: three lines on a cobalt-to-violet tile. Decorative; the name is
-// always beside it.
+// The StoreOps mark for the console. Decorative: the name is always beside it.
 export function StoreOpsMark({ className }: { className?: string }) {
   return (
     <span aria-hidden className={cn("grid size-6 shrink-0 place-items-center rounded-[7px] bg-linear-135 from-[#2f5bff] to-[#7b4dff]", className)}>

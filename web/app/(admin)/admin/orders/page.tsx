@@ -24,8 +24,6 @@ const statuses: OrderStatus[] = ["pending", "shipped", "delivered", "cancelled",
 const sorts: AdminOrderSort[] = ["placed", "placed_desc", "total", "total_desc"];
 const path = "/admin/orders";
 
-// Every order, newest first: found by number, customer name or email, narrowed by status or to one
-// customer (from their page), sorted by date or total, and changed in bulk from the ticked rows
 export default async function OrdersPage(props: { searchParams: Promise<SearchParams> }) {
   const params = await props.searchParams;
   const search = firstValue(params.q)?.trim() ?? "";

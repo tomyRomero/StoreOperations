@@ -11,8 +11,6 @@ export type ConsoleProps = {
   toShip: number;
 };
 
-// What the sidebar holds, on large screens and in the phone drawer: StoreOps, the store it runs, the
-// sections and who is signed in
 export function ConsoleSidebar({ storeName, payments, toShip, onNavigate }: ConsoleProps & { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col gap-3.5">

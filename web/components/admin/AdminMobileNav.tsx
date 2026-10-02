@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ConsoleSidebar, type ConsoleProps } from "./ConsoleSidebar";
 
-// The console's sidebar on phones and tablets, in a drawer from the left
 export function AdminMobileNav(props: ConsoleProps) {
   const [open, setOpen] = useState(false);
 

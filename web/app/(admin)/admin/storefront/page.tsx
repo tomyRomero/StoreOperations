@@ -7,7 +7,6 @@ import { getAdminStorefront } from "@/lib/data/admin-store";
 
 export const metadata: Metadata = { title: "Theme and brand" };
 
-// How the storefront looks and what it says, beside a live preview of the store with the changes
 export default async function StorefrontPage() {
   const storefront = await getAdminStorefront();
 

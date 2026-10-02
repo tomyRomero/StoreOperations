@@ -17,8 +17,7 @@ type Props = {
   onError: (message: string) => void;
 };
 
-// Uploads the chosen image straight away; the form then saves the key the API returns. The API names
-// the file and checks that it really is a JPEG, PNG or WebP image of at most 5 MB.
+// Uploads as soon as a file is chosen; the form then saves the key the API returns
 export function ImageUpload({ imageUrl, label, onUploaded, onError }: Props) {
   const [preview, setPreview] = useState(imageUrl);
   const [uploading, setUploading] = useState(false);

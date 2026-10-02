@@ -10,7 +10,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: { default: "Your account", template: `%s · Your account · ${storeNameOf(settings)}` } };
 }
 
-// The account area: its menu beside (or above, on phones) each page, under a soft pink glow
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser("/account");
   const [orders, addresses] = await Promise.all([getOrders(1, 1), getAddresses()]);
