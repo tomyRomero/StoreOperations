@@ -1,6 +1,6 @@
 # StoreOps
 
-StoreOps is an online store platform: a storefront for customers and a console for the people who run the store. Each store runs its own copy, with its own name, settings, catalog and payments. **Palettehub**, a small art-supply shop, is the demo store you see in the screenshots.
+StoreOps is an online store platform: a storefront for customers and a console for the people who run the store. Each store runs its own copy, with its own name, look, words, settings, catalog and payments, all set from the console. **Palettehub**, a small art-supply shop, is the demo store you see in the screenshots; nothing about it is written into the code.
 
 It is built as a production-style system rather than a template: a Next.js storefront and console, a .NET API with SQL Server, real Stripe payments (in test mode), transactional email, and tests that run in CI.
 
@@ -16,16 +16,18 @@ It is built as a production-style system rather than a template: a Next.js store
 - Product pages with sale prices, stock levels and the shipping and returns rules of the store.
 - A bag that remembers itself before you sign in and tells you how far you are from free shipping.
 - Checkout in two steps: choose or add an address, then pay with Stripe. Sales tax is worked out for the address by Stripe Tax before you pay.
-- An account with every order and where it is (placed, shipped with tracking, delivered), saved addresses, and password changes. A forgotten password can be reset by email.
+- An account with every order and where it is (placed, shipped with tracking, delivered), Buy again on past orders, saved addresses, and password changes. A forgotten password can be reset by email.
+- Sign-up says how strong a new password really is ("Password1!" meets the rules and is still weak), and offers the newsletter.
 - Light and dark mode, following the device until the shopper picks one.
 
 **For the store (the StoreOps console)**
 
+- Theme and brand: pick a theme (Night Studio or Atelier), upload a logo, choose an accent color, write the home page's headline and turn its rows on, off and around, name what the store sells ("supplies"), and fill in the About story, phone, address and social links. A live preview beside the form shows the real store with the changes, on desktop or phone, light or dark, before anything is published.
 - Home: sales over 7, 30 or 90 days against the period before, orders to ship, products running low, best sellers.
 - Orders: search and filter, update status with a carrier and tracking number (the customer is emailed), cancel or refund in full through Stripe.
 - Products and categories: prices, stock, deals, photos, archiving.
 - Customers: their orders and addresses, disabling an account, granting the admin role.
-- Newsletter, an activity feed of everything that changed, and store settings: name, support email, flat shipping, free-shipping threshold, returns policy and time zone. The storefront reads all of it, so a change in the console shows up on the site without a release.
+- Newsletter, an activity feed of everything that changed, and store settings: support email, flat shipping, free-shipping threshold, returns policy and time zone. The storefront reads all of it, so a change in the console shows up on the site without a release.
 
 ## Screenshots
 
@@ -52,6 +54,16 @@ It is built as a production-style system rather than a template: a Next.js store
 | Home | Product | Bag |
 | --- | --- | --- |
 | ![Home on a phone](docs/screenshots/phone-home-dark.jpg) | ![A product on a phone](docs/screenshots/phone-product-dark.jpg) | ![The bag on a phone](docs/screenshots/phone-bag-light.jpg) |
+
+### Making it your store
+
+Theme and brand in the console: the theme switched to Atelier and the accent to ultramarine, not yet published, with the real store previewed beside the form.
+
+![The Theme and brand page with a live preview of the store](docs/screenshots/console-theme-light.jpg)
+
+| Atelier, light | Atelier, dark |
+| --- | --- |
+| ![The demo store in the Atelier theme, light](docs/screenshots/atelier-home-light.jpg) | ![The demo store in the Atelier theme, dark](docs/screenshots/atelier-home-dark.jpg) |
 
 ### The StoreOps console
 
@@ -92,7 +104,9 @@ flowchart LR
 - **Emails are never lost or sent by mistake.** An email is written to an outbox table in the same database transaction as the change that caused it, then sent and retried by a background worker.
 - **Security by default.** Every endpoint needs a signed-in user unless marked otherwise, and admin endpoints need the admin role. Sign-in, sign-up and the public forms are rate limited. Repeated wrong passwords lock the account for a while. Sign-in answers a wrong password and an unknown email the same way and in the same time, and password reset answers the same whether or not the email has an account. Password reset links are single-use, expire in an hour and sign out every session. The API refuses to start with live Stripe keys.
 - **Money in whole cents, history kept.** Prices and totals are integers in cents. Orders keep their status history, and an activity log records who changed what in the console.
-- **A design system in tokens.** Colors, field sizes and button shapes are CSS variables with light and dark values. The storefront (the violet "Night Studio" look) and the console (StoreOps cobalt, compact controls) share the same components and differ only by tokens.
+- **A design system in tokens.** Colors, fonts, field sizes and button shapes are CSS variables with light and dark values. The storefront's themes (the violet "Night Studio" and the paper-and-serif "Atelier") and the console (StoreOps cobalt, compact controls) share the same components and differ only by tokens.
+- **Any brand color stays readable.** A store picks one accent color. StoreOps keeps its hue and adjusts only its lightness (in OKLCH) until text in it passes WCAG contrast on that theme's pages, in light and dark mode, and builds the glows and tints around it. The console shows the shades it will use and their contrast ratios.
+- **The preview is the real store.** The console's preview frame loads the actual storefront with the unsaved values in its address; the server applies them only for an admin, after validating them. There is no second copy of the pages to drift out of date.
 - **Accessible on purpose.** The target is WCAG 2.2 AA. During the redesign each page was checked with axe in light and dark mode on desktop and phone, contrast was measured rather than eyeballed, and search, menus and forms work by keyboard and screen reader.
 
 ### Data model
