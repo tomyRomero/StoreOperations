@@ -26,7 +26,7 @@ function emailProblem(value: string): string | null {
 // The API answers the same way whether or not the address was already on the list, so this form
 // can't be used to find out who subscribes. The address gets an email saying it's subscribed,
 // with a link to leave.
-const SubscribeForm = ({ variant = "footer" }: Props) => {
+export function SubscribeForm({ variant = "footer" }: Props) {
   const { many } = useStoreBrand();
   const id = useId();
   const field = useRef<HTMLInputElement>(null);
@@ -125,6 +125,4 @@ const SubscribeForm = ({ variant = "footer" }: Props) => {
       {body}
     </section>
   );
-};
-
-export default SubscribeForm;
+}

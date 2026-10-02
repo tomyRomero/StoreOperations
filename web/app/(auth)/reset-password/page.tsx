@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import ResetPasswordForm from "@/components/forms/ResetPasswordForm";
+import { ResetPasswordForm } from "@/components/forms/ResetPasswordForm";
 
 // The address holds a one-time token, so it is never sent on to another site as the referrer
 export const metadata: Metadata = { title: "Choose a new password", robots: { index: false }, referrer: "no-referrer" };

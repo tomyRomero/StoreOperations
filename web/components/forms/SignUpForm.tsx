@@ -30,7 +30,7 @@ const FormSchema = z.object({
   subscribeToNewsletter: z.boolean(),
 });
 
-const SignUpForm = ({ storeName }: { storeName: string }) => {
+export function SignUpForm({ storeName }: { storeName: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -143,6 +143,4 @@ const SignUpForm = ({ storeName }: { storeName: string }) => {
       </p>
     </div>
   );
-};
-
-export default SignUpForm;
+}

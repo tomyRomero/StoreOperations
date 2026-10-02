@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, LoaderCircle, Plus, Truck } from "lucide-react";
 import { Button } from "../ui/button";
-import AddressForm from "../forms/AddressForm";
+import { AddressForm } from "../forms/AddressForm";
 import { useCart } from "../cart/CartProvider";
 import { CheckoutBagSummary } from "./CheckoutBagSummary";
 import type { Address } from "@/lib/api/types";
@@ -22,9 +22,8 @@ type Props = {
 
 const legend = "mb-3.5 font-sans text-lg font-semibold";
 
-// Checkout's first step: where the order ships. Tax depends on it, so it comes before payment. Saved
-// addresses are radio cards; a new one is added right here. Beside it, the order as the bag has it.
-const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
+// Checkout's first step. Tax depends on the address, so it comes before payment.
+export function ChooseAddress({ addresses, selectedId, shipping }: Props) {
   const router = useRouter();
   const { cart } = useCart();
   const initial = addresses.find((a) => a.id === selectedId) ?? addresses.find((a) => a.isDefault) ?? addresses[0];
@@ -149,6 +148,4 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
       <CheckoutBagSummary shipping={shipping} />
     </div>
   );
-};
-
-export default ChooseAddress;
+}

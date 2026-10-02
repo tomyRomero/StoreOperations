@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import SignUpForm from "@/components/forms/SignUpForm";
+import { SignUpForm } from "@/components/forms/SignUpForm";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { storeNameOf } from "@/lib/storefront";
 

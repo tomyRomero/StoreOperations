@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
-import AddressForm from "@/components/forms/AddressForm";
+import { AddressForm } from "@/components/forms/AddressForm";
 import {
   AlertDialog,
   AlertDialogAction,

@@ -10,7 +10,7 @@ import { FormAlert } from "./FormAlert";
 
 // Leaves the newsletter only when the visitor presses the button: link scanners open the email's
 // links (and some run their scripts), and must never unsubscribe anyone by doing so.
-const UnsubscribeButton = ({ token }: { token: string }) => {
+export function UnsubscribeButton({ token }: { token: string }) {
   const [state, setState] = useState<"ready" | "sending" | "done">("ready");
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -49,6 +49,4 @@ const UnsubscribeButton = ({ token }: { token: string }) => {
       </Button>
     </div>
   );
-};
-
-export default UnsubscribeButton;
+}

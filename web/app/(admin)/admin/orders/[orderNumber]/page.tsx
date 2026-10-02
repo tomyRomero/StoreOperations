@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { OrderUpdateForm } from "@/components/admin/orders/OrderUpdateForm";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import { Button } from "@/components/ui/button";
 import { getAdminOrder } from "@/lib/data/admin-orders";
 import { getAdminSettings } from "@/lib/data/admin-store";

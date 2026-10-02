@@ -19,7 +19,7 @@ const FormSchema = z.object({
 
 // Asks for a reset link. The API answers the same whether or not the email has an account, so this
 // says "if an account uses it" rather than confirming anything.
-const ForgotPasswordForm = () => {
+export function ForgotPasswordForm() {
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [refusal, setRefusal] = useState<string | null>(null);
 
@@ -89,6 +89,4 @@ const ForgotPasswordForm = () => {
       </Link>
     </div>
   );
-};
-
-export default ForgotPasswordForm;
+}

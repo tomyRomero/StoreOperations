@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import OrderResult from "@/components/checkout/OrderResult";
+import { OrderResult } from "@/components/checkout/OrderResult";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { requireUser } from "@/lib/session";
 

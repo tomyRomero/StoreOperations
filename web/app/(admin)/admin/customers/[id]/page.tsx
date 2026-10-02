@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Mail } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AccountAccessButton } from "@/components/admin/customers/AccountAccessButton";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAdminCustomer } from "@/lib/data/admin-customers";

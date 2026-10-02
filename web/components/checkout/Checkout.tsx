@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorState } from "../shared/ErrorState";
 import { useCurrentUser } from "../CurrentUserProvider";
-import CheckoutForm from "./CheckoutForm";
+import { CheckoutForm } from "./CheckoutForm";
 import { OrderLines, OrderTotals } from "./OrderLines";
 import { api } from "@/lib/api/browser";
 import { problemMessage, type ApiProblem } from "@/lib/api/problems";
@@ -58,7 +58,7 @@ function appearanceFor(theme: "light" | "dark"): StripeElementsOptions["appearan
 
 // Asks the API for a quote (it prices the cart, ships to the address and has Stripe Tax add the tax),
 // then shows Stripe's Payment Element for it. Nothing about the amount comes from this page.
-const Checkout = ({ address }: { address: Address }) => {
+export function Checkout({ address }: { address: Address }) {
   const user = useCurrentUser();
   const { theme } = useTheme();
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -187,7 +187,7 @@ const Checkout = ({ address }: { address: Address }) => {
       </aside>
     </div>
   );
-};
+}
 
 function CheckoutSkeleton() {
   return (
@@ -201,5 +201,3 @@ function CheckoutSkeleton() {
     </div>
   );
 }
-
-export default Checkout;

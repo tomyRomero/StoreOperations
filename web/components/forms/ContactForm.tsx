@@ -24,7 +24,7 @@ const FormSchema = z.object({
 
 type Values = z.infer<typeof FormSchema>;
 
-const ContactForm = () => {
+export function ContactForm() {
   const user = useCurrentUser();
   const [refusal, setRefusal] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -141,6 +141,4 @@ const ContactForm = () => {
       </Form>
     </div>
   );
-};
-
-export default ContactForm;
+}

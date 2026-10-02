@@ -19,7 +19,7 @@ type Outcome = PaymentResult | "not_found" | "unknown";
 const attempts = 20;
 const delayMs = 1500;
 
-const OrderResult = ({ paymentIntentId, supportEmail }: { paymentIntentId: string; supportEmail: string | null }) => {
+export function OrderResult({ paymentIntentId, supportEmail }: { paymentIntentId: string; supportEmail: string | null }) {
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
@@ -104,7 +104,7 @@ const OrderResult = ({ paymentIntentId, supportEmail }: { paymentIntentId: strin
       <Actions primary={{ href: "/account/orders", label: "View your orders" }} />
     </Message>
   );
-};
+}
 
 const pill = "inline-flex h-14 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-colors";
 
@@ -241,5 +241,3 @@ function Actions({ primary }: { primary: { href: string; label: string } }) {
     </div>
   );
 }
-
-export default OrderResult;

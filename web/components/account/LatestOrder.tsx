@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProductThumb } from "@/components/products/ProductThumb";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import type { Order } from "@/lib/api/types";
 import { carrierName, formatDate, formatDay } from "@/lib/format";
 import { formatMoney } from "@/lib/money";

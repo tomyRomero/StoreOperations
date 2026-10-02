@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Mail, MapPin, Package, Phone, RotateCcw } from "lucide-react";
-import ContactForm from "@/components/forms/ContactForm";
+import { ContactForm } from "@/components/forms/ContactForm";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { nounsOf } from "@/lib/storefront";
 

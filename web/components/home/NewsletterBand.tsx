@@ -1,4 +1,4 @@
-import SubscribeForm from "@/components/forms/SubscribeForm";
+import { SubscribeForm } from "@/components/forms/SubscribeForm";
 
 // The home page's newsletter band. The footer leaves its own form out on this page.
 export function NewsletterBand({ many }: { many: string }) {

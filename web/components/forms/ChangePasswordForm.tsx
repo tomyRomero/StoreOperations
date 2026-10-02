@@ -25,7 +25,7 @@ const FormSchema = z
   });
 
 // Changing it signs out every other session; this one stays signed in
-const ChangePasswordForm = () => {
+export function ChangePasswordForm() {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -111,6 +111,4 @@ const ChangePasswordForm = () => {
       </form>
     </Form>
   );
-};
-
-export default ChangePasswordForm;
+}

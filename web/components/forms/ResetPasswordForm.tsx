@@ -26,7 +26,7 @@ const FormSchema = z
   });
 
 // Sets a new password from the emailed link, which carries the account and a one-time token
-const ResetPasswordForm = () => {
+export function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const userId = Number.parseInt(searchParams.get("user") ?? "", 10);
   const token = searchParams.get("token") ?? "";
@@ -142,6 +142,4 @@ const ResetPasswordForm = () => {
       </Form>
     </div>
   );
-};
-
-export default ResetPasswordForm;
+}

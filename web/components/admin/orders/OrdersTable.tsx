@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { BulkBar, SelectBox, useSelection } from "@/components/admin/list/selection";
 import { SortableHead } from "@/components/admin/list/SortableHead";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import {
   AlertDialog,
   AlertDialogAction,

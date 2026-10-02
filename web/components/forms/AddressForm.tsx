@@ -42,7 +42,7 @@ type Props = {
 
 // Adds an address to the customer's address book (the first one becomes the default on its own), or
 // changes a saved one. Which address is the default is chosen in the address book, so editing leaves it.
-const AddressForm = ({ address, onSaved, onCancel, submitLabel = "Save address", autoFocus = false }: Props) => {
+export function AddressForm({ address, onSaved, onCancel, submitLabel = "Save address", autoFocus = false }: Props) {
   const [saving, setSaving] = useState(false);
 
   const form = useForm<Values>({
@@ -200,6 +200,4 @@ const AddressForm = ({ address, onSaved, onCancel, submitLabel = "Save address",
       </form>
     </Form>
   );
-};
-
-export default AddressForm;
+}

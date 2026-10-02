@@ -21,7 +21,7 @@ const FormSchema = z.object({
   password: z.string().min(1, "Enter your password"),
 });
 
-const SignInForm = ({ storeName }: { storeName: string }) => {
+export function SignInForm({ storeName }: { storeName: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -109,6 +109,4 @@ const SignInForm = ({ storeName }: { storeName: string }) => {
       </div>
     </div>
   );
-};
-
-export default SignInForm;
+}

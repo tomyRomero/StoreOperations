@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import Checkout from "@/components/checkout/Checkout";
+import { Checkout } from "@/components/checkout/Checkout";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { getAddresses } from "@/lib/data/account";

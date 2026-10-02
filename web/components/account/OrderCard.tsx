@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Package } from "lucide-react";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import type { OrderSummary } from "@/lib/api/types";
 import { formatDate } from "@/lib/format";
 import { formatMoney } from "@/lib/money";

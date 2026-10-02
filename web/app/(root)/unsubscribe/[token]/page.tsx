@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { MailX } from "lucide-react";
-import UnsubscribeButton from "@/components/forms/UnsubscribeButton";
+import { UnsubscribeButton } from "@/components/forms/UnsubscribeButton";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { storeNameOf } from "@/lib/storefront";
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ChooseAddress from "@/components/checkout/ChooseAddress";
+import { ChooseAddress } from "@/components/checkout/ChooseAddress";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { getAddresses } from "@/lib/data/account";

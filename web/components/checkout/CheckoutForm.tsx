@@ -7,7 +7,7 @@ import { formatMoney } from "@/lib/money";
 
 // Stripe's Payment Element for the quote's PaymentIntent. Card details go straight to Stripe and never
 // touch this site or the API. After paying, Stripe sends the customer to the confirmation page.
-const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
+export function CheckoutForm({ totalCents }: { totalCents: number }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -60,6 +60,4 @@ const CheckoutForm = ({ totalCents }: { totalCents: number }) => {
       <p className="text-center text-[13px] text-muted-foreground">Card details go straight to Stripe and never touch our servers.</p>
     </form>
   );
-};
-
-export default CheckoutForm;
+}

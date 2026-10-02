@@ -8,7 +8,7 @@ import { OrderLines, OrderTotals } from "@/components/checkout/OrderLines";
 import { CopyButton } from "@/components/shared/CopyButton";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
-import OrderStatusBadge from "@/components/shared/OrderStatusBadge";
+import { OrderStatusBadge } from "@/components/shared/OrderStatusBadge";
 import type { Order } from "@/lib/api/types";
 import { getOrder } from "@/lib/data/account";
 import { getStoreSettings } from "@/lib/data/catalog";
