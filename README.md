@@ -94,7 +94,7 @@ flowchart LR
 | --- | --- |
 | Web | Next.js 16 (App Router, React 19, Server Components), TypeScript, Tailwind CSS 4, Radix UI, react-hook-form with Zod, openapi-fetch with types generated from the API's OpenAPI contract |
 | API | ASP.NET Core 10 controllers, EF Core 10 with SQL Server, ASP.NET Core Identity (cookie sessions), Stripe.net, MailKit with Razor email templates, S3 SDK for images |
-| Tests | xUnit with Testcontainers (a real SQL Server and an S3 mock per run), Vitest |
+| Tests | xUnit with Testcontainers (a real SQL Server and an S3 mock per run), Vitest, Playwright for end-to-end tests |
 | Local stack | Docker Compose: SQL Server 2025, S3Mock, Mailpit |
 | CI | GitHub Actions: web lint, typecheck, unit tests and build; API formatting check, build and tests |
 
@@ -178,6 +178,14 @@ The seed creates two accounts, `customer@example.test` and `admin@example.test`,
 ```bash
 cd api && dotnet format --verify-no-changes && dotnet test    # formatting, then integration tests against a real SQL Server in a container
 cd web && npm run lint && npm run typecheck && npm test        # ESLint, TypeScript and Vitest
+```
+
+The end-to-end tests drive the whole store in Chromium: a guest's checkout and getting back to the order, a new customer's checkout, keeping a guest order in a new account, an admin shipping an order (the guest gets the tracking by email), a password reset from the emailed link, adding a product with a photo, and a newsletter reaching a new subscriber. They pay with Stripe's test card and read the emails in Mailpit, so start the store first as in [Running it locally](#running-it-locally), with the webhook relay, then:
+
+```bash
+cd web
+npx playwright install chromium   # once
+npm run e2e
 ```
 
 The API tests run each feature through HTTP against a real database: checkout and webhooks (with a fake Stripe), refunds, the email outbox, rate limits and lockouts, admin permissions, and a check that the web app's copy of the API contract is up to date. CI runs both suites on every push.
