@@ -4,7 +4,7 @@ import type { HomeSection, StoreSettings } from "./api/types";
 // wording built from its name, so a new store reads well before it's set up.
 
 // Only when the API can't be reached
-export const fallbackStoreName = "Our store";
+const fallbackStoreName = "Our store";
 
 export function storeNameOf(settings: StoreSettings | null): string {
   return settings?.storeName ?? fallbackStoreName;

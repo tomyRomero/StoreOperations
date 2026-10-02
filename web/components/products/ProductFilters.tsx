@@ -24,7 +24,7 @@ type Props = {
 };
 
 // The filters as the form's boxes now stand
-export function readFilters(form: HTMLFormElement): Filters {
+function readFilters(form: HTMLFormElement): Filters {
   const data = new FormData(form);
   const params: SearchParams = {};
   for (const key of new Set(data.keys())) params[key] = data.getAll(key).map(String);

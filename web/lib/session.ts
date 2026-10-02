@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { signInPath } from "./sign-in-path";
 import { sessionCookie } from "./api/config";
 import { serverApi } from "./api/server";
@@ -19,12 +19,5 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 export async function requireUser(returnTo: string): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect(signInPath(returnTo));
-  return user;
-}
-
-// The admin pages don't exist for anyone else. The API refuses their requests either way.
-export async function requireAdmin(): Promise<CurrentUser> {
-  const user = await getCurrentUser();
-  if (!user?.isAdmin) notFound();
   return user;
 }

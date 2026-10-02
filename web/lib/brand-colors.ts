@@ -84,7 +84,7 @@ function toHex(color: Oklch): string {
     .join("")}`;
 }
 
-export function toOklch(hex: string): Oklch {
+function toOklch(hex: string): Oklch {
   return linearToOklch(hexToLinear(hex));
 }
 

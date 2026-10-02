@@ -12,17 +12,14 @@ export type ProductSort = Schemas["ProductSort"];
 
 export type Cart = Schemas["CartResponse"];
 export type CartLine = Schemas["CartLineResponse"];
-export type CartLineIssue = Schemas["CartLineIssue"];
 
 export type StoreSettings = Schemas["PublicStoreSettingsResponse"];
-export type Storefront = Schemas["StorefrontResponse"];
 export type HomeSection = Schemas["HomeSection"];
 export type StoreThemeName = Schemas["StorefrontTheme"];
 export type AdminStorefront = Schemas["StorefrontSettingsResponse"];
 
 export type PostalAddress = Schemas["PostalAddress"];
 export type Address = Schemas["AddressResponse"];
-export type NewAddress = Schemas["NewAddressRequest"];
 
 export type OrderSummary = Schemas["OrderSummaryResponse"];
 export type Order = Schemas["OrderResponse"];
@@ -30,7 +27,6 @@ export type OrderLine = Schemas["OrderLineResponse"];
 export type Carrier = NonNullable<Schemas["Carrier"]>;
 
 export type Checkout = Schemas["CheckoutResponse"];
-export type CheckoutLine = Schemas["CheckoutLineResponse"];
 export type PaymentResult = Schemas["PaymentResult"];
 
 export type AdminOrderSummary = Schemas["AdminOrderSummaryResponse"];
@@ -42,8 +38,6 @@ export type AdminCategory = Schemas["AdminCategoryResponse"];
 export type ProductStatus = Schemas["ProductStatus"];
 export type AdminProductSort = Schemas["AdminProductSort"];
 export type StockLevel = NonNullable<Schemas["StockLevel"]>;
-export type ProductBulkAction = Schemas["ProductBulkAction"];
-export type AdminCustomerSummary = Schemas["AdminCustomerSummaryResponse"];
 export type AdminCustomer = Schemas["AdminCustomerResponse"];
 export type AdminCustomerSort = Schemas["AdminCustomerSort"];
 export type AccountRole = NonNullable<Schemas["AccountRole"]>;
