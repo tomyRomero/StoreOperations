@@ -40,7 +40,8 @@ export function SignUpForm({ storeName }: { storeName: string }) {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { username: "", email: "", password: "", subscribeToNewsletter: false },
+    // A guest saving their order arrives with its email filled in
+    defaultValues: { username: "", email: searchParams.get("email") ?? "", password: "", subscribeToNewsletter: false },
   });
   const [typed, username, email] = useWatch({ control: form.control, name: ["password", "username", "email"] });
 

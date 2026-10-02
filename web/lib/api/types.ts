@@ -24,6 +24,7 @@ export type Address = Schemas["AddressResponse"];
 
 export type OrderSummary = Schemas["OrderSummaryResponse"];
 export type Order = Schemas["OrderResponse"];
+export type GuestOrder = Schemas["GuestOrderResponse"];
 export type OrderLine = Schemas["OrderLineResponse"];
 export type Carrier = NonNullable<Schemas["Carrier"]>;
 

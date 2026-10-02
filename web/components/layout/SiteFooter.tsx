@@ -54,7 +54,7 @@ export function SiteFooter({ categories, settings, hasDeals }: Props) {
           <Link href="/contact" className={linkClasses}>
             Contact us
           </Link>
-          <Link href="/account/orders" className={linkClasses}>
+          <Link href="/orders/find" className={linkClasses}>
             Track an order
           </Link>
           {contactPhone && (
