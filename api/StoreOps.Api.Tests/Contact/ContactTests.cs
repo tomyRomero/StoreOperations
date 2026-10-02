@@ -24,7 +24,10 @@ public class ContactTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
 
         var response = await SendAsync(new
         {
-            name = "Ada <Lovelace>", email = customer, subject = "Brush sizes", message = "Which brush suits gouache?",
+            name = "Ada <Lovelace>",
+            email = customer,
+            subject = "Brush sizes",
+            message = "Which brush suits gouache?",
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -57,7 +60,10 @@ public class ContactTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
     {
         var message = new Dictionary<string, string>
         {
-            ["name"] = "Ada", ["email"] = "ada@example.test", ["subject"] = "Brush sizes", ["message"] = "Which brush suits gouache?",
+            ["name"] = "Ada",
+            ["email"] = "ada@example.test",
+            ["subject"] = "Brush sizes",
+            ["message"] = "Which brush suits gouache?",
         };
         message[field] = value;
 

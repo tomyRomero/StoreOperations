@@ -131,17 +131,25 @@ public static class DevSeeder
         db.ActivityLog.AddRange(
             new ActivityLogEntry
             {
-                Action = ActivityAction.UserRegistered, EntityType = ActivityEntity.User, EntityId = customer.Id, OccurredAtUtc = now.AddHours(-1),
+                Action = ActivityAction.UserRegistered,
+                EntityType = ActivityEntity.User,
+                EntityId = customer.Id,
+                OccurredAtUtc = now.AddHours(-1),
                 DetailsJson = JsonSerializer.Serialize(new { username = customer.UserName }),
             },
             new ActivityLogEntry
             {
-                Action = ActivityAction.OrderCreated, EntityType = ActivityEntity.Order, EntityId = newestOrder.Id, OccurredAtUtc = now.AddMinutes(-30),
+                Action = ActivityAction.OrderCreated,
+                EntityType = ActivityEntity.Order,
+                EntityId = newestOrder.Id,
+                OccurredAtUtc = now.AddMinutes(-30),
                 DetailsJson = JsonSerializer.Serialize(new { orderNumber = newestOrder.OrderNumber, totalCents = newestOrder.TotalCents, refunded = false }),
             },
             new ActivityLogEntry
             {
-                Action = ActivityAction.NewsletterSubscribed, EntityType = ActivityEntity.NewsletterSubscriber, EntityId = newestSubscriber.Id,
+                Action = ActivityAction.NewsletterSubscribed,
+                EntityType = ActivityEntity.NewsletterSubscriber,
+                EntityId = newestSubscriber.Id,
                 OccurredAtUtc = now.AddMinutes(-10),
             });
         await db.SaveChangesAsync(cancellationToken);

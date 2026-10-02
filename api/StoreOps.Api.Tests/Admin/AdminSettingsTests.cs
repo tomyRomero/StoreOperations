@@ -176,7 +176,12 @@ public class AdminSettingsTests(ApiFixture api) : IClassFixture<ApiFixture>, IAs
         await customer.PostAsJsonAsync("/api/cart/items", new { productId, quantity = 1 }, Ct);
         var address = await customer.PostAsJsonAsync("/api/account/addresses", new
         {
-            recipientName = "Test shopper", line1 = "1 Easel Way", city = "Portland", state = "OR", postalCode = "97201", countryCode = "US",
+            recipientName = "Test shopper",
+            line1 = "1 Easel Way",
+            city = "Portland",
+            state = "OR",
+            postalCode = "97201",
+            countryCode = "US",
         }, Ct);
         var addressId = (await BodyOf(address)).GetProperty("id").GetInt32();
         var quote = await customer.PostAsJsonAsync("/api/checkout", new { addressId }, Ct);

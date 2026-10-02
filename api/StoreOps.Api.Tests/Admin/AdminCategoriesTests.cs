@@ -104,8 +104,13 @@ public class AdminCategoriesTests(ApiFixture api) : IClassFixture<ApiFixture>
             // Even an archived product keeps its category, so old orders still make sense
             db.Products.Add(new Product
             {
-                CategoryId = inUse, Name = $"Old varnish {Guid.NewGuid():N}", Description = "Retired.",
-                PriceCents = 500, Stock = 0, ImageKey = "seed/products/oilpaint.jpg", ArchivedAtUtc = DateTime.UtcNow,
+                CategoryId = inUse,
+                Name = $"Old varnish {Guid.NewGuid():N}",
+                Description = "Retired.",
+                PriceCents = 500,
+                Stock = 0,
+                ImageKey = "seed/products/oilpaint.jpg",
+                ArchivedAtUtc = DateTime.UtcNow,
             });
             await db.SaveChangesAsync(Ct);
         }

@@ -131,7 +131,9 @@ public class CheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
         var customer = withoutStripe.CreateClient();
         await customer.PostAsJsonAsync("/api/auth/register", new
         {
-            username = $"u-{Guid.NewGuid():N}"[..20], email = $"{Guid.NewGuid():N}@example.test", password = ApiFixture.Password,
+            username = $"u-{Guid.NewGuid():N}"[..20],
+            email = $"{Guid.NewGuid():N}@example.test",
+            password = ApiFixture.Password,
         }, Ct);
 
         var response = await StartAsync(customer, 1);
@@ -163,7 +165,12 @@ public class CheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
     {
         var response = await customer.PostAsJsonAsync("/api/account/addresses", new
         {
-            recipientName = "Test shopper", line1 = "1 Easel Way", city = "Portland", state = "OR", postalCode = "97201", countryCode = "US",
+            recipientName = "Test shopper",
+            line1 = "1 Easel Way",
+            city = "Portland",
+            state = "OR",
+            postalCode = "97201",
+            countryCode = "US",
         }, Ct);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return (await BodyOf(response)).GetProperty("id").GetInt32();

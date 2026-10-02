@@ -28,7 +28,12 @@ public static class Shopping
     {
         var address = await customer.PostAsJsonAsync("/api/account/addresses", new
         {
-            recipientName = "Test shopper", line1 = "1 Easel Way", city = "Portland", state = "OR", postalCode = "97201", countryCode = "US",
+            recipientName = "Test shopper",
+            line1 = "1 Easel Way",
+            city = "Portland",
+            state = "OR",
+            postalCode = "97201",
+            countryCode = "US",
         }, Ct);
         var addressId = (await address.Content.ReadFromJsonAsync<JsonElement>(Ct)).GetProperty("id").GetInt32();
         var checkout = await customer.PostAsJsonAsync("/api/checkout", new { addressId }, Ct);

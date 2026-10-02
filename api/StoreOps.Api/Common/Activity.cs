@@ -16,13 +16,16 @@ public static class Activity
     // still reads correctly after the product or category changes again. EntityId is null for an
     // action on many at once, such as removing subscribers.
     public static ActivityLogEntry Entry(
-        ActivityAction action, ActivityEntity entity, int? entityId, int actorUserId, object details, TimeProvider clock) => new()
+        ActivityAction action, ActivityEntity entity, int? entityId, int actorUserId, object details, TimeProvider clock)
     {
-        Action = action,
-        EntityType = entity,
-        EntityId = entityId,
-        ActorUserId = actorUserId,
-        DetailsJson = JsonSerializer.Serialize(details, DetailsJson),
-        OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
-    };
+        return new ActivityLogEntry
+        {
+            Action = action,
+            EntityType = entity,
+            EntityId = entityId,
+            ActorUserId = actorUserId,
+            DetailsJson = JsonSerializer.Serialize(details, DetailsJson),
+            OccurredAtUtc = clock.GetUtcNow().UtcDateTime,
+        };
+    }
 }
