@@ -106,7 +106,7 @@ Theme and brand in the console: the theme switched to Atelier and the accent to 
 - **Home:** sales for the period you pick against the one before, orders to ship, products running low, and best sellers.
 - **Orders:** search and filter, and update the status with a carrier and tracking number (the customer is emailed). Cancel or refund in full through Stripe.
 - **Products and categories:** prices, stock, deals, photos and archiving.
-- **Customers:** their orders and addresses, disabling an account, and granting the admin role.
+- **Customers:** their orders and addresses, and disabling an account. Who is an admin is set on the server, never from the console, so a stolen admin session can't create more admins.
 - **Newsletter**, and an **activity feed** of everything that changed and who changed it.
 - **Settings:** support email, flat shipping, the free-shipping threshold, the returns policy, the time zone, and whether guests can check out. The storefront reads all of it, so a change shows up on the site without a release.
 - **Made for long sessions:** on wide screens, table headers stay in view while you scroll, and long forms keep their Save button on screen.
@@ -258,6 +258,12 @@ npm run dev                  # http://localhost:3200
 The seed creates two accounts, `customer@example.test` and `admin@example.test`, both with the password `Demo-Pass-123!` (local demo data only). The admin opens the console at `/admin`.
 
 Pay with Stripe's test card `4242 4242 4242 4242`, any future date and any three digits. Every email the store sends shows up in Mailpit.
+
+To give an account admin rights, or take them away, run this from `api/`:
+
+```bash
+dotnet run --project StoreOps.Api -- make-admin someone@example.com     # or remove-admin
+```
 
 ## <a name="testing-and-ci">✅ Testing and CI</a>
 
