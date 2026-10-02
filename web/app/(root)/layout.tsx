@@ -24,7 +24,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
         {children}
       </main>
       <SiteFooter categories={categories} settings={settings} hasDeals={deals} />
-      <CartDrawer shipping={settings} categories={categories} />
+      <CartDrawer shipping={settings} categories={categories} guestCheckout={settings?.guestCheckout ?? false} />
     </CartProvider>
   );
 }

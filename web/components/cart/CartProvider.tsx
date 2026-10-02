@@ -27,6 +27,9 @@ type CartContextValue = {
   lastRemoved: CartLine | null;
   undoRemove: () => Promise<boolean>;
   refresh: () => Promise<void>;
+  // After paying: what was bought leaves the bag. The API already took it out of a customer's; a guest's
+  // is in this browser.
+  forgetBought: (productIds: number[]) => Promise<void>;
   // The cart drawer, opened by the cart button and after adding something (which it highlights)
   isOpen: boolean;
   justAdded: number | null;
@@ -75,6 +78,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const loaded = await load();
     if (loaded) show(loaded);
   }, [load, show]);
+
+  const forgetBought = useCallback(async (productIds: number[]) => {
+    if (!signedIn) writeGuestCart(readGuestCart().filter((l) => !productIds.includes(l.productId)));
+    await refresh();
+  }, [signedIn, refresh]);
 
   // On first load, and again when the visitor signs in or out. An answer that arrives after that
   // changed again is dropped, so it can't overwrite the newer cart.
@@ -193,12 +201,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     lastRemoved,
     undoRemove,
     refresh,
+    forgetBought,
     isOpen,
     justAdded,
     openCart,
     openedFrom,
     closeCart,
-  }), [cart, add, setQuantity, remove, lastRemoved, undoRemove, refresh, isOpen, justAdded, openCart, closeCart]);
+  }), [cart, add, setQuantity, remove, lastRemoved, undoRemove, refresh, forgetBought, isOpen, justAdded, openCart, closeCart]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
@@ -228,8 +237,9 @@ async function priceGuestCart(lines: GuestLine[]): Promise<Cart | undefined> {
   return data;
 }
 
-// localStorage can be missing or full (private windows); the cart then simply starts empty
-function readGuestCart(): GuestLine[] {
+// A guest's cart as stored in this browser. localStorage can be missing or full (private windows); the
+// cart then simply starts empty.
+export function readGuestCart(): GuestLine[] {
   try {
     const stored = JSON.parse(localStorage.getItem(guestCartKey) ?? "[]");
     return Array.isArray(stored)

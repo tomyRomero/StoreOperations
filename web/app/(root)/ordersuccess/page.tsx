@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import { OrderResult } from "@/components/checkout/OrderResult";
 import { getStoreSettings } from "@/lib/data/catalog";
-import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Order confirmation" };
 
-// Where Stripe sends the customer after paying, with the PaymentIntent's id in the address
+// Where Stripe sends the customer or guest after paying, with the PaymentIntent's id in the address. The
+// API only answers for the browser that paid: the customer's session, or the guest's checkout cookie.
 const page = async (props: { searchParams: Promise<{ payment_intent?: string }> }) => {
   const searchParams = await props.searchParams;
   const paymentIntentId = searchParams.payment_intent ?? "";
-  await requireUser(`/ordersuccess?payment_intent=${encodeURIComponent(paymentIntentId)}`);
   const settings = await getStoreSettings();
 
   return (

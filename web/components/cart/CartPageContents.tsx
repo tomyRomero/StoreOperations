@@ -17,10 +17,11 @@ type Props = {
   shipping: ShippingSettings;
   categories: Category[];
   lowStockThreshold: number;
+  guestCheckout: boolean;
 };
 
 // The bag as a page, for links to /cart and for coming back after sign-in
-export function CartPageContents({ shipping, categories, lowStockThreshold }: Props) {
+export function CartPageContents({ shipping, categories, lowStockThreshold, guestCheckout }: Props) {
   const { cart, itemCount } = useCart();
 
   return (
@@ -68,7 +69,7 @@ export function CartPageContents({ shipping, categories, lowStockThreshold }: Pr
               <h2 id="bag-summary-heading" className="mb-4.5 font-sans text-xl font-semibold tracking-[-0.02em]">
                 Summary
               </h2>
-              <CartSummary cart={cart} shipping={shipping} variant="page" />
+              <CartSummary cart={cart} shipping={shipping} guestCheckout={guestCheckout} variant="page" />
             </section>
           </div>
           <ShippingNudges shipping={shipping} variant="page" lowStockThreshold={lowStockThreshold} />

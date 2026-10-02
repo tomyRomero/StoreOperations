@@ -13,7 +13,7 @@ export default async function CartPage() {
     <div className="relative isolate overflow-x-clip">
       <div aria-hidden className="absolute -right-24 -top-36 -z-10 h-[460px] w-[700px] max-w-full bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-blue)_18%,transparent),transparent_70%)] opacity-(--glow-strength)" />
       <div className="container pb-8 pt-8 lg:pt-12">
-        <CartPageContents shipping={settings} categories={categories} lowStockThreshold={settings?.lowStockThreshold ?? 5} />
+        <CartPageContents shipping={settings} categories={categories} lowStockThreshold={settings?.lowStockThreshold ?? 5} guestCheckout={settings?.guestCheckout ?? false} />
       </div>
     </div>
   );

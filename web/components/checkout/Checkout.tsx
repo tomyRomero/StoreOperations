@@ -9,12 +9,14 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorState } from "../shared/ErrorState";
 import { useCurrentUser } from "../CurrentUserProvider";
+import { readGuestCart } from "../cart/CartProvider";
 import { CheckoutForm } from "./CheckoutForm";
 import { OrderLines, OrderTotals } from "./OrderLines";
 import { api } from "@/lib/api/browser";
 import { problemMessage, type ApiProblem } from "@/lib/api/problems";
 import type { Address, Checkout as Quote } from "@/lib/api/types";
 import { addressLines } from "@/lib/format";
+import type { GuestDetails } from "@/lib/guest-checkout";
 import { formatMoney } from "@/lib/money";
 import { useTheme } from "@/lib/use-theme";
 
@@ -56,26 +58,36 @@ function appearanceFor(theme: "light" | "dark"): StripeElementsOptions["appearan
   };
 }
 
-// Asks the API for a quote (it prices the cart, ships to the address and has Stripe Tax add the tax),
+type Props =
+  // A customer, paying to one of their saved addresses
+  | { address: Address; guest?: never }
+  // A guest, with what they entered in the first step. The bag is the one in this browser.
+  | { guest: GuestDetails; address?: never };
+
+// Asks the API for a quote (it prices the bag, ships to the address and has Stripe Tax add the tax),
 // then shows Stripe's Payment Element for it. Nothing about the amount comes from this page.
-export function Checkout({ address }: { address: Address }) {
+export function Checkout({ address, guest }: Props) {
   const user = useCurrentUser();
   const { theme } = useTheme();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
 
-  // React runs effects twice in development. One quote per address is enough, so the second run is skipped.
-  const startedFor = useRef<number | null>(null);
+  // React runs effects twice in development. One quote per address or set of details is enough, so the
+  // second run is skipped.
+  const startedFor = useRef<string | null>(null);
 
   useEffect(() => {
+    const key = address ? `address:${address.id}` : JSON.stringify(guest);
     // Without Stripe in this browser nothing could be paid, so no quote is asked for
-    if (!stripePromise || startedFor.current === address.id) return;
-    startedFor.current = address.id;
+    if (!stripePromise || startedFor.current === key) return;
+    startedFor.current = key;
 
     const start = async (retry: boolean): Promise<void> => {
       setQuote(null);
       setProblem(null);
-      const { data, error } = await api.POST("/api/checkout", { body: { addressId: address.id } });
+      const { data, error } = address
+        ? await api.POST("/api/checkout", { body: { addressId: address.id } })
+        : await api.POST("/api/checkout/guest", { body: { ...guest, items: readGuestCart() } });
       if (data) {
         setQuote(data);
         return;
@@ -86,9 +98,10 @@ export function Checkout({ address }: { address: Address }) {
     };
 
     void start(true);
-  }, [address.id]);
+  }, [address, guest]);
 
-  const changeAddress = `/address?address=${address.id}`;
+  const changeAddress = address ? `/address?address=${address.id}` : "/address";
+  const contact = user?.email ?? guest?.email;
 
   if (problem || !stripePromise) {
     return (
@@ -100,7 +113,7 @@ export function Checkout({ address }: { address: Address }) {
               <Link href="/cart">Back to bag</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href={changeAddress}>Choose another address</Link>
+              <Link href={changeAddress}>{address ? "Choose another address" : "Change your details"}</Link>
             </Button>
           </>
         }
@@ -120,7 +133,7 @@ export function Checkout({ address }: { address: Address }) {
   );
 
   const facts = [
-    ...(user ? [["Contact", user.email, null] as const] : []),
+    ...(contact ? [["Contact", contact, guest ? changeAddress : null] as const] : []),
     ["Ship to", `${quote.shipTo.recipientName} · ${addressLines(quote.shipTo).join(", ")}`, changeAddress] as const,
     ["Delivery", `Standard, tracked · ${quote.shippingCents === 0 ? "Free" : formatMoney(quote.shippingCents)}`, null] as const,
   ];
@@ -150,7 +163,7 @@ export function Checkout({ address }: { address: Address }) {
                 <span className="min-w-0 break-words">{value}</span>
                 {href && (
                   <Link href={href} className="shrink-0 text-[13px] font-medium text-accent underline-offset-3 hover:underline">
-                    Change<span className="sr-only"> the address</span>
+                    Change<span className="sr-only"> the {term === "Contact" ? "email" : "address"}</span>
                   </Link>
                 )}
               </dd>
@@ -189,7 +202,7 @@ export function Checkout({ address }: { address: Address }) {
   );
 }
 
-function CheckoutSkeleton() {
+export function CheckoutSkeleton() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-12" aria-busy="true" aria-label="Preparing your payment">
       <div className="grid gap-6">

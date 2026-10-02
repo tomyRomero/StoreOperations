@@ -15,7 +15,7 @@ import { ShippingNudges } from "./ShippingNudges";
 
 // The bag in a drawer. Radix keeps focus inside and Esc closes it; focus then goes back to the button
 // that opened it (an add button passes itself, see openCart).
-export function CartDrawer({ shipping, categories }: { shipping: ShippingSettings; categories: Category[] }) {
+export function CartDrawer({ shipping, categories, guestCheckout }: { shipping: ShippingSettings; categories: Category[]; guestCheckout: boolean }) {
   const { cart, itemCount, isOpen, justAdded, closeCart, openCart, openedFrom } = useCart();
   const added = justAdded !== null ? cart?.lines.find((line) => line.productId === justAdded) : undefined;
 
@@ -81,7 +81,7 @@ export function CartDrawer({ shipping, categories }: { shipping: ShippingSetting
               <ShippingNudges shipping={shipping} variant="drawer" onNavigate={closeCart} />
             </div>
             <div className="shrink-0 border-t border-foreground/8 bg-surface-sunk px-6 pb-6 pt-5">
-              <CartSummary cart={cart} shipping={shipping} onNavigate={closeCart} />
+              <CartSummary cart={cart} shipping={shipping} guestCheckout={guestCheckout} onNavigate={closeCart} />
             </div>
           </>
         )}

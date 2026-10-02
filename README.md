@@ -15,7 +15,8 @@ It is built as a production-style system rather than a template: a Next.js store
 - Browse by category, filter by price and stock, sort, and search from anywhere with ⌘K.
 - Product pages with sale prices, stock levels and the shipping and returns rules of the store.
 - A bag that remembers itself before you sign in and tells you how far you are from free shipping.
-- Checkout in two steps: choose or add an address, then pay with Stripe. Sales tax is worked out for the address by Stripe Tax before you pay.
+- Checkout in two steps, with or without an account: an address (and an email, for a guest), then pay with Stripe. Sales tax is worked out for the address by Stripe Tax before you pay.
+- A guest gets a private link to their order in every email about it, can have the link sent again from Find your order, and can keep the order by creating an account with the same email.
 - An account with every order and where it is (placed, shipped with tracking, delivered), Buy again on past orders, saved addresses, and password changes. A forgotten password can be reset by email.
 - Sign-up says how strong a new password really is ("Password1!" meets the rules and is still weak), and offers the newsletter.
 - Light and dark mode, following the device until the shopper picks one.
@@ -27,7 +28,7 @@ It is built as a production-style system rather than a template: a Next.js store
 - Orders: search and filter, update status with a carrier and tracking number (the customer is emailed), cancel or refund in full through Stripe.
 - Products and categories: prices, stock, deals, photos, archiving.
 - Customers: their orders and addresses, disabling an account, granting the admin role.
-- Newsletter, an activity feed of everything that changed, and store settings: support email, flat shipping, free-shipping threshold, returns policy and time zone. The storefront reads all of it, so a change in the console shows up on the site without a release.
+- Newsletter, an activity feed of everything that changed, and store settings: support email, flat shipping, free-shipping threshold, returns policy, time zone and whether guests can check out. The storefront reads all of it, so a change in the console shows up on the site without a release.
 
 ## Screenshots
 
@@ -101,6 +102,7 @@ flowchart LR
 
 - **One origin, no tokens in JavaScript.** The browser only talks to the Next.js site, which forwards `/api/*` to the API. The API's session cookie is HttpOnly and SameSite=Lax, so it never touches client code and needs no cross-site setup.
 - **The server owns every amount.** At checkout the API prices the bag, adds shipping and asks Stripe Tax for the tax, then creates one PaymentIntent for that quote. The order is created only when Stripe's webhook confirms the payment. If anything changed in between (a product sold out), the payment is refunded automatically and the customer is told why. Stock can never go negative.
+- **Guest checkout without guest accounts.** A guest's checkout is theirs through a random key in an HttpOnly cookie, so going back to change the address updates the same quote and PaymentIntent. Their order gets a long random link that only its emails carry. Find your order emails that link to the order's own address and answers the same whether or not anything matched, and an order moves into an account only for an account with the order's email, holding the link.
 - **Emails are never lost or sent by mistake.** An email is written to an outbox table in the same database transaction as the change that caused it, then sent and retried by a background worker.
 - **Security by default.** Every endpoint needs a signed-in user unless marked otherwise, and admin endpoints need the admin role. Sign-in, sign-up and the public forms are rate limited. Repeated wrong passwords lock the account for a while. Sign-in answers a wrong password and an unknown email the same way and in the same time, and password reset answers the same whether or not the email has an account. Password reset links are single-use, expire in an hour and sign out every session. The API refuses to start with live Stripe keys.
 - **Money in whole cents, history kept.** Prices and totals are integers in cents. Orders keep their status history, and an activity log records who changed what in the console.
@@ -115,8 +117,8 @@ flowchart LR
 erDiagram
     USER ||--o{ USER_ADDRESS : saves
     USER ||--o{ CART_ITEM : "has in bag"
-    USER ||--o{ CHECKOUT : starts
-    USER ||--o{ ORDER : places
+    USER |o--o{ CHECKOUT : starts
+    USER |o--o{ ORDER : places
     CATEGORY ||--o{ PRODUCT : groups
     PRODUCT ||--o{ CART_ITEM : ""
     CHECKOUT ||--|{ CHECKOUT_LINE : quotes
@@ -125,7 +127,7 @@ erDiagram
     PRODUCT ||--o{ ORDER_LINE : ""
 ```
 
-A checkout is the priced quote behind one Stripe PaymentIntent; the webhook turns it into an order, matched by that PaymentIntent (unique, so a retried webhook can't create a second order). Alongside these: store settings (one row), the activity log, newsletter subscribers, the email outbox, and the keys that encrypt session cookies. The schema is created and changed by EF Core migrations.
+A checkout is the priced quote behind one Stripe PaymentIntent; the webhook turns it into an order, matched by that PaymentIntent (unique, so a retried webhook can't create a second order). Checkouts and orders belong to an account or to a guest, and the database refuses an order that neither an account nor a private link can reach. Alongside these: store settings (one row), the activity log, newsletter subscribers, the email outbox, and the keys that encrypt session cookies. The schema is created and changed by EF Core migrations.
 
 ## Running it locally
 
@@ -151,6 +153,8 @@ You need Docker, the .NET 10 SDK and Node.js 24. For payments, a Stripe account 
    dotnet run --project StoreOps.Api -- seed                 # creates the demo store
    dotnet run --project StoreOps.Api --launch-profile http   # http://localhost:5200
    ```
+
+   The seed rebuilds the database from scratch. To keep your data after pulling a change to the schema, run `dotnet ef database update --project StoreOps.Api` instead.
 
    In another terminal, forward Stripe's webhooks to it:
 

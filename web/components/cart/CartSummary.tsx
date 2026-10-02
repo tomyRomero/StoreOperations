@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 type Props = {
   cart: Cart;
   shipping: ShippingSettings;
+  // Whether the store lets shoppers check out without an account
+  guestCheckout: boolean;
   // The drawer's footer, or the bag page's summary card
   variant?: "drawer" | "page";
   onNavigate?: () => void;
@@ -20,21 +22,23 @@ type Props = {
 const checkoutButton =
   "inline-flex items-center justify-center gap-2.5 rounded-button bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/85";
 
-// The totals and the way to checkout. Tax depends on the address, so checkout adds it. Guests sign in
-// first and come back to the bag, which then holds what they picked as a guest.
-export function CartSummary({ cart, shipping, variant = "drawer", onNavigate }: Props) {
+// The totals and the way to checkout. Tax depends on the address, so checkout adds it. Guests check out
+// with their email and address, or, when the store asks for an account, sign in first and come back to
+// the bag, which then holds what they picked as a guest.
+export function CartSummary({ cart, shipping, guestCheckout, variant = "drawer", onNavigate }: Props) {
   const user = useCurrentUser();
   const page = variant === "page";
   const shippingCents = shippingFor(cart.subtotalCents, shipping);
   const savings = cartSavings(cart);
 
   const button = cn(checkoutButton, page ? "h-[58px] text-base shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)]" : "h-[54px] text-[15px] shadow-[0_16px_40px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)]");
-  const checkout = !user ? (
+  const checkout = !user && !guestCheckout ? (
     <Link href={signInPath("/cart")} onClick={onNavigate} className={button}>
       Sign in to check out
     </Link>
   ) : cart.canCheckout ? (
-    <Link href="/checkout" onClick={onNavigate} className={button}>
+    // A customer with a default address goes straight to payment
+    <Link href={user ? "/checkout" : "/address"} onClick={onNavigate} className={button}>
       <LockKeyhole className="size-4" aria-hidden />
       Check out
     </Link>

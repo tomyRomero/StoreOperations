@@ -3,7 +3,7 @@ import { sessionCookie } from "./lib/api/config";
 import { draftHeader } from "./lib/storefront-draft";
 
 // Pages that need an account
-const signedInOnly = ["/account", "/address", "/checkout", "/ordersuccess", "/admin"];
+const signedInOnly = ["/account", "/admin"];
 
 export function proxy(request: NextRequest) {
   const { pathname, search, searchParams } = request.nextUrl;
@@ -27,5 +27,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/about", "/account/:path*", "/address", "/checkout", "/ordersuccess", "/admin/:path*"],
+  matcher: ["/", "/about", "/account/:path*", "/admin/:path*"],
 };

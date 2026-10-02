@@ -19,11 +19,16 @@ type Outcome = PaymentResult | "not_found" | "unknown";
 const attempts = 20;
 const delayMs = 1500;
 
+// What the API said about the order: its number, and for a guest the private link to it
+type Placed = { orderNumber: string; orderToken: string | null };
+
 export function OrderResult({ paymentIntentId, supportEmail }: { paymentIntentId: string; supportEmail: string | null }) {
+  const user = useCurrentUser();
   const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [orderNumber, setOrderNumber] = useState<string | null>(null);
-  const [order, setOrder] = useState<Order | null>(null);
-  const { refresh: refreshCart } = useCart();
+  const [placed, setPlaced] = useState<Placed | null>(null);
+  // What was bought and where it's going, and a guest's email. Without them the page still confirms.
+  const [order, setOrder] = useState<{ details: Order; email: string | null } | null>(null);
+  const { forgetBought } = useCart();
 
   useEffect(() => {
     let stopped = false;
@@ -42,23 +47,24 @@ export function OrderResult({ paymentIntentId, supportEmail }: { paymentIntentId
       }
 
       setOutcome(data.result);
-      setOrderNumber(data.orderNumber);
-      if (data.result === "paid") {
-        // The order emptied the cart on the API; the badge in the header catches up
-        void refreshCart();
-        // What was bought and where it's going, for the confirmation. Without it the page still confirms.
-        if (data.orderNumber) {
-          const { data: placed } = await api.GET("/api/account/orders/{orderNumber}", { params: { path: { orderNumber: data.orderNumber } } });
-          if (!stopped && placed) setOrder(placed);
-        }
-      }
+      if (data.result !== "paid" || !data.orderNumber) return;
+
+      setPlaced({ orderNumber: data.orderNumber, orderToken: data.orderToken });
+      const loaded = data.orderToken
+        ? (await api.GET("/api/orders/{accessToken}", { params: { path: { accessToken: data.orderToken } } })).data
+        : await api.GET("/api/account/orders/{orderNumber}", { params: { path: { orderNumber: data.orderNumber } } })
+          .then(({ data: details }) => (details ? { order: details, email: null } : undefined));
+      if (stopped) return;
+      if (loaded) setOrder({ details: loaded.order, email: loaded.email });
+      // The header's bag badge catches up
+      void forgetBought(loaded?.order.lines.map((line) => line.productId) ?? []);
     };
 
     void check(1);
     return () => {
       stopped = true;
     };
-  }, [paymentIntentId, refreshCart]);
+  }, [paymentIntentId, forgetBought]);
 
   if (outcome === null) {
     return (
@@ -68,13 +74,17 @@ export function OrderResult({ paymentIntentId, supportEmail }: { paymentIntentId
     );
   }
 
-  if (outcome === "paid" && orderNumber) return <Confirmation orderNumber={orderNumber} order={order} supportEmail={supportEmail} />;
+  if (outcome === "paid" && placed) {
+    return <Confirmation placed={placed} order={order?.details ?? null} email={user?.email ?? order?.email ?? null} supportEmail={supportEmail} />;
+  }
 
   if (outcome === "processing") {
     return (
       <Message icon={Clock} title="Your payment is processing">
-        We&apos;ll email you as soon as your order is confirmed. It will also appear in your orders.
-        <Actions primary={{ href: "/account/orders", label: "View your orders" }} />
+        {user
+          ? "We'll email you as soon as your order is confirmed. It will also appear in your orders."
+          : "We'll email you as soon as your order is confirmed, with a link to follow it."}
+        <Actions primary={user ? { href: "/account/orders", label: "View your orders" } : undefined} />
       </Message>
     );
   }
@@ -100,16 +110,19 @@ export function OrderResult({ paymentIntentId, supportEmail }: { paymentIntentId
 
   return (
     <Message icon={SearchX} title="We couldn't find that payment">
-      If you were charged, your order will appear in your orders and you&apos;ll get a confirmation email.
-      <Actions primary={{ href: "/account/orders", label: "View your orders" }} />
+      {user
+        ? "If you were charged, your order will appear in your orders and you'll get a confirmation email."
+        : "If you were charged, you'll get a confirmation email with a link to your order."}
+      <Actions primary={user ? { href: "/account/orders", label: "View your orders" } : { href: "/orders/find", label: "Find your order" }} />
     </Message>
   );
 }
 
 const pill = "inline-flex h-14 items-center justify-center gap-2 rounded-full px-7 text-base font-semibold transition-colors";
 
-function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: string; order: Order | null; supportEmail: string | null }) {
-  const user = useCurrentUser();
+type ConfirmationProps = { placed: Placed; order: Order | null; email: string | null; supportEmail: string | null };
+
+function Confirmation({ placed: { orderNumber, orderToken }, order, email, supportEmail }: ConfirmationProps) {
   const steps = [
     { label: "Placed", note: "Just now", done: true },
     { label: "Shipped", note: "We email the tracking number", done: false },
@@ -126,7 +139,7 @@ function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: strin
         <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] sm:text-[56px]">Thank you! Your order is confirmed.</h1>
         <p className="text-[17px] text-muted-foreground">
           Order <span className="rounded-md bg-foreground/8 px-1.5 py-0.5 font-mono text-[15px] text-foreground">#{orderNumber}</span>
-          {user && <> · A confirmation is on its way to {user.email}.</>}
+          {email && <> · A confirmation is on its way to {email}.</>}
         </p>
       </div>
 
@@ -200,7 +213,7 @@ function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: strin
       )}
 
       <div className="flex flex-wrap justify-center gap-3 pt-4">
-        <Link href={`/account/orders/${orderNumber}`} className={cn(pill, "bg-primary text-primary-foreground hover:bg-primary/85")}>
+        <Link href={orderToken ? `/orders/${orderToken}` : `/account/orders/${orderNumber}`} className={cn(pill, "bg-primary text-primary-foreground hover:bg-primary/85")}>
           Track your order
         </Link>
         <Link href="/products" className={cn(pill, "border border-foreground/16 hover:bg-foreground/5")}>
@@ -229,12 +242,14 @@ function Message({ icon: Icon, title, tone = "neutral", spin, children }: { icon
   );
 }
 
-function Actions({ primary }: { primary: { href: string; label: string } }) {
+function Actions({ primary }: { primary?: { href: string; label: string } }) {
   return (
     <div className="flex flex-wrap justify-center gap-3">
-      <Link href={primary.href} className={cn(pill, "bg-primary text-primary-foreground hover:bg-primary/85")}>
-        {primary.label}
-      </Link>
+      {primary && (
+        <Link href={primary.href} className={cn(pill, "bg-primary text-primary-foreground hover:bg-primary/85")}>
+          {primary.label}
+        </Link>
+      )}
       <Link href="/products" className={cn(pill, "border border-foreground/16 text-foreground hover:bg-foreground/5")}>
         Keep shopping
       </Link>
