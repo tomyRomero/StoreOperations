@@ -24,7 +24,7 @@ public class CatalogTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
         var categories = await GetAsync("/api/categories");
 
         Assert.Equal(["Brushes", "Canvas", "Paint"], categories.EnumerateArray().Select(c => c.GetProperty("name").GetString()));
-        Assert.Equal("/api/images/seed/categories/brushes.jpg", categories[0].GetProperty("imageUrl").GetString());
+        Assert.Equal("/api/images/seed/categories/brushes.png", categories[0].GetProperty("imageUrl").GetString());
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class CatalogTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsyncLif
         Assert.Equal(JsonValueKind.Null, product.GetProperty("compareAtPriceCents").ValueKind);
         Assert.Equal(0, product.GetProperty("stock").GetInt32());
         Assert.Equal("Paint", product.GetProperty("categoryName").GetString());
-        Assert.Equal("/api/images/seed/products/chalkpaint.jpg", product.GetProperty("imageUrl").GetString());
+        Assert.Equal("/api/images/seed/products/chalkpaint.png", product.GetProperty("imageUrl").GetString());
     }
 
     [Fact]
