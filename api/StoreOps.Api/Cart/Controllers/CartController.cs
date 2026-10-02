@@ -10,6 +10,7 @@ namespace StoreOps.Api.Cart.Controllers;
 // The signed-in customer's own cart. Every change answers with the whole cart, so the page can redraw from it.
 [ApiController]
 [Route("api/cart")]
+[Authorize(Policy = Policies.Shopper)]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class CartController(CartService cart) : ControllerBase
 {

@@ -11,6 +11,9 @@ namespace StoreOps.Api.Auth;
 public static class Policies
 {
     public const string Admin = "Admin";
+    // A signed-in customer. Admin accounts run the store and don't buy from it, so their orders never
+    // mix with customers' in the reports; they test checkout as a guest.
+    public const string Shopper = "Shopper";
 }
 
 public static class AuthServiceCollectionExtensions
@@ -75,7 +78,10 @@ public static class AuthServiceCollectionExtensions
         // Deny by default: every endpoint needs a signed-in user unless it is marked [AllowAnonymous]
         services.AddAuthorizationBuilder()
             .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build())
-            .AddPolicy(Policies.Admin, policy => policy.RequireRole(Roles.Admin));
+            .AddPolicy(Policies.Admin, policy => policy.RequireRole(Roles.Admin))
+            .AddPolicy(Policies.Shopper, policy => policy
+                .RequireAuthenticatedUser()
+                .RequireAssertion(context => !context.User.IsInRole(Roles.Admin)));
 
         // The keys that encrypt the cookie live in the database, so sign-ins survive a restart and
         // work across several API instances

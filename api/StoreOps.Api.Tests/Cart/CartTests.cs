@@ -171,6 +171,24 @@ public class CartTests(ApiFixture api) : IClassFixture<ApiFixture>
         Assert.Empty(secondCart.GetProperty("lines").EnumerateArray());
     }
 
+    // Admin accounts run the store; they test checkout as a guest
+    [Fact]
+    public async Task Admin_accounts_cannot_shop()
+    {
+        var admin = await api.CreateAdminClientAsync();
+        var productId = await api.AddProductAsync();
+
+        var add = await AddAsync(admin, productId, 1);
+        var cart = await admin.GetAsync("/api/cart", Ct);
+        var checkout = await admin.PostAsJsonAsync("/api/checkout", new { addressId = 1 }, Ct);
+
+        Assert.Equal(HttpStatusCode.Forbidden, add.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, cart.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, checkout.StatusCode);
+        await using var db = api.CreateContext();
+        Assert.False(await db.CartItems.AnyAsync(i => i.ProductId == productId, Ct));
+    }
+
     private static Task<HttpResponseMessage> AddAsync(HttpClient client, int productId, int quantity) =>
         client.PostAsJsonAsync("/api/cart/items", new { productId, quantity }, Ct);
 

@@ -16,6 +16,7 @@ public sealed class CheckoutController(CheckoutService checkout, IHostEnvironmen
 {
     // Starts checkout, or refreshes it after the cart or address changed
     [HttpPost]
+    [Authorize(Policy = Policies.Shopper)]
     [ProducesResponseType<CheckoutResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Start(StartCheckoutRequest request, CancellationToken ct)
     {
