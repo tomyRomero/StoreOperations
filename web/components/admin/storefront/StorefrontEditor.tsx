@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Check, Monitor, Moon, Smartphone, Sun } from "lucide-react";
@@ -15,137 +14,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api/browser";
 import { fieldErrors, problemMessage, type ApiProblem } from "@/lib/api/problems";
-import type { AdminStorefront, HomeSection, StoreThemeName } from "@/lib/api/types";
+import type { AdminStorefront, StoreThemeName } from "@/lib/api/types";
 import { accentFamily, contrast, isHexColor } from "@/lib/brand-colors";
 import { homeSectionLabels } from "@/lib/storefront";
-import { encodeDraft, type StorefrontDraft } from "@/lib/storefront-draft";
+import { encodeDraft } from "@/lib/storefront-draft";
 import { storeThemes } from "@/lib/themes";
 import { cn } from "@/lib/utils";
+import { SwatchButton, ThemeSwatch, Toggle } from "./EditorControls";
+import { FormSchema, formFieldFor, initialValues, pages, socialFields, swatches, toDraft, toRequest, type Values } from "./storefront-form";
 import { StorefrontPreview } from "./StorefrontPreview";
 
-const allSections: HomeSection[] = ["categories", "deals", "new_in", "newsletter"];
-const socialFields = [
-  ["instagramUrl", "Instagram", "instagram"],
-  ["tikTokUrl", "TikTok", "tikTok"],
-  ["pinterestUrl", "Pinterest", "pinterest"],
-  ["youTubeUrl", "YouTube", "youTube"],
-  ["facebookUrl", "Facebook", "facebook"],
-] as const;
-
-// A few starting points; any color works, and its shade is adjusted for contrast either way
-const swatches = [
-  ["Ultramarine", "#1F3BDB"],
-  ["Violet", "#6C4BF4"],
-  ["Magenta", "#B8168F"],
-  ["Vermilion", "#E5482A"],
-  ["Amber", "#C77700"],
-  ["Viridian", "#0E7C5A"],
-] as const;
-
-const optional = (max: number) => z.string().trim().max(max, `Use at most ${max} characters`);
-const link = z.union([z.literal(""), z.string().trim().max(300, "Use at most 300 characters").regex(/^https:\/\/\S+$/, "Use the full address, starting with https://")]);
-
-const FormSchema = z.object({
-  storeName: z.string().trim().min(1, "Enter the store's name").max(100, "Use at most 100 characters"),
-  theme: z.enum(["night_studio", "atelier"]),
-  tagline: optional(120),
-  description: optional(300),
-  logoImageKey: z.string().nullable(),
-  logoUrl: z.string().nullable(),
-  accentColor: z.union([z.literal(""), z.string().regex(/^#[0-9a-fA-F]{6}$/, "Use a color such as #5B3FD9")]),
-  productNoun: z.string().trim().min(1, "Enter a word").max(40, "Use at most 40 characters"),
-  productNounPlural: z.string().trim().min(1, "Enter a word").max(40, "Use at most 40 characters"),
-  heroHeadline: optional(80),
-  heroHighlight: optional(80),
-  heroText: optional(300),
-  heroButtonLabel: optional(40),
-  sections: z.array(z.object({ key: z.enum(["categories", "deals", "new_in", "newsletter"]), on: z.boolean() })),
-  aboutText: optional(4000),
-  contactPhone: optional(40),
-  contactAddress: optional(300),
-  instagramUrl: link,
-  tikTokUrl: link,
-  pinterestUrl: link,
-  youTubeUrl: link,
-  facebookUrl: link,
-});
-
-type Values = z.infer<typeof FormSchema>;
-
-function initialValues({ storeName, logoImageKey, storefront: s }: AdminStorefront): Values {
-  return {
-    storeName,
-    theme: s.theme,
-    tagline: s.tagline ?? "",
-    description: s.description ?? "",
-    logoImageKey,
-    logoUrl: s.logoUrl,
-    accentColor: s.accentColor ?? "",
-    productNoun: s.productNoun,
-    productNounPlural: s.productNounPlural,
-    heroHeadline: s.heroHeadline ?? "",
-    heroHighlight: s.heroHighlight ?? "",
-    heroText: s.heroText ?? "",
-    heroButtonLabel: s.heroButtonLabel ?? "",
-    // The rows that are on, in their order, then the ones that are off
-    sections: [...s.homeSections.map((key) => ({ key, on: true })), ...allSections.filter((key) => !s.homeSections.includes(key)).map((key) => ({ key, on: false }))],
-    aboutText: s.aboutText ?? "",
-    contactPhone: s.contactPhone ?? "",
-    contactAddress: s.contactAddress ?? "",
-    instagramUrl: s.social.instagram ?? "",
-    tikTokUrl: s.social.tikTok ?? "",
-    pinterestUrl: s.social.pinterest ?? "",
-    youTubeUrl: s.social.youTube ?? "",
-    facebookUrl: s.social.facebook ?? "",
-  };
-}
-
-const text = (value: string, max: number) => (value.trim() && value.trim().length <= max ? value.trim() : null);
-const safeLink = (value: string) => (/^https:\/\/\S+$/.test(value.trim()) && value.trim().length <= 300 ? value.trim() : null);
-
-// The preview shows what's valid so far; anything half-typed shows as not filled in
-function toDraft(v: Values, mode: "light" | "dark"): StorefrontDraft {
-  return {
-    storeName: text(v.storeName, 100) ?? "Your store",
-    theme: v.theme,
-    mode,
-    tagline: text(v.tagline, 120),
-    description: text(v.description, 300),
-    logoUrl: v.logoUrl,
-    accentColor: isHexColor(v.accentColor) ? v.accentColor : null,
-    productNoun: text(v.productNoun, 40) ?? "product",
-    productNounPlural: text(v.productNounPlural, 40) ?? "products",
-    heroHeadline: text(v.heroHeadline, 80),
-    heroHighlight: text(v.heroHighlight, 80),
-    heroText: text(v.heroText, 300),
-    heroButtonLabel: text(v.heroButtonLabel, 40),
-    homeSections: v.sections.filter((s) => s.on).map((s) => s.key),
-    // Only the About page shows it, and it's the longest field, so only that page's preview carries it
-    aboutText: text(v.aboutText, 4000),
-    contactPhone: text(v.contactPhone, 40),
-    contactAddress: text(v.contactAddress, 300),
-    social: {
-      instagram: safeLink(v.instagramUrl),
-      tikTok: safeLink(v.tikTokUrl),
-      pinterest: safeLink(v.pinterestUrl),
-      youTube: safeLink(v.youTubeUrl),
-      facebook: safeLink(v.facebookUrl),
-    },
-  };
-}
-
-// The fields of the form as the API names them, for its errors
-const formFieldFor: Record<string, keyof Values> = { homeSections: "sections" };
-
-const pages = [
-  ["/", "Home"],
-  ["/about", "About"],
-  ["/contact", "Contact"],
-  ["/products", "Shop"],
-] as const;
-
-// Theme and brand: the storefront's theme, logo, name and color, its home page and its own pages, with the
-// real store beside the form showing every change before it's published
+// Theme and brand. The preview beside the form is the real storefront with the unsaved values, so
+// every change can be seen before it's published.
 export function StorefrontEditor({ storefront }: { storefront: AdminStorefront }) {
   const router = useRouter();
   const defaults = useMemo(() => initialValues(storefront), [storefront]);
@@ -179,32 +59,7 @@ export function StorefrontEditor({ storefront }: { storefront: AdminStorefront }
 
   const onSubmit = async (v: Values) => {
     setPublishing(true);
-    const { data, error } = await api.PUT("/api/admin/storefront", {
-      body: {
-        storeName: v.storeName,
-        theme: v.theme,
-        tagline: v.tagline || null,
-        description: v.description || null,
-        logoImageKey: v.logoImageKey,
-        accentColor: v.accentColor || null,
-        productNoun: v.productNoun,
-        productNounPlural: v.productNounPlural,
-        heroHeadline: v.heroHeadline || null,
-        heroHighlight: v.heroHighlight || null,
-        heroText: v.heroText || null,
-        heroButtonLabel: v.heroButtonLabel || null,
-        homeSections: v.sections.filter((s) => s.on).map((s) => s.key),
-        aboutText: v.aboutText || null,
-        contactPhone: v.contactPhone || null,
-        contactAddress: v.contactAddress || null,
-        instagramUrl: v.instagramUrl || null,
-        tikTokUrl: v.tikTokUrl || null,
-        pinterestUrl: v.pinterestUrl || null,
-        youTubeUrl: v.youTubeUrl || null,
-        facebookUrl: v.facebookUrl || null,
-        rowVersion: storefront.rowVersion,
-      },
-    });
+    const { data, error } = await api.PUT("/api/admin/storefront", { body: toRequest(v, storefront.rowVersion) });
     setPublishing(false);
 
     if (data) {
@@ -504,71 +359,5 @@ function TextField({ form, name, label, description, placeholder, multiline, row
         </FormItem>
       )}
     />
-  );
-}
-
-function SwatchButton({ label, hex, selected, onSelect }: { label: string; hex?: string; selected: boolean; onSelect: () => void }) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      aria-label={label}
-      title={label}
-      onClick={onSelect}
-      className={cn("grid size-8 place-items-center rounded-full border transition-shadow", selected && "ring-2 ring-ring ring-offset-2 ring-offset-card", !hex && "bg-brand-sweep")}
-      style={hex ? { background: hex } : undefined}
-    >
-      {selected && <Check className="size-4 text-white drop-shadow" aria-hidden />}
-    </button>
-  );
-}
-
-// A small picture of each theme: its page, ink and accent
-function ThemeSwatch({ theme }: { theme: StoreThemeName }) {
-  if (theme === "atelier") {
-    return (
-      <span aria-hidden className="grid h-16 grid-cols-[1.2fr_1fr] overflow-hidden rounded-md bg-[#f4f0e8]">
-        <span className="bg-linear-160 from-[#cfc3ae] to-[#9c8c72]" />
-        <span className="grid content-center gap-1 px-2">
-          <span className="font-[family-name:var(--font-serif)] text-xl leading-none text-[#1c1a16] italic">Aa</span>
-          <span className="h-0.5 rounded bg-[#a1452b]" />
-        </span>
-      </span>
-    );
-  }
-  return (
-    <span aria-hidden className="relative block h-16 overflow-hidden rounded-md bg-[#0b0b0f]">
-      <span className="absolute left-[18%] top-[30%] size-10 rounded-full bg-[#ff4fa3] opacity-60 blur-[12px]" />
-      <span className="absolute right-[16%] top-[22%] size-10 rounded-full bg-[#3d8bff] opacity-60 blur-[12px]" />
-      <span className="absolute inset-x-2 top-2 h-1 rounded bg-white/85" />
-      <span className="absolute left-2 top-4 h-1 w-2/5 rounded bg-linear-to-r from-[#ff4fa3] to-[#3d8bff]" />
-    </span>
-  );
-}
-
-type ToggleProps<T extends string> = {
-  label: string;
-  value: T;
-  onChange: (value: T) => void;
-  options: [T, string, React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>][];
-};
-
-function Toggle<T extends string>({ label, value, onChange, options }: ToggleProps<T>) {
-  return (
-    <div role="group" aria-label={label} className="flex rounded-md bg-muted p-0.5">
-      {options.map(([key, text, Icon]) => (
-        <button
-          key={key}
-          type="button"
-          aria-pressed={value === key}
-          onClick={() => onChange(key)}
-          className={cn("flex h-8 items-center gap-1.5 rounded-[5px] px-2.5 text-sm font-medium", value === key ? "bg-card shadow-sm" : "text-muted-foreground hover:text-foreground")}
-        >
-          <Icon className="size-4" aria-hidden />
-          {text}
-        </button>
-      ))}
-    </div>
   );
 }
