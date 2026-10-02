@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Hash, LifeBuoy, Search } from "lucide-react";
+import { useStoreBrand } from "@/components/StoreBrandProvider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api/browser";
 import type { Category, Product } from "@/lib/api/types";
@@ -48,6 +49,7 @@ function categoryJumps(categories: Category[]): Option[] {
 // categories and help pages, and every result for the words. Opens with ⌘K or Ctrl+K anywhere, with /,
 // or from the header. Arrow keys move, Enter opens, Escape closes.
 export function SearchPalette({ categories, lowStockThreshold }: Props) {
+  const { many } = useStoreBrand();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -156,7 +158,7 @@ export function SearchPalette({ categories, lowStockThreshold }: Props) {
         <input
           type="search"
           name="q"
-          aria-label="Search supplies"
+          aria-label={`Search ${many}`}
           placeholder="Search"
           maxLength={100}
           onPointerDown={(event) => {
@@ -194,7 +196,7 @@ export function SearchPalette({ categories, lowStockThreshold }: Props) {
         >
           <DialogTitle className="sr-only">Search the store</DialogTitle>
           <DialogDescription className="sr-only">Products, categories and help. Use the arrow keys to move and Enter to open.</DialogDescription>
-          <div aria-hidden className="pointer-events-none absolute -top-30 left-[20%] h-[200px] w-[400px] bg-[radial-gradient(50%_50%_at_50%_50%,rgb(139_108_255/0.25),transparent_70%)] opacity-(--glow-strength)" />
+          <div aria-hidden className="pointer-events-none absolute -top-30 left-[20%] h-[200px] w-[400px] bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-violet)_25%,transparent),transparent_70%)] opacity-(--glow-strength)" />
 
           <div className="relative flex h-[66px] items-center gap-3.5 border-b border-foreground/8 px-5">
             <Search className="size-5 shrink-0 text-muted-foreground" aria-hidden />
@@ -210,7 +212,7 @@ export function SearchPalette({ categories, lowStockThreshold }: Props) {
               value={query}
               onChange={(event) => change(event.target.value)}
               onKeyDown={keys}
-              placeholder="Search supplies, categories and help"
+              placeholder={`Search ${many}, categories and help`}
               maxLength={100}
               className="h-full min-w-0 grow bg-transparent text-[19px] font-medium caret-glow-violet outline-none placeholder:text-muted-foreground"
             />
@@ -220,7 +222,7 @@ export function SearchPalette({ categories, lowStockThreshold }: Props) {
           <div className="relative max-h-[min(60dvh,520px)] overflow-y-auto p-2.5">
             {nothing && (
               <p className="px-3 pb-2 pt-3 text-[15px] text-muted-foreground">
-                No supplies match “{words}”{jumps.length > 0 ? ". Try a category instead:" : "."}
+                No {many} match “{words}”{jumps.length > 0 ? ". Try a category instead:" : "."}
               </p>
             )}
             {options.length > 0 && (

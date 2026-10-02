@@ -4,8 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Logo } from "@/components/brand/Logo";
+import { StoreLogo } from "@/components/brand/StoreLogo";
 import { useCurrentUser } from "@/components/CurrentUserProvider";
+import { useStoreBrand } from "@/components/StoreBrandProvider";
 import type { Category } from "@/lib/api/types";
 import { currentPath, signInPath } from "@/lib/sign-in-path";
 import { useSignOut } from "@/lib/use-sign-out";
@@ -16,8 +17,9 @@ const groupLabel = "px-3 pb-1 font-mono text-xs uppercase tracking-[0.08em] text
 
 // The phone menu: the categories, the account pages and the light and dark switch, in a drawer from the
 // left. Following a link closes it. Search is the icon beside the bag.
-export function MobileNav({ categories, storeName, hasDeals }: { categories: Category[]; storeName: string; hasDeals: boolean }) {
+export function MobileNav({ categories, hasDeals }: { categories: Category[]; hasDeals: boolean }) {
   const [open, setOpen] = useState(false);
+  const { many } = useStoreBrand();
   const user = useCurrentUser();
   const here = currentPath(usePathname(), useSearchParams());
   const signOut = useSignOut();
@@ -37,7 +39,7 @@ export function MobileNav({ categories, storeName, hasDeals }: { categories: Cat
         <SheetHeader>
           <SheetTitle asChild>
             <div>
-              <Logo name={storeName} compact />
+              <StoreLogo compact />
             </div>
           </SheetTitle>
           <SheetDescription className="sr-only">Shop by category, your account and help</SheetDescription>
@@ -48,7 +50,7 @@ export function MobileNav({ categories, storeName, hasDeals }: { categories: Cat
             <ul>
               <li>
                 <Link href="/products" onClick={close} className={linkClasses}>
-                  All supplies
+                  All {many}
                 </Link>
               </li>
               {categories.map((category) => (

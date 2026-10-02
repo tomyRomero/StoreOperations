@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { AccountNav } from "@/components/account/AccountNav";
 import { getAddresses, getOrders } from "@/lib/data/account";
 import { getStoreSettings } from "@/lib/data/catalog";
+import { storeNameOf } from "@/lib/storefront";
 import { requireUser } from "@/lib/session";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getStoreSettings();
-  return { title: { default: "Your account", template: `%s · Your account · ${settings?.storeName ?? "Palettehub"}` } };
+  return { title: { default: "Your account", template: `%s · Your account · ${storeNameOf(settings)}` } };
 }
 
 // The account area: its menu beside (or above, on phones) each page, under a soft pink glow
@@ -16,7 +17,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
 
   return (
     <div className="relative isolate overflow-x-clip">
-      <div aria-hidden className="absolute -right-20 -top-32 -z-10 h-[420px] w-[700px] max-w-full bg-[radial-gradient(50%_50%_at_50%_50%,rgb(255_79_163/0.16),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -right-20 -top-32 -z-10 h-[420px] w-[700px] max-w-full bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-pink)_16%,transparent),transparent_70%)] opacity-(--glow-strength)" />
       <div className="container grid grid-cols-1 gap-6 py-8 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-10 lg:py-12">
         <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
           <AccountNav username={user.username} email={user.email} orderCount={orders?.totalCount ?? null} addressCount={addresses?.length ?? null} />

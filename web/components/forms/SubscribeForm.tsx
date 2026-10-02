@@ -10,6 +10,7 @@ import { Button } from "../ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "../ui/use-toast";
 import { api } from "@/lib/api/browser";
+import { useStoreBrand } from "@/components/StoreBrandProvider";
 import { problemMessage } from "@/lib/api/problems";
 
 const FormSchema = z.object({
@@ -25,6 +26,7 @@ type Props = {
 // can't be used to find out who subscribes. The address gets an email saying it's subscribed,
 // with a link to leave.
 const SubscribeForm = ({ variant = "footer" }: Props) => {
+  const { many } = useStoreBrand();
   const [subscribed, setSubscribed] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -103,7 +105,7 @@ const SubscribeForm = ({ variant = "footer" }: Props) => {
       <h2 id="newsletter-heading" className="mb-1.5 font-sans text-[15px] font-semibold">
         Newsletter
       </h2>
-      <p className="mb-4 text-[15px] text-muted-foreground">New supplies and deals, about once a month. Leave any time.</p>
+      <p className="mb-4 text-[15px] text-muted-foreground">New {many} and deals, about once a month. Leave any time.</p>
       {body}
     </section>
   );

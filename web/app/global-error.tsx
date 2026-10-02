@@ -2,7 +2,7 @@
 
 import "./globals.css";
 import { RefreshCw } from "lucide-react";
-import { Logo } from "@/components/brand/Logo";
+import { LogoMark } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { fontVariables } from "./fonts";
 
@@ -12,9 +12,9 @@ export default function GlobalError({ error, retry }: { error: Error & { digest?
   return (
     <html lang="en" className={fontVariables}>
       <body className="flex min-h-screen flex-col">
-        <title>Palettehub is unavailable</title>
+        <title>We&apos;ll be right back</title>
         <header className="px-6 py-5 sm:px-10">
-          <Logo />
+          <LogoMark />
         </header>
         <main className="flex flex-1 items-center justify-center px-6 pb-16">
           <div className="grid max-w-md justify-items-center gap-4 text-center">

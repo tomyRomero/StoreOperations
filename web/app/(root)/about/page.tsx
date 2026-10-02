@@ -5,25 +5,30 @@ import { ArrowRight } from "lucide-react";
 import { getCategories, getCategorySummary, getStoreSettings } from "@/lib/data/catalog";
 import { returnsSummary, shippingSummary } from "@/lib/format";
 import { formatMoney } from "@/lib/money";
+import { countOf, nounsOf, paragraphs, splitLastWords, storeNameOf } from "@/lib/storefront";
 
-export const metadata: Metadata = {
-  title: "About us",
-  description: "Artist-grade paint, brushes and canvas, shipped across the US.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getStoreSettings();
+  return { title: "About us", description: settings?.storefront.description ?? undefined };
+}
 
 const glows = ["bg-glow-pink", "bg-glow-violet", "bg-glow-blue", "bg-glow-green"];
 const numbers = ["text-sale", "text-accent", "text-info", "text-success"];
 
-// The store, its categories and how ordering works. The headline and lead are the demo store's own words,
-// like the home page's; everything else comes from the live catalog and Store settings.
+// The store, its story, its categories and how ordering works. The headline is the store's tagline, the lead
+// its description and the story its About text, all from Theme and brand; the rest comes from the live
+// catalog and Store settings.
 export default async function AboutPage() {
   const [categories, settings] = await Promise.all([getCategories(), getStoreSettings()]);
   const summaries = await Promise.all(categories.map((category) => getCategorySummary(category.id)));
-  const storeName = settings?.storeName ?? "Palettehub";
+  const storeName = storeNameOf(settings);
+  const { one, many } = nounsOf(settings);
   const total = summaries.reduce((sum, summary) => sum + summary.count, 0);
+  const [headline, highlight] = splitLastWords(settings?.storefront.tagline ?? `Welcome to ${storeName}.`);
+  const story = paragraphs(settings?.storefront.aboutText);
 
   const steps = [
-    { title: "Pick your supplies", text: "Browse by category or search. Every product says how many are left." },
+    { title: `Pick your ${many}`, text: "Browse by category or search. Every product says how many are left." },
     { title: "Pay securely", text: "Checkout runs on Stripe, so your card details never reach our servers." },
     {
       title: "We ship it",
@@ -34,18 +39,34 @@ export default async function AboutPage() {
 
   return (
     <div className="relative isolate overflow-x-clip">
-      <div aria-hidden className="absolute -top-40 left-1/2 -z-10 h-[640px] w-[1200px] max-w-full -translate-x-1/2 bg-[radial-gradient(40%_50%_at_25%_35%,rgb(255_79_163/0.2),transparent_70%),radial-gradient(40%_50%_at_75%_25%,rgb(61_139_255/0.2),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -top-40 left-1/2 -z-10 h-[640px] w-[1200px] max-w-full -translate-x-1/2 bg-[radial-gradient(40%_50%_at_25%_35%,color-mix(in_oklab,var(--glow-pink)_20%,transparent),transparent_70%),radial-gradient(40%_50%_at_75%_25%,color-mix(in_oklab,var(--glow-blue)_20%,transparent),transparent_70%)] opacity-(--glow-strength)" />
       <div aria-hidden className="bg-studio-grid absolute inset-x-0 -top-20 -z-10 h-[640px]" />
 
       <section aria-labelledby="about-heading" className="container grid justify-items-center gap-6 pt-16 text-center lg:pt-28">
         <p className="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent">About {storeName}</p>
         <h1 id="about-heading" className="max-w-4xl text-[clamp(2.75rem,8vw,6rem)] font-semibold leading-[0.95] tracking-[-0.055em]">
-          Supplies for people who <span className="text-brand-gradient">make things.</span>
+          {headline}
+          <span className="text-brand-gradient">{highlight}</span>
         </h1>
-        <p className="max-w-xl text-lg leading-normal text-muted-foreground sm:text-xl">
-          Artist-grade paint, brushes and canvas, from a first sketch to a finished piece, shipped anywhere in the US.
-        </p>
+        {settings?.storefront.description && (
+          <p className="max-w-xl text-lg leading-normal text-muted-foreground sm:text-xl">{settings.storefront.description}</p>
+        )}
       </section>
+
+      {story.length > 0 && (
+        <section aria-labelledby="story-heading" className="container grid gap-6 pt-24 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:pt-36">
+          <h2 id="story-heading" className="text-[40px] font-semibold leading-none tracking-[-0.05em] lg:text-[56px]">
+            Our story
+          </h2>
+          <div className="grid max-w-2xl gap-5 text-lg leading-relaxed text-ink-2">
+            {story.map((paragraph, i) => (
+              <p key={i} className="whitespace-pre-line">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
 
       {categories.length > 0 && (
         <section aria-labelledby="stock-heading" className="container pt-24 lg:pt-36">
@@ -54,7 +75,7 @@ export default async function AboutPage() {
               What we stock
             </h2>
             <p className="max-w-[440px] text-[17px] leading-relaxed text-muted-foreground lg:justify-self-end">
-              A focused range in {categories.length === 1 ? "one category" : `${categories.length} categories`}: {total === 1 ? "1 supply" : `${total} supplies`}, each
+              A focused range in {categories.length === 1 ? "one category" : `${categories.length} categories`}: {countOf(total, settings)}, each
               one picked for how it handles.
             </p>
           </div>
@@ -71,7 +92,7 @@ export default async function AboutPage() {
                     <span className="absolute left-7 top-6.5 grid gap-1.5">
                       <span className="text-[32px] font-semibold tracking-[-0.04em]">{category.name}</span>
                       <span className="text-sm text-muted-foreground">
-                        {count === 1 ? "1 supply" : `${count} supplies`}
+                        {countOf(count, settings)}
                         {fromCents !== null && ` · from ${formatMoney(fromCents)}`}
                       </span>
                     </span>
@@ -105,12 +126,12 @@ export default async function AboutPage() {
 
       <section aria-labelledby="talk-heading" className="container pt-24 lg:pt-36">
         <div className="relative isolate flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-[32px] border bg-card p-8 sm:p-12">
-          <span aria-hidden className="absolute -right-20 -top-24 -z-10 h-[340px] w-[520px] bg-[radial-gradient(50%_50%_at_50%_50%,rgb(139_108_255/0.24),transparent_70%)] opacity-(--glow-strength)" />
+          <span aria-hidden className="absolute -right-20 -top-24 -z-10 h-[340px] w-[520px] bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-violet)_24%,transparent),transparent_70%)] opacity-(--glow-strength)" />
           <div className="grid gap-3">
             <h2 id="talk-heading" className="text-[32px] font-semibold leading-none tracking-[-0.045em] sm:text-[44px]">
               Not sure what you need?
             </h2>
-            <p className="text-[17px] text-muted-foreground">Ask about a supply or an order. A real person reads every message.</p>
+            <p className="text-[17px] text-muted-foreground">Ask about a {one} or an order. A real person reads every message.</p>
           </div>
           <Link
             href="/contact"

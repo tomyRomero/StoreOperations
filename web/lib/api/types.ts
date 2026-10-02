@@ -15,6 +15,10 @@ export type CartLine = Schemas["CartLineResponse"];
 export type CartLineIssue = Schemas["CartLineIssue"];
 
 export type StoreSettings = Schemas["PublicStoreSettingsResponse"];
+export type Storefront = Schemas["StorefrontResponse"];
+export type HomeSection = Schemas["HomeSection"];
+export type StoreThemeName = Schemas["StorefrontTheme"];
+export type AdminStorefront = Schemas["StorefrontSettingsResponse"];
 
 export type PostalAddress = Schemas["PostalAddress"];
 export type Address = Schemas["AddressResponse"];

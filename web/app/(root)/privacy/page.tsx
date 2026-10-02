@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentPage, ContentSection } from "@/components/content/ContentPage";
 import { getStoreSettings } from "@/lib/data/catalog";
+import { storeNameOf } from "@/lib/storefront";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 // Written from what the code actually stores and sends: keep it in step when that changes
 export default async function PrivacyPage() {
   const settings = await getStoreSettings();
-  const storeName = settings?.storeName ?? "Palettehub";
+  const storeName = storeNameOf(settings);
   const supportEmail = settings?.supportEmail;
 
   return (

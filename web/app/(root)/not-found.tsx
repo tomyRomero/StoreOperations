@@ -3,17 +3,19 @@ import Link from "next/link";
 import { ArrowRight, Search } from "lucide-react";
 import { ProductRow } from "@/components/home/ProductRow";
 import { getProducts, getStoreSettings } from "@/lib/data/catalog";
+import { nounsOf } from "@/lib/storefront";
 
-// A mistyped or old link: a supply drifting over the 404, a search, the ways back into the shop, and the
+// A mistyped or old link: a product drifting over the 404, a search, the ways back into the shop, and the
 // newest products to carry on from
 export default async function NotFound() {
   const [newest, settings] = await Promise.all([getProducts({ sort: "newest", pageSize: 8 }), getStoreSettings()]);
   const products = newest?.items ?? [];
   const drifting = products[0];
+  const { many } = nounsOf(settings);
 
   return (
     <div className="relative isolate overflow-x-clip pb-8">
-      <div aria-hidden className="absolute -top-24 left-1/2 -z-10 h-[620px] w-[1100px] max-w-full -translate-x-1/2 bg-[radial-gradient(40%_50%_at_35%_40%,rgb(255_79_163/0.2),transparent_70%),radial-gradient(40%_50%_at_65%_35%,rgb(61_139_255/0.22),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -top-24 left-1/2 -z-10 h-[620px] w-[1100px] max-w-full -translate-x-1/2 bg-[radial-gradient(40%_50%_at_35%_40%,color-mix(in_oklab,var(--glow-pink)_20%,transparent),transparent_70%),radial-gradient(40%_50%_at_65%_35%,color-mix(in_oklab,var(--glow-blue)_22%,transparent),transparent_70%)] opacity-(--glow-strength)" />
 
       <section aria-labelledby="not-found-heading" className="container grid justify-items-center pt-10 text-center lg:pt-14">
         <div aria-hidden className="relative grid h-[200px] w-full place-items-center sm:h-[300px]">
@@ -31,13 +33,13 @@ export default async function NotFound() {
 
         <form action="/products" method="get" role="search" aria-label="Search the store" className="mt-8 flex w-full max-w-[520px] gap-2 rounded-full border border-input bg-card p-1.5">
           <label htmlFor="not-found-search" className="sr-only">
-            Search supplies
+            Search {many}
           </label>
           <input
             id="not-found-search"
             type="search"
             name="q"
-            placeholder="Search supplies"
+            placeholder={`Search ${many}`}
             className="h-12 min-w-0 flex-1 rounded-full bg-transparent px-4.5 text-base text-foreground placeholder:text-muted-foreground"
           />
           <button type="submit" className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-primary px-5.5 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary/85">
@@ -48,7 +50,7 @@ export default async function NotFound() {
 
         <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[15px] font-medium">
           <Link href="/products" className="inline-flex items-center gap-1.5 text-accent hover:underline">
-            Shop all supplies
+            Shop all {many}
             <ArrowRight className="size-4" aria-hidden />
           </Link>
           <Link href="/" className="text-ink-2 hover:text-foreground">

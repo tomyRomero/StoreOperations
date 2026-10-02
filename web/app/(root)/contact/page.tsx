@@ -1,28 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Mail, Package, RotateCcw } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Package, Phone, RotateCcw } from "lucide-react";
 import ContactForm from "@/components/forms/ContactForm";
 import { getStoreSettings } from "@/lib/data/catalog";
+import { nounsOf } from "@/lib/storefront";
 
-export const metadata: Metadata = {
-  title: "Contact us",
-  description: "Questions about a supply or an order? Send us a message.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { one } = nounsOf(await getStoreSettings());
+  return { title: "Contact us", description: `Questions about a ${one} or an order? Send us a message.` };
+}
 
 // The form beside the quicker answers to the usual questions. Messages go to the support email in
-// Store settings, so the admin can change it without a release.
+// Store settings, so the admin can change it without a release; the phone number and address show when
+// Theme and brand has them.
 export default async function ContactPage() {
   const settings = await getStoreSettings();
+  const { one } = nounsOf(settings);
+  const phone = settings?.storefront.contactPhone;
+  const address = settings?.storefront.contactAddress;
 
   const shortcuts = [
     ...(settings?.supportEmail ? [{ icon: Mail, small: "Email us", big: settings.supportEmail, href: `mailto:${settings.supportEmail}` }] : []),
+    ...(phone ? [{ icon: Phone, small: "Call us", big: phone, href: `tel:${phone.replace(/[^\d+]/g, "")}` }] : []),
     { icon: Package, small: "Where's my order?", big: "See your orders", href: "/account/orders" },
     { icon: RotateCcw, small: "Returns", big: "Shipping and returns", href: "/shipping-returns" },
   ];
 
   return (
     <div className="relative isolate overflow-x-clip">
-      <div aria-hidden className="absolute -left-40 -top-40 -z-10 h-[560px] w-[900px] max-w-full bg-[radial-gradient(50%_50%_at_40%_45%,rgb(139_108_255/0.2),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -left-40 -top-40 -z-10 h-[560px] w-[900px] max-w-full bg-[radial-gradient(50%_50%_at_40%_45%,color-mix(in_oklab,var(--glow-violet)_20%,transparent),transparent_70%)] opacity-(--glow-strength)" />
       <div className="container grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 lg:py-20">
         <div className="grid content-start gap-9">
           <div className="grid gap-5">
@@ -32,7 +38,7 @@ export default async function ContactPage() {
               <br />a person.
             </h1>
             <p className="max-w-[460px] text-lg leading-normal text-muted-foreground">
-              Questions about a supply, an order or a delivery? Send a message and we&apos;ll reply by email.
+              Questions about a {one}, an order or a delivery? Send a message and we&apos;ll reply by email.
             </p>
           </div>
           <ul className="grid gap-3">
@@ -52,7 +58,7 @@ export default async function ContactPage() {
               const look = "flex items-center gap-4 rounded-[20px] border bg-card px-5 py-4 transition-colors hover:border-foreground/22";
               return (
                 <li key={href}>
-                  {href.startsWith("mailto:") ? (
+                  {href.startsWith("mailto:") || href.startsWith("tel:") ? (
                     <a href={href} className={look}>
                       {body}
                     </a>
@@ -65,6 +71,12 @@ export default async function ContactPage() {
               );
             })}
           </ul>
+          {address && (
+            <div className="flex items-start gap-4 px-5">
+              <MapPin className="mt-0.5 size-5 shrink-0 text-faint" strokeWidth={1.8} aria-hidden />
+              <address className="whitespace-pre-line not-italic text-ink-2">{address}</address>
+            </div>
+          )}
         </div>
 
         <section aria-labelledby="contact-form-heading" className="grid content-start gap-6 rounded-[28px] border bg-card p-6 sm:p-8">

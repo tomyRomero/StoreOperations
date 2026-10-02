@@ -1,14 +1,19 @@
 import "server-only";
 
+import { cache } from "react";
 import { serverApi } from "../api/server";
+import { applyDraft } from "../storefront-draft";
+import { getPreviewDraft } from "./preview";
 import type { Category, Product, ProductSort, StoreSettings } from "../api/types";
 
-// The public catalog for Server Components, from the API
+// The public catalog for Server Components, from the API. What every page's frame needs (the categories,
+// whether there's a sale, the store's settings) is asked once per request and shared by the layouts, the
+// page and its metadata.
 
-export async function getCategories(): Promise<Category[]> {
+export const getCategories = cache(async (): Promise<Category[]> => {
   const { data } = await serverApi().GET("/api/categories");
   return data ?? [];
-}
+});
 
 export async function getDeals(): Promise<Product[]> {
   const { data } = await serverApi().GET("/api/products", { params: { query: { onDeal: true, pageSize: 12 } } });
@@ -16,10 +21,10 @@ export async function getDeals(): Promise<Product[]> {
 }
 
 // Whether anything is on a deal right now, so the store only offers a Sale link that leads somewhere
-export async function hasDeals(): Promise<boolean> {
+export const hasDeals = cache(async (): Promise<boolean> => {
   const { data } = await serverApi().GET("/api/products", { params: { query: { onDeal: true, pageSize: 1 } } });
   return (data?.items.length ?? 0) > 0;
-}
+});
 
 export type ProductQuery = {
   categoryIds?: number[];
@@ -77,7 +82,9 @@ export async function getRelatedProducts(id: number): Promise<Product[]> {
 }
 
 // The store's policies as customers see them: shipping, returns, the support email
-export async function getStoreSettings(): Promise<StoreSettings | null> {
-  const { data } = await serverApi().GET("/api/store");
-  return data ?? null;
-}
+// With the Theme and brand preview's unsaved values laid over it, when an admin's preview asks
+export const getStoreSettings = cache(async (): Promise<StoreSettings | null> => {
+  const [{ data }, draft] = await Promise.all([serverApi().GET("/api/store"), getPreviewDraft()]);
+  if (!data) return null;
+  return draft ? applyDraft(data, draft) : data;
+});

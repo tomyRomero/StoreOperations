@@ -19,6 +19,7 @@ import type { Category } from "@/lib/api/types";
 import { getCategories, getCategorySummary, getProducts, getStoreSettings } from "@/lib/data/catalog";
 import type { SearchParams } from "@/lib/paging";
 import { parseProductFilters, productFiltersHref, sortOptions, type ProductFilters as Filters } from "@/lib/product-filters";
+import { countOf, nounsOf } from "@/lib/storefront";
 
 const pageSize = 12;
 
@@ -64,7 +65,7 @@ export default async function ProductsPage(props: Props) {
 
   return (
     <div className="relative isolate pb-8">
-      <div aria-hidden className="absolute -left-[10%] -top-40 -z-10 h-[420px] w-[700px] max-w-full bg-[radial-gradient(50%_50%_at_50%_50%,rgb(139_108_255/0.22),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -left-[10%] -top-40 -z-10 h-[420px] w-[700px] max-w-full bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-violet)_22%,transparent),transparent_70%)] opacity-(--glow-strength)" />
 
       <div className="container flex flex-col gap-5 pb-6 pt-8 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:pb-9 lg:pt-12">
         <div className="grid gap-3.5">
@@ -103,17 +104,19 @@ export default async function ProductsPage(props: Props) {
 }
 
 async function ResultCount({ href, filters }: { href: string; filters: Filters }) {
-  const products = await loadProducts(href, filters);
+  const [products, settings] = await Promise.all([loadProducts(href, filters), getStoreSettings()]);
   if (!products) return null;
+  const { one, many } = nounsOf(settings);
   return (
     <p className="text-[15px] text-muted-foreground max-lg:hidden" aria-live="polite">
-      <b className="font-semibold text-foreground">{products.totalCount}</b> {products.totalCount === 1 ? "supply" : "supplies"}
+      <b className="font-semibold text-foreground">{products.totalCount.toLocaleString("en-US")}</b> {products.totalCount === 1 ? one : many}
     </p>
   );
 }
 
 async function ProductResults({ href, filters, searchParams, lowStockThreshold }: { href: string; filters: Filters; searchParams: SearchParams; lowStockThreshold: number }) {
-  const products = await loadProducts(href, filters);
+  const [products, settings] = await Promise.all([loadProducts(href, filters), getStoreSettings()]);
+  const { many } = nounsOf(settings);
 
   if (!products) {
     return <ErrorState title="We couldn't load the products" action={<RetryButton />} />;
@@ -127,7 +130,7 @@ async function ProductResults({ href, filters, searchParams, lowStockThreshold }
         title={pastTheEnd ? "There's nothing on this page" : filters.q ? `Nothing matches “${filters.q}”` : "No products match these filters"}
         action={
           <Button asChild className="rounded-full">
-            <Link href={pastTheEnd ? productFiltersHref({ ...filters, page: 1 }) : "/products"}>{pastTheEnd ? "Go to the first page" : "See all supplies"}</Link>
+            <Link href={pastTheEnd ? productFiltersHref({ ...filters, page: 1 }) : "/products"}>{pastTheEnd ? "Go to the first page" : `See all ${many}`}</Link>
           </Button>
         }
       >
@@ -145,7 +148,7 @@ async function ProductResults({ href, filters, searchParams, lowStockThreshold }
     <div className="grid gap-8">
       <h2 className="sr-only">Products</h2>
       <p className="-mb-3 text-sm text-muted-foreground lg:hidden" aria-live="polite">
-        {products.totalCount === 1 ? "1 supply" : `${products.totalCount} supplies`}
+        {countOf(products.totalCount, settings)}
       </p>
       <ul className="grid grid-cols-2 gap-2.5 md:gap-4 lg:grid-cols-3">
         {products.items.map((product, index) => (
@@ -158,7 +161,7 @@ async function ProductResults({ href, filters, searchParams, lowStockThreshold }
         <p className="rounded-[18px] border border-dashed border-foreground/12 p-5 text-center text-sm text-muted-foreground">
           That&apos;s everything in stock.{" "}
           <Link href={productFiltersHref({ ...filters, inStock: false, page: 1 })} className="text-foreground underline underline-offset-3">
-            Show sold-out supplies too
+            Show sold-out {many} too
           </Link>
         </p>
       )}

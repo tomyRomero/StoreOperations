@@ -6,6 +6,7 @@ import { SkipLink } from "@/components/layout/SkipLink";
 import { countOrders } from "@/lib/data/admin-orders";
 import { getStoreSettings } from "@/lib/data/catalog";
 import { getCurrentUser } from "@/lib/session";
+import { storeNameOf } from "@/lib/storefront";
 
 export const metadata: Metadata = {
   title: { default: "StoreOps", template: "%s · StoreOps" },
@@ -26,7 +27,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user?.isAdmin) redirect("/");
 
   const [toShip, settings] = await Promise.all([countOrders("pending"), getStoreSettings()]);
-  const shell = { storeName: settings?.storeName ?? "Palettehub", payments, toShip: toShip ?? 0 } as const;
+  const shell = { storeName: storeNameOf(settings), payments, toShip: toShip ?? 0 } as const;
 
   return (
     <div data-console className="min-h-screen bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">

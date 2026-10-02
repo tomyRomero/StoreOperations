@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Category, Product, StoreSettings } from "@/lib/api/types";
 import { formatMoney, percentOff } from "@/lib/money";
+import { countOf } from "@/lib/storefront";
 import { cn } from "@/lib/utils";
 import { ShippingTile } from "./ShippingTile";
 
@@ -71,7 +72,7 @@ export function CategoryBento({ tiles, settings, deals }: Props) {
               <span className="absolute left-5 top-4 grid gap-1 lg:left-8 lg:top-8 lg:gap-2">
                 <span className={cn("font-semibold tracking-[-0.04em]", look.name)}>{category.name}</span>
                 <span className={cn("text-sm text-muted-foreground lg:text-[15px]", i > 0 && "max-md:hidden")}>
-                  {count === 1 ? "1 supply" : `${count} supplies`}
+                  {countOf(count, settings)}
                   {fromCents !== null && ` · from ${formatMoney(fromCents)}`}
                 </span>
               </span>
@@ -120,7 +121,7 @@ export function CategoryBento({ tiles, settings, deals }: Props) {
         {deals.length > 0 && (
           <Link
             href="/products?sale=1"
-            className="group flex justify-between gap-6 overflow-hidden rounded-[28px] border bg-[linear-gradient(135deg,rgb(255_79_163/0.16),rgb(139_108_255/0.1)_60%,var(--card))] px-9 py-8 transition-[border-color,translate] duration-300 hover:-translate-y-1 hover:border-foreground/22 max-md:hidden md:col-span-2"
+            className="group flex justify-between gap-6 overflow-hidden rounded-[28px] border bg-[linear-gradient(135deg,color-mix(in_oklab,var(--glow-pink)_16%,transparent),color-mix(in_oklab,var(--glow-violet)_10%,transparent)_60%,var(--card))] px-9 py-8 transition-[border-color,translate] duration-300 hover:-translate-y-1 hover:border-foreground/22 max-md:hidden md:col-span-2"
           >
             <span className="flex flex-col justify-between">
               <span className={cn(label, "text-sale")}>On sale now</span>

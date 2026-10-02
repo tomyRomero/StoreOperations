@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MailX } from "lucide-react";
 import UnsubscribeButton from "@/components/forms/UnsubscribeButton";
 import { getStoreSettings } from "@/lib/data/catalog";
+import { storeNameOf } from "@/lib/storefront";
 
 // Kept out of search results: every address here is one subscriber's private link
 export const metadata: Metadata = { title: "Unsubscribe", robots: { index: false } };
@@ -18,7 +19,7 @@ export default async function UnsubscribePage(props: { params: Promise<{ token: 
         <span className="flex size-12 items-center justify-center rounded-full bg-muted">
           <MailX className="size-6 text-muted-foreground" aria-hidden />
         </span>
-        <h1 className="text-h2">Leave the {settings?.storeName ?? "Palettehub"} newsletter?</h1>
+        <h1 className="text-h2">Leave the {storeNameOf(settings)} newsletter?</h1>
         <p className="text-muted-foreground">You&apos;ll stop getting our newsletter. Emails about your orders still arrive as usual.</p>
         <div className="mt-2">
           <UnsubscribeButton token={token} />

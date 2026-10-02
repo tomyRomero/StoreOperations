@@ -2,7 +2,7 @@ import SubscribeForm from "@/components/forms/SubscribeForm";
 
 // The newsletter, given the room to ask: a band with a gradient edge near the end of the home page.
 // The footer leaves its own form out on this page.
-export function NewsletterBand() {
+export function NewsletterBand({ many }: { many: string }) {
   return (
     <section aria-labelledby="newsletter-band-heading" className="container pt-18 lg:pt-40">
       <div className="rounded-[26px] bg-linear-120 from-glow-pink/70 via-glow-violet/40 to-glow-blue/70 p-px lg:rounded-[32px]">
@@ -13,7 +13,7 @@ export function NewsletterBand() {
               Be first to <br className="max-lg:hidden" />
               the restock.
             </h2>
-            <p className="text-[15px] leading-normal text-muted-foreground lg:text-[17px]">New supplies, restocks and sales, about once a month. Unsubscribe in one click.</p>
+            <p className="text-[15px] leading-normal text-muted-foreground lg:text-[17px]">New {many}, restocks and sales, about once a month. Unsubscribe in one click.</p>
           </div>
           <SubscribeForm variant="band" />
         </div>

@@ -9,6 +9,7 @@ import type { Category } from "@/lib/api/types";
 import { activeFilterCount, clearedFilters, productFiltersHref, type ProductFilters as Filters } from "@/lib/product-filters";
 import { cn } from "@/lib/utils";
 import { ProductFilters } from "./ProductFilters";
+import { useCountOf } from "@/components/StoreBrandProvider";
 
 type Props = {
   categories: Category[];
@@ -21,6 +22,7 @@ type Props = {
 export function MobileFilters({ categories, counts, filters }: Props) {
   const [open, setOpen] = useState(false);
   const [found, setFound] = useState<number | null>(null);
+  const countOf = useCountOf();
   const latest = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const active = activeFilterCount(filters);
@@ -47,7 +49,7 @@ export function MobileFilters({ categories, counts, filters }: Props) {
     }, 250);
   };
 
-  const showLabel = found === null ? "Show results" : found === 0 ? "Nothing matches yet" : `Show ${found} ${found === 1 ? "supply" : "supplies"}`;
+  const showLabel = found === null ? "Show results" : found === 0 ? "Nothing matches yet" : `Show ${countOf(found)}`;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

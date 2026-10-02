@@ -1,14 +1,14 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { Logo } from "@/components/brand/Logo";
-import type { Category } from "@/lib/api/types";
+import { StoreLogo } from "@/components/brand/StoreLogo";
+import type { Category, StoreSettings } from "@/lib/api/types";
+import { nounsOf, socialLinksOf, storeNameOf } from "@/lib/storefront";
 import { FooterNewsletter } from "./FooterNewsletter";
 
 type Props = {
   categories: Category[];
-  storeName: string;
-  // From Store settings; shown when the store has set one
-  supportEmail: string | null;
+  // The support email, phone, address and social links each show only when the store has set them
+  settings: StoreSettings | null;
   // Offered only while something is on a deal
   hasDeals: boolean;
 };
@@ -18,19 +18,23 @@ const headingClasses = "mb-1 font-mono text-xs font-medium uppercase tracking-[0
 
 // The store's name and newsletter, then shop, help and the store's own pages, and the name again in large
 // fading type to close the page
-export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Props) {
+export function SiteFooter({ categories, settings, hasDeals }: Props) {
+  const storeName = storeNameOf(settings);
+  const supportEmail = settings?.supportEmail ?? null;
+  const { contactPhone, contactAddress } = settings?.storefront ?? {};
+  const social = socialLinksOf(settings);
   return (
     <footer className="mt-auto overflow-hidden border-t pt-14 lg:pt-16">
       <div className="container grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-[2fr_1fr_1fr_1fr] lg:gap-8">
         <div className="col-span-2 grid content-start gap-5 sm:col-span-3 lg:col-span-1 lg:max-w-sm">
-          <Logo name={storeName} />
-          <FooterNewsletter />
+          <StoreLogo />
+          <FooterNewsletter homeHasBand={settings?.storefront.homeSections.includes("newsletter") ?? true} />
         </div>
 
         <nav aria-label="Shop" className="grid content-start gap-3">
           <h2 className={headingClasses}>Shop</h2>
           <Link href="/products" className={linkClasses}>
-            All supplies
+            All {nounsOf(settings).many}
           </Link>
           {categories.map((category) => (
             <Link key={category.id} href={`/products?category=${category.id}`} className={linkClasses}>
@@ -55,6 +59,11 @@ export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Pr
           <Link href="/account/orders" className={linkClasses}>
             Track an order
           </Link>
+          {contactPhone && (
+            <a href={`tel:${contactPhone.replace(/[^\d+]/g, "")}`} className={linkClasses}>
+              {contactPhone}
+            </a>
+          )}
           {supportEmail && (
             // A narrow column wraps the address after the @, never inside a word
             <a href={`mailto:${supportEmail}`} className={`${linkClasses} break-words`}>
@@ -80,6 +89,7 @@ export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Pr
           <Link href="/privacy" className={linkClasses}>
             Privacy
           </Link>
+          {contactAddress && <address className="whitespace-pre-line text-[15px] not-italic text-ink-2">{contactAddress}</address>}
         </nav>
       </div>
 
@@ -88,6 +98,18 @@ export function SiteFooter({ categories, storeName, supportEmail, hasDeals }: Pr
           <p>
             © {new Date().getFullYear()} {storeName}
           </p>
+          {social.length > 0 && (
+            <ul aria-label={`${storeName} elsewhere`} className="flex flex-wrap gap-x-5 gap-y-2">
+              {social.map((link) => (
+                <li key={link.name}>
+                  <a href={link.href} rel="me noopener" target="_blank" className="transition-colors hover:text-foreground">
+                    {link.name}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
           <p>Runs on StoreOps</p>
         </div>
       </div>

@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthArt } from "@/components/auth/AuthArt";
-import { Logo } from "@/components/brand/Logo";
+import { StoreLogo } from "@/components/brand/StoreLogo";
 import { SkipLink } from "@/components/layout/SkipLink";
-import { getDeals, getProducts, getStoreSettings } from "@/lib/data/catalog";
+import { getDeals, getProducts } from "@/lib/data/catalog";
 import { getCurrentUser } from "@/lib/session";
 import { stageProducts } from "@/lib/stage";
 
 // Sign-in and sign-up: the store's products in the studio light on large screens (the same three as the
 // home page's stage), the form beside them. Someone already signed in goes back to the store.
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  const [user, settings, deals, newest] = await Promise.all([getCurrentUser(), getStoreSettings(), getDeals(), getProducts({ sort: "newest", pageSize: 3 })]);
+  const [user, deals, newest] = await Promise.all([getCurrentUser(), getDeals(), getProducts({ sort: "newest", pageSize: 3 })]);
   if (user) {
     redirect("/");
   }
@@ -21,7 +21,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       {/* Over the art's top corner on large screens, above the form on smaller ones */}
       <header className="px-2 pt-1 lg:absolute lg:left-14 lg:top-14 lg:z-10 lg:p-0">
         <Link href="/" className="inline-flex rounded-lg">
-          <Logo name={settings?.storeName} />
+          <StoreLogo />
           <span className="sr-only">, back to the store</span>
         </Link>
       </header>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import SignInForm from "@/components/forms/SignInForm";
 import { getStoreSettings } from "@/lib/data/catalog";
+import { storeNameOf } from "@/lib/storefront";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -16,7 +17,7 @@ export default async function SignInPage() {
       </div>
       {/* The form reads where to go back to from the address */}
       <Suspense>
-        <SignInForm storeName={settings?.storeName ?? "Palettehub"} />
+        <SignInForm storeName={storeNameOf(settings)} />
       </Suspense>
     </div>
   );
