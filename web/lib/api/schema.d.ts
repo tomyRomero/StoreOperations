@@ -3190,6 +3190,7 @@ export interface components {
             username: string;
             email: string;
             password: string;
+            subscribeToNewsletter?: boolean;
         };
         RemovedSubscribersResponse: {
             /** Format: int32 */

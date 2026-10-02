@@ -61,6 +61,22 @@ public class AuthTests(ApiFixture api) : IClassFixture<ApiFixture>
             e.Action == ActivityAction.UserRegistered && e.EntityId == me.GetProperty("id").GetInt32(), Ct));
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Signing_up_joins_the_newsletter_only_when_asked(bool subscribe)
+    {
+        var email = NewEmail();
+
+        var response = await api.Factory.CreateClient().PostAsJsonAsync("/api/auth/register",
+            new { username = $"u-{Guid.NewGuid():N}"[..20], email, password = Password, subscribeToNewsletter = subscribe }, Ct);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        await using var db = api.CreateContext();
+        Assert.Equal(subscribe, await db.NewsletterSubscribers.AnyAsync(s => s.Email == email, Ct));
+        Assert.Equal(subscribe, await db.EmailOutbox.AnyAsync(m => m.ToAddress == email && m.Kind == EmailKind.NewsletterWelcome, Ct));
+    }
+
     [Fact]
     public async Task An_email_can_only_be_registered_once_whatever_its_case()
     {

@@ -10,6 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
+import { useStoreBrand } from "@/components/StoreBrandProvider";
 import { api } from "@/lib/api/browser";
 import { fieldErrors, problemMessage } from "@/lib/api/problems";
 import { safeReturnPath } from "@/lib/sign-in-path";
@@ -26,18 +27,20 @@ const FormSchema = z.object({
     .regex(/^[A-Za-z0-9._-]+$/, "Use only letters, numbers, dots, dashes and underscores"),
   email: z.string().trim().min(1, "Enter your email").email("Enter an email address"),
   password: newPassword,
+  subscribeToNewsletter: z.boolean(),
 });
 
 const SignUpForm = ({ storeName }: { storeName: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { many } = useStoreBrand();
   const [refusal, setRefusal] = useState<string | null>(null);
   const callbackUrl = searchParams.get("callbackUrl");
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { username: "", email: "", password: "" },
+    defaultValues: { username: "", email: "", password: "", subscribeToNewsletter: false },
   });
   const [typed, username, email] = useWatch({ control: form.control, name: ["password", "username", "email"] });
 
@@ -102,6 +105,29 @@ const SignUpForm = ({ storeName }: { storeName: string }) => {
                 </FormControl>
                 <PasswordChecklist value={typed} personal={[username, email]} />
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="subscribeToNewsletter"
+            render={({ field }) => (
+              <FormItem className="flex items-start gap-3">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={(event) => field.onChange(event.target.checked)}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                    ref={field.ref}
+                    className="mt-0.5 size-5 shrink-0 cursor-pointer accent-(--accent)"
+                  />
+                </FormControl>
+                <div className="grid gap-0.5">
+                  <FormLabel className="cursor-pointer font-normal">Email me about new {many} and sales</FormLabel>
+                  <FormDescription className="text-[13px]">About once a month. Unsubscribe in one click.</FormDescription>
+                </div>
               </FormItem>
             )}
           />

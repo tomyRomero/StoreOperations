@@ -14,6 +14,9 @@ public sealed record RegisterRequest
     // The strength rules (length, character classes) are Identity's, configured in AuthServiceCollectionExtensions
     [Required, StringLength(128)]
     public string Password { get; init; } = "";
+
+    // The box on the sign-up form, unticked unless the shopper ticks it
+    public bool SubscribeToNewsletter { get; init; }
 }
 
 public sealed record LoginRequest

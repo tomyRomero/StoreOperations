@@ -10,6 +10,7 @@ using StoreOps.Api.Auth.Models;
 using StoreOps.Api.Data;
 using StoreOps.Api.Domain;
 using StoreOps.Api.Emails;
+using StoreOps.Api.Newsletter.Services;
 
 namespace StoreOps.Api.Auth.Services;
 
@@ -58,6 +59,7 @@ public sealed class AuthService(
     LoginThrottle throttle,
     AppDbContext db,
     StoreEmails emails,
+    NewsletterService newsletter,
     IOptions<DataProtectionTokenProviderOptions> tokenOptions,
     TimeProvider clock,
     ILogger<AuthService> logger)
@@ -149,7 +151,12 @@ public sealed class AuthService(
         }
 
         if (result.User is not null)
+        {
             await signIn.SignInAsync(result.User, isPersistent: true);
+            // After the account exists, on its own: a newsletter hiccup never costs the shopper their account
+            if (request.SubscribeToNewsletter)
+                await newsletter.SubscribeAsync(result.User.Email!, ct);
+        }
         return result;
     }
 

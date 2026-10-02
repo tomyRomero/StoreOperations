@@ -5455,6 +5455,9 @@
             "maxLength": 128,
             "minLength": 0,
             "type": "string"
+          },
+          "subscribeToNewsletter": {
+            "type": "boolean"
           }
         }
       },
