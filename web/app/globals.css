@@ -88,6 +88,9 @@
   @variant dark {
     --glow-strength: 1;
   }
+  --brand-text-1: light-dark(#d4247a, var(--glow-pink));
+  --brand-text-2: light-dark(#6d4df2, var(--glow-violet));
+  --brand-text-3: light-dark(#2563eb, var(--glow-blue));
 
   /* Form fields: roomy on the storefront (52px tall, 14px corners, 15px text from tablets up; phones get
      16px so iOS doesn't zoom in on focus). The console sets its own, compact ones below. */
@@ -97,6 +100,63 @@
 
   /* Buttons are pills on the storefront; the console keeps crisp 6px corners */
   --button-radius: 9999px;
+
+  /* Headings' face; a theme can set its own */
+  --display-face: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+  Atelier: warm paper and ink, serif headlines, no glows. Only the tokens change; the pages are the same.
+  The console keeps its own look whatever the store's theme. Contrast, light / dark, on the page:
+  foreground 14.0 / 13.7:1, muted-foreground 5.9 / 6.4:1, faint 4.7 / 4.8:1, accent 5.0 / 9.1:1,
+  input borders 3.3 / 3.7:1.
+*/
+:root[data-store-theme="atelier"]:not(:has([data-console])) {
+  --background: light-dark(#f4f0e8, #15130f);
+  --foreground: light-dark(#1c1a16, #f1ebe1);
+  --card: light-dark(#fbf9f5, #1c1a16);
+  --popover: light-dark(#fbf9f5, #1f1c18);
+  --muted: light-dark(#ece6db, #23201b);
+  --muted-foreground: light-dark(#5c564c, #aaa294);
+  --border: light-dark(rgb(28 26 22 / 0.1), rgb(255 248 235 / 0.08));
+  --input: light-dark(#8b8478, #7a7364);
+  --ink-2: light-dark(#3d3932, #dcd5c8);
+  --ink-3: light-dark(#4a453d, #bdb5a6);
+  --faint: light-dark(#6b655a, #938b7c);
+  --surface-sunk: light-dark(#f8f5ef, #18160f);
+  --surface-3: light-dark(#e6dfd2, #2a2620);
+  --surface-hover: light-dark(#f7f3ec, #1f1c17);
+  --chip: light-dark(#ddd5c6, #3d382f);
+  --stage-end: light-dark(#fbf9f5, #1c1a16);
+  --stage-blue: light-dark(#ece5d8, #22201b);
+  --stage-violet: light-dark(#efe4d6, #26211b);
+  --shadow: light-dark(rgb(60 40 20 / 0.18), rgb(0 0 0 / 0.55));
+  --shadow-strong: light-dark(rgb(60 40 20 / 0.24), rgb(0 0 0 / 0.65));
+  --accent: light-dark(#a1452b, #f0b49e);
+  --accent-subtle: light-dark(rgb(161 69 43 / 0.1), rgb(240 180 158 / 0.14));
+  --accent-ink: light-dark(#742c18, #f7cbb9);
+  --ring: light-dark(#a1452b, #f0b49e);
+  --glow-pink: #c8613f;
+  --glow-violet: #a1452b;
+  --glow-blue: #5e7a5c;
+  --glow-strength: 0;
+  --field-radius: 8px;
+  --button-radius: 6px;
+  --display-face: var(--font-serif), Georgia, "Times New Roman", serif;
+}
+
+/* Instrument Serif has one weight: headlines are set in it at their regular weight, with the highlighted
+   words in italic, instead of a faked bold. Outside the layers, so it wins over the pages' utilities. */
+:root[data-store-theme="atelier"]:not(:has([data-console])) :is(h1, h2, h3) {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Highlighted words are the accent in italic, not a sweep of color */
+:root[data-store-theme="atelier"]:not(:has([data-console])) .text-brand-gradient {
+  background-image: none;
+  color: var(--accent);
+  font-style: italic;
 }
 
 :root[data-theme="light"] {
@@ -186,10 +246,10 @@
   --color-glow-amber: var(--glow-amber);
   --color-glow-orange: var(--glow-orange);
 
-  /* Set by next/font in app/fonts.ts. Headings have their own family so a store can give them a
-     different face later; Night Studio uses Geist for both. */
+  /* Set by next/font in app/fonts.ts. Headings follow --display-face, which a theme sets: Geist in
+     Night Studio, Instrument Serif in Atelier. */
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--display-face);
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -278,14 +338,10 @@
   );
 }
 
-/* Display type swept through the glows. Light mode takes deeper stops so even the pink passes 4.4:1. */
+/* Display type swept through the glows. Light mode takes deeper stops (--brand-text-*) so even the pink
+   passes 4.4:1. */
 @utility text-brand-gradient {
-  background-image: linear-gradient(
-    90deg,
-    light-dark(#d4247a, var(--glow-pink)) 0%,
-    light-dark(#6d4df2, var(--glow-violet)) 45%,
-    light-dark(#2563eb, var(--glow-blue)) 100%
-  );
+  background-image: linear-gradient(90deg, var(--brand-text-1) 0%, var(--brand-text-2) 45%, var(--brand-text-3) 100%);
   background-clip: text;
   color: transparent;
 }
@@ -303,7 +359,7 @@
 @utility shadow-glow {
   box-shadow:
     0 0 0 6px color-mix(in oklab, var(--foreground) 5%, transparent),
-    0 20px 50px rgb(139 108 255 / 0.3);
+    0 20px 50px color-mix(in oklab, var(--glow-violet) 30%, transparent);
 }
 
 /* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */

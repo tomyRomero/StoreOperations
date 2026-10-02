@@ -30,7 +30,7 @@ export function CheckoutSteps() {
               className={cn(
                 "grid size-[26px] place-items-center rounded-full font-mono text-xs font-semibold",
                 done && "bg-glow-green text-[#052e1f]",
-                active && "bg-primary text-primary-foreground shadow-[0_0_0_4px_rgb(139_108_255/0.35)]",
+                active && "bg-primary text-primary-foreground shadow-[0_0_0_4px_color-mix(in_oklab,var(--glow-violet)_35%,transparent)]",
                 !done && !active && "border border-input text-muted-foreground",
               )}
             >

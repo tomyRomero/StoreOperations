@@ -42,7 +42,7 @@ export function OrderTimeline({ order, timeZone }: { order: Order; timeZone: str
               className={cn(
                 "relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full",
                 step.state === "ended" && "bg-foreground/15 text-foreground",
-                filled && step.state !== "current" && "bg-glow-green text-[#052e1f] shadow-[0_0_0_4px_rgb(52_211_153/0.18)]",
+                filled && step.state !== "current" && "bg-glow-green text-[#052e1f] shadow-[0_0_0_4px_color-mix(in_oklab,var(--glow-green)_18%,transparent)]",
                 step.state === "current" && "bg-primary ring-4 ring-glow-violet/30",
                 step.state === "upcoming" && "border-[1.5px] border-input bg-card"
               )}

@@ -29,7 +29,7 @@ export function ContentPage({ eyebrow, title, lead, facts, children }: PageProps
 
   return (
     <div className="relative isolate overflow-x-clip">
-      <div aria-hidden className="absolute -top-40 left-1/2 -z-10 h-[520px] w-[1100px] max-w-full -translate-x-1/2 bg-[radial-gradient(45%_50%_at_30%_40%,rgb(52_211_153/0.14),transparent_70%),radial-gradient(40%_50%_at_75%_30%,rgb(139_108_255/0.16),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -top-40 left-1/2 -z-10 h-[520px] w-[1100px] max-w-full -translate-x-1/2 bg-[radial-gradient(45%_50%_at_30%_40%,color-mix(in_oklab,var(--glow-green)_14%,transparent),transparent_70%),radial-gradient(40%_50%_at_75%_30%,color-mix(in_oklab,var(--glow-violet)_16%,transparent),transparent_70%)] opacity-(--glow-strength)" />
       <div className="container max-w-[1160px] py-12 lg:py-20">
         <div className="grid gap-4">
           <p className="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent">{eyebrow}</p>

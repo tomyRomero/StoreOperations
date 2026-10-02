@@ -53,7 +53,7 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
               {addresses.map((address) => (
                 <label
                   key={address.id}
-                  className="group relative grid cursor-pointer content-start gap-2 rounded-[20px] border bg-card p-5 transition-colors hover:border-foreground/22 has-checked:border-glow-violet/60 has-checked:bg-glow-violet/8 has-checked:shadow-[0_0_0_4px_rgb(139_108_255/0.12)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
+                  className="group relative grid cursor-pointer content-start gap-2 rounded-[20px] border bg-card p-5 transition-colors hover:border-foreground/22 has-checked:border-glow-violet/60 has-checked:bg-glow-violet/8 has-checked:shadow-[0_0_0_4px_color-mix(in_oklab,var(--glow-violet)_12%,transparent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring"
                 >
                   <input
                     type="radio"
@@ -133,7 +133,7 @@ const ChooseAddress = ({ addresses, selectedId, shipping }: Props) => {
               type="button"
               disabled={chosenId === undefined || going}
               onClick={() => chosenId !== undefined && continueWith(chosenId)}
-              className="inline-flex h-[58px] items-center gap-2.5 rounded-full bg-primary px-8 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_rgb(139_108_255/0.3)] transition-colors hover:bg-primary/85 disabled:opacity-60 max-sm:w-full max-sm:justify-center"
+              className="inline-flex h-[58px] items-center gap-2.5 rounded-full bg-primary px-8 text-base font-semibold text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)] transition-colors hover:bg-primary/85 disabled:opacity-60 max-sm:w-full max-sm:justify-center"
             >
               {going && <LoaderCircle className="size-4 animate-spin" aria-hidden />}
               Continue to payment

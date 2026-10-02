@@ -120,7 +120,7 @@ function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: strin
     <div className="mx-auto grid max-w-[1120px] gap-4">
       <div role="status" className="relative isolate grid justify-items-center gap-4 pb-8 text-center">
         <span aria-hidden className="absolute -top-10 -z-10 size-72 rounded-full bg-glow-green opacity-[calc(0.22*var(--glow-strength))] blur-[90px]" />
-        <span className="grid size-16 place-items-center rounded-full bg-linear-to-br from-glow-green to-glow-blue text-[#052e1f] shadow-[0_0_0_8px_rgb(52_211_153/0.15),0_20px_60px_rgb(52_211_153/0.35)]">
+        <span className="grid size-16 place-items-center rounded-full bg-linear-to-br from-glow-green to-glow-blue text-[#052e1f] shadow-[0_0_0_8px_color-mix(in_oklab,var(--glow-green)_15%,transparent),0_20px_60px_color-mix(in_oklab,var(--glow-green)_35%,transparent)]">
           <CircleCheck className="size-8" strokeWidth={2.2} aria-hidden />
         </span>
         <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] sm:text-[56px]">Thank you! Your order is confirmed.</h1>
@@ -137,7 +137,7 @@ function Confirmation({ orderNumber, order, supportEmail }: { orderNumber: strin
               aria-hidden
               className={cn(
                 "grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold",
-                step.done ? "bg-glow-green text-[#052e1f] shadow-[0_0_0_4px_rgb(52_211_153/0.18)]" : "border-[1.5px] border-input",
+                step.done ? "bg-glow-green text-[#052e1f] shadow-[0_0_0_4px_color-mix(in_oklab,var(--glow-green)_18%,transparent)]" : "border-[1.5px] border-input",
               )}
             >
               {step.done && <Check className="size-4" strokeWidth={3} />}

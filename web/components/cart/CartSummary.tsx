@@ -28,7 +28,7 @@ export function CartSummary({ cart, shipping, variant = "drawer", onNavigate }: 
   const shippingCents = shippingFor(cart.subtotalCents, shipping);
   const savings = cartSavings(cart);
 
-  const button = cn(checkoutButton, page ? "h-[58px] text-base shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_rgb(139_108_255/0.3)]" : "h-[54px] text-[15px] shadow-[0_16px_40px_rgb(139_108_255/0.3)]");
+  const button = cn(checkoutButton, page ? "h-[58px] text-base shadow-[0_0_0_6px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_50px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)]" : "h-[54px] text-[15px] shadow-[0_16px_40px_color-mix(in_oklab,var(--glow-violet)_30%,transparent)]");
   const checkout = !user ? (
     <Link href={signInPath("/cart")} onClick={onNavigate} className={button}>
       Sign in to check out

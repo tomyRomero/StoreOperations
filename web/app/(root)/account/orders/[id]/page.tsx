@@ -59,7 +59,7 @@ export default async function OrderPage(props: Props) {
       </div>
 
       <section aria-labelledby="progress-heading" className="relative isolate grid gap-7 overflow-hidden rounded-[28px] border bg-card p-6 sm:p-7">
-        <div aria-hidden className="absolute -right-20 -top-24 -z-10 h-[300px] w-[420px] bg-[radial-gradient(50%_50%_at_50%_50%,rgb(61_139_255/0.16),transparent_70%)] opacity-(--glow-strength)" />
+        <div aria-hidden className="absolute -right-20 -top-24 -z-10 h-[300px] w-[420px] bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-blue)_16%,transparent),transparent_70%)] opacity-(--glow-strength)" />
         <h2 id="progress-heading" className="sr-only">
           Progress
         </h2>

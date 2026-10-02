@@ -31,7 +31,7 @@ export function LatestOrder({ order, timeZone }: { order: Order; timeZone: strin
 
   return (
     <article aria-labelledby="latest-heading" className="relative isolate grid gap-6 overflow-hidden rounded-[28px] border bg-card p-6 sm:p-7">
-      <div aria-hidden className="absolute -right-16 -top-20 -z-10 h-[300px] w-[380px] bg-[radial-gradient(50%_50%_at_50%_50%,rgb(61_139_255/0.2),transparent_70%)] opacity-(--glow-strength)" />
+      <div aria-hidden className="absolute -right-16 -top-20 -z-10 h-[300px] w-[380px] bg-[radial-gradient(50%_50%_at_50%_50%,color-mix(in_oklab,var(--glow-blue)_20%,transparent),transparent_70%)] opacity-(--glow-strength)" />
 
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="grid gap-2.5">
