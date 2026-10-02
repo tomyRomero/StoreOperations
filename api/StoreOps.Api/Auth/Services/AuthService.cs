@@ -216,7 +216,7 @@ public sealed class AuthService(
     // Sets the new password from the emailed link. The token is checked before the password, so a link that
     // is wrong, expired or already used says so; a weak password keeps the link usable for another try.
     // Success replaces the security stamp, which ends every session, and clears any lockout from wrong
-    // passwords so the owner can sign in straight away.
+    // passwords so the account holder can sign in straight away.
     public async Task<ResetPasswordResult> ResetPasswordAsync(ResetPasswordRequest request, CancellationToken ct)
     {
         string token;

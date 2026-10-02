@@ -28,7 +28,7 @@ public sealed class StripePayments(IOptions<StripeOptions> options) : IPayments
         return customer.Id;
     }
 
-    // D-26: shipping is part of the calculation, so Stripe applies each location's rule for it
+    // Shipping is part of the calculation, so Stripe applies each location's rule for taxing it
     public async Task<TaxQuote> CalculateTaxAsync(
         IReadOnlyList<TaxLine> lines, int shippingCents, PostalAddress shipTo, CancellationToken ct)
     {
@@ -64,7 +64,7 @@ public sealed class StripePayments(IOptions<StripeOptions> options) : IPayments
 
     public async Task<PaymentIntentState> CreatePaymentIntentAsync(string customerId, int amountCents, int userId, CancellationToken ct)
     {
-        // P3: no setup_future_usage, so the card isn't saved to the customer
+        // No setup_future_usage, so the card isn't saved to the customer
         var intent = await new PaymentIntentService(Client).CreateAsync(new PaymentIntentCreateOptions
         {
             Amount = amountCents,

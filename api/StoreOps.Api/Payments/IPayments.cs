@@ -21,7 +21,7 @@ public sealed record PaymentIntentState(string Id, string ClientSecret, string S
 // so they need neither a Stripe account nor the network.
 public interface IPayments
 {
-    // P2: a Stripe customer is created at the first checkout, not at sign-up
+    // A Stripe customer is created at the first checkout, not at sign-up
     Task<string> CreateCustomerAsync(int userId, string email, CancellationToken ct);
 
     Task<TaxQuote> CalculateTaxAsync(IReadOnlyList<TaxLine> lines, int shippingCents, PostalAddress shipTo, CancellationToken ct);

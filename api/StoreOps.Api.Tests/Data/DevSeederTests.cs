@@ -24,8 +24,8 @@ public class DevSeederTests(ApiFixture api) : IClassFixture<ApiFixture>
     [Theory]
     [InlineData("Server=tcp:storeops.database.windows.net,1433;Database=Palettehub")]
     [InlineData("Server=192.168.1.20,14330;Database=Palettehub")]
-    // Another project's database on this machine
-    [InlineData("Server=localhost,1433;Database=Clareion")]
+    // Another app's database on this machine
+    [InlineData("Server=localhost,1433;Database=OtherApp")]
     [InlineData("Server=localhost,14330;Database=master")]
     public void Seeding_is_refused_anywhere_else(string connectionString)
     {

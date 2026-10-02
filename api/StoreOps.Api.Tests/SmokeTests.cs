@@ -113,8 +113,8 @@ public class OpenApiTests(ApiFixture api) : IClassFixture<ApiFixture>
     }
 }
 
-// Every value the contract offers for a query-string enum is one the API accepts. MVC's own binder only
-// knew the C# names, so two-word values the contract lists (entityType=store_settings) were refused.
+// Every value the contract offers for a query-string enum is one the API accepts, including two-word
+// values (entityType=store_settings) that MVC's default binder, which only knows the C# names, refuses.
 public class QueryEnumTests(ApiFixture api) : IClassFixture<ApiFixture>
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;

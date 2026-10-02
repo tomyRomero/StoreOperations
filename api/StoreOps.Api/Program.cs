@@ -33,8 +33,8 @@ builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document,
     return Task.CompletedTask;
 }));
 
-// Enums travel as readable strings ("no_returns"), the same convention as Clareion's API, and numbers
-// only as JSON numbers. Set for the controllers and for the OpenAPI document, which reads its own copy.
+// Enums travel as snake_case strings ("no_returns") and numbers only as JSON numbers. Set for the
+// controllers and for the OpenAPI document, which reads its own copy.
 static void UseStoreJson(JsonSerializerOptions json)
 {
     json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower));

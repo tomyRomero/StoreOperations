@@ -10,9 +10,9 @@ namespace StoreOps.Api.Checkouts.Services;
 
 public sealed record PlacedOrder(int Id, string OrderNumber, OrderStatus Status, string StripeTaxCalculationId, string? StripeTaxTransactionId);
 
-// Turns a paid checkout into an order and queues its emails. Stripe may deliver the same webhook more than once, or two
-// deliveries at the same moment; every step is safe to repeat, and the unique PaymentIntent id on
-// orders means there is only ever one order per payment.
+// Turns a paid checkout into an order and queues its emails. Stripe may deliver the same webhook more
+// than once, or two deliveries at the same moment; every step is safe to repeat, and the unique
+// PaymentIntent id on orders means there is only ever one order per payment.
 public sealed class OrderPlacement(
     AppDbContext db, IPayments payments, StoreEmails emails, TimeProvider clock, ILogger<OrderPlacement> logger)
 {
@@ -77,7 +77,8 @@ public sealed class OrderPlacement(
     {
         var now = clock.GetUtcNow().UtcDateTime;
 
-        // D-27: the money received must match the quote exactly. P4: every line must still be in stock.
+        // The money received must match the quote exactly, and every line must still be in stock;
+        // otherwise the order is recorded as refunded
         var refundNote = amountReceivedCents != checkout.TotalCents
             ? "Your cart changed while you were paying, so we refunded this payment in full. Please check out again."
             : !await TakeStockAsync(checkout.Lines, ct)

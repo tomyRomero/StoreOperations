@@ -84,7 +84,7 @@ public sealed class CartService(AppDbContext db, TimeProvider clock)
     }
 
     // After sign-in: the browser's guest cart joins the saved one. For a product in both, the larger
-    // quantity wins (as before), limited to what's in stock. Products no longer sold are skipped.
+    // quantity wins, limited to what's in stock. Products no longer sold are skipped.
     public async Task<CartResponse> MergeAsync(int userId, IReadOnlyList<CartLineRequest> guestLines, CancellationToken ct)
     {
         var wanted = Wanted(guestLines);

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace StoreOps.Api.Common;
 
 // Enums in query strings and routes use the same names as JSON bodies and the published contract
-// ("store_settings", "price_desc"). MVC's own binder only knows the C# names, so it refused every
+// ("store_settings", "price_desc"). MVC's default binder only accepts the C# names, which rejects every
 // value of two words or more. Request bodies are left to the JSON serializer.
 public sealed class QueryEnumBinderProvider : IModelBinderProvider
 {

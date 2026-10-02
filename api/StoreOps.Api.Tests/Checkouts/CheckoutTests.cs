@@ -21,7 +21,7 @@ public class CheckoutTests(ApiFixture api) : IClassFixture<ApiFixture>
 
         Assert.Equal(2500, quote.GetProperty("subtotalCents").GetInt32());
         Assert.Equal(1000, quote.GetProperty("shippingCents").GetInt32());
-        // D-26: shipping is taxed along with the products
+        // Shipping is taxed along with the products
         Assert.Equal(FakePayments.TaxOn(3500), quote.GetProperty("taxCents").GetInt32());
         Assert.Equal(3500 + FakePayments.TaxOn(3500), quote.GetProperty("totalCents").GetInt32());
         Assert.Equal("Test shopper", quote.GetProperty("shipTo").GetProperty("recipientName").GetString());

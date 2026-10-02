@@ -23,8 +23,7 @@ public static class AuthServiceCollectionExtensions
                 options.User.RequireUniqueEmail = true;
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyz0123456789._-";
 
-                // The rules the store has always used: 9+ characters with an uppercase letter,
-                // a number and a symbol
+                // 9+ characters with an uppercase letter, a number and a symbol
                 options.Password.RequiredLength = 9;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = true;

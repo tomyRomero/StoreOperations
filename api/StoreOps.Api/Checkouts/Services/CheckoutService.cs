@@ -128,7 +128,7 @@ public sealed class CheckoutService(
             null);
     }
 
-    // P2: the Stripe customer is created at the first checkout and kept on the account
+    // The Stripe customer is created at the first checkout and kept on the account
     private async Task<string> StripeCustomerIdAsync(int userId, CancellationToken ct)
     {
         var user = await db.Users.SingleAsync(u => u.Id == userId, ct);
