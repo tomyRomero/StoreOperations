@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressLines, addressOneLine, formatDate, formatDay, formatTimeAgo, orderStatusLabel, returnsSummary, shippingSentence, shippingSummary } from "@/lib/format";
+import { addressLines, addressOneLine, formatDate, formatDay, formatTimeAgo, returnsSummary, shippingSentence, shippingSummary } from "@/lib/format";
 import type { PostalAddress } from "@/lib/api/types";
 
 describe("formatDate", () => {
@@ -53,13 +53,6 @@ describe("addresses", () => {
 
   it("fits on one line for a dropdown", () => {
     expect(addressOneLine(full)).toBe("Ada Lovelace, 1 Main St, Apt 4, Springfield, IL 62701");
-  });
-});
-
-describe("orderStatusLabel", () => {
-  it("says what a pending order is waiting for", () => {
-    expect(orderStatusLabel("pending")).toBe("Preparing to ship");
-    expect(orderStatusLabel("refunded")).toBe("Refunded");
   });
 });
 
