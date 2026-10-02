@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Folder, House, Mail, Package, Settings, ShoppingBag, Users, type LucideIcon } from "lucide-react";
+import { Activity, Folder, House, Mail, Package, Palette, Settings, ShoppingBag, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Item = { href: string; label: string; icon: LucideIcon };
@@ -23,6 +23,7 @@ const groups: { label: string | null; items: Item[] }[] = [
   {
     label: "Store",
     items: [
+      { href: "/admin/storefront", label: "Theme and brand", icon: Palette },
       { href: "/admin/activity", label: "Activity", icon: Activity },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],

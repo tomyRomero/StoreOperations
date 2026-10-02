@@ -1,7 +1,7 @@
 import "server-only";
 
 import { serverApi } from "../api/server";
-import type { ActivityEntity, AdminSettings, Dashboard } from "../api/types";
+import type { ActivityEntity, AdminSettings, AdminStorefront, Dashboard } from "../api/types";
 
 // The store as a whole, for the admin pages: settings, the activity log and the newsletter. The API refuses
 // these to anyone who isn't an admin.
@@ -14,6 +14,12 @@ export async function getDashboard(days: number): Promise<Dashboard | null> {
 
 export async function getAdminSettings(): Promise<AdminSettings | null> {
   const { data } = await serverApi().GET("/api/admin/settings");
+  return data ?? null;
+}
+
+// Theme and brand: the storefront's look and words, with the version it was read at
+export async function getAdminStorefront(): Promise<AdminStorefront | null> {
+  const { data } = await serverApi().GET("/api/admin/storefront");
   return data ?? null;
 }
 
