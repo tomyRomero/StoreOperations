@@ -18,7 +18,9 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       <SkipLink />
       {user?.isAdmin && !draft && <AdminBar />}
       <SiteHeader categories={categories} hasDeals={deals} lowStockThreshold={settings?.lowStockThreshold ?? 5} />
-      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+      {/* At least a screen tall, so the footer starts below the fold: pages whose content arrives a moment
+          later (the bag, the account) grow without moving anything the shopper can see */}
+      <main id="main" tabIndex={-1} className="min-h-dvh flex-1 outline-none">
         {children}
       </main>
       <SiteFooter categories={categories} settings={settings} hasDeals={deals} />
