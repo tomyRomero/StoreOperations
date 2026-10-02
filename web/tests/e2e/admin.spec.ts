@@ -24,7 +24,7 @@ test("the admin ships a guest's order and the guest gets the tracking", async ({
   const notify = adminTab.getByRole("switch", { name: "Email the customer about this change" });
   if ((await notify.getAttribute("aria-checked")) !== "true") await notify.click();
   await adminTab.getByRole("button", { name: "Save changes" }).click();
-  await expect(adminTab.getByText("Shipped").first()).toBeVisible();
+  await expect(adminTab.getByText("Order updated").first()).toBeVisible();
 
   const update = await emailTo(email, /^Your order is on its way/);
   await page.goto(linkIn(update.text, /^\/orders\//));
