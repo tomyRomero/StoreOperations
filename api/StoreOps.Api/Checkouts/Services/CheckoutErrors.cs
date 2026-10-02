@@ -7,6 +7,9 @@ public static class CheckoutErrors
     public static readonly ApiError UnknownAddress = new(StatusCodes.Status400BadRequest, "UNKNOWN_ADDRESS",
         "Choose one of your saved addresses.", Field: "addressId");
 
+    public static readonly ApiError GuestCheckoutOff = new(StatusCodes.Status403Forbidden, "GUEST_CHECKOUT_OFF",
+        "Sign in or create an account to check out.");
+
     public static readonly ApiError CartEmpty = new(StatusCodes.Status409Conflict, "CART_EMPTY",
         "Your cart is empty.");
 

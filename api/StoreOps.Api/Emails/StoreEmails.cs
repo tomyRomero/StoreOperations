@@ -39,15 +39,15 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             "If it wasn't you, ignore this email. Your password stays as it is.\n");
     }
 
-    // The customer's confirmation and a note for the store, or, for a refunded order, the refund email
-    public async Task AddForPlacedOrderAsync(Order order, string customerEmail, CancellationToken ct)
+    // The buyer's confirmation and a note for the store, or, for a refunded order, the refund email
+    public async Task AddForPlacedOrderAsync(Order order, CancellationToken ct)
     {
         var settings = await SettingsAsync(ct);
         var model = new OrderEmailModel(
             settings.StoreName,
             settings.SupportEmail,
             order.OrderNumber,
-            $"{SiteUrl}/account/orders/{order.OrderNumber}",
+            OrderUrl(order),
             order.Lines.Select(l => new OrderEmailLine(l.ProductName, l.Quantity, l.UnitPriceCents * l.Quantity)).ToList(),
             order.ShipTo,
             order.SubtotalCents,
@@ -58,12 +58,12 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
 
         if (order.Status == OrderStatus.Refunded)
         {
-            await AddAsync<OrderRefundedEmail>(EmailKind.OrderRefunded, customerEmail,
+            await AddAsync<OrderRefundedEmail>(EmailKind.OrderRefunded, order.Email,
                 $"We refunded your {settings.StoreName} payment", model, OrderText("We refunded your payment in full.", model));
             return;
         }
 
-        await AddAsync<OrderConfirmationEmail>(EmailKind.OrderConfirmation, customerEmail,
+        await AddAsync<OrderConfirmationEmail>(EmailKind.OrderConfirmation, order.Email,
             $"Order confirmation from {settings.StoreName}", model, OrderText("Thanks for your order!", model));
 
         if (settings.SupportEmail is { } storeInbox)
@@ -75,14 +75,14 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
     }
 
     // Only when the admin chose to email the customer about a status change
-    public async Task AddStatusUpdateAsync(Order order, string customerEmail, string? note, CancellationToken ct)
+    public async Task AddStatusUpdateAsync(Order order, string? note, CancellationToken ct)
     {
         var settings = await SettingsAsync(ct);
         var model = new OrderStatusEmailModel(
             settings.StoreName,
             settings.SupportEmail,
             order.OrderNumber,
-            $"{SiteUrl}/account/orders/{order.OrderNumber}",
+            OrderUrl(order),
             order.Status,
             order.ShipTo.RecipientName,
             order.Carrier is { } carrier ? CarrierNames.Of(carrier) : null,
@@ -103,8 +103,19 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             text.AppendLine($"{model.CarrierName ?? "Tracking"} number: {model.TrackingNumber} {model.TrackingUrl}");
         text.AppendLine().AppendLine($"See your order: {model.OrderUrl}");
 
-        await AddAsync<OrderStatusUpdateEmail>(EmailKind.OrderStatusUpdate, customerEmail,
+        await AddAsync<OrderStatusUpdateEmail>(EmailKind.OrderStatusUpdate, order.Email,
             $"{model.Headline} ({order.OrderNumber})", model, text.ToString());
+    }
+
+    // Answers "Find your order": the link to it, sent only to the address the order was placed with
+    public async Task AddOrderLinkAsync(Order order, CancellationToken ct)
+    {
+        var settings = await SettingsAsync(ct);
+        var model = new OrderLinkEmailModel(settings.StoreName, settings.SupportEmail, order.OrderNumber, OrderUrl(order),
+            InAccount: order.UserId is not null);
+        await AddAsync<OrderLinkEmail>(EmailKind.OrderLink, order.Email, $"Your {settings.StoreName} order {order.OrderNumber}", model,
+            $"Here's your order {order.OrderNumber}{(model.InAccount ? ". It's saved in your account, so sign in to see it" : "")}:\n" +
+            $"{model.OrderUrl}\n\nIf you didn't ask for this, you can ignore this email.\n");
     }
 
     // Tells a new subscriber they're on the list, with a link to leave in case someone else typed their address
@@ -150,6 +161,11 @@ public sealed class StoreEmails(AppDbContext db, EmailRenderer renderer, IOption
             replyTo: email);
         return true;
     }
+
+    // A guest's order opens from its private link, a customer's from their account
+    private string OrderUrl(Order order) => order.UserId is null
+        ? $"{SiteUrl}/orders/{order.AccessToken}"
+        : $"{SiteUrl}/account/orders/{order.OrderNumber}";
 
     // The page that asks "Unsubscribe?" before doing it, so a link scanner opening the link changes nothing
     private string UnsubscribePageUrl(string token) => $"{SiteUrl}/unsubscribe/{token}";

@@ -63,8 +63,8 @@ public class StoreSettingsConfiguration : IEntityTypeConfiguration<StoreSettings
             t.HasCheckConstraint("CK_StoreSettings_AccentColor", "[AccentColor] IS NULL OR [AccentColor] LIKE '#[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F]'");
         });
 
-        // A new store's starting point: $10 flat shipping, no free-shipping threshold. The demo seed
-        // fills in Palettehub's name and storefront.
+        // A new store's starting point: $10 flat shipping, no free-shipping threshold, and guests can check
+        // out. The demo seed fills in Palettehub's name and storefront.
         settings.HasData(new StoreSettings
         {
             Id = StoreSettings.SingletonId,
@@ -73,6 +73,7 @@ public class StoreSettingsConfiguration : IEntityTypeConfiguration<StoreSettings
             ReturnPolicy = ReturnPolicy.NoReturns,
             LowStockThreshold = 5,
             EmailCustomerOnStatusUpdateByDefault = false,
+            GuestCheckout = true,
             TimeZoneId = "America/New_York",
             UpdatedAtUtc = new DateTime(2026, 9, 30, 0, 0, 0, DateTimeKind.Utc),
         });

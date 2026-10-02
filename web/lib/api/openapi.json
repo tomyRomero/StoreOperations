@@ -440,6 +440,140 @@
         }
       }
     },
+    "/api/orders/{accessToken}": {
+      "get": {
+        "tags": [
+          "GuestOrders"
+        ],
+        "parameters": [
+          {
+            "name": "accessToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 48,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestOrderResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestOrderResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestOrderResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/find": {
+      "post": {
+        "tags": [
+          "GuestOrders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/orders/{accessToken}/save": {
+      "post": {
+        "tags": [
+          "GuestOrders"
+        ],
+        "parameters": [
+          {
+            "name": "accessToken",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "maxLength": 48,
+              "minLength": 0,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedOrderResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedOrderResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/account/orders": {
       "get": {
         "tags": [
@@ -1216,6 +1350,55 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/StartCheckoutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/checkout/guest": {
+      "post": {
+        "tags": [
+          "Checkout"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuestCheckoutRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuestCheckoutRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GuestCheckoutRequest"
               }
             }
           },
@@ -3667,7 +3850,10 @@
             "format": "date-time"
           },
           "customerId": {
-            "type": "integer",
+            "type": [
+              "null",
+              "integer"
+            ],
             "format": "int32"
           },
           "customerName": {
@@ -3791,6 +3977,7 @@
           "placedAtUtc",
           "customerName",
           "customerEmail",
+          "isGuest",
           "itemCount",
           "totalCents"
         ],
@@ -3817,6 +4004,9 @@
           },
           "customerEmail": {
             "type": "string"
+          },
+          "isGuest": {
+            "type": "boolean"
           },
           "itemCount": {
             "type": "integer",
@@ -4323,7 +4513,8 @@
       "CheckoutResultResponse": {
         "required": [
           "result",
-          "orderNumber"
+          "orderNumber",
+          "orderToken"
         ],
         "type": "object",
         "properties": {
@@ -4331,6 +4522,12 @@
             "$ref": "#/components/schemas/PaymentResult"
           },
           "orderNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "orderToken": {
             "type": [
               "null",
               "string"
@@ -4540,6 +4737,25 @@
           }
         }
       },
+      "FindOrderRequest": {
+        "required": [
+          "email",
+          "orderNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          },
+          "orderNumber": {
+            "maxLength": 20,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
       "ForgotPasswordRequest": {
         "required": [
           "email"
@@ -4550,6 +4766,51 @@
             "maxLength": 256,
             "minLength": 0,
             "type": "string"
+          }
+        }
+      },
+      "GuestCheckoutRequest": {
+        "required": [
+          "email",
+          "address",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "maxLength": 256,
+            "minLength": 0,
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressRequest"
+          },
+          "items": {
+            "maxItems": 100,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartLineRequest"
+            }
+          }
+        }
+      },
+      "GuestOrderResponse": {
+        "required": [
+          "email",
+          "inAccount",
+          "order"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "inAccount": {
+            "type": "boolean"
+          },
+          "order": {
+            "$ref": "#/components/schemas/OrderResponse"
           }
         }
       },
@@ -5380,6 +5641,7 @@
           "returnPolicyNote",
           "lowStockThreshold",
           "timeZoneId",
+          "guestCheckout",
           "storefront"
         ],
         "type": "object",
@@ -5426,6 +5688,9 @@
           },
           "timeZoneId": {
             "type": "string"
+          },
+          "guestCheckout": {
+            "type": "boolean"
           },
           "storefront": {
             "$ref": "#/components/schemas/StorefrontResponse"
@@ -5521,6 +5786,17 @@
           "exchanges",
           "refunds"
         ]
+      },
+      "SavedOrderResponse": {
+        "required": [
+          "orderNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "orderNumber": {
+            "type": "string"
+          }
+        }
       },
       "SetQuantityRequest": {
         "required": [
@@ -5772,6 +6048,7 @@
           "lowStockThreshold",
           "emailCustomerOnStatusUpdateByDefault",
           "timeZoneId",
+          "guestCheckout",
           "updatedAtUtc",
           "rowVersion"
         ],
@@ -5819,6 +6096,9 @@
           },
           "timeZoneId": {
             "type": "string"
+          },
+          "guestCheckout": {
+            "type": "boolean"
           },
           "updatedAtUtc": {
             "type": "string",
@@ -6181,6 +6461,7 @@
           "lowStockThreshold",
           "emailCustomerOnStatusUpdateByDefault",
           "timeZoneId",
+          "guestCheckout",
           "rowVersion"
         ],
         "type": "object",
@@ -6242,6 +6523,9 @@
             "minLength": 0,
             "type": "string"
           },
+          "guestCheckout": {
+            "type": "boolean"
+          },
           "rowVersion": {
             "maxLength": 8,
             "minLength": 8,
@@ -6279,6 +6563,9 @@
     },
     {
       "name": "AdminOrders"
+    },
+    {
+      "name": "GuestOrders"
     },
     {
       "name": "Orders"

@@ -5,7 +5,7 @@ namespace StoreOps.Api.Settings.Models;
 
 // What the storefront shows: the footer, the cart's free-shipping note, the returns page and "Only 3 left",
 // and its look and words. Order dates are shown in the store's time zone, the same calendar day the admin
-// pages use.
+// pages use. GuestCheckout says whether checkout asks for an account.
 public sealed record PublicStoreSettingsResponse(
     string StoreName,
     string? SupportEmail,
@@ -16,6 +16,7 @@ public sealed record PublicStoreSettingsResponse(
     string? ReturnPolicyNote,
     int LowStockThreshold,
     string TimeZoneId,
+    bool GuestCheckout,
     StorefrontResponse Storefront);
 
 // Empty text is null, and the storefront fills it from the store's name
@@ -128,6 +129,7 @@ public sealed record StoreSettingsResponse(
     int LowStockThreshold,
     bool EmailCustomerOnStatusUpdateByDefault,
     string TimeZoneId,
+    bool GuestCheckout,
     DateTime UpdatedAtUtc,
     byte[] RowVersion);
 
@@ -163,6 +165,9 @@ public sealed record UpdateStoreSettingsRequest
     // An IANA time zone such as America/New_York
     [Required, StringLength(64)]
     public string TimeZoneId { get; init; } = "";
+
+    // Off: shoppers sign in or create an account before checkout
+    public required bool GuestCheckout { get; init; }
 
     [Required, MinLength(8), MaxLength(8)]
     public byte[] RowVersion { get; init; } = [];

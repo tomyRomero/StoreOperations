@@ -22,6 +22,9 @@ public class StoreSettings : IUpdatedAt
     public int LowStockThreshold { get; set; }
     public bool EmailCustomerOnStatusUpdateByDefault { get; set; }
 
+    // Shoppers can check out without an account. When it's off, they sign in or create one first.
+    public bool GuestCheckout { get; set; } = true;
+
     // IANA time zone (e.g. America/New_York): decides what "a day" means on the dashboard and order pages
     public required string TimeZoneId { get; set; }
 

@@ -60,6 +60,7 @@ const FormSchema = z.object({
   returnPolicyNote: z.string().trim().max(500, "Use at most 500 characters"),
   lowStockThreshold: z.string().regex(/^\d{1,4}$/, "Enter a whole number").refine((t) => Number(t) <= 1000, "Use at most 1000"),
   emailCustomerOnStatusUpdateByDefault: z.boolean(),
+  guestCheckout: z.boolean(),
   timeZoneId: z.string().min(1, "Choose a time zone"),
 }).refine(
   (v) => v.returnPolicy === "no_returns" || (/^\d{1,3}$/.test(v.returnWindowDays) && Number(v.returnWindowDays) >= 1 && Number(v.returnWindowDays) <= 365),
@@ -91,6 +92,7 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
       returnPolicyNote: settings.returnPolicyNote ?? "",
       lowStockThreshold: String(settings.lowStockThreshold),
       emailCustomerOnStatusUpdateByDefault: settings.emailCustomerOnStatusUpdateByDefault,
+      guestCheckout: settings.guestCheckout,
       timeZoneId: settings.timeZoneId,
     },
   });
@@ -118,6 +120,7 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
         returnPolicyNote: values.returnPolicyNote || null,
         lowStockThreshold: Number(values.lowStockThreshold),
         emailCustomerOnStatusUpdateByDefault: values.emailCustomerOnStatusUpdateByDefault,
+        guestCheckout: values.guestCheckout,
         timeZoneId: values.timeZoneId,
         rowVersion: settings.rowVersion,
       },
@@ -326,6 +329,23 @@ export function StoreSettingsForm({ settings }: { settings: AdminSettings }) {
                 </FormControl>
                 <FormDescription>Products with this many or fewer left show as low, in the store and on the dashboard.</FormDescription>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="guestCheckout"
+            render={({ field }) => (
+              <FormItem className="flex items-start gap-3">
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} className="mt-0.5" />
+                </FormControl>
+                <div className="grid gap-1">
+                  <FormLabel>Let shoppers check out without an account</FormLabel>
+                  <FormDescription>
+                    Guests give their email and address at checkout and get a private link to their order. When it&apos;s off, they sign in or create an account first.
+                  </FormDescription>
+                </div>
               </FormItem>
             )}
           />

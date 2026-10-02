@@ -10,8 +10,16 @@ public class Order : IUpdatedAt
     // The number customers see, e.g. 7K3M9Q2A. Internal ids are never shown.
     public required string OrderNumber { get; set; }
 
-    public int UserId { get; set; }
-    public ApplicationUser User { get; set; } = null!;
+    // Null for a guest's order, until they save it to an account
+    public int? UserId { get; set; }
+    public ApplicationUser? User { get; set; }
+
+    // Where the order's emails go, as given at checkout
+    public required string Email { get; set; }
+
+    // A guest's private link to the order: /orders/{AccessToken}. Kept once the order is saved to an
+    // account, so the link in the confirmation email still works.
+    public string? AccessToken { get; set; }
 
     // The current status: a copy of the newest StatusHistory entry, kept for fast filtering
     public OrderStatus Status { get; set; } = OrderStatus.Pending;

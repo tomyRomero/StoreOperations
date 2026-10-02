@@ -47,6 +47,9 @@ public sealed record OrderStatusEmailModel(
     };
 }
 
+// "Find your order": InAccount when the order is saved in an account, so the link asks to sign in
+public sealed record OrderLinkEmailModel(string StoreName, string? SupportEmail, string OrderNumber, string OrderUrl, bool InAccount);
+
 // The admin's plain-text newsletter. Each paragraph keeps its line breaks.
 public sealed record NewsletterEmailModel(
     string StoreName, string? SupportEmail, string Subject, IReadOnlyList<string> Paragraphs, string ShopUrl, string UnsubscribeUrl);

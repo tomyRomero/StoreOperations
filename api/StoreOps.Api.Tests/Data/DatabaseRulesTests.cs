@@ -78,6 +78,32 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
     }
 
     [Fact]
+    public async Task Every_order_belongs_to_an_account_or_has_a_private_link()
+    {
+        var product = await AddProductAsync();
+        await using var db = database.CreateContext();
+
+        db.Orders.Add(NewOrder(userId: null, product.Id));
+
+        var error = await SqlErrorAsync(() => db.SaveChangesAsync(Ct));
+        Assert.Contains("CK_Orders_Reachable", error.Message);
+    }
+
+    [Fact]
+    public async Task A_checkout_is_a_customers_or_a_guests_never_both()
+    {
+        var user = await AddUserAsync();
+        await using var db = database.CreateContext();
+
+        var both = NewCheckout(user.Id, CheckoutStatus.Open);
+        both.GuestKey = new string('a', 48);
+        db.Checkouts.Add(both);
+
+        var error = await SqlErrorAsync(() => db.SaveChangesAsync(Ct));
+        Assert.Contains("CK_Checkouts_Owner", error.Message);
+    }
+
+    [Fact]
     public async Task Order_totals_must_add_up()
     {
         var user = await AddUserAsync();
@@ -242,10 +268,11 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
         return user;
     }
 
-    private static Order NewOrder(int userId, int productId, string? paymentIntentId = null) => new()
+    private static Order NewOrder(int? userId, int productId, string? paymentIntentId = null) => new()
     {
         OrderNumber = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant(),
         UserId = userId,
+        Email = "test@example.test",
         ShipTo = Address,
         SubtotalCents = 2000,
         ShippingCents = 1000,
@@ -260,6 +287,7 @@ public class DatabaseRulesTests(DatabaseFixture database) : IClassFixture<Databa
     private static Checkout NewCheckout(int userId, CheckoutStatus status) => new()
     {
         UserId = userId,
+        Email = "test@example.test",
         Status = status,
         CompletedAtUtc = status == CheckoutStatus.Completed ? DateTime.UtcNow : null,
         StripePaymentIntentId = $"pi_{Guid.NewGuid():N}",

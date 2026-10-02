@@ -1,0 +1,21 @@
+<EmailLayout StoreName="@Model.StoreName" SupportEmail="@Model.SupportEmail">
+    <div style="font-size:20px;font-weight:bold;text-align:center;">Your order @Model.OrderNumber</div>
+    <p style="text-align:center;color:#444444;">
+        @if (Model.InAccount)
+        {
+            <text>Here's the link you asked for. The order is saved in your @Model.StoreName account, so sign in to see it.</text>
+        }
+        else
+        {
+            <text>Here's the link you asked for. It opens your order, with its tracking, any time.</text>
+        }
+    </p>
+    <EmailButton Href="@Model.OrderUrl" Text="View your order" />
+    <p style="text-align:center;color:#666666;font-size:13px;">
+        If you didn't ask for this, you can ignore this email.
+    </p>
+</EmailLayout>
+
+@code {
+    [Parameter, EditorRequired] public OrderLinkEmailModel Model { get; set; } = null!;
+}

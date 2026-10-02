@@ -66,7 +66,7 @@ public sealed class OrderPlacement(
         catch (DbUpdateException exception) when (exception.IsUniqueViolation())
         {
             // A second delivery of the same webhook placed it a moment ago; this attempt was rolled back.
-            // Anything else (an order number clash) fails the webhook, and Stripe's retry draws a new number.
+            // Anything else (an order number or link clash) fails the webhook, and Stripe's retry draws again.
             if (await FindAsync(checkout.StripePaymentIntentId, ct) is { } placedMeanwhile)
                 return placedMeanwhile;
             throw;
@@ -89,6 +89,9 @@ public sealed class OrderPlacement(
         {
             OrderNumber = RandomNumberGenerator.GetString(OrderNumberAlphabet, 8),
             UserId = checkout.UserId,
+            Email = checkout.Email,
+            // A guest finds the order again through this private link, sent in its emails
+            AccessToken = checkout.UserId is null ? RandomNumberGenerator.GetHexString(48, lowercase: true) : null,
             Status = refundNote is null ? OrderStatus.Pending : OrderStatus.Refunded,
             ShipTo = checkout.ShipTo,
             SubtotalCents = checkout.SubtotalCents,
@@ -119,12 +122,13 @@ public sealed class OrderPlacement(
                 .SetProperty(c => c.Status, CheckoutStatus.Completed)
                 .SetProperty(c => c.CompletedAtUtc, now), ct);
 
-        // Bought products leave the cart. After a refund the cart stays, so the customer can try again.
-        if (refundNote is null)
+        // Bought products leave a customer's cart (a guest's is in their browser). After a refund the cart
+        // stays, so the customer can try again.
+        if (refundNote is null && checkout.UserId is { } userId)
         {
             var bought = checkout.Lines.Select(l => l.ProductId).ToList();
             await db.CartItems
-                .Where(i => i.UserId == checkout.UserId && bought.Contains(i.ProductId))
+                .Where(i => i.UserId == userId && bought.Contains(i.ProductId))
                 .ExecuteDeleteAsync(ct);
         }
 
@@ -141,8 +145,7 @@ public sealed class OrderPlacement(
         });
 
         // Queued in this transaction: sent only if the order is really saved
-        var customerEmail = await db.Users.Where(u => u.Id == checkout.UserId).Select(u => u.Email!).SingleAsync(ct);
-        await emails.AddForPlacedOrderAsync(order, customerEmail, ct);
+        await emails.AddForPlacedOrderAsync(order, ct);
 
         await db.SaveChangesAsync(ct);
 

@@ -62,7 +62,7 @@ public sealed class StripePayments(IOptions<StripeOptions> options) : IPayments
         return new TaxQuote(calculation.Id, checked((int)calculation.TaxAmountExclusive));
     }
 
-    public async Task<PaymentIntentState> CreatePaymentIntentAsync(string customerId, int amountCents, int userId, CancellationToken ct)
+    public async Task<PaymentIntentState> CreatePaymentIntentAsync(string? customerId, int amountCents, int? userId, CancellationToken ct)
     {
         // No setup_future_usage, so the card isn't saved to the customer
         var intent = await new PaymentIntentService(Client).CreateAsync(new PaymentIntentCreateOptions
@@ -72,7 +72,7 @@ public sealed class StripePayments(IOptions<StripeOptions> options) : IPayments
             Customer = customerId,
             AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions { Enabled = true },
             // Only a reference; the webhook finds the checkout by the PaymentIntent's own id
-            Metadata = new Dictionary<string, string> { ["user_id"] = Id(userId) },
+            Metadata = userId is { } id ? new Dictionary<string, string> { ["user_id"] = Id(id) } : null,
         }, cancellationToken: ct);
         return State(intent);
     }

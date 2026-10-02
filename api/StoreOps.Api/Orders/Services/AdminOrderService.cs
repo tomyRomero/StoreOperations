@@ -39,7 +39,7 @@ public sealed class AdminOrderService(
     TimeProvider clock,
     ILogger<AdminOrderService> logger)
 {
-    // Newest first. Search matches the order number, the customer's email or username, or the recipient.
+    // Newest first. Search matches the order number, its email, the customer's username, or the recipient.
     public async Task<Paged<AdminOrderSummaryResponse>> ListAsync(AdminOrderQuery query, CancellationToken ct)
     {
         var orders = db.Orders.AsQueryable();
@@ -49,8 +49,8 @@ public sealed class AdminOrderService(
             orders = orders.Where(o => o.UserId == customerId);
         if (query.Search?.Trim() is { Length: > 0 } search)
             orders = orders.Where(o => o.OrderNumber == search.ToUpper()
-                || o.User.Email!.Contains(search)
-                || o.User.UserName!.Contains(search)
+                || o.Email.Contains(search)
+                || (o.User != null && o.User.UserName!.Contains(search))
                 || o.ShipTo.RecipientName.Contains(search));
 
         var totalCount = await orders.CountAsync(ct);
@@ -66,7 +66,8 @@ public sealed class AdminOrderService(
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .Select(o => new AdminOrderSummaryResponse(
-                o.OrderNumber, o.Status, Order.NextStatuses(o.Status), o.PlacedAtUtc, o.User.UserName!, o.User.Email!,
+                o.OrderNumber, o.Status, Order.NextStatuses(o.Status), o.PlacedAtUtc,
+                o.User != null ? o.User.UserName! : o.ShipTo.RecipientName, o.Email, o.UserId == null,
                 o.Lines.Sum(l => l.Quantity), o.TotalCents))
             .ToListAsync(ct);
 
@@ -219,7 +220,7 @@ public sealed class AdminOrderService(
             var emailCustomer = request.EmailCustomer
                 ?? await db.StoreSettings.Select(s => s.EmailCustomerOnStatusUpdateByDefault).SingleAsync(ct);
             if (emailCustomer)
-                await emails.AddStatusUpdateAsync(order, order.User.Email!, note, ct);
+                await emails.AddStatusUpdateAsync(order, note, ct);
         }
 
         // The order is saved first, so an edit from an older copy fails before any stock moves
@@ -244,8 +245,8 @@ public sealed class AdminOrderService(
         Order.NextStatuses(order.Status),
         order.PlacedAtUtc,
         order.UserId,
-        order.User.UserName!,
-        order.User.Email!,
+        order.User?.UserName ?? order.ShipTo.RecipientName,
+        order.Email,
         order.Lines
             .OrderBy(l => l.ProductId)
             .Select(l => new OrderLineResponse(l.ProductId, l.ProductName, l.UnitPriceCents, l.Quantity, l.LineTotalCents, ImageKeys.UrlFor(l.ImageKey)))

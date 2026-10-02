@@ -16,7 +16,7 @@ public sealed record AdminOrderQuery(
     string? Search, OrderStatus? Status, int? CustomerId, AdminOrderSort Sort, int Page, int PageSize);
 
 // NextStatuses lets the list's bulk bar say which selected orders a change applies to (and what it
-// refunds) before anything is sent
+// refunds) before anything is sent. A guest's order is named after its recipient.
 public sealed record AdminOrderSummaryResponse(
     string OrderNumber,
     OrderStatus Status,
@@ -24,18 +24,20 @@ public sealed record AdminOrderSummaryResponse(
     DateTime PlacedAtUtc,
     string CustomerName,
     string CustomerEmail,
+    bool IsGuest,
     int ItemCount,
     int TotalCents);
 
 // ChangedBy is the admin's username, or null for the system (the webhook placing the order)
 public sealed record AdminOrderStepResponse(OrderStatus Status, DateTime ChangedAtUtc, string? Note, string? ChangedBy);
 
+// CustomerId is null for a guest's order, which is named after its recipient
 public sealed record AdminOrderResponse(
     string OrderNumber,
     OrderStatus Status,
     IReadOnlyList<OrderStatus> NextStatuses,
     DateTime PlacedAtUtc,
-    int CustomerId,
+    int? CustomerId,
     string CustomerName,
     string CustomerEmail,
     IReadOnlyList<OrderLineResponse> Lines,

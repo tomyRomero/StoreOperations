@@ -227,6 +227,7 @@ public static class DevSeeder
         {
             OrderNumber = orderNumber,
             UserId = customer.Id,
+            Email = customer.Email!,
             Status = status,
             ShipTo = CustomerAddress,
             SubtotalCents = subtotal,

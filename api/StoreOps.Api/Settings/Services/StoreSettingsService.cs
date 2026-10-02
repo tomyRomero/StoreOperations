@@ -38,7 +38,7 @@ public sealed class StoreSettingsService(AppDbContext db, ImageStorage images, T
         var s = await db.StoreSettings.AsNoTracking().SingleAsync(ct);
         return new PublicStoreSettingsResponse(
             s.StoreName, s.SupportEmail, s.ShippingFlatRateCents, s.FreeShippingThresholdCents,
-            s.ReturnPolicy, s.ReturnWindowDays, s.ReturnPolicyNote, s.LowStockThreshold, s.TimeZoneId, ToStorefront(s));
+            s.ReturnPolicy, s.ReturnWindowDays, s.ReturnPolicyNote, s.LowStockThreshold, s.TimeZoneId, s.GuestCheckout, ToStorefront(s));
     }
 
     public async Task<StorefrontSettingsResponse> GetStorefrontAsync(CancellationToken ct) =>
@@ -68,6 +68,7 @@ public sealed class StoreSettingsService(AppDbContext db, ImageStorage images, T
         settings.LowStockThreshold = request.LowStockThreshold;
         settings.EmailCustomerOnStatusUpdateByDefault = request.EmailCustomerOnStatusUpdateByDefault;
         settings.TimeZoneId = request.TimeZoneId;
+        settings.GuestCheckout = request.GuestCheckout;
 
         return await SaveAsync(settings, adminId, ct) ? (ToResponse(settings), null) : (null, SettingsErrors.EditConflict);
     }
@@ -171,5 +172,5 @@ public sealed class StoreSettingsService(AppDbContext db, ImageStorage images, T
     private static StoreSettingsResponse ToResponse(StoreSettings s) => new(
         s.SupportEmail, s.ShippingFlatRateCents, s.FreeShippingThresholdCents, s.ReturnPolicy,
         s.ReturnWindowDays, s.ReturnPolicyNote, s.LowStockThreshold, s.EmailCustomerOnStatusUpdateByDefault,
-        s.TimeZoneId, s.UpdatedAtUtc, s.RowVersion);
+        s.TimeZoneId, s.GuestCheckout, s.UpdatedAtUtc, s.RowVersion);
 }

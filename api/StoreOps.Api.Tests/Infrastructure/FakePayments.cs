@@ -20,6 +20,9 @@ public sealed class FakePayments : IPayments
     public ConcurrentBag<string> TaxRecordedForOrders { get; } = [];
     public ConcurrentBag<string> TaxReversedForOrders { get; } = [];
 
+    // The Stripe customer each PaymentIntent was made for: null for a guest's
+    public ConcurrentDictionary<string, string?> CustomerOfIntent { get; } = new();
+
     public int PaymentIntentsCreated => _intents.Count;
 
     public static int TaxOn(int amountCents) => (int)Math.Round(amountCents * TaxRate, MidpointRounding.AwayFromZero);
@@ -47,9 +50,10 @@ public sealed class FakePayments : IPayments
     public Task<TaxQuote> CalculateTaxAsync(IReadOnlyList<TaxLine> lines, int shippingCents, PostalAddress shipTo, CancellationToken ct) =>
         Task.FromResult(new TaxQuote($"taxcalc_test_{Guid.NewGuid():N}", TaxOn(lines.Sum(l => l.AmountCents) + shippingCents)));
 
-    public Task<PaymentIntentState> CreatePaymentIntentAsync(string customerId, int amountCents, int userId, CancellationToken ct)
+    public Task<PaymentIntentState> CreatePaymentIntentAsync(string? customerId, int amountCents, int? userId, CancellationToken ct)
     {
         var id = $"pi_test_{Guid.NewGuid():N}";
+        CustomerOfIntent[id] = customerId;
         return Task.FromResult(_intents[id] = new PaymentIntentState(
             id, $"{id}_secret_test", PaymentIntentState.RequiresPaymentMethod, amountCents, 0));
     }

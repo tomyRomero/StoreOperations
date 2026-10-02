@@ -10,8 +10,11 @@ public static class RateLimitPolicies
     // Sign-up, sign-in and password changes
     public const string Credentials = "Credentials";
 
-    // Public forms that send email: the newsletter sign-up and the contact form
+    // Public forms that send email: the newsletter sign-up, the contact form and finding an order
     public const string PublicForms = "PublicForms";
+
+    // Guest checkout: every start asks Stripe for a tax calculation and a payment
+    public const string GuestCheckout = "GuestCheckout";
 }
 
 // How many requests one address may make per window, set per policy under RateLimits:<policy name>
@@ -41,6 +44,7 @@ public static class EdgeSecurityExtensions
 
         AddLimits(services, configuration, RateLimitPolicies.Credentials, permitLimit: 10, TimeSpan.FromMinutes(1));
         AddLimits(services, configuration, RateLimitPolicies.PublicForms, permitLimit: 5, TimeSpan.FromMinutes(10));
+        AddLimits(services, configuration, RateLimitPolicies.GuestCheckout, permitLimit: 20, TimeSpan.FromMinutes(10));
 
         services.AddRateLimiter(options =>
         {
@@ -48,6 +52,7 @@ public static class EdgeSecurityExtensions
             // Sign-in attacks spread over many addresses are caught by the per-account lockout (LoginThrottle).
             options.AddPolicy(RateLimitPolicies.Credentials, context => PerAddress(context, RateLimitPolicies.Credentials));
             options.AddPolicy(RateLimitPolicies.PublicForms, context => PerAddress(context, RateLimitPolicies.PublicForms));
+            options.AddPolicy(RateLimitPolicies.GuestCheckout, context => PerAddress(context, RateLimitPolicies.GuestCheckout));
 
             options.OnRejected = async (rejected, _) =>
             {

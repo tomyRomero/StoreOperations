@@ -38,6 +38,7 @@ public enum EmailKind
     Newsletter,
     NewsletterWelcome,
     PasswordReset,
+    OrderLink,
 }
 
 public enum EmailStatus

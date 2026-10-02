@@ -8,6 +8,8 @@ public class CheckoutConfiguration : IEntityTypeConfiguration<Checkout>
 {
     public void Configure(EntityTypeBuilder<Checkout> checkout)
     {
+        checkout.Property(c => c.Email).HasMaxLength(256);
+        checkout.Property(c => c.GuestKey).HasMaxLength(48).IsFixedLength().IsUnicode(false);
         checkout.Property(c => c.StripePaymentIntentId).HasMaxLength(255).IsUnicode(false);
         checkout.Property(c => c.StripeTaxCalculationId).HasMaxLength(255).IsUnicode(false);
         checkout.ComplexProperty(c => c.ShipTo, a => a.MapAddress(prefix: "Ship"));
@@ -25,7 +27,9 @@ public class CheckoutConfiguration : IEntityTypeConfiguration<Checkout>
         // One open checkout per customer, and so one PaymentIntent: reloading checkout updates it
         checkout.HasIndex(c => c.UserId, "UX_Checkouts_UserId_Open")
             .IsUnique()
-            .HasFilter("[Status] = 'Open'");
+            .HasFilter("[Status] = 'Open' AND [UserId] IS NOT NULL");
+        // A guest's checkout, found from the key in their cookie
+        checkout.HasIndex(c => c.GuestKey).IsUnique().HasFilter("[GuestKey] IS NOT NULL").HasDatabaseName("UX_Checkouts_GuestKey");
 
         checkout.ToTable(t =>
         {
@@ -35,6 +39,9 @@ public class CheckoutConfiguration : IEntityTypeConfiguration<Checkout>
                 "AND [TotalCents] = [SubtotalCents] + [ShippingCents] + [TaxCents]");
             t.HasCheckConstraint("CK_Checkouts_Completed",
                 "([Status] = 'Open' AND [CompletedAtUtc] IS NULL) OR ([Status] = 'Completed' AND [CompletedAtUtc] IS NOT NULL)");
+            // A customer's or a guest's, never both
+            t.HasCheckConstraint("CK_Checkouts_Owner",
+                "([UserId] IS NOT NULL AND [GuestKey] IS NULL) OR ([UserId] IS NULL AND [GuestKey] IS NOT NULL)");
         });
     }
 }

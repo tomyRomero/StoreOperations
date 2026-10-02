@@ -21,12 +21,13 @@ public sealed record PaymentIntentState(string Id, string ClientSecret, string S
 // so they need neither a Stripe account nor the network.
 public interface IPayments
 {
-    // A Stripe customer is created at the first checkout, not at sign-up
+    // A Stripe customer is created at a customer's first checkout, not at sign-up. Guests have none.
     Task<string> CreateCustomerAsync(int userId, string email, CancellationToken ct);
 
     Task<TaxQuote> CalculateTaxAsync(IReadOnlyList<TaxLine> lines, int shippingCents, PostalAddress shipTo, CancellationToken ct);
 
-    Task<PaymentIntentState> CreatePaymentIntentAsync(string customerId, int amountCents, int userId, CancellationToken ct);
+    // customerId and userId are null for a guest
+    Task<PaymentIntentState> CreatePaymentIntentAsync(string? customerId, int amountCents, int? userId, CancellationToken ct);
 
     Task<PaymentIntentState> UpdatePaymentIntentAsync(string paymentIntentId, int amountCents, CancellationToken ct);
 

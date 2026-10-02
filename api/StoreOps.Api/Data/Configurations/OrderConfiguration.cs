@@ -9,6 +9,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     public void Configure(EntityTypeBuilder<Order> order)
     {
         order.Property(o => o.OrderNumber).HasMaxLength(8).IsFixedLength().IsUnicode(false);
+        order.Property(o => o.Email).HasMaxLength(256);
+        order.Property(o => o.AccessToken).HasMaxLength(48).IsFixedLength().IsUnicode(false);
         order.ComplexProperty(o => o.ShipTo, a => a.MapAddress(prefix: "Ship"));
         order.Property(o => o.StripePaymentIntentId).HasMaxLength(255).IsUnicode(false);
         order.Property(o => o.StripeTaxCalculationId).HasMaxLength(255).IsUnicode(false);
@@ -25,6 +27,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         order.HasMany(o => o.StatusHistory).WithOne().HasForeignKey(h => h.OrderId).OnDelete(DeleteBehavior.Cascade);
 
         order.HasIndex(o => o.OrderNumber).IsUnique().HasDatabaseName("UX_Orders_OrderNumber");
+        order.HasIndex(o => o.AccessToken).IsUnique().HasFilter("[AccessToken] IS NOT NULL").HasDatabaseName("UX_Orders_AccessToken");
         // Exactly one order per payment: the webhook's idempotency guarantee
         order.HasIndex(o => o.StripePaymentIntentId).IsUnique().HasDatabaseName("UX_Orders_StripePaymentIntentId");
         // A customer's orders, newest first
@@ -43,6 +46,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             t.HasCheckConstraint("CK_Orders_Amounts",
                 "[SubtotalCents] >= 0 AND [ShippingCents] >= 0 AND [TaxCents] >= 0 " +
                 "AND [TotalCents] = [SubtotalCents] + [ShippingCents] + [TaxCents]");
+            // Its customer can always reach it: through their account, or through the private link
+            t.HasCheckConstraint("CK_Orders_Reachable", "[UserId] IS NOT NULL OR [AccessToken] IS NOT NULL");
         });
     }
 }

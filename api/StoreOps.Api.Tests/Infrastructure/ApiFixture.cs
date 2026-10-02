@@ -132,6 +132,7 @@ public sealed class ApiFixture(SqlServerFixture sql, S3MockFixture s3) : Databas
             // lifted here. RateLimitTests checks the limiter with a low one.
             builder.UseSetting("RateLimits:Credentials:PermitLimit", "100000");
             builder.UseSetting("RateLimits:PublicForms:PermitLimit", "100000");
+            builder.UseSetting("RateLimits:GuestCheckout:PermitLimit", "100000");
             // Only warnings and errors, so a failing test's output isn't buried under SQL
             builder.ConfigureLogging(logging => logging.SetMinimumLevel(LogLevel.Warning));
         }

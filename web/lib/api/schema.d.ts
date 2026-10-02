@@ -332,6 +332,134 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/orders/{accessToken}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    accessToken: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["GuestOrderResponse"];
+                        "application/json": components["schemas"]["GuestOrderResponse"];
+                        "text/json": components["schemas"]["GuestOrderResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/find": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["FindOrderRequest"];
+                    "text/json": components["schemas"]["FindOrderRequest"];
+                    "application/*+json": components["schemas"]["FindOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/orders/{accessToken}/save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    accessToken: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SavedOrderResponse"];
+                        "application/json": components["schemas"]["SavedOrderResponse"];
+                        "text/json": components["schemas"]["SavedOrderResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/account/orders": {
         parameters: {
             query?: never;
@@ -1025,6 +1153,49 @@ export interface paths {
                     "application/json": components["schemas"]["StartCheckoutRequest"];
                     "text/json": components["schemas"]["StartCheckoutRequest"];
                     "application/*+json": components["schemas"]["StartCheckoutRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CheckoutResponse"];
+                        "application/json": components["schemas"]["CheckoutResponse"];
+                        "text/json": components["schemas"]["CheckoutResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/checkout/guest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["GuestCheckoutRequest"];
+                    "text/json": components["schemas"]["GuestCheckoutRequest"];
+                    "application/*+json": components["schemas"]["GuestCheckoutRequest"];
                 };
             };
             responses: {
@@ -2709,7 +2880,7 @@ export interface components {
             /** Format: date-time */
             placedAtUtc: string;
             /** Format: int32 */
-            customerId: number;
+            customerId: null | number;
             customerName: string;
             customerEmail: string;
             lines: components["schemas"]["OrderLineResponse"][];
@@ -2749,6 +2920,7 @@ export interface components {
             placedAtUtc: string;
             customerName: string;
             customerEmail: string;
+            isGuest: boolean;
             /** Format: int32 */
             itemCount: number;
             /** Format: int32 */
@@ -2889,6 +3061,7 @@ export interface components {
         CheckoutResultResponse: {
             result: components["schemas"]["PaymentResult"];
             orderNumber: null | string;
+            orderToken: null | string;
         };
         Comparison: {
             /** Format: int32 */
@@ -2944,8 +3117,22 @@ export interface components {
             dealPriceCents: number;
             description?: null | string;
         };
+        FindOrderRequest: {
+            email: string;
+            orderNumber: string;
+        };
         ForgotPasswordRequest: {
             email: string;
+        };
+        GuestCheckoutRequest: {
+            email: string;
+            address: components["schemas"]["AddressRequest"];
+            items: components["schemas"]["CartLineRequest"][];
+        };
+        GuestOrderResponse: {
+            email: string;
+            inAccount: boolean;
+            order: components["schemas"]["OrderResponse"];
         };
         /** @enum {unknown} */
         HomeSection: "categories" | "deals" | "new_in" | "newsletter";
@@ -3184,6 +3371,7 @@ export interface components {
             /** Format: int32 */
             lowStockThreshold: number;
             timeZoneId: string;
+            guestCheckout: boolean;
             storefront: components["schemas"]["StorefrontResponse"];
         };
         RegisterRequest: {
@@ -3207,6 +3395,9 @@ export interface components {
         };
         /** @enum {unknown} */
         ReturnPolicy: "no_returns" | "exchanges" | "refunds";
+        SavedOrderResponse: {
+            orderNumber: string;
+        };
         SetQuantityRequest: {
             /** Format: int32 */
             quantity: number;
@@ -3272,6 +3463,7 @@ export interface components {
             lowStockThreshold: number;
             emailCustomerOnStatusUpdateByDefault: boolean;
             timeZoneId: string;
+            guestCheckout: boolean;
             /** Format: date-time */
             updatedAtUtc: string;
             /** Format: byte */
@@ -3360,6 +3552,7 @@ export interface components {
             lowStockThreshold: number;
             emailCustomerOnStatusUpdateByDefault: boolean;
             timeZoneId: string;
+            guestCheckout: boolean;
             /** Format: byte */
             rowVersion: string;
         };

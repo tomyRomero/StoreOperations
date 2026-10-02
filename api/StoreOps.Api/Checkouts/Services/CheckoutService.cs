@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StoreOps.Api.Cart.Services;
@@ -10,12 +11,16 @@ using StoreOps.Api.Payments;
 
 namespace StoreOps.Api.Checkouts.Services;
 
-// Turns the customer's cart into a frozen quote tied to one Stripe PaymentIntent. Every amount comes
-// from the database and Stripe Tax, never from the browser. Starting checkout again (another address,
-// a changed cart, a reload) updates the same quote and the same PaymentIntent.
+// Turns a cart into a frozen quote tied to one Stripe PaymentIntent: a customer's saved cart, or the one
+// a guest built in their browser. Every amount comes from the database and Stripe Tax, never from the
+// browser. Starting checkout again (another address, a changed cart, a reload) updates the same quote and
+// the same PaymentIntent.
 public sealed class CheckoutService(
     AppDbContext db, CartService cart, IPayments payments, IOptions<StripeOptions> stripe)
 {
+    // A customer, or a guest known by the key in their cookie
+    private sealed record Buyer(int? UserId, string? GuestKey, string Email);
+
     public async Task<(CheckoutResponse? Checkout, ApiError? Error)> StartAsync(int userId, int addressId, CancellationToken ct)
     {
         if (!stripe.Value.IsConfigured)
@@ -44,40 +49,128 @@ public sealed class CheckoutService(
             })
             .ToListAsync(ct);
 
+        var open = await db.Checkouts
+            .Include(c => c.Lines)
+            .SingleOrDefaultAsync(c => c.UserId == userId && c.Status == CheckoutStatus.Open, ct);
+        var email = await db.Users.Where(u => u.Id == userId).Select(u => u.Email!).SingleAsync(ct);
+
+        return await QuoteAsync(new Buyer(userId, null, email), open, lines, address.Address, ct);
+    }
+
+    // Checkout without an account, when the store allows it. The cart and the address come from the
+    // browser; the prices don't. Returns the key that makes the checkout the guest's, for their cookie.
+    public async Task<(CheckoutResponse? Checkout, string? GuestKey, ApiError? Error)> StartAsGuestAsync(
+        GuestCheckoutRequest request, string? guestKey, CancellationToken ct)
+    {
+        if (!stripe.Value.IsConfigured)
+            return (null, null, PaymentErrors.NotConfigured);
+        if (!await db.StoreSettings.Select(s => s.GuestCheckout).SingleAsync(ct))
+            return (null, null, CheckoutErrors.GuestCheckoutOff);
+
+        // The same rules as a saved cart: in the store, in stock
+        var current = await cart.PreviewAsync(request.Items, ct);
+        if (current.Lines.Count == 0)
+            return (null, null, CheckoutErrors.CartEmpty);
+        if (!current.CanCheckout)
+            return (null, null, CheckoutErrors.CartNotReady);
+
+        var quantities = current.Lines.ToDictionary(l => l.ProductId, l => l.Quantity);
+        var ids = quantities.Keys.ToList();
+        var products = await db.Products
+            .Where(p => ids.Contains(p.Id))
+            .Select(p => new { p.Id, p.Name, p.PriceCents, p.ImageKey })
+            .ToListAsync(ct);
+        var lines = products
+            .Select(p => new CheckoutLine
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                UnitPriceCents = p.PriceCents,
+                ImageKey = p.ImageKey,
+                Quantity = quantities[p.Id],
+            })
+            .ToList();
+
+        var open = guestKey is null
+            ? null
+            : await db.Checkouts
+                .Include(c => c.Lines)
+                .SingleOrDefaultAsync(c => c.GuestKey == guestKey && c.Status == CheckoutStatus.Open, ct);
+        var key = open?.GuestKey ?? RandomNumberGenerator.GetHexString(48, lowercase: true);
+
+        var (quote, error) = await QuoteAsync(new Buyer(null, key, request.Email.Trim()), open, lines, request.Address.ToPostalAddress(), ct);
+        return (quote, error is null ? key : null, error);
+    }
+
+    // What the confirmation page shows after Stripe sends the buyer back. Null when the payment isn't one
+    // of this customer's or this guest's checkouts.
+    public async Task<CheckoutResultResponse?> ResultAsync(int? userId, string? guestKey, string paymentIntentId, CancellationToken ct)
+    {
+        var mine = await db.Checkouts.AnyAsync(c => c.StripePaymentIntentId == paymentIntentId
+            && ((userId != null && c.UserId == userId) || (guestKey != null && c.GuestKey == guestKey)), ct);
+        if (!mine)
+            return null;
+
+        var order = await db.Orders
+            .Where(o => o.StripePaymentIntentId == paymentIntentId)
+            .Select(o => new { o.OrderNumber, o.Status, o.UserId, o.AccessToken })
+            .SingleOrDefaultAsync(ct);
+        if (order is not null)
+            return new CheckoutResultResponse(
+                order.Status == OrderStatus.Refunded ? PaymentResult.Refunded : PaymentResult.Paid,
+                order.OrderNumber,
+                // A guest reaches the order through its private link
+                order.UserId is null ? order.AccessToken : null);
+
+        // No order yet: either the webhook hasn't arrived, or the payment didn't go through
+        var intent = await payments.GetPaymentIntentAsync(paymentIntentId, ct);
+        return new CheckoutResultResponse(
+            intent.Status is PaymentIntentState.RequiresPaymentMethod or PaymentIntentState.Canceled
+                ? PaymentResult.Failed
+                : PaymentResult.Processing,
+            null,
+            null);
+    }
+
+    // Prices the lines for the address and saves the quote: a new checkout with a new PaymentIntent, or
+    // the buyer's open one updated, keeping its PaymentIntent
+    private async Task<(CheckoutResponse? Checkout, ApiError? Error)> QuoteAsync(
+        Buyer buyer, Checkout? checkout, List<CheckoutLine> lines, PostalAddress shipTo, CancellationToken ct)
+    {
         var settings = await db.StoreSettings.AsNoTracking().SingleAsync(ct);
         var subtotal = lines.Sum(l => l.UnitPriceCents * l.Quantity);
         var shipping = settings.FreeShippingThresholdCents is { } threshold && subtotal >= threshold ? 0 : settings.ShippingFlatRateCents;
         var tax = await payments.CalculateTaxAsync(
             lines.Select(l => new TaxLine(l.ProductId, l.UnitPriceCents * l.Quantity, l.Quantity)).ToList(),
-            shipping, address.Address, ct);
+            shipping, shipTo, ct);
         var total = subtotal + shipping + tax.TaxCents;
-
-        var checkout = await db.Checkouts
-            .Include(c => c.Lines)
-            .SingleOrDefaultAsync(c => c.UserId == userId && c.Status == CheckoutStatus.Open, ct);
 
         PaymentIntentState intent;
         if (checkout is null)
         {
-            intent = await payments.CreatePaymentIntentAsync(await StripeCustomerIdAsync(userId, ct), total, userId, ct);
+            var customerId = buyer.UserId is { } userId ? await StripeCustomerIdAsync(userId, ct) : null;
+            intent = await payments.CreatePaymentIntentAsync(customerId, total, buyer.UserId, ct);
             checkout = new Checkout
             {
-                UserId = userId,
+                UserId = buyer.UserId,
+                GuestKey = buyer.GuestKey,
+                Email = buyer.Email,
                 StripePaymentIntentId = intent.Id,
                 StripeTaxCalculationId = tax.CalculationId,
-                ShipTo = address.Address,
+                ShipTo = shipTo,
             };
             db.Checkouts.Add(checkout);
         }
         else
         {
-            // Once the customer has paid (or is paying), the quote is final
+            // Once the buyer has paid (or is paying), the quote is final
             if (!(await payments.GetPaymentIntentAsync(checkout.StripePaymentIntentId, ct)).CanChangeAmount)
                 return (null, CheckoutErrors.PaymentInProgress);
 
             intent = await payments.UpdatePaymentIntentAsync(checkout.StripePaymentIntentId, total, ct);
             checkout.StripeTaxCalculationId = tax.CalculationId;
-            checkout.ShipTo = address.Address;
+            checkout.ShipTo = shipTo;
+            checkout.Email = buyer.Email;
         }
 
         checkout.SubtotalCents = subtotal;
@@ -102,30 +195,6 @@ public sealed class CheckoutService(
         }
 
         return (ToResponse(checkout, intent.ClientSecret), null);
-    }
-
-    // What the confirmation page shows after Stripe sends the customer back. Null when the payment
-    // isn't one of this customer's checkouts.
-    public async Task<CheckoutResultResponse?> ResultAsync(int userId, string paymentIntentId, CancellationToken ct)
-    {
-        if (!await db.Checkouts.AnyAsync(c => c.UserId == userId && c.StripePaymentIntentId == paymentIntentId, ct))
-            return null;
-
-        var order = await db.Orders
-            .Where(o => o.StripePaymentIntentId == paymentIntentId)
-            .Select(o => new { o.OrderNumber, o.Status })
-            .SingleOrDefaultAsync(ct);
-        if (order is not null)
-            return new CheckoutResultResponse(
-                order.Status == OrderStatus.Refunded ? PaymentResult.Refunded : PaymentResult.Paid, order.OrderNumber);
-
-        // No order yet: either the webhook hasn't arrived, or the payment didn't go through
-        var intent = await payments.GetPaymentIntentAsync(paymentIntentId, ct);
-        return new CheckoutResultResponse(
-            intent.Status is PaymentIntentState.RequiresPaymentMethod or PaymentIntentState.Canceled
-                ? PaymentResult.Failed
-                : PaymentResult.Processing,
-            null);
     }
 
     // The Stripe customer is created at the first checkout and kept on the account

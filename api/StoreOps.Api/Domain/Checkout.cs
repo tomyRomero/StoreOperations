@@ -5,8 +5,15 @@ namespace StoreOps.Api.Domain;
 public class Checkout : ICreatedAt, IUpdatedAt
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
-    public ApplicationUser User { get; set; } = null!;
+
+    // A customer's checkout, or a guest's, which is theirs through GuestKey: a random key kept in an
+    // HttpOnly cookie in their browser
+    public int? UserId { get; set; }
+    public ApplicationUser? User { get; set; }
+    public string? GuestKey { get; set; }
+
+    // Where the order's emails will go
+    public required string Email { get; set; }
 
     public CheckoutStatus Status { get; set; } = CheckoutStatus.Open;
     public required string StripePaymentIntentId { get; set; }
