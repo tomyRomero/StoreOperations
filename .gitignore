@@ -38,11 +38,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# private working notes stay local
-*.md
-!README.md
-/docs/audit/
-
 # .NET build output
 /api/**/bin/
 /api/**/obj/
