@@ -62,9 +62,9 @@
 
   /* Status colors, always with a label or an icon. Each solid fill has its own text color. Sale is the
      brand pink for prices and deals; anything wrong or irreversible is destructive red. */
-  --sale: light-dark(#c2185b, #ff7ab8);
+  --sale: light-dark(#c8102e, #ff6b6b);
   --sale-foreground: light-dark(#ffffff, #09090b);
-  --sale-subtle: light-dark(rgb(255 79 163 / 0.12), rgb(255 79 163 / 0.16));
+  --sale-subtle: light-dark(rgb(200 16 46 / 0.1), rgb(255 107 107 / 0.16));
   --success: light-dark(#047857, #6ee7b7);
   --success-foreground: light-dark(#ffffff, #09090b);
   --success-subtle: light-dark(rgb(52 211 153 / 0.14), rgb(52 211 153 / 0.14));

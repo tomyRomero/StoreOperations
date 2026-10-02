@@ -94,7 +94,7 @@ export default async function ProductPage(props: Props) {
                 {product.categoryName}
               </Link>
               {product.dealDescription && (
-                <span className="inline-flex h-[30px] items-center rounded-full border border-glow-pink/40 bg-linear-to-r from-glow-pink/25 to-glow-violet/25 px-3 font-mono text-xs font-medium text-sale">
+                <span className="inline-flex h-[30px] items-center rounded-full border border-sale/30 bg-sale-subtle px-3 font-mono text-xs font-medium text-sale">
                   {product.dealDescription}
                 </span>
               )}
@@ -104,13 +104,13 @@ export default async function ProductPage(props: Props) {
               <h1 className="text-[40px] font-semibold leading-none tracking-[-0.05em] lg:text-[64px]">{product.name}</h1>
               <p className="flex flex-wrap items-baseline gap-3">
                 {onSale && <span className="sr-only">Was {formatMoney(regular)}, now </span>}
-                <span className="text-[32px] font-semibold tabular-nums tracking-[-0.03em]">{formatMoney(product.priceCents)}</span>
+                <span className={cn("text-[32px] font-semibold tabular-nums tracking-[-0.03em]", onSale && "text-sale")}>{formatMoney(product.priceCents)}</span>
                 {onSale && (
                   <>
                     <s aria-hidden className="text-lg tabular-nums text-faint">
                       {formatMoney(regular)}
                     </s>
-                    <span className="inline-flex h-[26px] items-center self-center rounded-full bg-success-subtle px-2.5 font-mono text-xs font-medium text-success">
+                    <span className="inline-flex h-[26px] items-center self-center rounded-full bg-sale-subtle px-2.5 font-mono text-xs font-medium text-sale">
                       Save {formatMoney(regular - product.priceCents)}
                     </span>
                   </>

@@ -52,7 +52,7 @@ export function ProductCard({ product, lowStockThreshold, priority = false }: Pr
             {regular !== null && saving > 0 ? (
               <>
                 <span className="sr-only">Was {formatMoney(regular)}, now </span>
-                {formatMoney(product.priceCents)} <s aria-hidden className="text-faint">{formatMoney(regular)}</s>
+                <span className="font-semibold text-sale">{formatMoney(product.priceCents)}</span> <s aria-hidden className="text-faint">{formatMoney(regular)}</s>
               </>
             ) : (
               formatMoney(product.priceCents)

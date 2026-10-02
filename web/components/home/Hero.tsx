@@ -42,7 +42,7 @@ export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many
           href={`/products/${topDeal.id}`}
           className="inline-flex h-9 items-center gap-2.5 rounded-full border border-foreground/12 bg-foreground/5 py-0 pl-1.5 pr-3.5 text-sm text-ink-2 transition-colors hover:border-foreground/25 hover:text-foreground"
         >
-          <span className="inline-flex h-[26px] items-center rounded-full bg-linear-to-r from-[#d4247a] to-[#6d4df2] px-2.5 text-xs font-semibold text-white">Sale</span>
+          <span className="inline-flex h-[26px] items-center rounded-full bg-sale px-2.5 text-xs font-semibold text-sale-foreground">Sale</span>
           {topDeal.name} is {saving}% off
           <ArrowRight className="size-3.5" aria-hidden />
         </Link>
@@ -118,7 +118,7 @@ export function Hero({ products, topDeal, inStockCount, shippingLine, copy, many
                 </Link>
                 <p className="text-[13px] tabular-nums text-muted-foreground">
                   <span className="sr-only">Was {formatMoney(topDeal.compareAtPriceCents ?? 0)}, now </span>
-                  {formatMoney(topDeal.priceCents)} <s aria-hidden>{formatMoney(topDeal.compareAtPriceCents ?? 0)}</s>
+                  <span className="font-semibold text-sale">{formatMoney(topDeal.priceCents)}</span> <s aria-hidden>{formatMoney(topDeal.compareAtPriceCents ?? 0)}</s>
                 </p>
               </div>
               <QuickAddButton productId={topDeal.id} name={topDeal.name} className="h-8 w-auto rounded-[10px] px-3 text-[13px] font-semibold">

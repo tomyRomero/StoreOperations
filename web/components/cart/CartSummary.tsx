@@ -92,7 +92,7 @@ export function CartSummary({ cart, shipping, guestCheckout, variant = "drawer",
       {blocked}
       {checkout}
       {savings > 0 && (
-        <p className="rounded-xl bg-success-subtle px-3 py-2.5 text-center text-[13px] text-success">You&apos;re saving {formatMoney(savings)} on sale prices</p>
+        <p className="rounded-xl bg-sale-subtle px-3 py-2.5 text-center text-[13px] text-sale">You&apos;re saving {formatMoney(savings)} on sale prices</p>
       )}
       <p className="text-center text-[13px] text-muted-foreground">Payments are handled securely by Stripe</p>
     </div>

@@ -114,7 +114,7 @@ export function CartLineItem({ line, variant = "drawer", highlighted = false, on
 
       <div className="grid justify-items-end gap-0.5 font-mono tabular-nums">
         {regular !== null && <span className="sr-only">Was {formatMoney(regular * line.quantity)}, now </span>}
-        <span className={cn("font-medium", page ? "text-base sm:text-lg" : "text-[15px]")}>{formatMoney(line.lineTotalCents)}</span>
+        <span className={cn("font-medium", page ? "text-base sm:text-lg" : "text-[15px]", regular !== null && "text-sale")}>{formatMoney(line.lineTotalCents)}</span>
         {regular !== null && (
           <s aria-hidden className={cn("text-faint", page ? "text-[13px]" : "text-xs")}>
             {formatMoney(regular * line.quantity)}

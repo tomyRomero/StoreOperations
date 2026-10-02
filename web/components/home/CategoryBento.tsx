@@ -119,7 +119,7 @@ export function CategoryBento({ tiles, settings, deals }: Props) {
         {deals.length > 0 && (
           <Link
             href="/products?sale=1"
-            className="group flex justify-between gap-6 overflow-hidden rounded-[28px] border bg-[linear-gradient(135deg,color-mix(in_oklab,var(--glow-pink)_16%,transparent),color-mix(in_oklab,var(--glow-violet)_10%,transparent)_60%,var(--card))] px-9 py-8 transition-[border-color,translate] duration-300 hover:-translate-y-1 hover:border-foreground/22 max-md:hidden md:col-span-2"
+            className="group flex justify-between gap-6 overflow-hidden rounded-[28px] border bg-[linear-gradient(135deg,color-mix(in_oklab,var(--sale)_14%,transparent),color-mix(in_oklab,var(--sale)_4%,transparent)_60%,var(--card))] px-9 py-8 transition-[border-color,translate] duration-300 hover:-translate-y-1 hover:border-foreground/22 max-md:hidden md:col-span-2"
           >
             <span className="flex flex-col justify-between">
               <span className={cn(label, "text-sale")}>On sale now</span>
