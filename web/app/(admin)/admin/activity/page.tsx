@@ -11,9 +11,8 @@ import type { ActivityEntity } from "@/lib/api/types";
 import { describeActivity, groupByDay } from "@/lib/activity";
 import { listHref, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
 import { activityPageSize, getActivity, getAdminSettings } from "@/lib/data/admin-store";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatTimeAgo } from "@/lib/format";
 import type { SearchParams } from "@/lib/paging";
-import { calculateTimeAgo } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Activity" };
 
@@ -83,7 +82,7 @@ export default async function ActivityPage(props: { searchParams: Promise<Search
                         )}
                       </p>
                       <time dateTime={entry.occurredAtUtc} title={formatDate(entry.occurredAtUtc, settings.timeZoneId)} className="shrink-0 pt-1.5 text-sm text-muted-foreground">
-                        {calculateTimeAgo(now, entry.occurredAtUtc)}
+                        {formatTimeAgo(entry.occurredAtUtc, now)}
                       </time>
                     </li>
                   );

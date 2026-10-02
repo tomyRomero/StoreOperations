@@ -8,9 +8,9 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { Pagination } from "@/components/ui/pagination";
-import { firstValue, pageNumber } from "@/lib/admin-lists";
+import { pageNumber } from "@/lib/admin-lists";
 import { getAdminSettings, getSubscribers, subscribersPageSize } from "@/lib/data/admin-store";
-import type { SearchParams } from "@/lib/paging";
+import { firstValue, type SearchParams } from "@/lib/paging";
 
 export const metadata: Metadata = { title: "Newsletter" };
 

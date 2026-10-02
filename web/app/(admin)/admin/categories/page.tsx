@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorState } from "@/components/shared/ErrorState";
 import { RetryButton } from "@/components/shared/RetryButton";
 import { Button } from "@/components/ui/button";
-import { firstValue } from "@/lib/admin-lists";
+import { firstValue } from "@/lib/paging";
 import { getAdminCategories } from "@/lib/data/admin-catalog";
 import type { SearchParams } from "@/lib/paging";
 

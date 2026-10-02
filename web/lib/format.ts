@@ -8,6 +8,18 @@ export function formatDate(utc: string, timeZone: string): string {
   return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone }).format(new Date(utc));
 }
 
+const relative = new Intl.RelativeTimeFormat("en-US", { numeric: "always" });
+
+// "just now", "5 minutes ago", "3 hours ago", "2 days ago"
+export function formatTimeAgo(utc: string, now: Date): string {
+  const minutes = Math.floor((now.getTime() - new Date(utc).getTime()) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return relative.format(-minutes, "minute");
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return relative.format(-hours, "hour");
+  return relative.format(-Math.floor(hours / 24), "day");
+}
+
 // A date without a time (an estimated delivery day) is already a calendar day: shown as written
 export function formatDay(date: string): string {
   return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));

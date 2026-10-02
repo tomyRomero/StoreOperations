@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addressLines, addressOneLine, formatDate, formatDay, orderStatusLabel, returnsSummary, shippingSentence, shippingSummary } from "@/lib/format";
+import { addressLines, addressOneLine, formatDate, formatDay, formatTimeAgo, orderStatusLabel, returnsSummary, shippingSentence, shippingSummary } from "@/lib/format";
 import type { PostalAddress } from "@/lib/api/types";
 
 describe("formatDate", () => {
@@ -9,6 +9,22 @@ describe("formatDate", () => {
   it("uses the store's calendar, not the server's", () => {
     expect(formatDate(lateEvening, "America/New_York")).toBe("Sep 30, 2026");
     expect(formatDate(lateEvening, "UTC")).toBe("Oct 1, 2026");
+  });
+});
+
+describe("formatTimeAgo", () => {
+  const now = new Date("2026-10-02T12:00:00Z");
+
+  it.each([
+    ["2026-10-02T11:59:30Z", "just now"],
+    ["2026-10-02T11:59:00Z", "1 minute ago"],
+    ["2026-10-02T11:15:00Z", "45 minutes ago"],
+    ["2026-10-02T11:00:00Z", "1 hour ago"],
+    ["2026-10-01T13:00:00Z", "23 hours ago"],
+    ["2026-10-01T12:00:00Z", "1 day ago"],
+    ["2026-09-25T12:00:00Z", "7 days ago"],
+  ])("%s reads %j", (utc, text) => {
+    expect(formatTimeAgo(utc, now)).toBe(text);
   });
 });
 

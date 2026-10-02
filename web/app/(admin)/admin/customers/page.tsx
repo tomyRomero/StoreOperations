@@ -13,11 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AccountRole, AdminCustomerSort } from "@/lib/api/types";
-import { firstValue, listHref, nextSort, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
+import { listHref, nextSort, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
 import { adminCustomersPageSize, getAdminCustomers } from "@/lib/data/admin-customers";
 import { getAdminSettings } from "@/lib/data/admin-store";
 import { formatDate } from "@/lib/format";
-import type { SearchParams } from "@/lib/paging";
+import { firstValue, type SearchParams } from "@/lib/paging";
 
 export const metadata: Metadata = { title: "Customers" };
 

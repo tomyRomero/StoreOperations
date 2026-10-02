@@ -12,10 +12,10 @@ import { RetryButton } from "@/components/shared/RetryButton";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
 import type { AdminProductSort, ProductStatus, StockLevel } from "@/lib/api/types";
-import { firstValue, listHref, nextSort, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
+import { listHref, nextSort, oneOf, pageNumber, withParams } from "@/lib/admin-lists";
 import { adminProductsPageSize, getAdminCategories, getAdminProducts } from "@/lib/data/admin-catalog";
 import { getAdminSettings } from "@/lib/data/admin-store";
-import type { SearchParams } from "@/lib/paging";
+import { firstValue, type SearchParams } from "@/lib/paging";
 
 export const metadata: Metadata = { title: "Products" };
 

@@ -1,6 +1,6 @@
 import type { ProductSort } from "./api/types";
 import { parseDollars } from "./money";
-import type { SearchParams } from "./paging";
+import { firstValue, type SearchParams } from "./paging";
 
 // The product list's state, read from its address: /products?q=brush&category=2&sale=1&inStock=1&min=5&max=30&sort=price-asc&page=2
 // Links are shareable, back and forward work, and a refresh keeps the view.
@@ -26,27 +26,23 @@ export const sortOptions = {
 
 export type SortOption = keyof typeof sortOptions;
 
-function first(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 function all(value: string | string[] | undefined): string[] {
   return value === undefined ? [] : Array.isArray(value) ? value : [value];
 }
 
 // Anything that doesn't parse is ignored rather than refused, so an edited address still shows products
 export function parseProductFilters(params: SearchParams): ProductFilters {
-  const sort = first(params.sort);
-  const page = Number(first(params.page));
+  const sort = firstValue(params.sort);
+  const page = Number(firstValue(params.page));
   const ids = all(params.category).filter((id) => /^\d{1,9}$/.test(id)).map(Number);
 
   return {
-    q: (first(params.q) ?? "").trim().slice(0, 100),
+    q: (firstValue(params.q) ?? "").trim().slice(0, 100),
     categoryIds: [...new Set(ids)],
-    onSale: first(params.sale) === "1",
-    inStock: first(params.inStock) === "1",
-    minCents: parseDollars(first(params.min) ?? ""),
-    maxCents: parseDollars(first(params.max) ?? ""),
+    onSale: firstValue(params.sale) === "1",
+    inStock: firstValue(params.inStock) === "1",
+    minCents: parseDollars(firstValue(params.min) ?? ""),
+    maxCents: parseDollars(firstValue(params.max) ?? ""),
     sort: sort && sort in sortOptions ? (sort as SortOption) : "newest",
     page: Number.isInteger(page) && page > 1 ? page : 1,
   };
@@ -73,11 +69,11 @@ function dollars(cents: number): string {
 }
 
 // The same search and sort with every filter taken off, back on page 1
-// How many filters narrow the list (search and sort don't count)
 export function clearedFilters(filters: ProductFilters): ProductFilters {
   return { ...filters, categoryIds: [], onSale: false, inStock: false, minCents: null, maxCents: null, page: 1 };
 }
 
+// How many filters narrow the list (search and sort don't count)
 export function activeFilterCount(filters: ProductFilters): number {
   return filters.categoryIds.length + (filters.onSale ? 1 : 0) + (filters.inStock ? 1 : 0) + (filters.minCents !== null || filters.maxCents !== null ? 1 : 0);
 }

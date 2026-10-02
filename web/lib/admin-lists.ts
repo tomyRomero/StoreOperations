@@ -1,11 +1,7 @@
-import type { SearchParams } from "./paging";
+import { firstValue, type SearchParams } from "./paging";
 
 // Admin lists keep their search, filters, sort and page in the address, so every view can be reloaded,
 // shared and opened in a new tab. These read the address and build the next one.
-
-export function firstValue(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
-}
 
 // The value if it's one of the allowed ones
 export function oneOf<T extends string>(value: string | string[] | undefined, allowed: readonly T[]): T | undefined {

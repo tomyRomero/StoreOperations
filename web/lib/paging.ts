@@ -2,6 +2,11 @@
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
+// A parameter's value, or its first one when the address repeats it (?q=a&q=b)
+export function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 // The same address on another page, keeping every other parameter. Page 1 has no ?page at all, so
 // there's one address for the first page.
 export function pageHref(pathname: string, params: SearchParams, page: number): string {

@@ -1,11 +1,12 @@
 import type { Comparison } from "./api/types";
+import { firstValue } from "./paging";
 
 // The dashboard's periods, in days. 30 is the default and stays out of the address.
 export const dashboardRanges = [7, 30, 90] as const;
 export type DashboardRange = (typeof dashboardRanges)[number];
 
 export function parseRange(value: string | string[] | undefined): DashboardRange {
-  const days = Number(Array.isArray(value) ? value[0] : value);
+  const days = Number(firstValue(value));
   return dashboardRanges.find((range) => range === days) ?? 30;
 }
 
