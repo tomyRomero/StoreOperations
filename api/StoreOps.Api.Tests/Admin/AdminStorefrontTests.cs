@@ -122,16 +122,6 @@ public class AdminStorefrontTests(ApiFixture api) : IClassFixture<ApiFixture>, I
         Assert.Equal("First", (await GetAsync(admin)).GetProperty("storefront").GetProperty("tagline").GetString());
     }
 
-    [Fact]
-    public async Task Customers_cannot_change_the_storefront()
-    {
-        var customer = await api.CreateCustomerClientAsync();
-
-        var response = await customer.GetAsync("/api/admin/storefront", Ct);
-
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
     private static Task<JsonElement> GetAsync(HttpClient admin) => admin.GetFromJsonAsync<JsonElement>("/api/admin/storefront", Ct);
 
     // Publishes the form as it was opened, with the given fields changed. The form is flat; the response

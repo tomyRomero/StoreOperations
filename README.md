@@ -188,7 +188,7 @@ npx playwright install chromium   # once
 npm run e2e
 ```
 
-The API tests run each feature through HTTP against a real database: checkout and webhooks (with a fake Stripe), refunds, the email outbox, rate limits and lockouts, admin permissions, and a check that the web app's copy of the API contract is up to date. CI runs both suites on every push.
+The API tests run each feature through HTTP against a real database: checkout and webhooks (with a fake Stripe), refunds, the email outbox, rate limits and lockouts, the rules the database enforces on its own, a check over every route the app has that admin routes need an admin and only a short list is open to visitors, and a check that the web app's copy of the API contract is up to date. CI runs both suites on every push.
 
 ## Project layout
 

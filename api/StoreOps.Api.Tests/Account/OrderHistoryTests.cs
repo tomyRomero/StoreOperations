@@ -60,12 +60,4 @@ public class OrderHistoryTests(ApiFixture api) : IClassFixture<ApiFixture>, IAsy
         Assert.Equal(0, list.GetProperty("totalCount").GetInt32());
         Assert.Equal(HttpStatusCode.NotFound, (await stranger.GetAsync("/api/account/orders/SEED0001", Ct)).StatusCode);
     }
-
-    [Fact]
-    public async Task Order_history_needs_a_signed_in_customer()
-    {
-        var response = await api.Factory.CreateClient().GetAsync("/api/account/orders", Ct);
-
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-    }
 }
