@@ -3,6 +3,10 @@
   <PropertyGroup>
     <!-- Local secrets (the database connection string) live outside the repo: dotnet user-secrets -->
     <UserSecretsId>d2a59559-92e1-4e67-a336-f4703a14c0c8</UserSecretsId>
+    <!-- The .razor files are email templates rendered on the server. Without this, the SDK adds Blazor's
+         browser assets package, whose version follows the SDK's patch release and so breaks locked restore
+         whenever CI's SDK is newer than the one that wrote packages.lock.json. -->
+    <RequiresAspNetWebAssets>false</RequiresAspNetWebAssets>
   </PropertyGroup>
 
   <ItemGroup>
