@@ -1,0 +1,93 @@
+import type { Carrier, OrderStatus, PostalAddress, StoreSettings } from "./api/types";
+import { formatMoney, formatMoneyBrief } from "./money";
+
+// How the API's values read on a page. Money has its own file (money.ts).
+
+// "Sep 30, 2026" for a moment the API sends in UTC, on the store's calendar (its time zone from /api/store)
+export function formatDate(utc: string, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone }).format(new Date(utc));
+}
+
+const relative = new Intl.RelativeTimeFormat("en-US", { numeric: "always" });
+
+// "just now", "5 minutes ago", "3 hours ago", "2 days ago"
+export function formatTimeAgo(utc: string, now: Date): string {
+  const minutes = Math.floor((now.getTime() - new Date(utc).getTime()) / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return relative.format(-minutes, "minute");
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return relative.format(-hours, "hour");
+  return relative.format(-Math.floor(hours / 24), "day");
+}
+
+// A date without a time (an estimated delivery day) is already a calendar day: shown as written
+export function formatDay(date: string): string {
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
+}
+
+export function addressLines(address: PostalAddress): string[] {
+  const cityLine = [address.city, [address.state, address.postalCode].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  return [address.line1, address.line2, cityLine, address.countryCode].filter((line): line is string => Boolean(line));
+}
+
+// One line, for a dropdown or a summary: "Ada Lovelace, 1 Main St, Springfield, IL 62701"
+export function addressOneLine(address: PostalAddress): string {
+  return [address.recipientName, ...addressLines(address).slice(0, -1)].join(", ");
+}
+
+const statusLabels: Record<OrderStatus, string> = {
+  pending: "Preparing to ship",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
+};
+
+export function orderStatusLabel(status: OrderStatus): string {
+  return statusLabels[status];
+}
+
+const carrierNames: Record<Carrier, string> = {
+  ups: "UPS",
+  usps: "USPS",
+  fedex: "FedEx",
+  dhl: "DHL",
+  other: "Carrier",
+};
+
+export function carrierName(carrier: Carrier): string {
+  return carrierNames[carrier];
+}
+
+// The store's policies in one line each, from Store settings, so no page promises more than checkout
+// and the returns desk deliver
+
+export function shippingSummary(settings: Pick<StoreSettings, "shippingFlatRateCents" | "freeShippingThresholdCents">): string {
+  if (settings.freeShippingThresholdCents !== null) {
+    return settings.shippingFlatRateCents === 0
+      ? "Free shipping on every order"
+      : `Free shipping on orders over ${formatMoney(settings.freeShippingThresholdCents)}`;
+  }
+  return settings.shippingFlatRateCents === 0 ? "Free shipping on every order" : `${formatMoney(settings.shippingFlatRateCents)} flat-rate shipping`;
+}
+
+// The same promise as one sentence, for the home page: "Flat $10 shipping, and free over $75."
+export function shippingSentence(settings: Pick<StoreSettings, "shippingFlatRateCents" | "freeShippingThresholdCents">): string {
+  const flat = settings.shippingFlatRateCents;
+  const free = settings.freeShippingThresholdCents;
+  if (flat === 0 || free === 0) return "Free shipping on every order.";
+  if (free === null) return `Flat ${formatMoneyBrief(flat)} shipping on every order.`;
+  return `Flat ${formatMoneyBrief(flat)} shipping, and free over ${formatMoneyBrief(free)}.`;
+}
+
+export function returnsSummary(settings: Pick<StoreSettings, "returnPolicy" | "returnWindowDays">): string {
+  const days = settings.returnWindowDays;
+  switch (settings.returnPolicy) {
+    case "exchanges":
+      return days ? `Exchanges within ${days} days` : "Exchanges accepted";
+    case "refunds":
+      return days ? `Refunds within ${days} days` : "Refunds accepted";
+    default:
+      return "All sales are final";
+  }
+}

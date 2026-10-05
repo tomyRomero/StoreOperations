@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Local secrets (the database connection string) live outside the repo: dotnet user-secrets -->
+    <UserSecretsId>d2a59559-92e1-4e67-a336-f4703a14c0c8</UserSecretsId>
+    <!-- The .razor files are email templates rendered on the server. Without this, the SDK adds Blazor's
+         browser assets package, whose version follows the SDK's patch release and so breaks locked restore
+         whenever CI's SDK is newer than the one that wrote packages.lock.json. -->
+    <RequiresAspNetWebAssets>false</RequiresAspNetWebAssets>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+    <PackageReference Include="Stripe.net" />
+    <!-- Migrations tooling; not shipped with the app -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Demo photos for the local seed: next to the app when it runs, never in a published build -->
+    <None Update="Data/SeedImages/**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+</Project>

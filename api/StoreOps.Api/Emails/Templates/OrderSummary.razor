@@ -1,0 +1,33 @@
+@* What was ordered, where it goes, and what it cost *@
+<div style="margin-top:20px;">
+    <div style="font-weight:bold;margin-bottom:8px;">Order @Model.OrderNumber</div>
+    <table role="presentation" style="width:100%;border-collapse:collapse;">
+        @foreach (var line in Model.Lines)
+        {
+            <tr>
+                <td style="padding:8px 0;border-bottom:1px solid #eeeeee;">@line.Quantity × @line.Name</td>
+                <td style="padding:8px 0;border-bottom:1px solid #eeeeee;text-align:right;">@Money.Format(line.LineTotalCents)</td>
+            </tr>
+        }
+        <tr><td style="padding:6px 0;color:#555555;">Subtotal</td><td style="text-align:right;">@Money.Format(Model.SubtotalCents)</td></tr>
+        <tr><td style="padding:6px 0;color:#555555;">Shipping</td><td style="text-align:right;">@Money.Format(Model.ShippingCents)</td></tr>
+        <tr><td style="padding:6px 0;color:#555555;">Tax</td><td style="text-align:right;">@Money.Format(Model.TaxCents)</td></tr>
+        <tr><td style="padding:10px 0;font-weight:bold;">Total</td><td style="text-align:right;font-weight:bold;">@Money.Format(Model.TotalCents)</td></tr>
+    </table>
+
+    <div style="font-weight:bold;margin:20px 0 6px;">Shipping to</div>
+    <div style="color:#444444;line-height:1.5;">
+        @Model.ShipTo.RecipientName<br />
+        @Model.ShipTo.Line1<br />
+        @if (Model.ShipTo.Line2 is not null)
+        {
+            @Model.ShipTo.Line2<br />
+        }
+        @Model.ShipTo.City@(Model.ShipTo.State is null ? "" : $", {Model.ShipTo.State}") @Model.ShipTo.PostalCode<br />
+        @Model.ShipTo.CountryCode
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public OrderEmailModel Model { get; set; } = null!;
+}

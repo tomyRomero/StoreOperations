@@ -1,0 +1,433 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+  Night Studio design tokens. Every color is written once as light-dark(light, dark), so the whole site
+  follows the color-scheme set on <html> below: the visitor's device setting, until they pick light or
+  dark with the switch in the header, which the root layout then reads from the "theme" cookie.
+  Components use the semantic names (bg-card, text-muted-foreground, border-input), never raw hex.
+  Contrast, light / dark, on the page background: foreground 18.3 / 18.2:1, muted-foreground 6.8 / 7.8:1,
+  faint 4.9 / 5.9:1, every status color at least 5:1, input borders and the focus ring at least 3:1.
+*/
+:root {
+  color-scheme: light dark;
+
+  --background: light-dark(#f6f6f7, #09090b);
+  --foreground: light-dark(#0c0c12, #f4f4f5);
+  --card: light-dark(#ffffff, #111114);
+  --card-foreground: var(--foreground);
+  --popover: light-dark(#ffffff, #131316);
+  --popover-foreground: var(--foreground);
+  --muted: light-dark(#f2f2f4, #18181c);
+  --muted-foreground: light-dark(#55555e, #a1a1aa);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+
+  /* Hairlines between areas are decorative; a form field's border has to be seen, so it is 3:1 */
+  --border: light-dark(rgb(12 12 18 / 0.08), rgb(255 255 255 / 0.08));
+  --input: light-dark(#8a8a93, #6b6b74);
+
+  /* Primary actions are ink on the page: near-black in light, near-white in dark */
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+
+  /* The text steps between foreground and muted: labels, then long-form reading text. Faint is the
+     quietest text that still passes AA, for timestamps and hints; placeholders use muted-foreground. */
+  --ink-2: light-dark(#3f3f46, #d4d4d8);
+  --ink-3: light-dark(#4b4b53, #b4b4bc);
+  --faint: light-dark(#6b6b74, #8b8b94);
+
+  /* Surfaces beyond the card: sunk wells, a third step for chips and tracks, the row under the pointer */
+  --surface-sunk: light-dark(#fafafb, #0e0e11);
+  --surface-3: light-dark(#ebebee, #1e1e24);
+  --surface-hover: light-dark(#fbfbfc, #141418);
+  --chip: light-dark(#e4e4e7, #3f3f46);
+  --scrim: light-dark(rgb(24 24 32 / 0.3), rgb(5 5 7 / 0.62));
+
+  /* The stage a product stands on: a soft gradient the cut-out photo floats over */
+  --stage-end: light-dark(#ffffff, #0e0e12);
+  --stage-blue: light-dark(#e6edff, #131a33);
+  --stage-violet: light-dark(#ede8ff, #1d1733);
+
+  /* Cut-outs cast a real shadow, much lighter on a light page */
+  --shadow: light-dark(rgb(0 0 0 / 0.23), rgb(0 0 0 / 0.6));
+  --shadow-strong: light-dark(rgb(0 0 0 / 0.27), rgb(0 0 0 / 0.7));
+
+  /* The one interface accent: links, selected states, the chart line. Focus is the brand violet. */
+  --accent: light-dark(#5b3fd9, #c9bcff);
+  --accent-foreground: light-dark(#ffffff, #09090b);
+  --accent-subtle: light-dark(rgb(139 108 255 / 0.12), rgb(139 108 255 / 0.18));
+  --accent-ink: light-dark(#4c33c2, #d9d0ff);
+  --ring: #8b6cff;
+
+  /* Status colors, always with a label or an icon. Each solid fill has its own text color. Sale is the
+     brand pink for prices and deals; anything wrong or irreversible is destructive red. */
+  --sale: light-dark(#c8102e, #ff6b6b);
+  --sale-foreground: light-dark(#ffffff, #09090b);
+  --sale-subtle: light-dark(rgb(200 16 46 / 0.1), rgb(255 107 107 / 0.16));
+  --success: light-dark(#047857, #6ee7b7);
+  --success-foreground: light-dark(#ffffff, #09090b);
+  --success-subtle: light-dark(rgb(52 211 153 / 0.14), rgb(52 211 153 / 0.14));
+  --warning: light-dark(#8a5a00, #fde7a9);
+  --warning-subtle: light-dark(rgb(255 197 61 / 0.18), rgb(255 197 61 / 0.14));
+  --info: light-dark(#1d4ed8, #bfd8ff);
+  --info-subtle: light-dark(rgb(61 139 255 / 0.12), rgb(61 139 255 / 0.16));
+  --destructive: light-dark(#b91c1c, #fca5a5);
+  --destructive-foreground: light-dark(#ffffff, #09090b);
+  --destructive-subtle: light-dark(rgb(220 38 38 / 0.1), rgb(248 113 113 / 0.14));
+
+  /* The brand glows behind products, the logo and the hero. Decorative only, never text or meaning,
+     and the same in both modes. They burn a little softer on a light page. */
+  --glow-pink: #ff4fa3;
+  --glow-violet: #8b6cff;
+  --glow-blue: #3d8bff;
+  --glow-green: #34d399;
+  --glow-amber: #ffc53d;
+  --glow-orange: #ff8a3d;
+  --glow-strength: 0.7;
+  @variant dark {
+    --glow-strength: 1;
+  }
+  --brand-text-1: light-dark(#d4247a, var(--glow-pink));
+  --brand-text-2: light-dark(#6d4df2, var(--glow-violet));
+  --brand-text-3: light-dark(#2563eb, var(--glow-blue));
+
+  /* Form fields: roomy on the storefront (52px tall, 14px corners, 15px text from tablets up; phones get
+     16px so iOS doesn't zoom in on focus). The console sets its own, compact ones below. */
+  --field-height: 3.25rem;
+  --field-radius: 14px;
+  --field-text: 0.9375rem;
+
+  /* Buttons are pills on the storefront; the console keeps crisp 6px corners */
+  --button-radius: 9999px;
+
+  /* Headings' face; a theme can set its own */
+  --display-face: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+  Atelier: warm paper and ink, serif headlines, no glows. Only the tokens change; the pages are the same.
+  The console keeps its own look whatever the store's theme. Contrast, light / dark, on the page:
+  foreground 14.0 / 13.7:1, muted-foreground 5.9 / 6.4:1, faint 4.7 / 4.8:1, accent 5.0 / 9.1:1,
+  input borders 3.3 / 3.7:1.
+*/
+:root[data-store-theme="atelier"]:not(:has([data-console])) {
+  --background: light-dark(#f4f0e8, #15130f);
+  --foreground: light-dark(#1c1a16, #f1ebe1);
+  --card: light-dark(#fbf9f5, #1c1a16);
+  --popover: light-dark(#fbf9f5, #1f1c18);
+  --muted: light-dark(#ece6db, #23201b);
+  --muted-foreground: light-dark(#5c564c, #aaa294);
+  --border: light-dark(rgb(28 26 22 / 0.1), rgb(255 248 235 / 0.08));
+  --input: light-dark(#8b8478, #7a7364);
+  --ink-2: light-dark(#3d3932, #dcd5c8);
+  --ink-3: light-dark(#4a453d, #bdb5a6);
+  --faint: light-dark(#6b655a, #938b7c);
+  --surface-sunk: light-dark(#f8f5ef, #18160f);
+  --surface-3: light-dark(#e6dfd2, #2a2620);
+  --surface-hover: light-dark(#f7f3ec, #1f1c17);
+  --chip: light-dark(#ddd5c6, #3d382f);
+  --stage-end: light-dark(#fbf9f5, #1c1a16);
+  --stage-blue: light-dark(#ece5d8, #22201b);
+  --stage-violet: light-dark(#efe4d6, #26211b);
+  --shadow: light-dark(rgb(60 40 20 / 0.18), rgb(0 0 0 / 0.55));
+  --shadow-strong: light-dark(rgb(60 40 20 / 0.24), rgb(0 0 0 / 0.65));
+  --accent: light-dark(#a1452b, #f0b49e);
+  --accent-subtle: light-dark(rgb(161 69 43 / 0.1), rgb(240 180 158 / 0.14));
+  --accent-ink: light-dark(#742c18, #f7cbb9);
+  --ring: light-dark(#a1452b, #f0b49e);
+  --glow-pink: #c8613f;
+  --glow-violet: #a1452b;
+  --glow-blue: #5e7a5c;
+  --glow-strength: 0;
+  --field-radius: 8px;
+  --button-radius: 6px;
+  --display-face: var(--font-serif), Georgia, "Times New Roman", serif;
+}
+
+/* Instrument Serif has one weight: headlines are set in it at their regular weight, with the highlighted
+   words in italic, instead of a faked bold. Outside the layers, so it wins over the pages' utilities. */
+:root[data-store-theme="atelier"]:not(:has([data-console])) :is(h1, h2, h3) {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Highlighted words are the accent in italic, not a sweep of color */
+:root[data-store-theme="atelier"]:not(:has([data-console])) .text-brand-gradient {
+  background-image: none;
+  color: var(--accent);
+  font-style: italic;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* The admin console: the StoreOps cobalt instead of the storefront's violet, light or dark like the
+   storefront (the same switch and cookie). Its accent text passes 4.5:1 on cards in both modes. */
+:root:has([data-console]) {
+  --accent: light-dark(#2f4be0, #8fa4ff);
+  --accent-subtle: light-dark(#eef1ff, rgb(47 91 255 / 0.18));
+  --accent-ink: light-dark(#2440b8, #b4c2ff);
+  --ring: light-dark(#2f5bff, #7b93ff);
+  --field-height: 2.5rem;
+  --field-radius: 4px;
+  --field-text: 0.875rem;
+  --button-radius: 6px;
+}
+
+/* For the rare style a token can't express, such as which icon the theme switch shows. Matches when
+   the page is dark, by the visitor's choice or by following a dark device. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-faint: var(--faint);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-surface-3: var(--surface-3);
+  --color-surface-hover: var(--surface-hover);
+  --color-chip: var(--chip);
+  --color-scrim: var(--scrim);
+  --color-stage-end: var(--stage-end);
+  --color-stage-blue: var(--stage-blue);
+  --color-stage-violet: var(--stage-violet);
+  --color-shadow: var(--shadow);
+  --color-shadow-strong: var(--shadow-strong);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-ink: var(--accent-ink);
+  --color-ring: var(--ring);
+  --color-sale: var(--sale);
+  --color-sale-foreground: var(--sale-foreground);
+  --color-sale-subtle: var(--sale-subtle);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-glow-pink: var(--glow-pink);
+  --color-glow-violet: var(--glow-violet);
+  --color-glow-blue: var(--glow-blue);
+  --color-glow-green: var(--glow-green);
+  --color-glow-amber: var(--glow-amber);
+  --color-glow-orange: var(--glow-orange);
+
+  /* Set by next/font in app/fonts.ts. Headings follow --display-face, which a theme sets: Geist in
+     Night Studio, Instrument Serif in Atelier. */
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--display-face);
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@theme {
+  /* Type scale: Geist throughout, headings at 600 with tight tracking that tightens as the size grows */
+  --text-display: clamp(2.75rem, 6vw, 5rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.055em;
+  --text-display--font-weight: 600;
+  --text-h1: clamp(2.25rem, 4vw, 3rem);
+  --text-h1--line-height: 1;
+  --text-h1--letter-spacing: -0.05em;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.875rem;
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.035em;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.025em;
+  --text-h3--font-weight: 600;
+  --text-h4: 1.125rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+
+  /* Crisp shapes for the admin console: 4px for badges, inputs and chips, 6px for buttons and cards, 10px
+     for drawers and dialogs. The storefront is softer: 14px fields, 24px cards, 32px product stages,
+     and pill buttons. Fields and buttons follow --field-radius and --button-radius, so each side sets its own. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-field: var(--field-radius);
+  --radius-button: var(--button-radius);
+  --radius-card: 24px;
+  --radius-stage: 32px;
+
+  /* Quick motion: 120ms hover, 200ms menus and toasts, 320ms drawers */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* The hero's product drifts up and down; the in-stock dot sends out a ring */
+  --animate-float: float 8s ease-in-out infinite;
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -14px;
+    }
+  }
+  --animate-ring: ring 1.8s ease-out infinite;
+  @keyframes ring {
+    from {
+      box-shadow: 0 0 0 0 rgb(52 211 153 / 0.55);
+    }
+    to {
+      box-shadow: 0 0 0 10px rgb(52 211 153 / 0);
+    }
+  }
+
+  /* A just-added cart line glows in the accent's tint, then settles */
+  --animate-highlight: highlight 2.4s var(--ease-standard);
+  @keyframes highlight {
+    from {
+      background-color: var(--color-accent-subtle);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+}
+
+/* The brand's sweep through every glow: the logo mark, avatars, the hero's light */
+@utility bg-brand-sweep {
+  background-image: conic-gradient(
+    from 200deg,
+    var(--glow-pink),
+    var(--glow-violet),
+    var(--glow-blue),
+    var(--glow-green),
+    var(--glow-amber),
+    var(--glow-pink)
+  );
+}
+
+/* Display type swept through the glows. Light mode takes deeper stops (--brand-text-*) so even the pink
+   passes 4.4:1. */
+@utility text-brand-gradient {
+  background-image: linear-gradient(90deg, var(--brand-text-1) 0%, var(--brand-text-2) 45%, var(--brand-text-3) 100%);
+  background-clip: text;
+  color: transparent;
+}
+
+/* A faint 64px studio grid that fades out from the top middle, behind the home page's opening */
+@utility bg-studio-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(60% 55% at 50% 20%, #000, transparent 75%);
+}
+
+/* Under a main action: a faint halo and the violet studio glow */
+@utility shadow-glow {
+  box-shadow:
+    0 0 0 6px color-mix(in oklab, var(--foreground) 5%, transparent),
+    0 20px 50px color-mix(in oklab, var(--glow-violet) 30%, transparent);
+}
+
+/* The page width: 1280px, centered, with a 16 / 24 / 32px gutter */
+@utility container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 64rem) {
+    padding-inline: 2rem;
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  /* Anything scrolled to or focused stops below the sticky header instead of behind it */
+  html {
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* One visible focus ring for everything focusable: 2px violet with a 2px gap */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-accent-ink);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Nothing moves for people who ask their system for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

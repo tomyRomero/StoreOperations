@@ -1,0 +1,141 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.EntityFrameworkCore;
+using StoreOps.Api.Account.Services;
+using StoreOps.Api.ActivityFeed.Services;
+using StoreOps.Api.Auth;
+using StoreOps.Api.Cart.Services;
+using StoreOps.Api.Catalog.Services;
+using StoreOps.Api.Checkouts.Services;
+using StoreOps.Api.Common;
+using StoreOps.Api.Contact.Services;
+using StoreOps.Api.Customers.Services;
+using StoreOps.Api.Dashboard.Services;
+using StoreOps.Api.Data;
+using StoreOps.Api.Emails;
+using StoreOps.Api.Images;
+using StoreOps.Api.Newsletter.Services;
+using StoreOps.Api.Orders.Services;
+using StoreOps.Api.Payments;
+using StoreOps.Api.Settings.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Every error, expected or not, is returned as RFC 9457 problem details (application/problem+json)
+builder.Services.AddProblemDetails();
+
+// The contract the web app generates its TypeScript types from. The same wherever it's served (no
+// server address in it), so the copy committed in web/lib/api can be compared with it in a test.
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
+{
+    document.Servers?.Clear();
+    return Task.CompletedTask;
+}));
+
+// Enums travel as snake_case strings ("no_returns") and numbers only as JSON numbers. Set for the
+// controllers and for the OpenAPI document, which reads its own copy.
+static void UseStoreJson(JsonSerializerOptions json)
+{
+    json.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower));
+    json.NumberHandling = JsonNumberHandling.Strict;
+}
+builder.Services.ConfigureHttpJsonOptions(options => UseStoreJson(options.SerializerOptions));
+
+builder.Services
+    .AddControllers(options =>
+    {
+        // Validation errors are keyed by the JSON names the client sent ("email", not "Email")
+        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+        // Query-string enums by their JSON names ("store_settings"), the ones the contract publishes
+        options.ModelBinderProviders.Insert(0, new QueryEnumBinderProvider());
+    })
+    .AddJsonOptions(options =>
+    {
+        UseStoreJson(options.JsonSerializerOptions);
+        // A body that doesn't fit the request (a missing required field, text where a number goes) is
+        // reported as "The input was not valid." under its JSON path, without the serializer's message,
+        // which names the API's own types
+        options.AllowInputFormatterExceptionMessages = false;
+    });
+
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<TimestampInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((services, options) => options
+    .UseSqlServer(
+        services.GetRequiredService<IConfiguration>().GetConnectionString("Database")
+            ?? throw new InvalidOperationException(
+                "ConnectionStrings:Database is not set. Locally it comes from dotnet user-secrets; " +
+                "in production from the ConnectionStrings__Database environment variable."),
+        // Retries brief connection drops. Explicit transactions must then run inside
+        // Database.CreateExecutionStrategy(), which EF enforces.
+        sql => sql.EnableRetryOnFailure())
+    .AddInterceptors(services.GetRequiredService<TimestampInterceptor>()));
+
+builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
+
+builder.Services.AddImageStorage();
+builder.Services.AddPayments();
+builder.Services.AddEmails();
+builder.Services.AddScoped<CatalogService>();
+builder.Services.AddScoped<CategoryAdminService>();
+builder.Services.AddScoped<ProductAdminService>();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<AddressService>();
+builder.Services.AddScoped<OrderHistoryService>();
+builder.Services.AddScoped<AdminOrderService>();
+builder.Services.AddScoped<AdminCustomerService>();
+builder.Services.AddScoped<ActivityFeedService>();
+builder.Services.AddScoped<StoreSettingsService>();
+builder.Services.AddScoped<NewsletterService>();
+builder.Services.AddScoped<ContactService>();
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<CheckoutService>();
+builder.Services.AddScoped<OrderPlacement>();
+
+builder.Services.AddEdgeSecurity(builder.Configuration);
+builder.Services.AddStoreOpsAuth(builder.Configuration, builder.Environment);
+
+var app = builder.Build();
+
+// dotnet run --project StoreOps.Api -- seed: rebuild the local database with demo data, then exit
+if (args is ["seed"])
+{
+    if (!app.Environment.IsDevelopment())
+        throw new InvalidOperationException("Refusing to seed outside the Development environment.");
+
+    await DevSeeder.RunAsync(app.Services);
+    Console.WriteLine($"Seeded the demo store. Sign in as admin@example.test or customer@example.test, password {DevSeeder.DemoPassword}");
+    return;
+}
+
+// dotnet run --project StoreOps.Api -- make-admin someone@example.com (or remove-admin): change who is an admin, then exit
+if (args is [(AdminCommands.MakeAdmin or AdminCommands.RemoveAdmin) and var command, var email])
+{
+    Environment.ExitCode = await AdminCommands.RunAsync(app.Services, command, email, Console.Out);
+    return;
+}
+
+// First, so everything after it sees the browser's address instead of the Next server's
+app.UseForwardedHeaders();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
+// Before authentication, so a refused request costs as little as possible
+app.UseRateLimiter();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    // The API contract. The web app generates its TypeScript types from it.
+    app.MapOpenApi().AllowAnonymous();
+}
+
+app.MapHealthChecks("/health").AllowAnonymous();
+
+app.Run();

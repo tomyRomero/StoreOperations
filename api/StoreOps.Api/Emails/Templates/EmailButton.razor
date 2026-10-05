@@ -1,0 +1,8 @@
+<div style="text-align:center;margin-top:24px;">
+    <a href="@Href" style="display:inline-block;padding:12px 22px;background:#222222;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">@Text</a>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Href { get; set; } = "";
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+}

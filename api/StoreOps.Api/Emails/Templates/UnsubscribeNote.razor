@@ -1,0 +1,10 @@
+@* Every newsletter email says why it arrived and how to stop it *@
+<div style="margin-top:24px;font-size:13px;color:#666666;text-align:center;">
+    You're getting this because you signed up for @StoreName news.
+    <a href="@Url" style="color:#222222;">Unsubscribe</a>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string StoreName { get; set; } = "";
+    [Parameter, EditorRequired] public string Url { get; set; } = "";
+}

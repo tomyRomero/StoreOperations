@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel an in-progress run when a newer commit arrives on the same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: "Web: lint, typecheck, test and build"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: web/.nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      # The API's types must match the committed contract (the API job checks the contract itself)
+      - run: npm run api:types -- --offline && git diff --exit-code lib/api/schema.d.ts
+
+      - run: npm run typecheck
+      - run: npm test
+
+      # No secrets are needed: settings are validated when the server first uses them, not at build time
+      - run: npm run build
+
+  api:
+    name: "API: build and test"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the newest .NET 10 SDK allowed by api/global.json and caches NuGet packages
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: api/global.json
+          cache: true
+          cache-dependency-path: api/**/packages.lock.json
+
+      # --locked-mode fails if packages.lock.json is out of date, so CI builds exactly what was committed
+      - run: dotnet restore --locked-mode
+
+      # The layout .editorconfig and the .NET formatter agree on
+      - run: dotnet format --no-restore --verify-no-changes
+
+      - run: dotnet build --no-restore --configuration Release
+      - run: dotnet test --no-build --configuration Release
